@@ -45,6 +45,24 @@ linear-gradient(225deg,transparent 50%,#241f20 51%) right top/17px 18px no-repea
 .reserveSheet .reserve-grid a{padding:11px 5px!important;font-size:12px!important}
 <style>
 .reserveSheet{display:block!important;visibility:visible!important;opacity:1!important;transform:translateX(-50%)!important;bottom:66px!important;z-index:60!important}
+</style>
+<style>
+/* Princess reservation / price simulator */
+.himePrice{width:100%;border-collapse:collapse;font-size:13px;margin:4px 0 12px}
+.himePrice th,.himePrice td{padding:8px 6px;border-bottom:1px solid #f0e5e2;text-align:right}
+.himePrice th:first-child,.himePrice td:first-child{text-align:left}
+.fixedFee{background:#fff5f3;border:1px solid #ead9d6;border-radius:9px;padding:10px 12px;font-size:12px;line-height:1.8;margin:10px 0}
+.simBox{background:#fff8f6;border:1px solid #e5cfcb;border-radius:11px;padding:12px;margin-top:12px}
+.simBox label{display:block;font-size:12px;font-weight:700;margin:9px 0 5px}
+.simBox select{width:100%;min-height:44px;border:1px solid #d9c3bf;border-radius:8px;background:#fff;padding:0 10px;font-size:14px}
+.simResult{margin-top:12px;background:#fff;border-radius:9px;padding:11px;font-size:12px;line-height:1.9}
+.simResult .total{display:flex;justify-content:space-between;border-top:1px solid #ead9d6;margin-top:6px;padding-top:7px;font-size:17px;font-weight:800;color:#8d2034}
+.himeNote{font-size:11px;color:#8e7470;line-height:1.6}
+.template{white-space:pre-wrap;background:#fffaf8;border:1px dashed #d9b9b9;border-radius:9px;padding:12px;font-size:13px;line-height:1.9;margin:10px 0}
+.copyBtn{width:100%;min-height:46px;border:0;border-radius:9px;background:#86192c;color:#fff;font-weight:800;font-size:14px}
+.himeSend{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:9px}
+.himeSend a,.himeSend button{min-height:45px;border:1px solid #d9b9b9;border-radius:9px;background:#fff;color:#7d1728;text-decoration:none;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center}
+.himeSend .pending{opacity:.45}
 </style></head><body><main class="app">
 <section class="hero" id="home"><img src="main.png.png" alt="本田 メイン画像" style="width:100%;height:100%;object-fit:cover;display:block"><button class="menuBtn" onclick="toggleMenu()" aria-label="メニュー">☰</button></section>
 <div class="content">
@@ -52,6 +70,62 @@ linear-gradient(225deg,transparent 50%,#241f20 51%) right top/17px 18px no-repea
 <section class="card" id="profile"><div class="head"><span>プロフィール</span><small>PROFILE</small></div><div class="profile"><img src="https://rose-gentleman.com/exa_userdata/person/153/image_main1_resize1.jpg" alt="本田"><dl><dt>年齢</dt><dd>37歳</dd><dt>身長</dt><dd>160cm</dd><dt>タイプ</dt><dd>キレ可愛系 / 小柄</dd><dt>特徴</dt><dd>色白美肌 / 癒し系</dd><dt>趣味</dt><dd>食べ歩き</dd><dt>性格</dt><dd>好奇心旺盛</dd></dl></div></section>
 <section class="card"><div class="catAccent">🐾 Honda's personality 🐾</div><img class="personalImg" src="personal-cat.png" alt="本田さんを猫に例えると" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="personalFallback" style="display:none">🐾 パーソナル画像<br>personal-cat.png を登録すると表示されます</div></section>
 <section class="card intro" id="intro"><div class="center"><p class="name">🌹薔薇と紳士　本田です🌹</p><b>「ぽんちゃん」って呼んでください♡</b><p class="catch">〜大人の癒しと少し意地悪な時間を♡〜</p></div><p>🌹「また会いたい」と言ってもらえる施術を目指しています🌹</p><p>疲れた身体をしっかりほぐしながら、<br>甘やかすだけじゃ終わらない♡<br>少しだけドキドキする時間をお届けします♡<br>沼る準備をしてきてね🐱🤍</p><h3>こんな方におすすめ✨</h3><p>❤️ 細身のお姉さんが好き<br>❤️ 猫顔がタイプ<br>❤️ 大人の女性に甘えたい<br>❤️ 少しSなお姉さんにドキドキしたい<br>❤️ M気質<br>❤️ しっかりマッサージされたい<br>❤️ 癒しも刺激もどっちも欲しい<br>❤️ 楽しくお話したい</p><h3>✨得意✨</h3><p>✔ 密着感のあるマッサージ<br>✔ 肩・首・背中のコリほぐし<br>✔ 焦らされるような距離感♡<br>✔ 初めてでも緊張しない空気作り</p><p>「思ってたより話しやすい😊」<br>「時間があっという間だった！」</p><p>そう言ってもらえることが多いです🌹</p><p>初指名・人見知りさん大歓迎です☺️</p><p>ぜひ一度、ぽんちゃんに会いに来てください🤍</p></section>
+
+<section class="card" id="hime">
+  <div class="head"><span>姫予約</span><small>DIRECT RESERVATION</small></div>
+  <p style="font-size:13px;line-height:1.7;margin-top:0">ぽんちゃんへ直接ご予約いただく際の料金確認と、送信用テンプレートです。</p>
+
+  <div style="font-weight:800;color:#8d2034;margin:14px 0 6px">本田さん コース料金</div>
+  <table class="himePrice">
+    <thead><tr><th>コース</th><th>基本料金（税抜）</th><th>税込合計※</th></tr></thead>
+    <tbody>
+      <tr><td>90分</td><td>15,000円</td><td>20,900円</td></tr>
+      <tr><td>120分</td><td>20,000円</td><td>26,400円</td></tr>
+      <tr><td>150分</td><td>27,000円</td><td>34,100円</td></tr>
+      <tr><td>180分</td><td>36,000円</td><td>44,000円</td></tr>
+      <tr><td>210分</td><td>47,000円</td><td>56,100円</td></tr>
+      <tr><td>240分</td><td>60,000円</td><td>70,400円</td></tr>
+      <tr><td>270分</td><td>75,000円</td><td>86,900円</td></tr>
+      <tr><td>300分</td><td>92,000円</td><td>105,600円</td></tr>
+    </tbody>
+  </table>
+  <div class="fixedFee"><b>固定料金</b><br>本指名料：2,000円<br>特別指名料：2,000円<br><small>※税込合計は「基本料金＋本指名料＋特別指名料」に消費税10%を加算。指定ホテル以外は別途交通費。</small></div>
+
+  <div class="simBox">
+    <div style="font-weight:800;color:#8d2034">料金シミュレーション</div>
+    <label for="courseSel">① コース</label>
+    <select id="courseSel" onchange="calcHime()">
+      <option value="15000">90分</option><option value="20000">120分</option><option value="27000">150分</option><option value="36000">180分</option>
+      <option value="47000">210分</option><option value="60000">240分</option><option value="75000">270分</option><option value="92000">300分</option>
+    </select>
+    <label for="areaSel">② エリア</label>
+    <select id="areaSel" onchange="calcHime()">
+      <option value="0">指定ホテル（兎我野町・日本橋・谷町九丁目）／無料</option>
+      <optgroup label="交通費 1,000円"><option value="1000">北区</option><option value="1000">福島区</option><option value="1000">中央区</option><option value="1000">西区</option><option value="1000">浪速区</option><option value="1000">都島区</option><option value="1000">淀川区</option><option value="1000">天王寺区</option><option value="1000">阿倍野区</option><option value="1000">東成区</option><option value="1000">生野区</option><option value="1000">西成区</option></optgroup>
+      <optgroup label="交通費 2,000円"><option value="2000">東淀川区</option><option value="2000">西淀川区</option><option value="2000">港区</option><option value="2000">此花区</option><option value="2000">大正区</option><option value="2000">旭区</option><option value="2000">城東区</option><option value="2000">鶴見区</option></optgroup>
+      <optgroup label="交通費 3,000円"><option value="3000">住之江区</option><option value="3000">住吉区</option><option value="3000">平野区</option><option value="3000">東住吉区</option><option value="3000">吹田市</option><option value="3000">豊中市</option><option value="3000">伊丹市</option><option value="3000">守口市</option><option value="3000">東大阪市</option><option value="3000">堺市（堺区・北区）</option></optgroup>
+      <optgroup label="交通費 4,000円"><option value="4000">池田市</option><option value="4000">摂津市</option><option value="4000">門真市</option><option value="4000">松原市</option><option value="4000">箕面市</option><option value="4000">八尾市</option><option value="4000">尼崎市</option><option value="4000">堺市（西区・東区・中区・美原区）</option></optgroup>
+      <optgroup label="交通費 5,000円"><option value="5000">寝屋川市</option><option value="5000">大東市</option><option value="5000">藤井寺市</option><option value="5000">茨木市</option><option value="5000">四條畷市</option><option value="5000">柏原市</option><option value="5000">大阪狭山市</option><option value="5000">堺市（南区）</option><option value="5000">高槻市</option><option value="5000">羽曳野市</option><option value="5000">宝塚市</option><option value="5000">西宮市</option></optgroup>
+      <optgroup label="交通費 6,000円"><option value="6000">枚方市</option><option value="6000">交野市</option><option value="6000">和泉市</option><option value="6000">高石市</option><option value="6000">泉大津市</option><option value="6000">河内長野市</option><option value="6000">芦屋市</option></optgroup>
+      <optgroup label="交通費 7,000円"><option value="7000">岸和田市</option><option value="7000">貝塚市</option></optgroup>
+      <optgroup label="交通費 8,000円"><option value="8000">泉佐野市</option><option value="8000">神戸市</option></optgroup>
+      <optgroup label="交通費 9,000円"><option value="9000">泉南市</option><option value="9000">阪南市</option><option value="9000">奈良市</option></optgroup>
+      <optgroup label="交通費 10,000円"><option value="10000">天理市</option><option value="10000">島本町</option></optgroup>
+      <optgroup label="交通費 要確認"><option value="ask">京都市</option><option value="ask">和歌山市</option></optgroup>
+    </select>
+    <div class="simResult" id="simResult"></div>
+  </div>
+
+  <div style="font-weight:800;color:#8d2034;margin:16px 0 4px">姫予約テンプレート</div>
+  <p class="himeNote">下記内容をコピーして、必要事項をご記入のうえLINE・X・02のいずれかから送信してください。</p>
+  <div class="template" id="himeTemplate"></div>
+  <button class="copyBtn" id="copyHimeBtn" onclick="copyHime()">📋 内容をコピー</button>
+  <div class="himeSend">
+    <button class="pending" type="button">LINE<br>URL設定待ち</button>
+    <a href="https://x.com/PonchaRose" target="_blank" rel="noopener">Xで姫予約</a>
+    <a href="https://m-sns.net/profile/@PonchaRose" target="_blank" rel="noopener">02で姫予約</a>
+  </div>
+</section>
 <section class="card" id="schedule"><div class="head"><span>本日の出勤</span></div><div class="today"><span id="todayDate"></span><strong id="todayStatus"></strong></div></section>
 <section class="card"><div class="head"><span>明日以降の出勤</span></div><div id="future"></div></section>
 <section class="card" id="calendar"><div class="head"><span>カレンダー</span></div><img src="calendar.jfif" alt="本田 出勤カレンダー" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;border-radius:10px"></section>
@@ -62,7 +136,7 @@ linear-gradient(225deg,transparent 50%,#241f20 51%) right top/17px 18px no-repea
 </div></main>
 <nav class="nav"><a href="#home"><span class="ico">⌂</span>HOME</a><a href="#schedule"><span class="ico">▦</span>出勤</a><a href="#photo"><span class="ico">▣</span>PHOTO</a><button onclick="alert('チャット機能は接続設定後に利用できます')"><span class="ico">●</span>チャット</button><button onclick="toggleReserve()"><span class="ico">♡</span>予約</button></nav>
 <button class="catPeek" onclick="alert('チャット機能は接続設定後に利用できます')" aria-label="ぽんちゃんに話しかける"><span class="catBubble">ぽんちゃんに話しかける</span><svg viewBox="0 0 100 90" aria-hidden="true"><path d="M17 36 22 8 43 26c5-2 10-2 15 0L79 8l5 29c7 8 10 18 8 29-3 15-18 22-41 22S13 81 10 66c-2-11 0-21 7-30Z" fill="#242021"/><path d="M32 52c5-5 10-5 15 0M62 52c5-5 10-5 15 0" fill="none" stroke="#f7ece8" stroke-width="3" stroke-linecap="round"/><path d="M49 61c3 2 5 2 8 0" fill="none" stroke="#c89191" stroke-width="3" stroke-linecap="round"/></svg></button>
-<div class="drawerBack" id="drawerBack" onclick="if(event.target===this)toggleMenu()"><aside class="drawer"><div class="drawerTop"><b>🐾 MENU</b><button onclick="toggleMenu()">×</button></div><a href="#home" onclick="toggleMenu()">HOME</a><a href="#profile" onclick="toggleMenu()">プロフィール</a><a href="#intro" onclick="toggleMenu()">自己紹介</a><a href="#schedule" onclick="toggleMenu()">出勤予定</a><a href="#calendar" onclick="toggleMenu()">カレンダー</a><a href="#news" onclick="toggleMenu()">お知らせ</a><a href="#photo" onclick="toggleMenu()">PHOTO</a><a href="#sns-bottom" onclick="toggleMenu()">SNS</a><a href="https://rose-gentleman.com/profile.php?id=153" target="_blank">オフィシャルプロフィール</a><a href="#" onclick="event.preventDefault();toggleMenu()">予約・お問い合わせ</a></aside></div>
+<div class="drawerBack" id="drawerBack" onclick="if(event.target===this)toggleMenu()"><aside class="drawer"><div class="drawerTop"><b>🐾 MENU</b><button onclick="toggleMenu()">×</button></div><a href="#home" onclick="toggleMenu()">HOME</a><a href="#profile" onclick="toggleMenu()">プロフィール</a><a href="#intro" onclick="toggleMenu()">自己紹介</a><a href="#hime" onclick="toggleMenu()">姫予約・料金</a><a href="#schedule" onclick="toggleMenu()">出勤予定</a><a href="#calendar" onclick="toggleMenu()">カレンダー</a><a href="#news" onclick="toggleMenu()">お知らせ</a><a href="#photo" onclick="toggleMenu()">PHOTO</a><a href="#sns-bottom" onclick="toggleMenu()">SNS</a><a href="https://rose-gentleman.com/profile.php?id=153" target="_blank">オフィシャルプロフィール</a><a href="#" onclick="event.preventDefault();toggleMenu()">予約・お問い合わせ</a></aside></div>
 <div class="reserveSheet" id="reserveSheet"><div class="head"><span>予約・お問い合わせ</span></div><div class="reserve-grid"><a class="tel" href="tel:0662145047">☎ お店に電話</a><a class="shopline" href="https://lin.ee/YBqxbQD" target="_blank">◉ お店にLINE</a></div></div>
 <div class="lightbox" id="lightbox"><button class="x" onclick="closeLb()">×</button><button class="prev" onclick="moveLb(-1)">‹</button><img id="lbImg" alt=""><button class="next" onclick="moveLb(1)">›</button></div>
 <div class="backdrop" id="notice"><div class="modal"><h2 id="noticeTitle">SNS利用に関する注意事項</h2><p>セラピストが安心してSNSを利用できるよう、以下の行為はお控えください。</p><ul><li>誹謗中傷、侮辱、脅迫、威圧的なメッセージ</li><li>執拗なDMや返信を強要する行為</li><li>個人情報やプライベートに関する過度な詮索</li><li>画像・投稿内容・DM等の無断転載や公開</li><li>性的・差別的その他不適切なメッセージ</li><li>店舗またはセラピストが禁止する方法での直接的な交渉・勧誘</li></ul><p>悪質な行為については、記録の保存、店舗への報告、利用制限、警察・弁護士等への相談を含む対応を行う場合があります。</p><div class="actions"><button class="cancel" onclick="closeNotice()">戻る</button><button class="go" id="go">同意してSNSを開く</button></div></div></div>
@@ -73,4 +147,29 @@ const photos=Array.from({length:20},(_,i)=>'photo-'+String(i+1).padStart(2,'0')+
 function initPhotos(){const box=document.getElementById('photoThumbs');photos.forEach(src=>{const im=new Image();im.onload=()=>{validPhotos.push(src);const x=document.createElement('img');x.src=src;x.alt='本田 PHOTO';x.onclick=()=>openLb(validPhotos.indexOf(src));box.appendChild(x)};im.src=src})}
 function openLb(i){lbIndex=i;lbImg.src=validPhotos[i];lightbox.classList.add('open')}function closeLb(){lightbox.classList.remove('open')}function moveLb(d){if(!validPhotos.length)return;lbIndex=(lbIndex+d+validPhotos.length)%validPhotos.length;lbImg.src=validPhotos[lbIndex]}initPhotos();
 const sc={"2026-09-23":"休み","2026-09-24":"休み","2026-09-25":"ご予約完売","2026-09-26":"ご予約完売","2026-09-27":"休み","2026-09-28":"休み","2026-09-29":"10:00〜16:00"},wd=['日','月','火','水','木','金','土'],p=n=>String(n).padStart(2,'0'),k=d=>d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()),f=d=>(d.getMonth()+1)+'/'+d.getDate()+'（'+wd[d.getDay()]+'）',st=d=>sc[k(d)]||'休み';function render(){let n=new Date();todayDate.textContent=f(n);todayStatus.textContent=st(n);let h='';for(let i=1;i<=7;i++){let d=new Date(n.getFullYear(),n.getMonth(),n.getDate()+i),s=st(d),c=s==='休み'?'off':s.includes('完売')?'full':'';h+='<div class="row"><b>'+f(d)+'</b><span class="'+c+'">'+s+'</span></div>'}future.innerHTML=h}render();
+
+function yen(n){return Number(n).toLocaleString('ja-JP')+'円'}
+function calcHime(){
+  const course=document.getElementById('courseSel'),area=document.getElementById('areaSel');
+  if(!course||!area)return;
+  const base=Number(course.value),fee=4000,areaName=area.options[area.selectedIndex].text.replace(/\s*\/.*$/,'');
+  const courseName=course.options[course.selectedIndex].text;
+  let totalText='',detail='';
+  if(area.value==='ask'){
+    totalText='要確認';
+    detail='<div>コース料金　'+yen(base)+'</div><div>本指名料　2,000円</div><div>特別指名料　2,000円</div><div>交通費　要確認</div><div class="total"><span>お支払い合計</span><span>要確認</span></div>';
+  }else{
+    const travel=Number(area.value),subtotal=base+fee+travel,tax=Math.round(subtotal*.1),total=subtotal+tax;
+    totalText=yen(total);
+    detail='<div>コース料金　'+yen(base)+'</div><div>本指名料　2,000円</div><div>特別指名料　2,000円</div><div>交通費　'+yen(travel)+'</div><div>小計　'+yen(subtotal)+'</div><div>消費税（10%）　'+yen(tax)+'</div><div class="total"><span>お支払い合計</span><span>'+yen(total)+'</span></div>';
+  }
+  simResult.innerHTML=detail;
+  himeTemplate.textContent='【姫予約】\n\nお名前：\n携帯番号：\n日時：○月○日 ○時〜\nコース：'+courseName+'\nエリア：'+areaName+'\n料金目安：'+totalText;
+}
+async function copyHime(){
+  const txt=himeTemplate.textContent,b=document.getElementById('copyHimeBtn');
+  try{await navigator.clipboard.writeText(txt)}catch(e){const t=document.createElement('textarea');t.value=txt;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove()}
+  b.textContent='✓ コピーしました';setTimeout(()=>b.textContent='📋 内容をコピー',1600);
+}
+calcHime();
 </script></body></html>
