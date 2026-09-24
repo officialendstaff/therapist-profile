@@ -8,7 +8,7 @@
 <div class="sub" id="monthSub"><div class="head"><b>月間予定</b><small>基本シフト</small></div><div class="note">1か月分の「出勤・出勤時間・休み・完売」を登録。閲覧ページでは、この予定から直近の出勤情報を自動表示する設計です。</div><div class="monthHead"><button onclick="moveMonth(-1)">‹</button><span class="monthTitle" id="monthTitle"></span><button onclick="moveMonth(1)">›</button></div><div class="monthList" id="monthList"></div><button class="save" onclick="saveMonth()">この月の予定を保存</button><div class="ok" id="monthSaved">✓ Supabaseへ保存しました</div></div></div></section>
 <section class="pane" id="newsPane"><div class="card"><div class="head"><b>お知らせ管理</b><small>POPUP NEWS</small></div><div class="note">保存すると閲覧ページのNEWSと中央ポップアップへ反映されます。</div><div class="noticeType"><button class="active" id="normalBtn" onclick="setNoticeType(false)">通常</button><button id="importantBtn" onclick="setNoticeType(true)">🔴 重要</button></div><div class="field"><label>定型文</label><div class="preset"><button onclick="preset('x')">Xアカウント変更</button><button onclick="preset('line')">LINEアカウント変更</button></div></div><div class="field"><label>見出し</label><input id="noticeTitle" placeholder="例：29日空いてます❤️"></div><div class="field"><label>詳細本文（ポップアップに表示）</label><textarea id="noticeText" placeholder="お知らせの詳細内容を入力"></textarea></div><div class="field"><label>公開設定</label><select id="noticePublic"><option value="public">公開する</option><option value="private">非公開</option></select></div><input type="hidden" id="noticeEditId"><button class="save" id="noticeSaveBtn" onclick="saveNews()">お知らせを保存</button><button class="ghost" id="noticeCancelBtn" style="display:none;margin-top:7px" onclick="resetNewsForm()">編集をキャンセル</button><div class="ok" id="newsSaved">✓ Supabaseへ保存しました</div><div class="head" style="margin-top:22px"><b>登録済みのお知らせ</b><small>NEWS LIST</small></div><div class="adminNewsPreview" id="adminNewsPreview"><div><span>読み込み中…</span></div></div></div></section>
 <section class="pane" id="photoPane"><div class="card"><div class="head"><b>PHOTO管理</b><small>PHOTO</small></div><div class="photoGuide"><b>📷 3：4の縦画像を推奨しています</b><br>横長・正方形は中央部分が自動で切り抜かれる場合があります。</div><div class="photoCount" id="photoCount">読み込み中…</div><div class="photoAdmin" id="photoAdmin"></div><input class="photoFile" type="file" id="photoFile" accept="image/*" onchange="previewPhoto(event)"><div class="previewBox" id="previewBox"><img id="previewImg"><p></p><button class="save" id="photoSaveBtn" onclick="savePhoto()">この画像を保存</button><button class="ghost" style="margin-top:7px" onclick="cancelPhoto()">キャンセル</button><div class="ok" id="photoSaved">✓ Supabaseへ保存しました</div></div><div class="note">最大20枚。追加・変更・削除はSupabaseへ保存され、閲覧ページへ反映されます。</div></div></section>
-<section class="pane" id="snsPane"><div class="card"><div class="head"><b>SNS設定</b><small>ACCOUNT</small></div><div class="snsrow"><b>X</b><input value="@PonchaRose"></div><div class="snsrow"><b>URL</b><input value="https://x.com/PonchaRose"></div><div class="snsrow"><b>02</b><input value="@PonchaRose"></div><div class="snsrow"><b>URL</b><input value="https://m-sns.net/profile/@PonchaRose"></div><div class="snsrow"><b>LINE</b><input value="@845txetv"></div><div class="snsrow"><b>URL</b><input value="https://lin.ee/67dA4sS"></div><button class="save" onclick="demoSave('snsSaved')">SNS情報を保存</button><div class="ok" id="snsSaved">✓ 試作画面内に保存しました</div></div></section>
+<section class="pane" id="snsPane"><div class="card"><div class="head"><b>SNS設定</b><small>ACCOUNT</small></div><div class="note">アカウント変更時はここだけ更新してください。保存すると閲覧ページのSNS・姫予約リンクへ一括反映されます。</div><div class="snsrow"><b>X</b><input id="snsXId" value="@PonchaRose"></div><div class="snsrow"><b>URL</b><input id="snsXUrl" value="https://x.com/PonchaRose"></div><div class="snsrow"><b>02</b><input id="sns02Id" value="@PonchaRose"></div><div class="snsrow"><b>URL</b><input id="sns02Url" value="https://m-sns.net/profile/@PonchaRose"></div><div class="snsrow"><b>LINE</b><input id="snsLineId" value="@845txetv"></div><div class="snsrow"><b>URL</b><input id="snsLineUrl" value="https://lin.ee/67dA4sS"></div><button class="save" id="snsSaveBtn" onclick="saveSns()">SNS情報を保存</button><div class="ok" id="snsSaved">✓ Supabaseへ保存しました</div></div></section>
 <section class="pane" id="pagePane"><div class="card"><div class="head"><b>ページ情報</b><small>PAGE</small></div><button class="ghost" onclick="location.href='../'">閲覧ページを開く</button><div class="field"><label>ニックネーム</label><input value="ぽんちゃん"></div><div class="field"><label>自己紹介</label><textarea>🌹薔薇と紳士　本田です🌹
 「ぽんちゃん」って呼んでください♡</textarea></div><div class="note">プロフィール・姫予約設定は運用を見ながら順次追加します。</div></div></section></div></main>
 <nav class="tabs"><button onclick="tab('schedulePane')"><span>▦</span>出勤</button><button onclick="tab('newsPane')"><span>●</span>お知らせ</button><button onclick="tab('photoPane')"><span>▣</span>PHOTO</button><button onclick="tab('snsPane')"><span>◎</span>SNS</button><button onclick="tab('pagePane')"><span>⚙</span>ページ</button></nav>
@@ -16,8 +16,8 @@
 const SB_URL='https://vjjnkflbfsjihwzjsjpr.supabase.co';
 const SB_KEY='sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos';
 const sb=supabase.createClient(SB_URL,SB_KEY);
-async function initAuth(){const {data}=await sb.auth.getSession();authGate.style.display=data.session?'none':'flex';if(data.session){await refreshSchedule();await loadNewsAdmin();await loadPhotosAdmin()}}
-async function login(){authErr.textContent='';const {error}=await sb.auth.signInWithPassword({email:loginEmail.value.trim(),password:loginPassword.value});if(error){authErr.textContent='ログインできません。メールアドレスとパスワードを確認してください。';return}authGate.style.display='none';loginPassword.value='';await refreshSchedule();await loadNewsAdmin();await loadPhotosAdmin()}
+async function initAuth(){const {data}=await sb.auth.getSession();authGate.style.display=data.session?'none':'flex';if(data.session){await refreshSchedule();await loadNewsAdmin();await loadPhotosAdmin();await loadSnsAdmin()}}
+async function login(){authErr.textContent='';const {error}=await sb.auth.signInWithPassword({email:loginEmail.value.trim(),password:loginPassword.value});if(error){authErr.textContent='ログインできません。メールアドレスとパスワードを確認してください。';return}authGate.style.display='none';loginPassword.value='';await refreshSchedule();await loadNewsAdmin();await loadPhotosAdmin();await loadSnsAdmin()}
 async function logout(){await sb.auth.signOut();authGate.style.display='flex'}
 function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 async function rowsBetween(a,b){const {data,error}=await sb.from('honda_schedule').select('*').gte('schedule_date',a).lte('schedule_date',b);if(error){alert('読み込みエラー：'+error.message);return []}return data||[]}
@@ -81,6 +81,26 @@ async function deletePhoto(i){
   for(const row of rows)await sb.from('honda_photos').update({sort_order:row.sort_order}).eq('id',row.id);
 }
 function cancelPhoto(){pendingPhotoData=null;previewImg.removeAttribute('src');previewBox.style.display='none';photoFile.value='';delete photoFile.dataset.replace}
+
+async function loadSnsAdmin(){
+  const {data,error}=await sb.from('honda_sns').select('*').eq('id',1).maybeSingle();
+  if(error){console.error('SNS load error',error);return}
+  if(!data)return;
+  snsXId.value=data.x_id||'';snsXUrl.value=data.x_url||'';
+  sns02Id.value=data.sns02_id||'';sns02Url.value=data.sns02_url||'';
+  snsLineId.value=data.line_id||'';snsLineUrl.value=data.line_url||'';
+}
+function validHttpUrl(v){try{const u=new URL(v);return u.protocol==='https:'||u.protocol==='http:'}catch(e){return false}}
+async function saveSns(){
+  const row={id:1,x_id:snsXId.value.trim(),x_url:snsXUrl.value.trim(),sns02_id:sns02Id.value.trim(),sns02_url:sns02Url.value.trim(),line_id:snsLineId.value.trim(),line_url:snsLineUrl.value.trim(),updated_at:new Date().toISOString()};
+  if(!row.x_id||!row.x_url||!row.sns02_id||!row.sns02_url||!row.line_id||!row.line_url){alert('IDとURLをすべて入力してください');return}
+  if(!validHttpUrl(row.x_url)||!validHttpUrl(row.sns02_url)||!validHttpUrl(row.line_url)){alert('URLを正しく入力してください');return}
+  snsSaveBtn.disabled=true;snsSaveBtn.textContent='保存中…';
+  const {error}=await sb.from('honda_sns').upsert(row,{onConflict:'id'});
+  snsSaveBtn.disabled=false;snsSaveBtn.textContent='SNS情報を保存';
+  if(error){alert('保存エラー：'+error.message);return}
+  flash('snsSaved');
+}
 function tab(id){document.querySelectorAll('.pane').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');scrollTo(0,0)}function demoSave(id){let e=document.getElementById(id);e.style.display='block';setTimeout(()=>e.style.display='none',1800)}function setNoticeType(v){noticeImportant=!!v;normalBtn.classList.toggle('active',!v);importantBtn.classList.toggle('active',v)}function preset(t){setNoticeType(true);noticeTitle.value=t==='x'?'Xアカウント変更のお知らせ':'LINEアカウント変更のお知らせ';noticeText.value=t==='x'?'Xのアカウントが新しくなりました🥲\nこのページに載っているXが新しいアカウントです🐾\nお手数ですが、またフォローしてもらえると嬉しいです🥹🤍\nよろしくお願いします♡':'LINEが新しくなりました🥲\nこのページに載っているLINEが新しいアカウントです🐾\nお手数ですが、追加して何か一言メッセージを送ってもらえると嬉しいです🥹🤍\nよろしくお願いします♡'}
 
 
