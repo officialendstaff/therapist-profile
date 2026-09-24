@@ -80,7 +80,7 @@ linear-gradient(225deg,transparent 50%,#241f20 51%) right top/17px 18px no-repea
 .snsPanel .sns button{min-height:74px}
 .himePrice th:last-child{line-height:1.25}
 .fixedFee .feeLine{white-space:nowrap;font-size:11.5px}
-</style></head><body><main class="app">
+</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body><main class="app">
 <section class="hero" id="home"><img src="main.png.png" alt="本田 メイン画像" style="width:100%;height:100%;object-fit:cover;display:block"><button class="menuBtn" onclick="toggleMenu()" aria-label="メニュー">☰</button></section>
 <div class="content">
 <section class="card news" id="news"><div class="head">お知らせ</div><div><time>09/16</time><span>29日空いてます❤️</span></div><div><time>09/13</time><span>ブログを更新しました</span></div></section>
@@ -166,7 +166,52 @@ function toggleMenu(){drawerBack.classList.toggle('open')}function toggleSnsShee
 const photos=Array.from({length:20},(_,i)=>'photo-'+String(i+1).padStart(2,'0')+'.jfif');let validPhotos=[],lbIndex=0;
 function initPhotos(){const box=document.getElementById('photoThumbs');photos.forEach(src=>{const im=new Image();im.onload=()=>{validPhotos.push(src);const x=document.createElement('img');x.src=src;x.alt='本田 PHOTO';x.onclick=()=>openLb(validPhotos.indexOf(src));box.appendChild(x)};im.src=src})}
 function openLb(i){lbIndex=i;lbImg.src=validPhotos[i];lightbox.classList.add('open')}function closeLb(){lightbox.classList.remove('open')}function moveLb(d){if(!validPhotos.length)return;lbIndex=(lbIndex+d+validPhotos.length)%validPhotos.length;lbImg.src=validPhotos[lbIndex]}initPhotos();
-const sc={"2026-09-23":"休み","2026-09-24":"休み","2026-09-25":"ご予約完売","2026-09-26":"ご予約完売","2026-09-27":"休み","2026-09-28":"休み","2026-09-29":"10:00〜16:00"},wd=['日','月','火','水','木','金','土'],p=n=>String(n).padStart(2,'0'),k=d=>d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()),f=d=>(d.getMonth()+1)+'/'+d.getDate()+'（'+wd[d.getDay()]+'）',st=d=>sc[k(d)]||'休み';function render(){let n=new Date();todayDate.textContent=f(n);todayStatus.textContent=st(n);let h='';for(let i=1;i<=7;i++){let d=new Date(n.getFullYear(),n.getMonth(),n.getDate()+i),s=st(d),c=s==='休み'?'off':s.includes('完売')?'full':'';h+='<div class="row"><b>'+f(d)+'</b><span class="'+c+'">'+s+'</span></div>'}future.innerHTML=h}render();
+const SB_URL='https://vjjnkflbfsjihwzjsjpr.supabase.co';
+const SB_KEY='sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos';
+const publicSb=supabase.createClient(SB_URL,SB_KEY);
+const wd=['日','月','火','水','木','金','土'],p=n=>String(n).padStart(2,'0'),k=d=>d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()),f=d=>(d.getMonth()+1)+'/'+d.getDate()+'（'+wd[d.getDay()]+'）';
+
+function resolvedStatus(row,isToday=false){
+  if(!row)return {status:'off',start:null,end:null,vacancy:null,note:null};
+  const status=(isToday&&row.today_status)||row.weekly_status||row.base_status||'off';
+  const start=(isToday&&row.today_start)||row.base_start||null;
+  const end=(isToday&&row.today_end)||row.base_end||null;
+  const vacancy=(isToday&&row.today_vacancy)||row.weekly_vacancy||null;
+  const note=(isToday&&row.today_note)||row.weekly_note||null;
+  return {status,start,end,vacancy,note};
+}
+function time5(v){return v?String(v).slice(0,5):''}
+function statusText(x){
+  if(x.status==='off')return '休み';
+  if(x.status==='full')return 'ご予約完売';
+  if(x.vacancy)return '空き '+x.vacancy+(x.note?' / '+x.note:'');
+  if(x.start&&x.end)return time5(x.start)+'〜'+time5(x.end);
+  return '出勤';
+}
+async function renderSchedule(){
+  const n=new Date(),end=new Date(n.getFullYear(),n.getMonth(),n.getDate()+7);
+  todayDate.textContent=f(n);
+  todayStatus.textContent='確認中…';
+  future.innerHTML='<div class="row"><span>出勤予定を読み込んでいます…</span></div>';
+  const {data,error}=await publicSb.from('honda_schedule').select('*').gte('schedule_date',k(n)).lte('schedule_date',k(end));
+  if(error){
+    console.error('schedule load error',error);
+    todayStatus.textContent='出勤情報を確認中';
+    future.innerHTML='<div class="row"><span>出勤情報を取得できませんでした</span></div>';
+    return;
+  }
+  const map=Object.fromEntries((data||[]).map(x=>[x.schedule_date,x]));
+  const t=resolvedStatus(map[k(n)],true);
+  todayStatus.textContent=statusText(t);
+  todayStatus.className=t.status==='off'?'off':t.status==='full'?'full':'';
+  let h='';
+  for(let i=1;i<=7;i++){
+    const d=new Date(n.getFullYear(),n.getMonth(),n.getDate()+i),x=resolvedStatus(map[k(d)],false),s=statusText(x),cl=x.status==='off'?'off':x.status==='full'?'full':'';
+    h+='<div class="row"><b>'+f(d)+'</b><span class="'+cl+'">'+s+'</span></div>';
+  }
+  future.innerHTML=h;
+}
+renderSchedule();
 
 function yen(n){return Number(n).toLocaleString('ja-JP')+'円'}
 function calcHime(){
