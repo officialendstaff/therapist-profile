@@ -255,4 +255,10 @@ async function copyHime(){
   b.textContent='✓ コピーしました';setTimeout(()=>b.textContent='📋 内容をコピー',1600);
 }
 calcHime();
+
+// Always start at the top after reload/revisit.
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+window.addEventListener('pageshow', function () {
+  requestAnimationFrame(function () { window.scrollTo(0, 0); });
+});
 </script></body></html>
