@@ -80,11 +80,17 @@ linear-gradient(225deg,transparent 50%,#241f20 51%) right top/17px 18px no-repea
 .snsPanel .sns button{min-height:74px}
 .himePrice th:last-child{line-height:1.25}
 .fixedFee .feeLine{white-space:nowrap;font-size:11.5px}
+
+.todayCat{margin:12px 0 2px;text-align:center}
+.todayCat svg{width:138px;height:105px;display:block;margin:0 auto;overflow:visible}
+.todayCat .catBody{fill:#242021}.todayCat .catPink{fill:#d78d91}.todayCat .catGold{fill:#d7aa49}.todayCat .catLine{fill:none;stroke:#242021;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.todayCatMsg{margin-top:3px;font-size:12px;font-weight:700;color:#8d2034}
+.todayCat[data-state="off"] .todayCatMsg{color:#806c69}.todayCat[data-state="full"] .todayCatMsg{color:#b62c48}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body><main class="app">
 <section class="hero" id="home"><img src="main.png.png" alt="本田 メイン画像" style="width:100%;height:100%;object-fit:cover;display:block"><button class="menuBtn" onclick="toggleMenu()" aria-label="メニュー">☰</button></section>
 <div class="content">
 <section class="card news" id="news"><div class="head">お知らせ</div><div><time>09/16</time><span>29日空いてます❤️</span></div><div><time>09/13</time><span>ブログを更新しました</span></div></section>
-<section class="card" id="schedule"><div class="head"><span>本日の出勤</span></div><div class="today"><span id="todayDate"></span><strong id="todayStatus"></strong></div></section>
+<section class="card" id="schedule"><div class="head"><span>本日の出勤</span></div><div class="today"><span id="todayDate"></span><strong id="todayStatus"></strong></div><div class="todayCat" id="todayCat" data-state="work"><div id="todayCatArt"></div><div class="todayCatMsg" id="todayCatMsg"></div></div></section>
 <section class="card"><div class="catAccent">🐾 Honda's personality 🐾</div><img class="personalImg" src="personal-cat.png" alt="本田さんを猫に例えると" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="personalFallback" style="display:none">🐾 パーソナル画像<br>personal-cat.png を登録すると表示されます</div></section>
 <section class="card intro" id="intro"><div class="center"><p class="name">🌹薔薇と紳士　本田です🌹</p><b>「ぽんちゃん」って呼んでください♡</b><p class="catch">〜大人の癒しと少し意地悪な時間を♡〜</p></div><p>🌹「また会いたい」と言ってもらえる施術を目指しています🌹</p><p>疲れた身体をしっかりほぐしながら、<br>甘やかすだけじゃ終わらない♡<br>少しだけドキドキする時間をお届けします♡<br>沼る準備をしてきてね🐱🤍</p><h3>こんな方におすすめ✨</h3><p>❤️ 細身のお姉さんが好き<br>❤️ 猫顔がタイプ<br>❤️ 大人の女性に甘えたい<br>❤️ 少しSなお姉さんにドキドキしたい<br>❤️ M気質<br>❤️ しっかりマッサージされたい<br>❤️ 癒しも刺激もどっちも欲しい<br>❤️ 楽しくお話したい</p><h3>✨得意✨</h3><p>✔ 密着感のあるマッサージ<br>✔ 肩・首・背中のコリほぐし<br>✔ 焦らされるような距離感♡<br>✔ 初めてでも緊張しない空気作り</p><p>「思ってたより話しやすい😊」<br>「時間があっという間だった！」</p><p>そう言ってもらえることが多いです🌹</p><p>初指名・人見知りさん大歓迎です☺️</p><p>ぜひ一度、ぽんちゃんに会いに来てください🤍</p></section>
 
@@ -181,6 +187,18 @@ function resolvedStatus(row,isToday=false){
   return {status,start,end,vacancy,note};
 }
 function time5(v){return v?String(v).slice(0,5):''}
+function catArt(state){
+  const work='<svg viewBox="0 0 180 130" aria-label="出勤中の黒猫"><path class="catBody" d="M63 62C45 57 34 44 38 30c3-10 12-14 19-9-7 7-5 17 6 23 7-8 17-13 29-13 27 0 46 19 46 45 0 28-20 43-49 43-30 0-48-14-48-37 0-12 4-21 12-27-9 0-17 3-22 9z"/><path class="catBody" d="M103 35l8-24 13 19 18-14-2 29"/><circle cx="109" cy="51" r="4" fill="#d7aa49"/><circle cx="129" cy="51" r="4" fill="#d7aa49"/><path d="M116 61q5 5 10 0" fill="none" stroke="#d78d91" stroke-width="3" stroke-linecap="round"/><path class="catLine" d="M68 108l-7 17M92 111l-2 15M119 107l8 17"/><path d="M44 77q-29 2-28-21" fill="none" stroke="#242021" stroke-width="10" stroke-linecap="round"/></svg>';
+  const off='<svg viewBox="0 0 180 130" aria-label="お休み中の黒猫"><ellipse cx="90" cy="102" rx="66" ry="18" fill="#eadfda"/><path class="catBody" d="M39 86c0-31 24-51 58-51 33 0 56 19 56 46 0 25-25 35-59 35-35 0-55-10-55-30z"/><path class="catBody" d="M50 55l8-27 18 20M73 46l19-18 5 28"/><path d="M60 67q8 7 16 0M83 67q8 7 16 0" fill="none" stroke="#d8c5c1" stroke-width="3" stroke-linecap="round"/><path d="M71 77q5 4 10 0" fill="none" stroke="#d78d91" stroke-width="3" stroke-linecap="round"/><path d="M135 103q32-13 21-41" fill="none" stroke="#242021" stroke-width="12" stroke-linecap="round"/><text x="118" y="34" font-size="20" fill="#806c69">Zzz…</text></svg>';
+  const full='<svg viewBox="0 0 180 130" aria-label="完売を喜ぶ黒猫"><path class="catBody" d="M58 62c0-26 15-43 38-43s39 17 39 43v48H58z"/><path class="catBody" d="M67 34l6-27 18 20M106 27l18-20 4 30"/><path class="catLine" d="M64 72Q35 55 28 29M129 72q27-15 31-43"/><circle class="catPink" cx="27" cy="25" r="7"/><circle class="catPink" cx="159" cy="25" r="7"/><path d="M76 50q8 8 16 0M102 50q8 8 16 0" fill="none" stroke="#d8c5c1" stroke-width="3" stroke-linecap="round"/><path d="M91 61q8 10 16 0" fill="#d78d91"/><path class="catGold" d="M82 17l7-13 8 10 10-10 7 13z"/><circle cx="49" cy="20" r="6" fill="#e65b68"/><circle cx="141" cy="14" r="6" fill="#e65b68"/></svg>';
+  return state==='off'?off:state==='full'?full:work;
+}
+function renderTodayCat(state){
+  todayCat.dataset.state=state;
+  todayCatArt.innerHTML=catArt(state);
+  todayCatMsg.textContent=state==='off'?'今日はおやすみです…🐾':state==='full'?'本日は完売しました♡ ありがとうございます！':'今日も頑張ります！🐾';
+}
+
 function statusText(x){
   if(x.status==='off')return '休み';
   if(x.status==='full')return 'ご予約完売';
@@ -204,6 +222,7 @@ async function renderSchedule(){
   const t=resolvedStatus(map[k(n)],true);
   todayStatus.textContent=statusText(t);
   todayStatus.className=t.status==='off'?'off':t.status==='full'?'full':'';
+  renderTodayCat(t.status);
   let h='';
   for(let i=1;i<=7;i++){
     const d=new Date(n.getFullYear(),n.getMonth(),n.getDate()+i),x=resolvedStatus(map[k(d)],false),s=statusText(x),cl=x.status==='off'?'off':x.status==='full'?'full':'';
