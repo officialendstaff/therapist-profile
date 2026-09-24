@@ -167,20 +167,20 @@ linear-gradient(225deg,transparent 50%,#241f20 51%) right top/17px 18px no-repea
   <div class="template" id="himeTemplate"></div>
   <button class="copyBtn" id="copyHimeBtn" onclick="copyHime()">📋 内容をコピー</button>
   <div class="himeSend">
-    <a href="https://lin.ee/67dA4sS" target="_blank" rel="noopener">LINEで姫予約</a>
-    <a href="https://x.com/PonchaRose" target="_blank" rel="noopener">Xで姫予約</a>
-    <a href="https://m-sns.net/profile/@PonchaRose" target="_blank" rel="noopener">02で姫予約</a>
+    <a href="https://lin.ee/67dA4sS" data-sns-link="line" target="_blank" rel="noopener">LINEで姫予約</a>
+    <a href="https://x.com/PonchaRose" data-sns-link="x" target="_blank" rel="noopener">Xで姫予約</a>
+    <a href="https://m-sns.net/profile/@PonchaRose" data-sns-link="02" target="_blank" rel="noopener">02で姫予約</a>
   </div>
 </section>
 <div class="sectionBreak"><div class="catWalk"><svg viewBox="0 0 120 70" aria-hidden="true"><ellipse cx="57" cy="36" rx="31" ry="19"/><circle cx="91" cy="28" r="13"/><path d="M82 18l3-15 10 13M95 16l11-12-2 17M28 33C8 27 5 10 13 5c-2 13 7 18 18 18z"/><path d="M38 48l-7 18h9l8-17M64 50l5 16h9l-4-20"/></svg><svg viewBox="0 0 120 70" aria-hidden="true"><ellipse cx="57" cy="36" rx="31" ry="19"/><circle cx="91" cy="28" r="13"/><path d="M82 18l3-15 10 13M95 16l11-12-2 17M28 33C8 27 5 10 13 5c-2 13 7 18 18 18z"/><path d="M38 48l-7 18h9l8-17M64 50l5 16h9l-4-20"/></svg><svg viewBox="0 0 120 70" aria-hidden="true"><ellipse cx="57" cy="36" rx="31" ry="19"/><circle cx="91" cy="28" r="13"/><path d="M82 18l3-15 10 13M95 16l11-12-2 17M28 33C8 27 5 10 13 5c-2 13 7 18 18 18z"/><path d="M38 48l-7 18h9l8-17M64 50l5 16h9l-4-20"/></svg><svg viewBox="0 0 120 70" aria-hidden="true"><ellipse cx="57" cy="36" rx="31" ry="19"/><circle cx="91" cy="28" r="13"/><path d="M82 18l3-15 10 13M95 16l11-12-2 17M28 33C8 27 5 10 13 5c-2 13 7 18 18 18z"/><path d="M38 48l-7 18h9l8-17M64 50l5 16h9l-4-20"/></svg></div><b>OFFICIAL</b><small>薔薇と紳士・公式情報</small></div>
 <section class="card" id="profile"><div class="head"><span>プロフィール</span><small>PROFILE</small></div><div class="profile"><img src="https://rose-gentleman.com/exa_userdata/person/153/image_main1_resize1.jpg" alt="本田"><dl><dt>年齢</dt><dd>37歳</dd><dt>身長</dt><dd>160cm</dd><dt>タイプ</dt><dd>キレ可愛系 / 小柄</dd><dt>特徴</dt><dd>色白美肌 / 癒し系</dd><dt>趣味</dt><dd>食べ歩き</dd><dt>性格</dt><dd>好奇心旺盛</dd></dl></div></section>
 <section class="card links"><a href="https://rose-gentleman.com/profile.php?id=153" target="_blank"><span>オフィシャルプロフィール</span><b>›</b></a><a href="https://rose-gentleman.com/bloglist.php?id=153" target="_blank"><span>オフィシャルブログ</span><b>›</b></a></section>
-<section class="card" id="sns-bottom"><div class="head">SNS</div><div class="sns"><button onclick="sns('X','https://x.com/PonchaRose')">𝕏<small>@PonchaRose</small></button><button onclick="sns('02','https://m-sns.net/profile/@PonchaRose')">02<small>@PonchaRose</small></button><button onclick="sns('LINE','https://lin.ee/67dA4sS')">LINE<small>@845txetv</small></button></div></section>
+<section class="card" id="sns-bottom"><div class="head">SNS</div><div class="sns"><button data-sns-btn="x" onclick="openDynamicSns('x')">𝕏<small>@PonchaRose</small></button><button data-sns-btn="02" onclick="openDynamicSns('02')">02<small>@PonchaRose</small></button><button data-sns-btn="line" onclick="openDynamicSns('line')">LINE<small>@845txetv</small></button></div></section>
 
 </div></main>
 <nav class="nav"><a href="#home"><span class="ico">🏠</span>HOME</a><a href="#schedule"><span class="ico">📅</span>SCHEDULE</a><a href="#photo"><span class="ico">🖼️</span>PHOTO</a><button onclick="toggleSnsSheet()"><span class="ico">🐱💬</span>SNS</button><button onclick="toggleReserve()"><span class="ico">🐾</span>予約</button></nav>
 <button class="catPeek" onclick="alert('チャット機能は接続設定後に利用できます')" aria-label="ぽんちゃんに話しかける"><span class="catBubble">ぽんちゃんに話しかける</span><svg viewBox="0 0 100 90" aria-hidden="true"><path d="M17 36 22 8 43 26c5-2 10-2 15 0L79 8l5 29c7 8 10 18 8 29-3 15-18 22-41 22S13 81 10 66c-2-11 0-21 7-30Z" fill="#242021"/><path d="M32 52c5-5 10-5 15 0M62 52c5-5 10-5 15 0" fill="none" stroke="#f7ece8" stroke-width="3" stroke-linecap="round"/><path d="M49 61c3 2 5 2 8 0" fill="none" stroke="#c89191" stroke-width="3" stroke-linecap="round"/></svg></button>
-<div class="snsSheet" id="snsSheet" onclick="if(event.target===this)toggleSnsSheet()"><div class="snsPanel"><div class="snsPanelTop"><span>ぽんちゃんのSNS 🐾</span><button onclick="toggleSnsSheet()">×</button></div><div class="sns"><button onclick="toggleSnsSheet();sns('X','https://x.com/PonchaRose')">𝕏<small>@PonchaRose</small></button><button onclick="toggleSnsSheet();sns('02','https://m-sns.net/profile/@PonchaRose')">02<small>@PonchaRose</small></button><button onclick="toggleSnsSheet();sns('LINE','https://lin.ee/67dA4sS')">LINE<small>@845txetv</small></button></div></div></div>
+<div class="snsSheet" id="snsSheet" onclick="if(event.target===this)toggleSnsSheet()"><div class="snsPanel"><div class="snsPanelTop"><span>ぽんちゃんのSNS 🐾</span><button onclick="toggleSnsSheet()">×</button></div><div class="sns"><button data-sns-btn="x" onclick="toggleSnsSheet();openDynamicSns('x')">𝕏<small>@PonchaRose</small></button><button data-sns-btn="02" onclick="toggleSnsSheet();openDynamicSns('02')">02<small>@PonchaRose</small></button><button data-sns-btn="line" onclick="toggleSnsSheet();openDynamicSns('line')">LINE<small>@845txetv</small></button></div></div></div>
 <div class="drawerBack" id="drawerBack" onclick="if(event.target===this)toggleMenu()"><aside class="drawer"><div class="drawerTop"><b>🐾 MENU</b><button onclick="toggleMenu()">×</button></div><a href="#home" onclick="toggleMenu()">HOME</a><a href="#profile" onclick="toggleMenu()">プロフィール</a><a href="#intro" onclick="toggleMenu()">自己紹介</a><a href="#hime" onclick="toggleMenu()">姫予約・料金</a><a href="#schedule" onclick="toggleMenu()">出勤予定</a><a href="#calendar" onclick="toggleMenu()">カレンダー</a><a href="#news" onclick="toggleMenu()">お知らせ</a><a href="#photo" onclick="toggleMenu()">PHOTO</a><a href="#" onclick="event.preventDefault();toggleMenu();toggleSnsSheet()">SNS</a><a href="https://rose-gentleman.com/profile.php?id=153" target="_blank">オフィシャルプロフィール</a><a href="#" onclick="event.preventDefault();toggleMenu()">予約・お問い合わせ</a></aside></div>
 <div class="reserveSheet" id="reserveSheet"><div class="head"><span>予約・お問い合わせ</span></div><div class="reserve-grid"><a class="tel" href="tel:0662145047">☎ お店に電話</a><a class="shopline" href="https://lin.ee/YBqxbQD" target="_blank">◉ お店にLINE</a></div></div>
 <div class="lightbox" id="lightbox"><button class="x" onclick="closeLb()">×</button><button class="prev" onclick="moveLb(-1)">‹</button><img id="lbImg" alt=""><button class="next" onclick="moveLb(1)">›</button></div>
@@ -202,6 +202,26 @@ function moveLb(d){if(!validPhotos.length)return;lbIndex=(lbIndex+d+validPhotos.
 const SB_URL='https://vjjnkflbfsjihwzjsjpr.supabase.co';
 const SB_KEY='sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos';
 const publicSb=supabase.createClient(SB_URL,SB_KEY);
+let hondaSns={
+  x:{id:'@PonchaRose',url:'https://x.com/PonchaRose',name:'X'},
+  '02':{id:'@PonchaRose',url:'https://m-sns.net/profile/@PonchaRose',name:'02'},
+  line:{id:'@845txetv',url:'https://lin.ee/67dA4sS',name:'LINE'}
+};
+function applySns(){
+  document.querySelectorAll('[data-sns-link="x"]').forEach(e=>e.href=hondaSns.x.url);
+  document.querySelectorAll('[data-sns-link="02"]').forEach(e=>e.href=hondaSns['02'].url);
+  document.querySelectorAll('[data-sns-link="line"]').forEach(e=>e.href=hondaSns.line.url);
+  document.querySelectorAll('[data-sns-btn]').forEach(e=>{const k=e.dataset.snsBtn,s=e.querySelector('small');if(s)s.textContent=hondaSns[k].id});
+}
+async function loadSns(){
+  const {data,error}=await publicSb.from('honda_sns').select('*').eq('id',1).maybeSingle();
+  if(error||!data){if(error)console.error('SNS load error',error);return}
+  hondaSns={x:{id:data.x_id||'',url:data.x_url||'',name:'X'},'02':{id:data.sns02_id||'',url:data.sns02_url||'',name:'02'},line:{id:data.line_id||'',url:data.line_url||'',name:'LINE'}};
+  applySns();
+}
+function openDynamicSns(k){const s=hondaSns[k];if(s&&s.url)sns(s.name,s.url)}
+loadSns();
+
 async function loadPhotos(){
   const {data,error}=await publicSb.from('honda_photos').select('image_data').order('sort_order',{ascending:true}).order('id',{ascending:true});
   if(error||!data||!data.length){renderPhotoSources(fallbackPhotos);return}
