@@ -66,11 +66,15 @@ linear-gradient(225deg,transparent 50%,#241f20 51%) right top/17px 18px no-repea
 </style></head><body><main class="app">
 <section class="hero" id="home"><img src="main.png.png" alt="本田 メイン画像" style="width:100%;height:100%;object-fit:cover;display:block"><button class="menuBtn" onclick="toggleMenu()" aria-label="メニュー">☰</button></section>
 <div class="content">
+<section class="card news" id="news"><div class="head">お知らせ</div><div><time>09/16</time><span>29日空いてます❤️</span></div><div><time>09/13</time><span>ブログを更新しました</span></div></section>
 <section class="card"><div class="head">SNS</div><div class="sns"><button onclick="sns('X','https://x.com/PonchaRose')">𝕏<small>@PonchaRose</small></button><button onclick="sns('02','https://m-sns.net/profile/@PonchaRose')">02<small>@PonchaRose</small></button><button class="disabled">LINE<small>URL設定待ち</small></button></div></section>
-<section class="card" id="profile"><div class="head"><span>プロフィール</span><small>PROFILE</small></div><div class="profile"><img src="https://rose-gentleman.com/exa_userdata/person/153/image_main1_resize1.jpg" alt="本田"><dl><dt>年齢</dt><dd>37歳</dd><dt>身長</dt><dd>160cm</dd><dt>タイプ</dt><dd>キレ可愛系 / 小柄</dd><dt>特徴</dt><dd>色白美肌 / 癒し系</dd><dt>趣味</dt><dd>食べ歩き</dd><dt>性格</dt><dd>好奇心旺盛</dd></dl></div></section>
 <section class="card"><div class="catAccent">🐾 Honda's personality 🐾</div><img class="personalImg" src="personal-cat.png" alt="本田さんを猫に例えると" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="personalFallback" style="display:none">🐾 パーソナル画像<br>personal-cat.png を登録すると表示されます</div></section>
 <section class="card intro" id="intro"><div class="center"><p class="name">🌹薔薇と紳士　本田です🌹</p><b>「ぽんちゃん」って呼んでください♡</b><p class="catch">〜大人の癒しと少し意地悪な時間を♡〜</p></div><p>🌹「また会いたい」と言ってもらえる施術を目指しています🌹</p><p>疲れた身体をしっかりほぐしながら、<br>甘やかすだけじゃ終わらない♡<br>少しだけドキドキする時間をお届けします♡<br>沼る準備をしてきてね🐱🤍</p><h3>こんな方におすすめ✨</h3><p>❤️ 細身のお姉さんが好き<br>❤️ 猫顔がタイプ<br>❤️ 大人の女性に甘えたい<br>❤️ 少しSなお姉さんにドキドキしたい<br>❤️ M気質<br>❤️ しっかりマッサージされたい<br>❤️ 癒しも刺激もどっちも欲しい<br>❤️ 楽しくお話したい</p><h3>✨得意✨</h3><p>✔ 密着感のあるマッサージ<br>✔ 肩・首・背中のコリほぐし<br>✔ 焦らされるような距離感♡<br>✔ 初めてでも緊張しない空気作り</p><p>「思ってたより話しやすい😊」<br>「時間があっという間だった！」</p><p>そう言ってもらえることが多いです🌹</p><p>初指名・人見知りさん大歓迎です☺️</p><p>ぜひ一度、ぽんちゃんに会いに来てください🤍</p></section>
 
+<div class="catTrail" aria-hidden="true"><span>🐾</span><span>🐾</span><span>🐾</span></div><section class="card" id="photo"><div class="head">PHOTO</div><div class="photoSub">PONCHAN’S PHOTO</div><div class="photoThumbs" id="photoThumbs"></div><p class="photoHint">写真をタップすると大きく表示できます 🐾</p></section>
+<section class="card" id="schedule"><div class="head"><span>本日の出勤</span></div><div class="today"><span id="todayDate"></span><strong id="todayStatus"></strong></div></section>
+<section class="card"><div class="head"><span>明日以降の出勤</span></div><div id="future"></div></section>
+<section class="card" id="calendar"><div class="head"><span>カレンダー</span></div><img src="calendar.jfif" alt="本田 出勤カレンダー" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;border-radius:10px"></section>
 <section class="card" id="hime">
   <div class="head"><span>姫予約</span><small>DIRECT RESERVATION</small></div>
   <p style="font-size:13px;line-height:1.7;margin-top:0">ぽんちゃんへ直接ご予約いただく際の料金確認と、送信用テンプレートです。</p>
@@ -126,13 +130,10 @@ linear-gradient(225deg,transparent 50%,#241f20 51%) right top/17px 18px no-repea
     <a href="https://m-sns.net/profile/@PonchaRose" target="_blank" rel="noopener">02で姫予約</a>
   </div>
 </section>
-<section class="card" id="schedule"><div class="head"><span>本日の出勤</span></div><div class="today"><span id="todayDate"></span><strong id="todayStatus"></strong></div></section>
-<section class="card"><div class="head"><span>明日以降の出勤</span></div><div id="future"></div></section>
-<section class="card" id="calendar"><div class="head"><span>カレンダー</span></div><img src="calendar.jfif" alt="本田 出勤カレンダー" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;border-radius:10px"></section>
-<section class="card news" id="news"><div class="head">お知らせ</div><div><time>09/16</time><span>29日空いてます❤️</span></div><div><time>09/13</time><span>ブログを更新しました</span></div></section>
-<div class="catTrail" aria-hidden="true"><span>🐾</span><span>🐾</span><span>🐾</span></div><section class="card" id="photo"><div class="head">PHOTO</div><div class="photoSub">PONCHAN’S PHOTO</div><div class="photoThumbs" id="photoThumbs"></div><p class="photoHint">写真をタップすると大きく表示できます 🐾</p></section>
+<section class="card" id="profile"><div class="head"><span>プロフィール</span><small>PROFILE</small></div><div class="profile"><img src="https://rose-gentleman.com/exa_userdata/person/153/image_main1_resize1.jpg" alt="本田"><dl><dt>年齢</dt><dd>37歳</dd><dt>身長</dt><dd>160cm</dd><dt>タイプ</dt><dd>キレ可愛系 / 小柄</dd><dt>特徴</dt><dd>色白美肌 / 癒し系</dd><dt>趣味</dt><dd>食べ歩き</dd><dt>性格</dt><dd>好奇心旺盛</dd></dl></div></section>
 <section class="card links"><a href="https://rose-gentleman.com/profile.php?id=153" target="_blank"><span>オフィシャルプロフィール</span><b>›</b></a><a href="https://rose-gentleman.com/bloglist.php?id=153" target="_blank"><span>オフィシャルブログ</span><b>›</b></a></section>
 <section class="card" id="sns-bottom"><div class="head">SNS</div><div class="sns"><button onclick="sns('X','https://x.com/PonchaRose')">𝕏<small>@PonchaRose</small></button><button onclick="sns('02','https://m-sns.net/profile/@PonchaRose')">02<small>@PonchaRose</small></button><button class="disabled">LINE<small>URL設定待ち</small></button></div></section>
+
 </div></main>
 <nav class="nav"><a href="#home"><span class="ico">⌂</span>HOME</a><a href="#schedule"><span class="ico">▦</span>出勤</a><a href="#photo"><span class="ico">▣</span>PHOTO</a><button onclick="alert('チャット機能は接続設定後に利用できます')"><span class="ico">●</span>チャット</button><button onclick="toggleReserve()"><span class="ico">♡</span>予約</button></nav>
 <button class="catPeek" onclick="alert('チャット機能は接続設定後に利用できます')" aria-label="ぽんちゃんに話しかける"><span class="catBubble">ぽんちゃんに話しかける</span><svg viewBox="0 0 100 90" aria-hidden="true"><path d="M17 36 22 8 43 26c5-2 10-2 15 0L79 8l5 29c7 8 10 18 8 29-3 15-18 22-41 22S13 81 10 66c-2-11 0-21 7-30Z" fill="#242021"/><path d="M32 52c5-5 10-5 15 0M62 52c5-5 10-5 15 0" fill="none" stroke="#f7ece8" stroke-width="3" stroke-linecap="round"/><path d="M49 61c3 2 5 2 8 0" fill="none" stroke="#c89191" stroke-width="3" stroke-linecap="round"/></svg></button>
