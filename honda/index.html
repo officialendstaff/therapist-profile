@@ -103,7 +103,7 @@ linear-gradient(225deg,transparent 50%,#241f20 51%) right top/17px 18px no-repea
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body><main class="app">
 <section class="hero" id="home"><img src="main.png.png" alt="本田 メイン画像" style="width:100%;height:100%;object-fit:cover;display:block"><button class="menuBtn" onclick="toggleMenu()" aria-label="メニュー">☰</button></section>
 <div class="content">
-<section class="card news" id="news"><div class="head">お知らせ</div><div class="newsItem" role="button" tabindex="0" onclick="openNewsDetail(0)"><time>09/16</time><span>29日空いてます❤️</span><b>›</b></div><div class="newsItem" role="button" tabindex="0" onclick="openNewsDetail(1)"><time>09/13</time><span>ブログを更新しました</span><b>›</b></div><button class="newsMore" type="button" onclick="openNewsList()">過去のお知らせを見る</button></section>
+<section class="card news" id="news"><div class="head">お知らせ</div><div id="newsTop"><div class="newsLoading">読み込み中…</div></div><button class="newsMore" id="newsMoreBtn" type="button" onclick="openNewsList()" style="display:none">過去のお知らせを見る</button></section>
 <section class="card" id="schedule"><div class="head"><span>本日の出勤</span></div><div class="today"><span id="todayDate"></span><strong id="todayStatus"></strong></div><div class="todayCat" id="todayCat" data-state="work"><div id="todayCatArt"></div><div class="todayCatMsg" id="todayCatMsg"></div></div></section>
 <section class="card"><div class="catAccent">🐾 Honda's personality 🐾</div><img class="personalImg" src="personal-cat.png" alt="本田さんを猫に例えると" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="personalFallback" style="display:none">🐾 パーソナル画像<br>personal-cat.png を登録すると表示されます</div></section>
 <section class="card intro" id="intro"><div class="center"><p class="name">🌹薔薇と紳士　本田です🌹</p><b>「ぽんちゃん」って呼んでください♡</b><p class="catch">〜大人の癒しと少し意地悪な時間を♡〜</p></div><p>🌹「また会いたい」と言ってもらえる施術を目指しています🌹</p><p>疲れた身体をしっかりほぐしながら、<br>甘やかすだけじゃ終わらない♡<br>少しだけドキドキする時間をお届けします♡<br>沼る準備をしてきてね🐱🤍</p><h3>こんな方におすすめ✨</h3><p>❤️ 細身のお姉さんが好き<br>❤️ 猫顔がタイプ<br>❤️ 大人の女性に甘えたい<br>❤️ 少しSなお姉さんにドキドキしたい<br>❤️ M気質<br>❤️ しっかりマッサージされたい<br>❤️ 癒しも刺激もどっちも欲しい<br>❤️ 楽しくお話したい</p><h3>✨得意✨</h3><p>✔ 密着感のあるマッサージ<br>✔ 肩・首・背中のコリほぐし<br>✔ 焦らされるような距離感♡<br>✔ 初めてでも緊張しない空気作り</p><p>「思ってたより話しやすい😊」<br>「時間があっという間だった！」</p><p>そう言ってもらえることが多いです🌹</p><p>初指名・人見知りさん大歓迎です☺️</p><p>ぜひ一度、ぽんちゃんに会いに来てください🤍</p></section>
@@ -295,24 +295,31 @@ window.addEventListener('pageshow',function(){
   setTimeout(resetPageToTop,250);
 });
 
-const hondaNews=[
-  {date:'09/16',title:'29日空いてます❤️',text:'29日空いてます❤️\nご予約・お問い合わせお待ちしています🐾'},
-  {date:'09/13',title:'ブログを更新しました',text:'ブログを更新しました。\nぜひチェックしてください🐾'}
-];
+let hondaNews=[];
+function escNews(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function newsDate(v){const d=new Date(v);return isNaN(d)?'':String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0')}
+async function loadNews(){
+  const {data,error}=await publicSb.from('honda_news').select('*').eq('is_public',true).order('published_at',{ascending:false}).order('id',{ascending:false});
+  if(error){console.error('news load error',error);newsTop.innerHTML='<div class="newsLoading">お知らせを取得できませんでした</div>';return}
+  hondaNews=data||[];
+  newsTop.innerHTML=hondaNews.length?hondaNews.slice(0,2).map((n,i)=>'<div class="newsItem" role="button" tabindex="0" onclick="openNewsDetail('+i+')"><time>'+newsDate(n.published_at)+'</time><span>'+(n.is_important?'🔴 ':'')+escNews(n.title)+'</span><b>›</b></div>').join(''):'<div class="newsLoading">現在お知らせはありません</div>';
+  newsMoreBtn.style.display=hondaNews.length>2?'block':'none';
+}
 function openNewsDetail(i){
-  const n=hondaNews[i]; if(!n)return;
-  newsPopupTitle.textContent='お知らせ';
-  newsPopupBody.innerHTML='<div class="newsDetailDate">'+n.date+'</div><div class="newsDetailTitle">'+n.title+'</div><div class="newsDetailText">'+n.text+'</div>';
-  newsPopup.classList.add('open'); document.body.style.overflow='hidden';
+  const n=hondaNews[i];if(!n)return;
+  newsPopupTitle.textContent=n.is_important?'🔴 重要なお知らせ':'お知らせ';
+  newsPopupBody.innerHTML='<div class="newsDetailDate">'+newsDate(n.published_at)+'</div><div class="newsDetailTitle">'+escNews(n.title)+'</div><div class="newsDetailText">'+escNews(n.body)+'</div>';
+  newsPopup.classList.add('open');document.body.style.overflow='hidden';
 }
 function openNewsList(){
   newsPopupTitle.textContent='お知らせ一覧';
-  newsPopupBody.innerHTML=hondaNews.map((n,i)=>'<button class="newsListItem" type="button" onclick="openNewsDetail('+i+')"><time>'+n.date+'</time><span>'+n.title+'</span><b>›</b></button>').join('');
-  newsPopup.classList.add('open'); document.body.style.overflow='hidden';
+  newsPopupBody.innerHTML=hondaNews.map((n,i)=>'<button class="newsListItem" type="button" onclick="openNewsDetail('+i+')"><time>'+newsDate(n.published_at)+'</time><span>'+(n.is_important?'🔴 ':'')+escNews(n.title)+'</span><b>›</b></button>').join('');
+  newsPopup.classList.add('open');document.body.style.overflow='hidden';
 }
 function closeNewsPopup(){newsPopup.classList.remove('open');document.body.style.overflow=''}
 function newsBackdropClose(e){if(e.target===newsPopup)closeNewsPopup()}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeNewsPopup()});
+loadNews();
 </script><div class="newsPopup" id="newsPopup" onclick="newsBackdropClose(event)">
   <div class="newsPopupPanel" role="dialog" aria-modal="true" aria-labelledby="newsPopupTitle">
     <div class="newsPopupTop"><b id="newsPopupTitle">お知らせ</b><button type="button" onclick="closeNewsPopup()" aria-label="閉じる">×</button></div>
