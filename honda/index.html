@@ -90,9 +90,9 @@ linear-gradient(225deg,transparent 50%,#241f20 51%) right top/17px 18px no-repea
 .news .newsItem{display:grid;grid-template-columns:54px 1fr 16px;align-items:center;gap:8px;cursor:pointer}
 .news .newsItem b{color:#a92d48;font-size:20px;text-align:right}
 .newsMore{width:100%;margin-top:7px;min-height:42px;border:1px solid #d9b9b9;border-radius:8px;background:#fff;color:#8b2035;font-weight:700}
-.newsPopup{position:fixed;inset:0;background:#0009;z-index:160;display:none;align-items:flex-end;justify-content:center}
+.newsPopup{position:fixed;inset:0;background:#0009;z-index:160;display:none;align-items:center;justify-content:center;padding:18px}
 .newsPopup.open{display:flex}
-.newsPopupPanel{width:min(430px,100%);max-height:78vh;overflow:auto;background:#fffaf8;border-radius:18px 18px 0 0;padding:18px 16px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -8px 30px #0004}
+.newsPopupPanel{width:min(394px,100%);max-height:78vh;overflow:auto;background:#fffaf8;border-radius:18px;padding:18px 16px;box-shadow:0 10px 34px #0005}
 .newsPopupTop{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid #ead9d6;color:#7d1728;font-size:18px}
 .newsPopupTop button{border:0;background:none;font-size:28px;line-height:1;color:#5b4543}
 .newsDetailDate{font-size:12px;color:#9a7e7c;margin:14px 0 7px}
@@ -270,10 +270,29 @@ async function copyHime(){
 }
 calcHime();
 
-// Always start at the top after reload/revisit.
+// Always start at HOME after reload/revisit instead of restoring a stale scroll position.
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-window.addEventListener('pageshow', function () {
-  requestAnimationFrame(function () { window.scrollTo(0, 0); });
+function resetPageToTop(){
+  if(location.hash){
+    history.replaceState(null,'',location.pathname+location.search);
+  }
+  document.documentElement.scrollTop=0;
+  document.body.scrollTop=0;
+  window.scrollTo(0,0);
+}
+resetPageToTop();
+document.addEventListener('DOMContentLoaded',resetPageToTop);
+window.addEventListener('load',function(){
+  resetPageToTop();
+  requestAnimationFrame(function(){
+    resetPageToTop();
+    requestAnimationFrame(resetPageToTop);
+  });
+});
+window.addEventListener('pageshow',function(){
+  resetPageToTop();
+  setTimeout(resetPageToTop,50);
+  setTimeout(resetPageToTop,250);
 });
 
 const hondaNews=[
