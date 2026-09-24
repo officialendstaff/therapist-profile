@@ -213,29 +213,30 @@ async function loadPageSettings(){
 loadPageSettings();
 
 let hondaSns={
-  x:{id:'@PonchaRose',url:'https://x.com/PonchaRose',name:'X'},
-  '02':{id:'@PonchaRose',url:'https://m-sns.net/profile/@PonchaRose',name:'02'},
-  line:{id:'@845txetv',url:'https://lin.ee/67dA4sS',name:'LINE'}
+  x:{id:'@PonchaRose',url:'https://x.com/PonchaRose',name:'X',enabled:true},
+  '02':{id:'@PonchaRose',url:'https://m-sns.net/profile/@PonchaRose',name:'02',enabled:true},
+  line:{id:'@845txetv',url:'https://lin.ee/67dA4sS',name:'LINE',enabled:true}
 };
 function applySns(){
   document.querySelectorAll('[data-sns-link="x"]').forEach(e=>e.href=hondaSns.x.url);
   document.querySelectorAll('[data-sns-link="02"]').forEach(e=>e.href=hondaSns['02'].url);
   document.querySelectorAll('[data-sns-link="line"]').forEach(e=>e.href=hondaSns.line.url);
-  document.querySelectorAll('[data-sns-btn]').forEach(e=>{const k=e.dataset.snsBtn,s=e.querySelector('small');if(s)s.textContent=hondaSns[k].id});
+  document.querySelectorAll('[data-sns-btn]').forEach(e=>{const k=e.dataset.snsBtn,s=e.querySelector('small');if(s)s.textContent=hondaSns[k].id;e.style.display=hondaSns[k].enabled===false?'none':''});
+  document.querySelectorAll('[data-sns-link]').forEach(e=>{const k=e.dataset.snsLink;e.style.display=hondaSns[k]&&hondaSns[k].enabled===false?'none':''});
 }
 async function loadSns(){
   const {data,error}=await publicSb.from('honda_sns').select('*').eq('id',1).maybeSingle();
   if(error||!data){if(error)console.error('SNS load error',error);return}
-  hondaSns={x:{id:data.x_id||'',url:data.x_url||'',name:'X'},'02':{id:data.sns02_id||'',url:data.sns02_url||'',name:'02'},line:{id:data.line_id||'',url:data.line_url||'',name:'LINE'}};
+  hondaSns={x:{id:data.x_id||'',url:data.x_url||'',name:'X',enabled:data.x_enabled!==false},'02':{id:data.sns02_id||'',url:data.sns02_url||'',name:'02',enabled:data.sns02_enabled!==false},line:{id:data.line_id||'',url:data.line_url||'',name:'LINE',enabled:data.line_enabled!==false}};
   applySns();
 }
-function openDynamicSns(k){const s=hondaSns[k];if(s&&s.url)sns(s.name,s.url)}
+function openDynamicSns(k){const s=hondaSns[k];if(s&&s.enabled!==false&&s.url)sns(s.name,s.url)}
 loadSns();
 
 async function loadPhotos(){
-  const {data,error}=await publicSb.from('honda_photos').select('image_data').order('sort_order',{ascending:true}).order('id',{ascending:true});
+  const {data,error}=await publicSb.from('honda_photos').select('image_url,image_data').order('sort_order',{ascending:true}).order('id',{ascending:true});
   if(error||!data||!data.length){renderPhotoSources(fallbackPhotos);return}
-  renderPhotoSources(data.map(x=>x.image_data));
+  renderPhotoSources(data.map(x=>x.image_url||x.image_data).filter(Boolean));
 }
 loadPhotos();
 const wd=['日','月','火','水','木','金','土'],p=n=>String(n).padStart(2,'0'),k=d=>d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()),f=d=>(d.getMonth()+1)+'/'+d.getDate()+'（'+wd[d.getDay()]+'）';
