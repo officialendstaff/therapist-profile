@@ -190,12 +190,24 @@ if("scrollRestoration" in history) history.scrollRestoration="manual";
 window.addEventListener("pageshow",()=>{if(!location.hash) window.scrollTo(0,0)});
 let url='';function sns(n,u){url=u;noticeTitle.textContent=n+' 利用に関する注意事項';notice.classList.add('open')}function closeNotice(){notice.classList.remove('open');url=''};go.onclick=()=>{if(url)open(url,'_blank','noopener');closeNotice()};notice.onclick=e=>{if(e.target===notice)closeNotice()};
 function toggleMenu(){drawerBack.classList.toggle('open')}function toggleSnsSheet(){snsSheet.classList.toggle('open')}function toggleReserve(){reserveSheet.classList.toggle('open')}
-const photos=Array.from({length:20},(_,i)=>'photo-'+String(i+1).padStart(2,'0')+'.jfif');let validPhotos=[],lbIndex=0;
-function initPhotos(){const box=document.getElementById('photoThumbs');photos.forEach(src=>{const im=new Image();im.onload=()=>{validPhotos.push(src);const x=document.createElement('img');x.src=src;x.alt='本田 PHOTO';x.onclick=()=>openLb(validPhotos.indexOf(src));box.appendChild(x)};im.src=src})}
-function openLb(i){lbIndex=i;lbImg.src=validPhotos[i];lightbox.classList.add('open')}function closeLb(){lightbox.classList.remove('open')}function moveLb(d){if(!validPhotos.length)return;lbIndex=(lbIndex+d+validPhotos.length)%validPhotos.length;lbImg.src=validPhotos[lbIndex]}initPhotos();
+let validPhotos=[],lbIndex=0;
+const fallbackPhotos=Array.from({length:10},(_,i)=>'photo-'+String(i+1).padStart(2,'0')+'.jfif');
+function renderPhotoSources(list){
+  const box=document.getElementById('photoThumbs');box.innerHTML='';validPhotos=[];
+  list.forEach(src=>{const im=new Image();im.onload=()=>{validPhotos.push(src);const x=document.createElement('img');x.src=src;x.alt='本田 PHOTO';x.onclick=()=>openLb(validPhotos.indexOf(src));box.appendChild(x)};im.src=src});
+}
+function openLb(i){lbIndex=i;lbImg.src=validPhotos[i];lightbox.classList.add('open')}
+function closeLb(){lightbox.classList.remove('open')}
+function moveLb(d){if(!validPhotos.length)return;lbIndex=(lbIndex+d+validPhotos.length)%validPhotos.length;lbImg.src=validPhotos[lbIndex]}
 const SB_URL='https://vjjnkflbfsjihwzjsjpr.supabase.co';
 const SB_KEY='sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos';
 const publicSb=supabase.createClient(SB_URL,SB_KEY);
+async function loadPhotos(){
+  const {data,error}=await publicSb.from('honda_photos').select('image_data').order('sort_order',{ascending:true}).order('id',{ascending:true});
+  if(error||!data||!data.length){renderPhotoSources(fallbackPhotos);return}
+  renderPhotoSources(data.map(x=>x.image_data));
+}
+loadPhotos();
 const wd=['日','月','火','水','木','金','土'],p=n=>String(n).padStart(2,'0'),k=d=>d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()),f=d=>(d.getMonth()+1)+'/'+d.getDate()+'（'+wd[d.getDay()]+'）';
 
 function resolvedStatus(row,isToday=false){
