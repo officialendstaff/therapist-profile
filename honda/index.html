@@ -86,10 +86,24 @@ linear-gradient(225deg,transparent 50%,#241f20 51%) right top/17px 18px no-repea
 .todayCat .catBody{fill:#242021}.todayCat .catPink{fill:#d78d91}.todayCat .catGold{fill:#d7aa49}.todayCat .catLine{fill:none;stroke:#242021;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
 .todayCatMsg{margin-top:3px;font-size:12px;font-weight:700;color:#8d2034}
 .todayCat[data-state="off"] .todayCatMsg{color:#806c69}.todayCat[data-state="full"] .todayCatMsg{color:#b62c48}
+
+.news .newsItem{display:grid;grid-template-columns:54px 1fr 16px;align-items:center;gap:8px;cursor:pointer}
+.news .newsItem b{color:#a92d48;font-size:20px;text-align:right}
+.newsMore{width:100%;margin-top:7px;min-height:42px;border:1px solid #d9b9b9;border-radius:8px;background:#fff;color:#8b2035;font-weight:700}
+.newsPopup{position:fixed;inset:0;background:#0009;z-index:160;display:none;align-items:flex-end;justify-content:center}
+.newsPopup.open{display:flex}
+.newsPopupPanel{width:min(430px,100%);max-height:78vh;overflow:auto;background:#fffaf8;border-radius:18px 18px 0 0;padding:18px 16px calc(22px + env(safe-area-inset-bottom));box-shadow:0 -8px 30px #0004}
+.newsPopupTop{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid #ead9d6;color:#7d1728;font-size:18px}
+.newsPopupTop button{border:0;background:none;font-size:28px;line-height:1;color:#5b4543}
+.newsDetailDate{font-size:12px;color:#9a7e7c;margin:14px 0 7px}
+.newsDetailTitle{font-size:18px;font-weight:800;color:#4b3434;margin-bottom:12px}
+.newsDetailText{font-size:14px;line-height:1.9;white-space:pre-wrap}
+.newsListItem{width:100%;display:grid;grid-template-columns:58px 1fr 18px;align-items:center;gap:7px;text-align:left;border:0;border-bottom:1px solid #ead9d6;background:transparent;padding:14px 2px;color:#443131}
+.newsListItem time{font-size:12px;color:#9a7e7c}.newsListItem span{font-size:14px;font-weight:700}.newsListItem b{font-size:20px;color:#a92d48}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body><main class="app">
 <section class="hero" id="home"><img src="main.png.png" alt="本田 メイン画像" style="width:100%;height:100%;object-fit:cover;display:block"><button class="menuBtn" onclick="toggleMenu()" aria-label="メニュー">☰</button></section>
 <div class="content">
-<section class="card news" id="news"><div class="head">お知らせ</div><div><time>09/16</time><span>29日空いてます❤️</span></div><div><time>09/13</time><span>ブログを更新しました</span></div></section>
+<section class="card news" id="news"><div class="head">お知らせ</div><div class="newsItem" role="button" tabindex="0" onclick="openNewsDetail(0)"><time>09/16</time><span>29日空いてます❤️</span><b>›</b></div><div class="newsItem" role="button" tabindex="0" onclick="openNewsDetail(1)"><time>09/13</time><span>ブログを更新しました</span><b>›</b></div><button class="newsMore" type="button" onclick="openNewsList()">過去のお知らせを見る</button></section>
 <section class="card" id="schedule"><div class="head"><span>本日の出勤</span></div><div class="today"><span id="todayDate"></span><strong id="todayStatus"></strong></div><div class="todayCat" id="todayCat" data-state="work"><div id="todayCatArt"></div><div class="todayCatMsg" id="todayCatMsg"></div></div></section>
 <section class="card"><div class="catAccent">🐾 Honda's personality 🐾</div><img class="personalImg" src="personal-cat.png" alt="本田さんを猫に例えると" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="personalFallback" style="display:none">🐾 パーソナル画像<br>personal-cat.png を登録すると表示されます</div></section>
 <section class="card intro" id="intro"><div class="center"><p class="name">🌹薔薇と紳士　本田です🌹</p><b>「ぽんちゃん」って呼んでください♡</b><p class="catch">〜大人の癒しと少し意地悪な時間を♡〜</p></div><p>🌹「また会いたい」と言ってもらえる施術を目指しています🌹</p><p>疲れた身体をしっかりほぐしながら、<br>甘やかすだけじゃ終わらない♡<br>少しだけドキドキする時間をお届けします♡<br>沼る準備をしてきてね🐱🤍</p><h3>こんな方におすすめ✨</h3><p>❤️ 細身のお姉さんが好き<br>❤️ 猫顔がタイプ<br>❤️ 大人の女性に甘えたい<br>❤️ 少しSなお姉さんにドキドキしたい<br>❤️ M気質<br>❤️ しっかりマッサージされたい<br>❤️ 癒しも刺激もどっちも欲しい<br>❤️ 楽しくお話したい</p><h3>✨得意✨</h3><p>✔ 密着感のあるマッサージ<br>✔ 肩・首・背中のコリほぐし<br>✔ 焦らされるような距離感♡<br>✔ 初めてでも緊張しない空気作り</p><p>「思ってたより話しやすい😊」<br>「時間があっという間だった！」</p><p>そう言ってもらえることが多いです🌹</p><p>初指名・人見知りさん大歓迎です☺️</p><p>ぜひ一度、ぽんちゃんに会いに来てください🤍</p></section>
@@ -261,4 +275,29 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 window.addEventListener('pageshow', function () {
   requestAnimationFrame(function () { window.scrollTo(0, 0); });
 });
-</script></body></html>
+
+const hondaNews=[
+  {date:'09/16',title:'29日空いてます❤️',text:'29日空いてます❤️\nご予約・お問い合わせお待ちしています🐾'},
+  {date:'09/13',title:'ブログを更新しました',text:'ブログを更新しました。\nぜひチェックしてください🐾'}
+];
+function openNewsDetail(i){
+  const n=hondaNews[i]; if(!n)return;
+  newsPopupTitle.textContent='お知らせ';
+  newsPopupBody.innerHTML='<div class="newsDetailDate">'+n.date+'</div><div class="newsDetailTitle">'+n.title+'</div><div class="newsDetailText">'+n.text+'</div>';
+  newsPopup.classList.add('open'); document.body.style.overflow='hidden';
+}
+function openNewsList(){
+  newsPopupTitle.textContent='お知らせ一覧';
+  newsPopupBody.innerHTML=hondaNews.map((n,i)=>'<button class="newsListItem" type="button" onclick="openNewsDetail('+i+')"><time>'+n.date+'</time><span>'+n.title+'</span><b>›</b></button>').join('');
+  newsPopup.classList.add('open'); document.body.style.overflow='hidden';
+}
+function closeNewsPopup(){newsPopup.classList.remove('open');document.body.style.overflow=''}
+function newsBackdropClose(e){if(e.target===newsPopup)closeNewsPopup()}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeNewsPopup()});
+</script><div class="newsPopup" id="newsPopup" onclick="newsBackdropClose(event)">
+  <div class="newsPopupPanel" role="dialog" aria-modal="true" aria-labelledby="newsPopupTitle">
+    <div class="newsPopupTop"><b id="newsPopupTitle">お知らせ</b><button type="button" onclick="closeNewsPopup()" aria-label="閉じる">×</button></div>
+    <div id="newsPopupBody"></div>
+  </div>
+</div>
+</body></html>
