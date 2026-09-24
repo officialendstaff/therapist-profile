@@ -142,6 +142,8 @@ linear-gradient(225deg,transparent 50%,#241f20 51%) right top/17px 18px no-repea
 <div class="lightbox" id="lightbox"><button class="x" onclick="closeLb()">×</button><button class="prev" onclick="moveLb(-1)">‹</button><img id="lbImg" alt=""><button class="next" onclick="moveLb(1)">›</button></div>
 <div class="backdrop" id="notice"><div class="modal"><h2 id="noticeTitle">SNS利用に関する注意事項</h2><p>セラピストが安心してSNSを利用できるよう、以下の行為はお控えください。</p><ul><li>誹謗中傷、侮辱、脅迫、威圧的なメッセージ</li><li>執拗なDMや返信を強要する行為</li><li>個人情報やプライベートに関する過度な詮索</li><li>画像・投稿内容・DM等の無断転載や公開</li><li>性的・差別的その他不適切なメッセージ</li><li>店舗またはセラピストが禁止する方法での直接的な交渉・勧誘</li></ul><p>悪質な行為については、記録の保存、店舗への報告、利用制限、警察・弁護士等への相談を含む対応を行う場合があります。</p><div class="actions"><button class="cancel" onclick="closeNotice()">戻る</button><button class="go" id="go">同意してSNSを開く</button></div></div></div>
 <script>
+if("scrollRestoration" in history) history.scrollRestoration="manual";
+window.addEventListener("pageshow",()=>{if(!location.hash) window.scrollTo(0,0)});
 let url='';function sns(n,u){url=u;noticeTitle.textContent=n+' 利用に関する注意事項';notice.classList.add('open')}function closeNotice(){notice.classList.remove('open');url=''};go.onclick=()=>{if(url)open(url,'_blank','noopener');closeNotice()};notice.onclick=e=>{if(e.target===notice)closeNotice()};
 function toggleMenu(){drawerBack.classList.toggle('open')}function toggleReserve(){reserveSheet.classList.toggle('open')}
 const photos=Array.from({length:20},(_,i)=>'photo-'+String(i+1).padStart(2,'0')+'.jfif');let validPhotos=[],lbIndex=0;
