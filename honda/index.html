@@ -81,7 +81,7 @@ linear-gradient(225deg,transparent 50%,#241f20 51%) right top/17px 18px no-repea
 .todayCatMsg{margin-top:3px;font-size:12px;font-weight:700;color:#8d2034}
 .todayCat[data-state="off"] .todayCatMsg{color:#806c69}.todayCat[data-state="full"] .todayCatMsg{color:#b62c48}
 
-.news .newsItem{display:grid;grid-template-columns:54px 1fr 16px;align-items:center;gap:8px;cursor:pointer}
+.news #newsTop{display:grid;grid-template-columns:1fr;gap:7px}.news .newsItem{display:grid;grid-template-columns:54px 1fr 16px;align-items:center;gap:8px;cursor:pointer;width:100%;padding:11px 8px;border-top:1px solid #f0e5e2}
 .news .newsItem b{color:#a92d48;font-size:20px;text-align:right}
 .newsMore{width:100%;margin-top:7px;min-height:42px;border:1px solid #d9b9b9;border-radius:8px;background:#fff;color:#8b2035;font-weight:700}
 .newsPopup{position:fixed;inset:0;background:#0009;z-index:160;display:none;align-items:center;justify-content:center;padding:18px}
@@ -350,8 +350,8 @@ async function loadNews(){
   const {data,error}=await publicSb.from('honda_news').select('*').eq('is_public',true).lte('published_at',new Date().toISOString()).order('published_at',{ascending:false}).order('id',{ascending:false});
   if(error){console.error('news load error',error);newsTop.innerHTML='<div class="newsLoading">お知らせを取得できませんでした</div>';return}
   hondaNews=(data||[]).filter(n=>!n.expires_at||new Date(n.expires_at)>new Date());
-  newsTop.innerHTML=hondaNews.length?hondaNews.slice(0,2).map((n,i)=>'<div class="newsItem '+(n.is_important?'important':'')+'" role="button" tabindex="0" onclick="openNewsDetail('+i+')"><time>'+newsDate(n.published_at)+'</time><span>'+(n.is_important?'<em class="importantBadge">重要</em>':'')+escNews(n.title)+'</span><b>›</b></div>').join(''):'<div class="newsLoading">現在お知らせはありません</div>';
-  newsMoreBtn.style.display=hondaNews.length>2?'block':'none';
+  newsTop.innerHTML=hondaNews.length?hondaNews.slice(0,3).map((n,i)=>'<div class="newsItem '+(n.is_important?'important':'')+'" role="button" tabindex="0" onclick="openNewsDetail('+i+')"><time>'+newsDate(n.published_at)+'</time><span>'+(n.is_important?'<em class="importantBadge">重要</em>':'')+escNews(n.title)+'</span><b>›</b></div>').join(''):'<div class="newsLoading">現在お知らせはありません</div>';
+  newsMoreBtn.style.display=hondaNews.length>3?'block':'none';
 }
 function openNewsDetail(i){
   const n=hondaNews[i];if(!n)return;
