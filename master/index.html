@@ -1,0 +1,396 @@
+<!-- THERAPIST MASTER TEMPLATE: clone this directory for new therapist pages. -->
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#8f1830"><title>本田｜薔薇と紳士</title>
+<style>
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#eee7e4;color:#332727;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;padding-bottom:72px}.app{max-width:430px;margin:auto;min-height:100vh;background:#fff8f6;box-shadow:0 0 28px #0002}.hero{position:relative;aspect-ratio:3/4;overflow:hidden;background:linear-gradient(145deg,#f3e9e6,#e5d3cf);display:flex;align-items:center;justify-content:center}.placeholder{color:#8d6d69;text-align:center;font-size:13px;line-height:1.8}.logo{position:absolute;top:18px;left:16px;color:#7d1728;font-family:"Yu Mincho",serif;text-shadow:0 1px 4px #fff}.logo b{font-size:25px}.logo small{display:block;color:#3f2b2d;letter-spacing:.12em}.menu{position:absolute;right:16px;top:15px;color:#fff;text-align:center;text-shadow:0 2px 5px #000;font-size:9px}.menu b{font-size:29px;display:block;line-height:24px}.hero-copy{position:absolute;right:20px;bottom:28px;text-align:right;color:#fff;text-shadow:0 2px 8px #0009}.hero-copy i{font:italic 25px Georgia}.hero-copy strong{display:block;font:34px "Yu Mincho",serif}.hero-copy small{display:block;margin-top:9px;letter-spacing:.12em}.content{padding:10px}.card{background:#fff;border:1px solid #ead9d6;border-radius:13px;margin:10px 0;padding:15px;box-shadow:0 2px 9px #6e2a3510}.head{display:flex;justify-content:space-between;align-items:center;font-size:17px;font-weight:800;margin-bottom:12px}.head small{font-size:12px;font-weight:500;color:#b13c52}.sns{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.sns button{min-height:67px;border:1px solid #dfc6c3;background:#fff;border-radius:9px;color:#3c2b2b;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center}.sns button small{font-size:10px;color:#a26e73;font-weight:400;margin-top:5px}.sns .disabled{opacity:.45}.profile{display:grid;grid-template-columns:98px 1fr;gap:14px}.profile img{width:98px;height:130px;border-radius:8px;object-fit:cover}.profile dl{margin:0;display:grid;grid-template-columns:58px 1fr;font-size:13px;line-height:1.8}.profile dt{color:#90716d}.profile dd{margin:0}.intro{line-height:1.9;font-size:14px}.intro .center{text-align:center}.intro .name{color:#8d2034;font-family:"Yu Mincho",serif;font-size:18px}.intro .catch{color:#a92d48;font-family:"Yu Mincho",serif;font-size:16px}.intro h3{font-size:15px;color:#8d2034;margin:22px 0 8px}.monthly{aspect-ratio:1/1;border-radius:10px;border:1px dashed #d8b6b5;background:linear-gradient(145deg,#fff7f6,#f6e8e6);display:flex;align-items:center;justify-content:center;text-align:center;color:#a57978;font-size:13px}.today{display:flex;justify-content:space-between;align-items:center}.today strong{font-size:21px;color:#d34361}.row{display:grid;grid-template-columns:100px 1fr;padding:10px 2px;border-top:1px solid #f0e5e2;font-size:14px}.off{color:#a78e8a}.full{color:#b62c48;font-weight:700}.news div{display:flex;gap:10px;padding:10px 0;border-top:1px solid #f0e5e2;font-size:13px}.news time{color:#a28c88}.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.gallery img{width:100%;aspect-ratio:1/1.25;object-fit:cover;border-radius:8px}.more{display:block;margin-top:11px;padding:12px;text-align:center;border:1px solid #d9b9b9;border-radius:8px;color:#8b2035;text-decoration:none;font-weight:700;font-size:13px}.links{display:grid;gap:8px}.links a{display:flex;justify-content:space-between;padding:15px;border:1px solid #ddc7c3;border-radius:9px;text-decoration:none;color:#4b3434;font-weight:700}.reserve{padding:2px 10px 24px}.reserve-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.reserve-grid a{padding:15px 6px;border-radius:10px;text-align:center;text-decoration:none;font-weight:800}.tel{background:#771a2a;color:#fff}.shopline{background:#fff;border:1px solid #9a2a3d;color:#8c2337}.foot{text-align:center;font-size:10px;color:#a88f8b;padding:8px 0 24px}.nav{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(430px,100%);height:66px;background:#92172e;display:grid;grid-template-columns:repeat(5,1fr);z-index:50;border-radius:0 0 24px 24px;box-shadow:0 -3px 14px #0002}.nav a,.nav button{border:0;background:transparent;color:#fff;text-decoration:none;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;gap:2px}.nav .ico{font-size:19px}.backdrop{position:fixed;inset:0;background:#0008;z-index:100;display:none;align-items:center;justify-content:center;padding:20px}.backdrop.open{display:flex}.modal{width:min(390px,100%);max-height:82vh;overflow:auto;background:#fffaf8;border-radius:16px;padding:20px}.modal h2{font-size:18px;margin:0 0 12px;color:#7d1728}.modal p,.modal li{font-size:13px;line-height:1.7}.actions{display:grid;grid-template-columns:1fr 1.35fr;gap:8px}.actions button{min-height:48px;border-radius:9px;font-weight:800}.cancel{background:#fff;border:1px solid #ccb9b5}.go{background:#86192c;border:1px solid #86192c;color:#fff}
+
+.menuBtn{position:fixed;left:calc(50% + min(215px,50vw) - 60px);right:auto;right:14px;top:14px;z-index:12;width:46px;height:46px;border:0;border-radius:50%;background:#0006;color:#fff;font-size:24px;line-height:1;backdrop-filter:blur(4px)}
+.drawerBack{position:fixed;inset:0;background:#0008;z-index:80;display:none}.drawerBack.open{display:block}.drawer{position:absolute;right:0;top:0;width:min(330px,86vw);height:100%;background:#fffaf8;padding:24px 18px;overflow:auto}.drawerTop{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.drawerTop b{color:#7d1728;font-size:19px}.drawerTop button{border:0;background:none;font-size:27px}.drawer a{display:flex;justify-content:space-between;padding:14px 5px;border-bottom:1px solid #ead9d6;color:#442f2f;text-decoration:none;font-weight:700}.drawer a:after{content:"›";color:#a23b4d}.catAccent{text-align:center;color:#9a7e7c;font-size:13px;margin:4px 0 14px}.personalImg{width:100%;display:block;border-radius:11px}.personalFallback{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;text-align:center;border:1px dashed #d8b6b5;border-radius:11px;color:#a57978;background:#fff7f6}.photoThumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.photoThumbs img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:8px;cursor:pointer}.photoHint{text-align:center;color:#9a7e7c;font-size:11px;margin:10px 0 0}.lightbox{position:fixed;inset:0;background:#000e;z-index:120;display:none;align-items:center;justify-content:center}.lightbox.open{display:flex}.lightbox img{max-width:94vw;max-height:86vh;object-fit:contain}.lightbox .x{position:absolute;right:16px;top:14px;background:none;border:0;color:#fff;font-size:32px}.lightbox .prev,.lightbox .next{position:absolute;top:50%;transform:translateY(-50%);border:0;background:#0006;color:#fff;font-size:30px;width:44px;height:60px}.lightbox .prev{left:4px}.lightbox .next{right:4px}.reserveSheet{position:fixed;left:50%;bottom:72px;transform:translateX(-50%) translateY(calc(100% + 66px));width:min(410px,calc(100% - 20px));background:#fffaf8;border:1px solid #e4ceca;border-radius:16px;padding:14px;z-index:70;box-shadow:0 8px 30px #0004;transition:.22s}.reserveSheet.open{transform:translateX(-50%) translateY(0)}.reserveSheet .reserve-grid{margin-top:6px}
+
+/* HONDA BLACK CAT UI v1 */
+body{position:relative;background-color:#fbf6f2;background-image:
+radial-gradient(circle at 18px 18px,rgba(117,82,82,.055) 0 4px,transparent 4.5px),
+radial-gradient(circle at 11px 10px,rgba(117,82,82,.045) 0 2.4px,transparent 2.8px),
+radial-gradient(circle at 18px 8px,rgba(117,82,82,.045) 0 2.4px,transparent 2.8px),
+radial-gradient(circle at 25px 10px,rgba(117,82,82,.045) 0 2.4px,transparent 2.8px);
+background-size:150px 150px;background-position:8px 12px,8px 12px,8px 12px,8px 12px}
+.card{position:relative;overflow:visible}
+.card:not(.intro):not(.links):not(.news)::before{content:"";position:absolute;right:18px;top:-8px;width:34px;height:18px;background:
+linear-gradient(135deg,transparent 50%,#241f20 51%) left top/17px 18px no-repeat,
+linear-gradient(225deg,transparent 50%,#241f20 51%) right top/17px 18px no-repeat;opacity:.78;pointer-events:none}
+.head{position:relative}
+.head::after{content:"●  ●  ●";font-size:7px;letter-spacing:2px;color:#b89b98;margin-left:8px;vertical-align:middle;opacity:.85}
+.catTrail{height:24px;position:relative;margin:-2px 0 5px;pointer-events:none}
+.catTrail span{position:absolute;color:#bca7a4;font-size:13px;opacity:.5;transform:rotate(-22deg)}
+.catTrail span:nth-child(1){left:22%;top:6px}.catTrail span:nth-child(2){left:42%;top:1px;transform:rotate(12deg)}.catTrail span:nth-child(3){left:63%;top:7px;transform:rotate(-8deg)}
+.catPeek{position:fixed;right:max(calc((100vw - 430px)/2 + 5px),5px);bottom:66px;width:60px;height:54px;z-index:65;filter:drop-shadow(0 3px 4px #0003);cursor:pointer;transition:.2s}.catPeek:active{transform:scale(.94)}
+.catPeek svg{width:100%;height:100%;display:block}.catBubble{position:absolute;right:48px;top:-15px;white-space:nowrap;background:#fffaf7;color:#7d1728;border:1px solid #ddc6c2;border-radius:14px;padding:6px 9px;font-size:10px;font-weight:700;box-shadow:0 3px 10px #0002}
+.photoThumbs{position:relative}.photoThumbs img{outline:1px solid rgba(125,23,40,.08)}
+.photoThumbs:after{content:"🐾";position:absolute;right:-3px;bottom:-9px;font-size:17px;transform:rotate(-18deg);opacity:.65}
+.photoSub{font-family:Georgia,serif;text-align:center;color:#7d1728;font-size:11px;letter-spacing:2px;margin:-4px 0 12px}
+.lightbox .prev,.lightbox .next{border-radius:50%;height:46px;width:46px;font-size:0}.lightbox .prev:after{content:"🐾";font-size:20px;display:block;transform:rotate(-35deg)}.lightbox .next:after{content:"🐾";font-size:20px;display:block;transform:rotate(35deg)}
+.reserveCat{text-align:center;color:#7d1728;font-size:12px;font-weight:700;margin:3px 0 10px}
+.nav button:nth-of-type(1) .ico{font-size:0}.nav button:nth-of-type(1) .ico:after{content:"・・・";font-size:17px}.nav button:nth-of-type(2) .ico{font-size:0}.nav button:nth-of-type(2) .ico:after{content:"🌹";font-size:18px}
+
+/* CAT UI v2 corrections */
+.card:not(.intro):not(.links):not(.news)::before{content:none!important}
+.head::after{content:"🐾"!important;font-size:13px!important;letter-spacing:0!important;color:inherit!important;opacity:.72!important;margin-left:7px!important}
+.catPeek{display:none!important}
+/* Reservation bar: always visible above bottom navigation */
+.reserveSheet{bottom:66px!important;border-radius:14px 14px 0 0!important;padding:9px 12px!important;z-index:70!important}
+.reserveSheet .head{margin-bottom:5px!important;font-size:13px!important}
+.reserveSheet .head button{display:none!important}
+.reserveSheet .reserveCat{display:none!important}
+.reserveSheet .reserve-grid a{padding:11px 5px!important;font-size:12px!important}
+/* Princess reservation / price simulator */
+.himePrice{width:100%;border-collapse:collapse;font-size:13px;margin:4px 0 12px}
+.himePrice th,.himePrice td{padding:8px 6px;border-bottom:1px solid #f0e5e2;text-align:right}
+.himePrice th:first-child,.himePrice td:first-child{text-align:left}
+.fixedFee{background:#fff5f3;border:1px solid #ead9d6;border-radius:9px;padding:10px 12px;font-size:12px;line-height:1.8;margin:10px 0}
+.simBox{background:#fff8f6;border:1px solid #e5cfcb;border-radius:11px;padding:12px;margin-top:12px}
+.simBox label{display:block;font-size:12px;font-weight:700;margin:9px 0 5px}
+.simBox select{width:100%;min-height:44px;border:1px solid #d9c3bf;border-radius:8px;background:#fff;padding:0 10px;font-size:14px}
+.simResult{margin-top:12px;background:#fff;border-radius:9px;padding:11px;font-size:12px;line-height:1.9}
+.simResult .total{display:flex;justify-content:space-between;border-top:1px solid #ead9d6;margin-top:6px;padding-top:7px;font-size:17px;font-weight:800;color:#8d2034}
+.himeNote{font-size:11px;color:#8e7470;line-height:1.6}
+.template{white-space:pre-wrap;background:#fffaf8;border:1px dashed #d9b9b9;border-radius:9px;padding:12px;font-size:13px;line-height:1.9;margin:10px 0}
+.copyBtn{width:100%;min-height:46px;border:0;border-radius:9px;background:#86192c;color:#fff;font-weight:800;font-size:14px}
+.himeSend{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:9px}
+.himeSend a,.himeSend button{min-height:45px;border:1px solid #d9b9b9;border-radius:9px;background:#fff;color:#7d1728;text-decoration:none;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center}
+.himeSend .pending{opacity:.45}
+
+.sectionBreak{margin:28px -10px 12px;padding:18px 10px 8px;text-align:center;border-top:1px solid #ead9d6;background:linear-gradient(180deg,#f8efec 0,#fff8f6 100%)}
+.catWalk{height:42px;display:flex;align-items:flex-end;justify-content:center;gap:18px;margin-bottom:5px}
+.catWalk svg{width:48px;height:34px;fill:#242021;overflow:visible}
+.catWalk svg:nth-child(2){transform:translateY(-3px)}
+.catWalk svg:nth-child(3){transform:translateY(1px)}
+.catWalk svg:nth-child(4){transform:translateY(-2px)}
+.sectionBreak b{display:block;font:700 15px Georgia,serif;letter-spacing:.18em;color:#7d1728}
+.sectionBreak small{display:block;margin-top:3px;color:#9b7773;font-size:11px}
+.snsSheet{position:fixed;inset:0;background:#0008;z-index:110;display:none;align-items:flex-end;justify-content:center}
+.snsSheet.open{display:flex}
+.snsPanel{width:min(430px,100%);background:#fffaf8;border-radius:18px 18px 0 0;padding:18px 16px 88px;box-shadow:0 -8px 30px #0003}
+.snsPanelTop{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;color:#7d1728;font-weight:800}
+.snsPanelTop button{border:0;background:none;font-size:26px}
+.snsPanel .sns button{min-height:74px}
+.himePrice th:last-child{line-height:1.25}
+.fixedFee .feeLine{white-space:nowrap;font-size:11.5px}
+
+.todayCat{margin:12px 0 2px;text-align:center}
+.todayCat{overflow:hidden}.todayCat img{width:100%;height:auto;aspect-ratio:1/1;object-fit:contain;display:block;margin:0 auto;border-radius:18px}
+.todayCat .catBody{fill:#242021}.todayCat .catPink{fill:#d78d91}.todayCat .catGold{fill:#d7aa49}.todayCat .catLine{fill:none;stroke:#242021;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.todayCatMsg{margin-top:3px;font-size:12px;font-weight:700;color:#8d2034}
+.todayCat[data-state="off"] .todayCatMsg{color:#806c69}.todayCat[data-state="full"] .todayCatMsg{color:#b62c48}
+
+.news #newsTop{display:grid;grid-template-columns:1fr;gap:7px}.news .newsItem{display:grid;grid-template-columns:54px 1fr 16px;align-items:center;gap:8px;cursor:pointer;width:100%;padding:11px 8px;border-top:1px solid #f0e5e2}
+.news .newsItem b{color:#a92d48;font-size:20px;text-align:right}
+.newsMore{width:100%;margin-top:7px;min-height:42px;border:1px solid #d9b9b9;border-radius:8px;background:#fff;color:#8b2035;font-weight:700}
+.newsPopup{position:fixed;inset:0;background:#0009;z-index:160;display:none;align-items:center;justify-content:center;padding:18px}
+.newsPopup.open{display:flex}
+.newsPopupPanel{width:min(394px,100%);max-height:78vh;overflow:auto;background:#fffaf8;border-radius:18px;padding:18px 16px;box-shadow:0 10px 34px #0005}
+.newsPopupTop{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid #ead9d6;color:#7d1728;font-size:18px}
+.newsPopupTop button{border:0;background:none;font-size:28px;line-height:1;color:#5b4543}
+.newsDetailDate{font-size:12px;color:#9a7e7c;margin:14px 0 7px}
+.newsDetailTitle{font-size:18px;font-weight:800;color:#4b3434;margin-bottom:12px}
+.newsDetailText{font-size:14px;line-height:1.9;white-space:pre-wrap}
+.newsListItem{width:100%;display:grid;grid-template-columns:58px 1fr 18px;align-items:center;gap:7px;text-align:left;border:0;border-bottom:1px solid #ead9d6;background:transparent;padding:14px 2px;color:#443131}
+.newsListItem time{font-size:12px;color:#9a7e7c}.newsListItem span{font-size:14px;font-weight:700}.newsListItem b{font-size:20px;color:#a92d48}
+
+.newsItem.important{background:#fff0f1;border:1px solid #d94b5f!important;border-left:5px solid #b3122d!important;border-radius:9px;margin:6px 0;padding:10px 8px}
+.newsItem.important time{color:#a01930;font-weight:800}
+.importantBadge{display:inline-block;background:#b3122d;color:#fff;border-radius:999px;padding:3px 8px;margin-right:6px;font-size:10px;font-weight:900;letter-spacing:.04em;vertical-align:1px}
+.newsImportantBox{background:#fff0f1;border:1px solid #d94b5f;border-left:5px solid #b3122d;border-radius:10px;padding:13px 12px;margin-top:13px}
+.newsImportantBox .newsDetailDate{margin-top:0;color:#a01930;font-weight:700}
+.newsImportantBox .newsDetailTitle{color:#8d1026}
+.themeCustom .head::after{content:""!important;width:18px;height:18px;display:inline-block;background-image:var(--theme-character);background-size:contain;background-position:center;background-repeat:no-repeat;vertical-align:middle}
+.themeCustom .photoThumbs:after{content:""!important;width:22px;height:22px;background-image:var(--theme-character);background-size:contain;background-position:center;background-repeat:no-repeat}
+.themeCustom .catWalk img{width:48px;height:34px;object-fit:contain;display:block}
+
+</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body><main class="app">
+<section class="hero" id="home"><img id="heroImage" src="main.png.png" alt="本田 メイン画像" style="width:100%;height:100%;object-fit:cover;display:block"><button class="menuBtn" onclick="toggleMenu()" aria-label="メニュー">☰</button></section>
+<div class="content">
+<section class="card news" id="news"><div class="head">お知らせ</div><div id="newsTop"><div class="newsLoading">読み込み中…</div></div><button class="newsMore" id="newsMoreBtn" type="button" onclick="openNewsList()" style="display:none">過去のお知らせを見る</button></section>
+<section class="card" id="schedule"><div class="head"><span>本日の出勤</span></div><div class="today"><span id="todayDate"></span><strong id="todayStatus"></strong></div><div class="todayCat" id="todayCat" data-state="work"><div id="todayCatArt"></div><div class="todayCatMsg" id="todayCatMsg"></div></div></section>
+<section class="card"><div class="catAccent">🐾 Honda's personality 🐾</div><img id="personalImage" class="personalImg" src="personal-cat.png" alt="本田さんを猫に例えると" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="personalFallback" style="display:none">🐾 パーソナル画像<br>personal-cat.png を登録すると表示されます</div></section>
+<section class="card intro" id="intro"><div id="pageIntroDynamic"><p>🌹薔薇と紳士　本田です🌹<br>「ぽんちゃん」って呼んでください♡</p><p>〜大人の癒しと少し意地悪な時間を♡〜</p><p>🌹「また会いたい」と言ってもらえる施術を目指しています🌹</p><p>疲れた身体をしっかりほぐしながら、<br>甘やかすだけじゃ終わらない♡<br>少しだけドキドキする時間をお届けします♡<br>沼る準備をしてきてね🐱🤍</p><h3>こんな方におすすめ✨</h3><p>❤️ 細身のお姉さんが好き<br>❤️ 猫顔がタイプ<br>❤️ 大人の女性に甘えたい<br>❤️ 少しSなお姉さんにドキドキしたい<br>❤️ M気質<br>❤️ しっかりマッサージされたい<br>❤️ 癒しも刺激もどっちも欲しい<br>❤️ 楽しくお話したい</p><h3>✨得意✨</h3><p>✔ 密着感のあるマッサージ<br>✔ 肩・首・背中のコリほぐし<br>✔ 焦らされるような距離感♡<br>✔ 初めてでも緊張しない空気作り</p><p>「思ってたより話しやすい😊」<br>「時間があっという間だった！」</p><p>そう言ってもらえることが多いです🌹</p><p>初指名・人見知りさん大歓迎です☺️</p><p>ぜひ一度、ぽんちゃんに会いに来てください🤍</p></div></section>
+
+<div class="catTrail" aria-hidden="true"><span>🐾</span><span>🐾</span><span>🐾</span></div><section class="card" id="photo"><div class="head">PHOTO</div><div class="photoSub">PONCHAN’S PHOTO</div><div class="photoThumbs" id="photoThumbs"></div><p class="photoHint">写真をタップすると大きく表示できます 🐾</p></section>
+<div class="sectionBreak"><div class="catWalk"><svg viewBox="0 0 120 70" aria-hidden="true"><ellipse cx="57" cy="36" rx="31" ry="19"/><circle cx="91" cy="28" r="13"/><path d="M82 18l3-15 10 13M95 16l11-12-2 17M28 33C8 27 5 10 13 5c-2 13 7 18 18 18z"/><path d="M38 48l-7 18h9l8-17M64 50l5 16h9l-4-20"/></svg><svg viewBox="0 0 120 70" aria-hidden="true"><ellipse cx="57" cy="36" rx="31" ry="19"/><circle cx="91" cy="28" r="13"/><path d="M82 18l3-15 10 13M95 16l11-12-2 17M28 33C8 27 5 10 13 5c-2 13 7 18 18 18z"/><path d="M38 48l-7 18h9l8-17M64 50l5 16h9l-4-20"/></svg><svg viewBox="0 0 120 70" aria-hidden="true"><ellipse cx="57" cy="36" rx="31" ry="19"/><circle cx="91" cy="28" r="13"/><path d="M82 18l3-15 10 13M95 16l11-12-2 17M28 33C8 27 5 10 13 5c-2 13 7 18 18 18z"/><path d="M38 48l-7 18h9l8-17M64 50l5 16h9l-4-20"/></svg><svg viewBox="0 0 120 70" aria-hidden="true"><ellipse cx="57" cy="36" rx="31" ry="19"/><circle cx="91" cy="28" r="13"/><path d="M82 18l3-15 10 13M95 16l11-12-2 17M28 33C8 27 5 10 13 5c-2 13 7 18 18 18z"/><path d="M38 48l-7 18h9l8-17M64 50l5 16h9l-4-20"/></svg></div><b>SCHEDULE</b><small>ぽんちゃんに会える日</small></div>
+<section class="card"><div class="head"><span>明日以降の出勤</span></div><div id="future"></div></section>
+<section class="card" id="calendar"><div class="head"><span>カレンダー</span></div><img id="calendarImage" src="calendar.jfif" alt="本田 出勤カレンダー" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;border-radius:10px"></section>
+<div class="sectionBreak"><div class="catWalk"><svg viewBox="0 0 120 70" aria-hidden="true"><ellipse cx="57" cy="36" rx="31" ry="19"/><circle cx="91" cy="28" r="13"/><path d="M82 18l3-15 10 13M95 16l11-12-2 17M28 33C8 27 5 10 13 5c-2 13 7 18 18 18z"/><path d="M38 48l-7 18h9l8-17M64 50l5 16h9l-4-20"/></svg><svg viewBox="0 0 120 70" aria-hidden="true"><ellipse cx="57" cy="36" rx="31" ry="19"/><circle cx="91" cy="28" r="13"/><path d="M82 18l3-15 10 13M95 16l11-12-2 17M28 33C8 27 5 10 13 5c-2 13 7 18 18 18z"/><path d="M38 48l-7 18h9l8-17M64 50l5 16h9l-4-20"/></svg><svg viewBox="0 0 120 70" aria-hidden="true"><ellipse cx="57" cy="36" rx="31" ry="19"/><circle cx="91" cy="28" r="13"/><path d="M82 18l3-15 10 13M95 16l11-12-2 17M28 33C8 27 5 10 13 5c-2 13 7 18 18 18z"/><path d="M38 48l-7 18h9l8-17M64 50l5 16h9l-4-20"/></svg><svg viewBox="0 0 120 70" aria-hidden="true"><ellipse cx="57" cy="36" rx="31" ry="19"/><circle cx="91" cy="28" r="13"/><path d="M82 18l3-15 10 13M95 16l11-12-2 17M28 33C8 27 5 10 13 5c-2 13 7 18 18 18z"/><path d="M38 48l-7 18h9l8-17M64 50l5 16h9l-4-20"/></svg></div><b>RESERVATION</b><small>ぽんちゃんへ姫予約</small></div>
+<section class="card" id="hime">
+  <div class="head"><span>姫予約</span><small>DIRECT RESERVATION</small></div>
+  <table class="himePrice">
+    <thead><tr><th>コース</th><th>基本料金（税抜）</th><th>税込合計<br><small>（指名料込）</small></th></tr></thead>
+    <tbody>
+      <tr><td>90分</td><td>15,000円</td><td>20,900円</td></tr>
+      <tr><td>120分</td><td>20,000円</td><td>26,400円</td></tr>
+      <tr><td>150分</td><td>27,000円</td><td>34,100円</td></tr>
+      <tr><td>180分</td><td>36,000円</td><td>44,000円</td></tr>
+      <tr><td>210分</td><td>47,000円</td><td>56,100円</td></tr>
+      <tr><td>240分</td><td>60,000円</td><td>70,400円</td></tr>
+      <tr><td>270分</td><td>75,000円</td><td>86,900円</td></tr>
+      <tr><td>300分</td><td>92,000円</td><td>105,600円</td></tr>
+    </tbody>
+  </table>
+  <div class="fixedFee"><b>固定料金</b><br><span class="feeLine">本指名料：2,000円　特別指名料：2,000円</span><br><small>※税込合計は「基本料金＋本指名料＋特別指名料」に消費税10%を加算。指定ホテル以外は別途交通費。</small></div>
+
+  <div class="simBox">
+    <div style="font-weight:800;color:#8d2034">料金シミュレーション</div>
+    <label for="courseSel">① コース</label>
+    <select id="courseSel" onchange="calcHime()">
+      <option value="15000">90分</option><option value="20000">120分</option><option value="27000">150分</option><option value="36000">180分</option>
+      <option value="47000">210分</option><option value="60000">240分</option><option value="75000">270分</option><option value="92000">300分</option>
+    </select>
+    <label for="areaSel">② エリア</label>
+    <select id="areaSel" onchange="calcHime()">
+      <option value="0">指定ホテル（兎我野町・日本橋・谷町九丁目）／無料</option>
+      <optgroup label="交通費 1,000円"><option value="1000">北区</option><option value="1000">福島区</option><option value="1000">中央区</option><option value="1000">西区</option><option value="1000">浪速区</option><option value="1000">都島区</option><option value="1000">淀川区</option><option value="1000">天王寺区</option><option value="1000">阿倍野区</option><option value="1000">東成区</option><option value="1000">生野区</option><option value="1000">西成区</option></optgroup>
+      <optgroup label="交通費 2,000円"><option value="2000">東淀川区</option><option value="2000">西淀川区</option><option value="2000">港区</option><option value="2000">此花区</option><option value="2000">大正区</option><option value="2000">旭区</option><option value="2000">城東区</option><option value="2000">鶴見区</option></optgroup>
+      <optgroup label="交通費 3,000円"><option value="3000">住之江区</option><option value="3000">住吉区</option><option value="3000">平野区</option><option value="3000">東住吉区</option><option value="3000">吹田市</option><option value="3000">豊中市</option><option value="3000">伊丹市</option><option value="3000">守口市</option><option value="3000">東大阪市</option><option value="3000">堺市（堺区・北区）</option></optgroup>
+      <optgroup label="交通費 4,000円"><option value="4000">池田市</option><option value="4000">摂津市</option><option value="4000">門真市</option><option value="4000">松原市</option><option value="4000">箕面市</option><option value="4000">八尾市</option><option value="4000">尼崎市</option><option value="4000">堺市（西区・東区・中区・美原区）</option></optgroup>
+      <optgroup label="交通費 5,000円"><option value="5000">寝屋川市</option><option value="5000">大東市</option><option value="5000">藤井寺市</option><option value="5000">茨木市</option><option value="5000">四條畷市</option><option value="5000">柏原市</option><option value="5000">大阪狭山市</option><option value="5000">堺市（南区）</option><option value="5000">高槻市</option><option value="5000">羽曳野市</option><option value="5000">宝塚市</option><option value="5000">西宮市</option></optgroup>
+      <optgroup label="交通費 6,000円"><option value="6000">枚方市</option><option value="6000">交野市</option><option value="6000">和泉市</option><option value="6000">高石市</option><option value="6000">泉大津市</option><option value="6000">河内長野市</option><option value="6000">芦屋市</option></optgroup>
+      <optgroup label="交通費 7,000円"><option value="7000">岸和田市</option><option value="7000">貝塚市</option></optgroup>
+      <optgroup label="交通費 8,000円"><option value="8000">泉佐野市</option><option value="8000">神戸市</option></optgroup>
+      <optgroup label="交通費 9,000円"><option value="9000">泉南市</option><option value="9000">阪南市</option><option value="9000">奈良市</option></optgroup>
+      <optgroup label="交通費 10,000円"><option value="10000">天理市</option><option value="10000">島本町</option></optgroup>
+      <optgroup label="交通費 要確認"><option value="ask">京都市</option><option value="ask">和歌山市</option></optgroup>
+    </select>
+    <div class="simResult" id="simResult"></div>
+  </div>
+
+  <div style="font-weight:800;color:#8d2034;margin:16px 0 4px">姫予約テンプレート</div>
+  <p class="himeNote">下記内容をコピーして、必要事項をご記入のうえLINE・X・02のいずれかから送信してください。</p>
+  <div class="template" id="himeTemplate"></div>
+  <button class="copyBtn" id="copyHimeBtn" onclick="copyHime()">📋 内容をコピー</button>
+  <div class="himeSend">
+    <a href="https://lin.ee/67dA4sS" data-sns-link="line" target="_blank" rel="noopener">LINEで姫予約</a>
+    <a href="https://x.com/PonchaRose" data-sns-link="x" target="_blank" rel="noopener">Xで姫予約</a>
+    <a href="https://m-sns.net/profile/@PonchaRose" data-sns-link="02" target="_blank" rel="noopener">02で姫予約</a>
+  </div>
+</section>
+<div class="sectionBreak"><div class="catWalk"><svg viewBox="0 0 120 70" aria-hidden="true"><ellipse cx="57" cy="36" rx="31" ry="19"/><circle cx="91" cy="28" r="13"/><path d="M82 18l3-15 10 13M95 16l11-12-2 17M28 33C8 27 5 10 13 5c-2 13 7 18 18 18z"/><path d="M38 48l-7 18h9l8-17M64 50l5 16h9l-4-20"/></svg><svg viewBox="0 0 120 70" aria-hidden="true"><ellipse cx="57" cy="36" rx="31" ry="19"/><circle cx="91" cy="28" r="13"/><path d="M82 18l3-15 10 13M95 16l11-12-2 17M28 33C8 27 5 10 13 5c-2 13 7 18 18 18z"/><path d="M38 48l-7 18h9l8-17M64 50l5 16h9l-4-20"/></svg><svg viewBox="0 0 120 70" aria-hidden="true"><ellipse cx="57" cy="36" rx="31" ry="19"/><circle cx="91" cy="28" r="13"/><path d="M82 18l3-15 10 13M95 16l11-12-2 17M28 33C8 27 5 10 13 5c-2 13 7 18 18 18z"/><path d="M38 48l-7 18h9l8-17M64 50l5 16h9l-4-20"/></svg><svg viewBox="0 0 120 70" aria-hidden="true"><ellipse cx="57" cy="36" rx="31" ry="19"/><circle cx="91" cy="28" r="13"/><path d="M82 18l3-15 10 13M95 16l11-12-2 17M28 33C8 27 5 10 13 5c-2 13 7 18 18 18z"/><path d="M38 48l-7 18h9l8-17M64 50l5 16h9l-4-20"/></svg></div><b>OFFICIAL</b><small>薔薇と紳士・公式情報</small></div>
+<section class="card" id="profile"><div class="head"><span>プロフィール</span><small>PROFILE</small></div><div class="profile"><img id="profileImage" src="https://rose-gentleman.com/exa_userdata/person/153/image_main1_resize1.jpg" alt="本田"><dl><dt>年齢</dt><dd>37歳</dd><dt>身長</dt><dd>160cm</dd><dt>タイプ</dt><dd>キレ可愛系 / 小柄</dd><dt>特徴</dt><dd>色白美肌 / 癒し系</dd><dt>趣味</dt><dd>食べ歩き</dd><dt>性格</dt><dd>好奇心旺盛</dd></dl></div></section>
+<section class="card links"><a href="https://rose-gentleman.com/profile.php?id=153" target="_blank"><span>オフィシャルプロフィール</span><b>›</b></a><a href="https://rose-gentleman.com/bloglist.php?id=153" target="_blank"><span>オフィシャルブログ</span><b>›</b></a></section>
+</div></main>
+<nav class="nav"><a href="#home"><span class="ico">🏠</span>HOME</a><a href="#schedule"><span class="ico">📅</span>SCHEDULE</a><a href="#photo"><span class="ico">🖼️</span>PHOTO</a><button onclick="toggleSnsSheet()"><span class="ico">🐱💬</span>SNS</button><button onclick="toggleReserve()"><span class="ico">🐾</span>予約</button></nav>
+<button class="catPeek" onclick="alert('チャット機能は接続設定後に利用できます')" aria-label="ぽんちゃんに話しかける"><span class="catBubble">ぽんちゃんに話しかける</span><svg viewBox="0 0 100 90" aria-hidden="true"><path d="M17 36 22 8 43 26c5-2 10-2 15 0L79 8l5 29c7 8 10 18 8 29-3 15-18 22-41 22S13 81 10 66c-2-11 0-21 7-30Z" fill="#242021"/><path d="M32 52c5-5 10-5 15 0M62 52c5-5 10-5 15 0" fill="none" stroke="#f7ece8" stroke-width="3" stroke-linecap="round"/><path d="M49 61c3 2 5 2 8 0" fill="none" stroke="#c89191" stroke-width="3" stroke-linecap="round"/></svg></button>
+<div class="snsSheet" id="snsSheet" onclick="if(event.target===this)toggleSnsSheet()"><div class="snsPanel"><div class="snsPanelTop"><span>ぽんちゃんのSNS 🐾</span><button onclick="toggleSnsSheet()">×</button></div><div class="sns"><button data-sns-btn="x" onclick="toggleSnsSheet();openDynamicSns('x')">𝕏<small>@PonchaRose</small></button><button data-sns-btn="02" onclick="toggleSnsSheet();openDynamicSns('02')">02<small>@PonchaRose</small></button><button data-sns-btn="line" onclick="toggleSnsSheet();openDynamicSns('line')">LINE<small>@845txetv</small></button></div></div></div>
+<div class="drawerBack" id="drawerBack" onclick="if(event.target===this)toggleMenu()"><aside class="drawer"><div class="drawerTop"><b>🐾 MENU</b><button onclick="toggleMenu()">×</button></div><a href="#home" onclick="toggleMenu()">HOME</a><a href="#profile" onclick="toggleMenu()">プロフィール</a><a href="#intro" onclick="toggleMenu()">自己紹介</a><a href="#hime" onclick="toggleMenu()">姫予約・料金</a><a href="#schedule" onclick="toggleMenu()">出勤予定</a><a href="#calendar" onclick="toggleMenu()">カレンダー</a><a href="#news" onclick="toggleMenu()">お知らせ</a><a href="#photo" onclick="toggleMenu()">PHOTO</a><a href="#" onclick="event.preventDefault();toggleMenu();toggleSnsSheet()">SNS</a><a href="https://rose-gentleman.com/profile.php?id=153" target="_blank">オフィシャルプロフィール</a><a href="#" onclick="event.preventDefault();toggleMenu()">予約・お問い合わせ</a></aside></div>
+<div class="reserveSheet" id="reserveSheet"><div class="head"><span>予約・お問い合わせ</span></div><div class="reserve-grid"><a class="tel" href="tel:0662145047">☎ お店に電話</a><a class="shopline" href="https://line.me/R/ti/p/@639kkifl?oat_content=url" target="_blank" rel="noopener">◉ お店にLINE</a></div></div>
+<div class="lightbox" id="lightbox"><button class="x" onclick="closeLb()">×</button><button class="prev" onclick="moveLb(-1)">‹</button><img id="lbImg" alt=""><button class="next" onclick="moveLb(1)">›</button></div>
+<div class="backdrop" id="notice"><div class="modal"><h2 id="noticeTitle">SNS利用に関する注意事項</h2><p>セラピストが安心してSNSを利用できるよう、以下の行為はお控えください。</p><ul><li>誹謗中傷、侮辱、脅迫、威圧的なメッセージ</li><li>執拗なDMや返信を強要する行為</li><li>個人情報やプライベートに関する過度な詮索</li><li>画像・投稿内容・DM等の無断転載や公開</li><li>性的・差別的その他不適切なメッセージ</li><li>店舗またはセラピストが禁止する方法での直接的な交渉・勧誘</li></ul><p>悪質な行為については、記録の保存、店舗への報告、利用制限、警察・弁護士等への相談を含む対応を行う場合があります。</p><div class="actions"><button class="cancel" onclick="closeNotice()">戻る</button><button class="go" id="go">同意してSNSを開く</button></div></div></div>
+<script>
+if("scrollRestoration" in history) history.scrollRestoration="manual";
+window.addEventListener("pageshow",()=>{if(!location.hash) window.scrollTo(0,0)});
+let url='';function sns(n,u){url=u;noticeTitle.textContent=n+' 利用に関する注意事項';notice.classList.add('open')}function closeNotice(){notice.classList.remove('open');url=''};go.onclick=()=>{if(url)open(url,'_blank','noopener');closeNotice()};notice.onclick=e=>{if(e.target===notice)closeNotice()};
+function toggleMenu(){drawerBack.classList.toggle('open')}function toggleSnsSheet(){snsSheet.classList.toggle('open')}function toggleReserve(){reserveSheet.classList.toggle('open')}
+let validPhotos=[],lbIndex=0;
+const fallbackPhotos=Array.from({length:10},(_,i)=>'photo-'+String(i+1).padStart(2,'0')+'.jfif');
+function renderPhotoSources(list){
+  const box=document.getElementById('photoThumbs');box.innerHTML='';validPhotos=[];
+  list.forEach(src=>{const im=new Image();im.onload=()=>{validPhotos.push(src);const x=document.createElement('img');x.src=src;x.alt='本田 PHOTO';x.onclick=()=>openLb(validPhotos.indexOf(src));box.appendChild(x)};im.src=src});
+}
+function openLb(i){lbIndex=i;lbImg.src=validPhotos[i];lightbox.classList.add('open')}
+function closeLb(){lightbox.classList.remove('open')}
+function moveLb(d){if(!validPhotos.length)return;lbIndex=(lbIndex+d+validPhotos.length)%validPhotos.length;lbImg.src=validPhotos[lbIndex]}
+const SB_URL='https://vjjnkflbfsjihwzjsjpr.supabase.co';
+const SB_KEY='sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos';
+const publicSb=supabase.createClient(SB_URL,SB_KEY);
+function escPage(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+let managedStatusImages={work:'',off:'',full:''};
+let managedThemeImage='';
+async function loadPageSettings(){
+  const {data,error}=await publicSb.from('honda_page').select('*').eq('id',1).maybeSingle();
+  if(error||!data){if(error)console.error('PAGE load error',error);return}
+  const box=document.getElementById('pageIntroDynamic');
+  if(box&&data.intro){
+    const lines=String(data.intro).split(/\r?\n/),parts=[],buf=[];
+    const flush=()=>{if(buf.length){parts.push('<p>'+buf.map(escPage).join('<br>')+'</p>');buf.length=0}};
+    lines.forEach(line=>{const t=line.trim();if(/^【.+】$/.test(t)){flush();parts.push('<h3>'+escPage(t.slice(1,-1))+'</h3>')}else if(t===''){flush()}else{buf.push(line)}});
+    flush();box.innerHTML=parts.join('');
+  }
+  document.querySelectorAll('.catBubble').forEach(e=>e.textContent=(data.nickname||'ぽんちゃん')+'に話しかける');
+  managedStatusImages={work:data.work_image_url||'',off:data.off_image_url||'',full:data.full_image_url||''};
+  const managedImages={heroImage:data.hero_image_url,profileImage:data.profile_image_url,personalImage:data.personal_image_url,calendarImage:data.calendar_image_url};
+  Object.entries(managedImages).forEach(([id,u])=>{const e=document.getElementById(id);if(e&&u)e.src=u});
+  managedThemeImage=data.theme_image_url||'';
+  if(managedThemeImage){
+    document.documentElement.style.setProperty('--theme-character','url("'+managedThemeImage.replace(/"/g,'%22')+'")');
+    document.body.classList.add('themeCustom');
+    document.querySelectorAll('.catWalk').forEach(w=>{w.innerHTML=Array.from({length:4},()=>'<img src="'+managedThemeImage+'" alt="">').join('')});
+  }
+}
+
+let hondaSns={
+  x:{id:'@PonchaRose',url:'https://x.com/PonchaRose',name:'X',enabled:true},
+  '02':{id:'@PonchaRose',url:'https://m-sns.net/profile/@PonchaRose',name:'02',enabled:true},
+  line:{id:'@845txetv',url:'https://lin.ee/67dA4sS',name:'LINE',enabled:true}
+};
+function applySns(){
+  document.querySelectorAll('[data-sns-link="x"]').forEach(e=>e.href=hondaSns.x.url);
+  document.querySelectorAll('[data-sns-link="02"]').forEach(e=>e.href=hondaSns['02'].url);
+  document.querySelectorAll('[data-sns-link="line"]').forEach(e=>e.href=hondaSns.line.url);
+  document.querySelectorAll('[data-sns-btn]').forEach(e=>{const k=e.dataset.snsBtn,s=e.querySelector('small');if(s)s.textContent=hondaSns[k].id;e.style.display=hondaSns[k].enabled===false?'none':''});
+  document.querySelectorAll('[data-sns-link]').forEach(e=>{const k=e.dataset.snsLink;e.style.display=hondaSns[k]&&hondaSns[k].enabled===false?'none':''});
+}
+async function loadSns(){
+  const {data,error}=await publicSb.from('honda_sns').select('*').eq('id',1).maybeSingle();
+  if(error||!data){if(error)console.error('SNS load error',error);return}
+  hondaSns={x:{id:data.x_id||'',url:data.x_url||'',name:'X',enabled:data.x_enabled!==false},'02':{id:data.sns02_id||'',url:data.sns02_url||'',name:'02',enabled:data.sns02_enabled!==false},line:{id:data.line_id||'',url:data.line_url||'',name:'LINE',enabled:data.line_enabled!==false}};
+  applySns();
+}
+function openDynamicSns(k){const s=hondaSns[k];if(s&&s.enabled!==false&&s.url)sns(s.name,s.url)}
+loadSns();
+
+async function loadPhotos(){
+  const {data,error}=await publicSb.from('honda_photos').select('image_url,image_data').order('sort_order',{ascending:true}).order('id',{ascending:true});
+  if(error||!data||!data.length){renderPhotoSources(fallbackPhotos);return}
+  renderPhotoSources(data.map(x=>x.image_url||x.image_data).filter(Boolean));
+}
+loadPhotos();
+const wd=['日','月','火','水','木','金','土'],p=n=>String(n).padStart(2,'0'),k=d=>d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()),f=d=>(d.getMonth()+1)+'/'+d.getDate()+'（'+wd[d.getDay()]+'）';
+
+function resolvedStatus(row,isToday=false){
+  if(!row)return {status:'off',start:null,end:null,vacancy:null,note:null};
+  const status=(isToday&&row.today_status)||row.weekly_status||row.base_status||'off';
+  const start=(isToday&&row.today_start)||row.base_start||null;
+  const end=(isToday&&row.today_end)||row.base_end||null;
+  const vacancy=(isToday&&row.today_vacancy)||row.weekly_vacancy||null;
+  const note=(isToday&&row.today_note)||row.weekly_note||null;
+  return {status,start,end,vacancy,note};
+}
+function time5(v){return v?String(v).slice(0,5):''}
+function catArt(state){
+  const src=managedStatusImages[state]||(state==='off'?'cat-off.png':state==='full'?'cat-full.png':'cat-work.png');
+  const alt=state==='off'?'お休み中の黒猫':state==='full'?'完売を喜ぶ黒猫':'出勤中の黒猫';
+  return '<img src="'+src+'" alt="'+alt+'">';
+}
+function renderTodayCat(state){
+  todayCat.dataset.state=state;
+  todayCatArt.innerHTML=catArt(state);
+  todayCatMsg.textContent=state==='off'?'今日はおやすみです…🐾':state==='full'?'本日は完売しました♡ ありがとうございます！':'今日も頑張ります！🐾';
+}
+
+function statusText(x){
+  if(x.status==='off')return '休み';
+  if(x.status==='full')return 'ご予約完売';
+  if(x.vacancy)return '空き '+x.vacancy+(x.note?' / '+x.note:'');
+  if(x.start&&x.end)return time5(x.start)+'〜'+time5(x.end);
+  return '出勤';
+}
+async function renderSchedule(){
+  const n=new Date(),end=new Date(n.getFullYear(),n.getMonth(),n.getDate()+7);
+  todayDate.textContent=f(n);
+  todayStatus.textContent='確認中…';
+  future.innerHTML='<div class="row"><span>出勤予定を読み込んでいます…</span></div>';
+  const {data,error}=await publicSb.from('honda_schedule').select('*').gte('schedule_date',k(n)).lte('schedule_date',k(end));
+  if(error){
+    console.error('schedule load error',error);
+    todayStatus.textContent='出勤情報を確認中';
+    future.innerHTML='<div class="row"><span>出勤情報を取得できませんでした</span></div>';
+    return;
+  }
+  const map=Object.fromEntries((data||[]).map(x=>[x.schedule_date,x]));
+  const t=resolvedStatus(map[k(n)],true);
+  todayStatus.textContent=statusText(t);
+  todayStatus.className=t.status==='off'?'off':t.status==='full'?'full':'';
+  renderTodayCat(t.status);
+  let h='';
+  for(let i=1;i<=7;i++){
+    const d=new Date(n.getFullYear(),n.getMonth(),n.getDate()+i),x=resolvedStatus(map[k(d)],false),s=statusText(x),cl=x.status==='off'?'off':x.status==='full'?'full':'';
+    h+='<div class="row"><b>'+f(d)+'</b><span class="'+cl+'">'+s+'</span></div>';
+  }
+  future.innerHTML=h;
+}
+async function initPage(){
+  await loadPageSettings();
+  await renderSchedule();
+}
+initPage();
+
+function yen(n){return Number(n).toLocaleString('ja-JP')+'円'}
+function calcHime(){
+  const course=document.getElementById('courseSel'),area=document.getElementById('areaSel');
+  if(!course||!area)return;
+  const base=Number(course.value),fee=4000,areaName=area.options[area.selectedIndex].text.replace(/\s*\/.*$/,'');
+  const courseName=course.options[course.selectedIndex].text;
+  let totalText='',detail='';
+  if(area.value==='ask'){
+    totalText='要確認';
+    detail='<div>コース料金　'+yen(base)+'</div><div>本指名料　2,000円</div><div>特別指名料　2,000円</div><div>交通費　要確認</div><div class="total"><span>お支払い合計</span><span>要確認</span></div>';
+  }else{
+    const travel=Number(area.value),subtotal=base+fee+travel,tax=Math.round(subtotal*.1),total=subtotal+tax;
+    totalText=yen(total);
+    detail='<div>コース料金　'+yen(base)+'</div><div>本指名料　2,000円</div><div>特別指名料　2,000円</div><div>交通費　'+yen(travel)+'</div><div>小計　'+yen(subtotal)+'</div><div>消費税（10%）　'+yen(tax)+'</div><div class="total"><span>お支払い合計</span><span>'+yen(total)+'</span></div>';
+  }
+  simResult.innerHTML=detail;
+  himeTemplate.textContent='【姫予約】\n\nお名前：\n携帯番号：\n日時：○月○日 ○時〜\nコース：'+courseName+'\nエリア：'+areaName+'\n料金目安：'+totalText;
+}
+async function copyHime(){
+  const txt=himeTemplate.textContent,b=document.getElementById('copyHimeBtn');
+  try{await navigator.clipboard.writeText(txt)}catch(e){const t=document.createElement('textarea');t.value=txt;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove()}
+  b.textContent='✓ コピーしました';setTimeout(()=>b.textContent='📋 内容をコピー',1600);
+}
+calcHime();
+
+// Always start at HOME after reload/revisit instead of restoring a stale scroll position.
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+function resetPageToTop(){
+  if(location.hash){
+    history.replaceState(null,'',location.pathname+location.search);
+  }
+  document.documentElement.scrollTop=0;
+  document.body.scrollTop=0;
+  window.scrollTo(0,0);
+}
+resetPageToTop();
+document.addEventListener('DOMContentLoaded',resetPageToTop);
+window.addEventListener('load',function(){
+  resetPageToTop();
+  requestAnimationFrame(function(){
+    resetPageToTop();
+    requestAnimationFrame(resetPageToTop);
+  });
+});
+window.addEventListener('pageshow',function(){
+  resetPageToTop();
+  setTimeout(resetPageToTop,50);
+  setTimeout(resetPageToTop,250);
+});
+
+let hondaNews=[];
+function escNews(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function newsDate(v){const d=new Date(v);return isNaN(d)?'':String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0')}
+async function loadNews(){
+  const {data,error}=await publicSb.from('honda_news').select('*').eq('is_public',true).lte('published_at',new Date().toISOString()).order('published_at',{ascending:false}).order('id',{ascending:false});
+  if(error){console.error('news load error',error);newsTop.innerHTML='<div class="newsLoading">お知らせを取得できませんでした</div>';return}
+  hondaNews=(data||[]).filter(n=>!n.expires_at||new Date(n.expires_at)>new Date());
+  newsTop.innerHTML=hondaNews.length?hondaNews.slice(0,3).map((n,i)=>'<div class="newsItem '+(n.is_important?'important':'')+'" role="button" tabindex="0" onclick="openNewsDetail('+i+')"><time>'+newsDate(n.published_at)+'</time><span>'+(n.is_important?'<em class="importantBadge">重要</em>':'')+escNews(n.title)+'</span><b>›</b></div>').join(''):'<div class="newsLoading">現在お知らせはありません</div>';
+  newsMoreBtn.style.display=hondaNews.length>3?'block':'none';
+}
+function openNewsDetail(i){
+  const n=hondaNews[i];if(!n)return;
+  newsPopupTitle.textContent=n.is_important?'重要なお知らせ':'お知らせ';
+  const detail='<div class="newsDetailDate">'+newsDate(n.published_at)+'</div><div class="newsDetailTitle">'+(n.is_important?'<span class="importantBadge">重要</span>':'')+escNews(n.title)+'</div><div class="newsDetailText">'+escNews(n.body)+'</div>';
+  newsPopupBody.innerHTML=n.is_important?'<div class="newsImportantBox">'+detail+'</div>':detail;
+  newsPopup.classList.add('open');document.body.style.overflow='hidden';
+}
+function openNewsList(){
+  newsPopupTitle.textContent='お知らせ一覧';
+  newsPopupBody.innerHTML=hondaNews.map((n,i)=>'<button class="newsListItem '+(n.is_important?'important':'')+'" type="button" onclick="openNewsDetail('+i+')"><time>'+newsDate(n.published_at)+'</time><span>'+(n.is_important?'<em class="importantBadge">重要</em>':'')+escNews(n.title)+'</span><b>›</b></button>').join('');
+  newsPopup.classList.add('open');document.body.style.overflow='hidden';
+}
+function closeNewsPopup(){newsPopup.classList.remove('open');document.body.style.overflow=''}
+function newsBackdropClose(e){if(e.target===newsPopup)closeNewsPopup()}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeNewsPopup()});
+loadNews();
+</script><div class="newsPopup" id="newsPopup" onclick="newsBackdropClose(event)">
+  <div class="newsPopupPanel" role="dialog" aria-modal="true" aria-labelledby="newsPopupTitle">
+    <div class="newsPopupTop"><b id="newsPopupTitle">お知らせ</b><button type="button" onclick="closeNewsPopup()" aria-label="閉じる">×</button></div>
+    <div id="newsPopupBody"></div>
+  </div>
+</div>
+</body></html>
