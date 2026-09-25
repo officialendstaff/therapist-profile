@@ -156,7 +156,7 @@ async function loadDashboard(){
   const today=new Date().toISOString().slice(0,10);
   const [s,n,p,x]=await Promise.all([
    sb.from('nishino_schedule').select('*').eq('schedule_date',today).maybeSingle(),
-   sb.from('nishino_news').select('id,is_public,published_at,expires_at').eq('is_public',true).order('published_at',{ascending:false}).limit(1),
+   sb.from('nishino_news').select('id,is_public,published_at').eq('is_public',true).order('published_at',{ascending:false}).limit(1),
    sb.from('nishino_photos').select('id',{count:'exact',head:true}),
    sb.from('nishino_sns').select('*').eq('id',1).maybeSingle()
   ]);
@@ -182,7 +182,7 @@ function resetNewsForm(){noticeEditId.value='';noticeTitle.value='';noticeText.v
 function editNews(id){const n=adminNews.find(x=>x.id===id);if(!n)return;noticeEditId.value=n.id;noticeTitle.value=n.title||'';noticeText.value=n.body||'';noticePublic.value=n.is_public?'public':'private';setNoticeType(!!n.is_important);noticeSaveBtn.textContent='変更を保存';noticeCancelBtn.style.display='block';window.scrollTo(0,0)}
 async function saveNews(){
   const title=noticeTitle.value.trim(),body=noticeText.value.trim(); if(!title||!body){alert('見出しと詳細本文を入力してください');return}
-  const row={title,body,is_important:noticeImportant,is_public:noticePublic.value==='public',published_at:newsStartAt.value?new Date(newsStartAt.value).toISOString():new Date().toISOString(),expires_at:newsEndAt.value?new Date(newsEndAt.value).toISOString():null};
+  const row={title,body,is_important:noticeImportant,is_public:noticePublic.value==='public',published_at:newsStartAt.value?new Date(newsStartAt.value).toISOString():new Date().toISOString()};
   let q,err;if(noticeEditId.value){q=await sb.from('nishino_news').update(row).eq('id',Number(noticeEditId.value));err=q.error}else{q=await sb.from('nishino_news').insert(row);err=q.error}
   if(err){alert('保存エラー：'+err.message);return}flash('newsSaved');resetNewsForm();await loadNewsAdmin()
 }
