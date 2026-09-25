@@ -101,6 +101,9 @@ linear-gradient(225deg,transparent 50%,#241f20 51%) right top/17px 18px no-repea
 .newsImportantBox{background:#fff0f1;border:1px solid #d94b5f;border-left:5px solid #b3122d;border-radius:10px;padding:13px 12px;margin-top:13px}
 .newsImportantBox .newsDetailDate{margin-top:0;color:#a01930;font-weight:700}
 .newsImportantBox .newsDetailTitle{color:#8d1026}
+.themeCustom .head::after{content:""!important;width:18px;height:18px;display:inline-block;background-image:var(--theme-character);background-size:contain;background-position:center;background-repeat:no-repeat;vertical-align:middle}
+.themeCustom .photoThumbs:after{content:""!important;width:22px;height:22px;background-image:var(--theme-character);background-size:contain;background-position:center;background-repeat:no-repeat}
+.themeCustom .catWalk img{width:48px;height:34px;object-fit:contain;display:block}
 
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body><main class="app">
 <section class="hero" id="home"><img id="heroImage" src="main.png.png" alt="西野 メイン画像" style="width:100%;height:100%;object-fit:cover;display:block"><button class="menuBtn" onclick="toggleMenu()" aria-label="メニュー">☰</button></section>
@@ -197,6 +200,7 @@ const SB_KEY='sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos';
 const publicSb=supabase.createClient(SB_URL,SB_KEY);
 function escPage(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 let managedStatusImages={work:'',off:'',full:''};
+let managedThemeImage='';
 async function loadPageSettings(){
   const {data,error}=await publicSb.from('nishino_page').select('*').eq('id',1).maybeSingle();
   if(error||!data){if(error)console.error('PAGE load error',error);return}
@@ -209,6 +213,12 @@ async function loadPageSettings(){
   }
   document.querySelectorAll('.catBubble').forEach(e=>e.textContent=(data.nickname||'にっしゃん')+'に話しかける');
   managedStatusImages={work:data.work_image_url||'',off:data.off_image_url||'',full:data.full_image_url||''};
+  managedThemeImage=data.theme_image_url||'';
+  if(managedThemeImage){
+    document.documentElement.style.setProperty('--theme-character','url("'+managedThemeImage.replace(/"/g,'%22')+'")');
+    document.body.classList.add('themeCustom');
+    document.querySelectorAll('.catWalk').forEach(w=>{w.innerHTML=Array.from({length:4},()=>'<img src="'+managedThemeImage+'" alt="">').join('')});
+  }
   const managedImages={
     heroImage:data.hero_image_url,
     profileImage:data.profile_image_url,
