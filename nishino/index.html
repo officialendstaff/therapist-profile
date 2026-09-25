@@ -196,6 +196,7 @@ const SB_URL='https://vjjnkflbfsjihwzjsjpr.supabase.co';
 const SB_KEY='sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos';
 const publicSb=supabase.createClient(SB_URL,SB_KEY);
 function escPage(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+let managedStatusImages={work:'',off:'',full:''};
 async function loadPageSettings(){
   const {data,error}=await publicSb.from('nishino_page').select('*').eq('id',1).maybeSingle();
   if(error||!data){if(error)console.error('PAGE load error',error);return}
@@ -207,6 +208,7 @@ async function loadPageSettings(){
     flush();box.innerHTML=parts.join('');
   }
   document.querySelectorAll('.catBubble').forEach(e=>e.textContent=(data.nickname||'にっしゃん')+'に話しかける');
+  managedStatusImages={work:data.work_image_url||'',off:data.off_image_url||'',full:data.full_image_url||''};
   const managedImages={
     heroImage:data.hero_image_url,
     profileImage:data.profile_image_url,
@@ -264,7 +266,7 @@ function resolvedStatus(row,isToday=false){
 }
 function time5(v){return v?String(v).slice(0,5):''}
 function catArt(state){
-  const src=state==='off'?'cat-off.png':state==='full'?'cat-full.png':'cat-work.png';
+  const src=managedStatusImages[state]||(state==='off'?'cat-off.png':state==='full'?'cat-full.png':'cat-work.png');
   const alt=state==='off'?'お休み中の黒猫':state==='full'?'完売を喜ぶ黒猫':'出勤中の黒猫';
   return '<img src="'+src+'" alt="'+alt+'">';
 }
