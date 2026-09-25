@@ -207,6 +207,20 @@ async function loadPageSettings(){
     flush();box.innerHTML=parts.join('');
   }
   document.querySelectorAll('.catBubble').forEach(e=>e.textContent=(data.nickname||'にっしゃん')+'に話しかける');
+  const managedImages={
+    heroImage:data.hero_image_url,
+    profileImage:data.profile_image_url,
+    personalImage:data.personal_image_url,
+    calendarImage:data.calendar_image_url
+  };
+  Object.entries(managedImages).forEach(([id,url])=>{
+    const el=document.getElementById(id);
+    if(el&&url){
+      el.src=url;
+      el.style.display='';
+      if(id==='personalImage'&&el.nextElementSibling)el.nextElementSibling.style.display='none';
+    }
+  });
 }
 loadPageSettings();
 
