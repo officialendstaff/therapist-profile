@@ -125,7 +125,7 @@ async function loadSnsAdmin(){
 function validHttpUrl(v){try{const u=new URL(v);return u.protocol==='https:'||u.protocol==='http:'}catch(e){return false}}
 async function saveSns(){
   const row={id:1,x_id:snsXId.value.trim(),x_url:snsXUrl.value.trim(),sns02_id:sns02Id.value.trim(),sns02_url:sns02Url.value.trim(),line_id:snsLineId.value.trim(),line_url:snsLineUrl.value.trim(),x_enabled:snsXEnabled.checked,sns02_enabled:sns02Enabled.checked,line_enabled:snsLineEnabled.checked,updated_at:new Date().toISOString()};
-  if(!row.x_id||!row.x_url||!row.sns02_id||!row.sns02_url||!row.line_id||!row.line_url){alert('IDとURLをすべて入力してください');return}
+  const required=[];if(row.x_enabled&&(!row.x_id||!row.x_url))required.push('X');if(row.sns02_enabled&&(!row.sns02_id||!row.sns02_url))required.push('02');if(row.line_enabled&&(!row.line_id||!row.line_url))required.push('LINE');if(required.length){alert(required.join('・')+' のIDとURLを入力してください');return}
   if(!validHttpUrl(row.x_url)||!validHttpUrl(row.sns02_url)||!validHttpUrl(row.line_url)){alert('URLを正しく入力してください');return}
   snsSaveBtn.disabled=true;snsSaveBtn.textContent='保存中…';
   const {error}=await sb.from('nishino_sns').upsert(row,{onConflict:'id'});
