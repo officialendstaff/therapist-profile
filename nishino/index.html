@@ -381,7 +381,7 @@ function newsDate(v){const d=new Date(v);return isNaN(d)?'':String(d.getMonth()+
 async function loadNews(){
   const {data,error}=await publicSb.from('nishino_news').select('*').eq('is_public',true).lte('published_at',new Date().toISOString()).order('published_at',{ascending:false}).order('id',{ascending:false});
   if(error){console.error('news load error',error);newsTop.innerHTML='<div class="newsLoading">お知らせを取得できませんでした</div>';return}
-  hondaNews=(data||[]).filter(n=>!n.expires_at||new Date(n.expires_at)>new Date());
+  hondaNews=data||[];
   newsTop.innerHTML=hondaNews.length?hondaNews.slice(0,3).map((n,i)=>'<div class="newsItem '+(n.is_important?'important':'')+'" role="button" tabindex="0" onclick="openNewsDetail('+i+')"><time>'+newsDate(n.published_at)+'</time><span>'+(n.is_important?'<em class="importantBadge">重要</em>':'')+escNews(n.title)+'</span><b>›</b></div>').join(''):'<div class="newsLoading">現在お知らせはありません</div>';
   newsMoreBtn.style.display=hondaNews.length>3?'block':'none';
 }
