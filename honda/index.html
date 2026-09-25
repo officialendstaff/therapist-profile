@@ -222,7 +222,6 @@ async function loadPageSettings(){
     document.querySelectorAll('.catWalk').forEach(w=>{w.innerHTML=Array.from({length:4},()=>'<img src="'+managedThemeImage+'" alt="">').join('')});
   }
 }
-loadPageSettings();
 
 let hondaSns={
   x:{id:'@PonchaRose',url:'https://x.com/PonchaRose',name:'X',enabled:true},
@@ -305,7 +304,11 @@ async function renderSchedule(){
   }
   future.innerHTML=h;
 }
-renderSchedule();
+async function initPage(){
+  await loadPageSettings();
+  await renderSchedule();
+}
+initPage();
 
 function yen(n){return Number(n).toLocaleString('ja-JP')+'円'}
 function calcHime(){
