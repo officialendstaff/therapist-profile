@@ -241,6 +241,9 @@ let hondaSns={
   line:{id:'',url:'https://lin.ee/67dA4sS',name:'LINE',enabled:true}
 };
 function applySns(){
+  document.querySelectorAll('[data-sns-link]').forEach(e=>{
+    e.onclick=ev=>{ev.preventDefault();openDynamicSns(e.dataset.snsLink)};
+  });
   document.querySelectorAll('[data-sns-link="x"]').forEach(e=>e.href=hondaSns.x.url);
   document.querySelectorAll('[data-sns-link="02"]').forEach(e=>e.href=hondaSns['02'].url);
   document.querySelectorAll('[data-sns-link="line"]').forEach(e=>e.href=hondaSns.line.url);
