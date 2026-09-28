@@ -123,11 +123,11 @@ body{background:#e8e3dc;color:#28231f;background-image:none}
 .movieBox{aspect-ratio:16/9;border:1px solid #ded4c4;border-radius:10px;background:#f4f0e8;display:flex;align-items:center;justify-content:center;color:#8c7449;font-size:12px;overflow:hidden}
 .movieBox video,.movieBox iframe{width:100%;height:100%;border:0}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body><main class="app">
-<section class="hero" id="home"><img id="heroImage" src="main.png.png" alt="美優 メイン画像" style="width:100%;height:100%;object-fit:cover;display:block"><button class="menuBtn" onclick="toggleMenu()" aria-label="メニュー">☰</button></section>
+<section class="hero" id="home"><img id="heroImage" src="" alt="美優 メイン画像" style="width:100%;height:100%;object-fit:cover;display:block"><button class="menuBtn" onclick="toggleMenu()" aria-label="メニュー">☰</button></section>
 <div class="content">
 <section class="card news" id="news"><div class="head">お知らせ</div><div id="newsTop"><div class="newsLoading">読み込み中…</div></div><button class="newsMore" id="newsMoreBtn" type="button" onclick="openNewsList()" style="display:none">過去のお知らせを見る</button></section>
 <section class="card" id="schedule"><div class="head"><span>本日の出勤</span></div><div class="today"><span id="todayDate"></span><strong id="todayStatus"></strong></div><div class="todayCat" id="todayCat" data-state="work"><div id="todayCatArt"></div><div class="todayCatMsg" id="todayCatMsg"></div></div></section>
-<section class="card"><div class="catAccent">🐾 Miyu's personality 🐾</div><img id="personalImage" class="personalImg" src="personal-cat.png" alt="美優さんを猫に例えると" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="personalFallback" style="display:none">🐾 パーソナル画像<br>personal-cat.png を登録すると表示されます</div></section>
+<section class="card"><div class="catAccent">✦ Miyu's personality ✦</div><img id="personalImage" class="personalImg" src="" alt="美優 パーソナル画像" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="personalFallback" style="display:none">🐾 パーソナル画像<br>personal-cat.png を登録すると表示されます</div></section>
 <section class="card intro" id="intro"><div id="pageIntroDynamic"><p>🌹Grand Luxe　美優です🌹<br>「美優さん」って呼んでください♡</p><p>〜大人の癒しと少し意地悪な時間を♡〜</p><p>🌹「また会いたい」と言ってもらえる施術を目指しています🌹</p><p>疲れた身体をしっかりほぐしながら、<br>甘やかすだけじゃ終わらない♡<br>少しだけドキドキする時間をお届けします♡<br>沼る準備をしてきてね🐱🤍</p><h3>こんな方におすすめ✨</h3><p>❤️ 細身のお姉さんが好き<br>❤️ 猫顔がタイプ<br>❤️ 大人の女性に甘えたい<br>❤️ 少しSなお姉さんにドキドキしたい<br>❤️ M気質<br>❤️ しっかりマッサージされたい<br>❤️ 癒しも刺激もどっちも欲しい<br>❤️ 楽しくお話したい</p><h3>✨得意✨</h3><p>✔ 密着感のあるマッサージ<br>✔ 肩・首・背中のコリほぐし<br>✔ 焦らされるような距離感♡<br>✔ 初めてでも緊張しない空気作り</p><p>「思ってたより話しやすい😊」<br>「時間があっという間だった！」</p><p>そう言ってもらえることが多いです🌹</p><p>初指名・人見知りさん大歓迎です☺️</p><p>ぜひ一度、美優さんに会いに来てください🤍</p></div></section>
 
 <div class="catTrail" aria-hidden="true"><span>🐾</span><span>🐾</span><span>🐾</span></div><section class="card" id="photo"><div class="head">PHOTO</div><div class="photoSub">PONCHAN’S PHOTO</div><div class="photoThumbs" id="photoThumbs"></div><p class="photoHint">写真をタップすると大きく表示できます 🐾</p></section><section class="card" id="movie"><div class="head"><span>MOVIE</span><small>美優 MOVIE</small></div><div class="movieBox" id="movieBox">動画は管理ページ設定後に表示されます</div></section>
@@ -204,7 +204,7 @@ async function loadPageSettings(){
   }
 }
 
-let hondaSns={
+let miyuSns={
   x:{id:'@PonchaRose',url:'https://x.com/PonchaRose',name:'X',enabled:true},
   '02':{id:'@PonchaRose',url:'https://m-sns.net/profile/@PonchaRose',name:'02',enabled:true},
   line:{id:'@845txetv',url:'https://lin.ee/67dA4sS',name:'LINE',enabled:true}
@@ -213,19 +213,19 @@ function applySns(){
   document.querySelectorAll('[data-sns-link]').forEach(e=>{
     e.onclick=ev=>{ev.preventDefault();openDynamicSns(e.dataset.snsLink)};
   });
-  document.querySelectorAll('[data-sns-link="x"]').forEach(e=>e.href=hondaSns.x.url);
-  document.querySelectorAll('[data-sns-link="02"]').forEach(e=>e.href=hondaSns['02'].url);
-  document.querySelectorAll('[data-sns-link="line"]').forEach(e=>e.href=hondaSns.line.url);
-  document.querySelectorAll('[data-sns-btn]').forEach(e=>{const k=e.dataset.snsBtn,s=e.querySelector('small');if(s)s.textContent=hondaSns[k].id;e.style.display=hondaSns[k].enabled===false?'none':''});
-  document.querySelectorAll('[data-sns-link]').forEach(e=>{const k=e.dataset.snsLink;e.style.display=hondaSns[k]&&hondaSns[k].enabled===false?'none':''});
+  document.querySelectorAll('[data-sns-link="x"]').forEach(e=>e.href=miyuSns.x.url);
+  document.querySelectorAll('[data-sns-link="02"]').forEach(e=>e.href=miyuSns['02'].url);
+  document.querySelectorAll('[data-sns-link="line"]').forEach(e=>e.href=miyuSns.line.url);
+  document.querySelectorAll('[data-sns-btn]').forEach(e=>{const k=e.dataset.snsBtn,s=e.querySelector('small');if(s)s.textContent=miyuSns[k].id;e.style.display=miyuSns[k].enabled===false?'none':''});
+  document.querySelectorAll('[data-sns-link]').forEach(e=>{const k=e.dataset.snsLink;e.style.display=miyuSns[k]&&miyuSns[k].enabled===false?'none':''});
 }
 async function loadSns(){
   const {data,error}=await publicSb.from('miyu_sns').select('*').eq('id',1).maybeSingle();
   if(error||!data){if(error)console.error('SNS load error',error);return}
-  hondaSns={x:{id:data.x_id||'',url:data.x_url||'',name:'X',enabled:data.x_enabled!==false},'02':{id:data.sns02_id||'',url:data.sns02_url||'',name:'02',enabled:data.sns02_enabled!==false},line:{id:data.line_id||'',url:data.line_url||'',name:'LINE',enabled:data.line_enabled!==false}};
+  miyuSns={x:{id:data.x_id||'',url:data.x_url||'',name:'X',enabled:data.x_enabled!==false},'02':{id:data.sns02_id||'',url:data.sns02_url||'',name:'02',enabled:data.sns02_enabled!==false},line:{id:data.line_id||'',url:data.line_url||'',name:'LINE',enabled:data.line_enabled!==false}};
   applySns();
 }
-function openDynamicSns(k){const s=hondaSns[k];if(s&&s.enabled!==false&&s.url)sns(s.name,s.url)}
+function openDynamicSns(k){const s=miyuSns[k];if(s&&s.enabled!==false&&s.url)sns(s.name,s.url)}
 loadSns();
 
 async function loadPhotos(){
@@ -295,23 +295,7 @@ async function initPage(){
 initPage();
 
 function yen(n){return Number(n).toLocaleString('ja-JP')+'円'}
-function calcHime(){
-  const course=document.getElementById('courseSel'),area=document.getElementById('areaSel');
-  if(!course||!area)return;
-  const base=Number(course.value),fee=4000,areaName=area.options[area.selectedIndex].text.replace(/\s*\/.*$/,'');
-  const courseName=course.options[course.selectedIndex].text;
-  let totalText='',detail='';
-  if(area.value==='ask'){
-    totalText='要確認';
-    detail='<div>コース料金　'+yen(base)+'</div><div>本指名料　2,000円</div><div>特別指名料　2,000円</div><div>交通費　要確認</div><div class="total"><span>お支払い合計</span><span>要確認</span></div>';
-  }else{
-    const travel=Number(area.value),subtotal=base+fee+travel,tax=Math.round(subtotal*.1),total=subtotal+tax;
-    totalText=yen(total);
-    detail='<div>コース料金　'+yen(base)+'</div><div>本指名料　2,000円</div><div>特別指名料　2,000円</div><div>交通費　'+yen(travel)+'</div><div>小計　'+yen(subtotal)+'</div><div>消費税（10%）　'+yen(tax)+'</div><div class="total"><span>お支払い合計</span><span>'+yen(total)+'</span></div>';
-  }
-  simResult.innerHTML=detail;
-  himeTemplate.textContent='【姫予約】\n\nお名前：\n携帯番号：\n日時：○月○日 ○時〜\nコース：'+courseName+'\nエリア：'+areaName+'\n料金目安：'+totalText;
-}
+function calcHime(){}
 async function copyHime(){
   const txt=himeTemplate.textContent,b=document.getElementById('copyHimeBtn');
   try{await navigator.clipboard.writeText(txt)}catch(e){const t=document.createElement('textarea');t.value=txt;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove()}
@@ -344,18 +328,18 @@ window.addEventListener('pageshow',function(){
   setTimeout(resetPageToTop,250);
 });
 
-let hondaNews=[];
+let miyuNews=[];
 function escNews(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function newsDate(v){const d=new Date(v);return isNaN(d)?'':String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0')}
 async function loadNews(){
   const {data,error}=await publicSb.from('miyu_news').select('*').eq('is_public',true).lte('published_at',new Date().toISOString()).order('published_at',{ascending:false}).order('id',{ascending:false});
   if(error){console.error('news load error',error);newsTop.innerHTML='<div class="newsLoading">お知らせを取得できませんでした</div>';return}
-  hondaNews=(data||[]).filter(n=>!n.expires_at||new Date(n.expires_at)>new Date());
-  newsTop.innerHTML=hondaNews.length?hondaNews.slice(0,3).map((n,i)=>'<div class="newsItem '+(n.is_important?'important':'')+'" role="button" tabindex="0" onclick="openNewsDetail('+i+')"><time>'+newsDate(n.published_at)+'</time><span>'+(n.is_important?'<em class="importantBadge">重要</em>':'')+escNews(n.title)+'</span><b>›</b></div>').join(''):'<div class="newsLoading">現在お知らせはありません</div>';
-  newsMoreBtn.style.display=hondaNews.length>3?'block':'none';
+  miyuNews=(data||[]).filter(n=>!n.expires_at||new Date(n.expires_at)>new Date());
+  newsTop.innerHTML=miyuNews.length?miyuNews.slice(0,3).map((n,i)=>'<div class="newsItem '+(n.is_important?'important':'')+'" role="button" tabindex="0" onclick="openNewsDetail('+i+')"><time>'+newsDate(n.published_at)+'</time><span>'+(n.is_important?'<em class="importantBadge">重要</em>':'')+escNews(n.title)+'</span><b>›</b></div>').join(''):'<div class="newsLoading">現在お知らせはありません</div>';
+  newsMoreBtn.style.display=miyuNews.length>3?'block':'none';
 }
 function openNewsDetail(i){
-  const n=hondaNews[i];if(!n)return;
+  const n=miyuNews[i];if(!n)return;
   newsPopupTitle.textContent=n.is_important?'重要なお知らせ':'お知らせ';
   const detail='<div class="newsDetailDate">'+newsDate(n.published_at)+'</div><div class="newsDetailTitle">'+(n.is_important?'<span class="importantBadge">重要</span>':'')+escNews(n.title)+'</div><div class="newsDetailText">'+escNews(n.body)+'</div>';
   newsPopupBody.innerHTML=n.is_important?'<div class="newsImportantBox">'+detail+'</div>':detail;
@@ -363,7 +347,7 @@ function openNewsDetail(i){
 }
 function openNewsList(){
   newsPopupTitle.textContent='お知らせ一覧';
-  newsPopupBody.innerHTML=hondaNews.map((n,i)=>'<button class="newsListItem '+(n.is_important?'important':'')+'" type="button" onclick="openNewsDetail('+i+')"><time>'+newsDate(n.published_at)+'</time><span>'+(n.is_important?'<em class="importantBadge">重要</em>':'')+escNews(n.title)+'</span><b>›</b></button>').join('');
+  newsPopupBody.innerHTML=miyuNews.map((n,i)=>'<button class="newsListItem '+(n.is_important?'important':'')+'" type="button" onclick="openNewsDetail('+i+')"><time>'+newsDate(n.published_at)+'</time><span>'+(n.is_important?'<em class="importantBadge">重要</em>':'')+escNews(n.title)+'</span><b>›</b></button>').join('');
   newsPopup.classList.add('open');document.body.style.overflow='hidden';
 }
 function closeNewsPopup(){newsPopup.classList.remove('open');document.body.style.overflow=''}
