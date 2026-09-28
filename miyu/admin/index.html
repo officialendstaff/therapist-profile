@@ -8,7 +8,15 @@
 <div class="sub" id="weekSub"><div class="head"><b>週間予定</b><small>直近7日</small></div><div class="note">月間予定を基本に、予約状況・空き枠だけを微調整する画面です。</div><div id="weekList"></div><button class="save" onclick="saveWeek()">週間予定を保存</button><div class="ok" id="weekSaved">✓ Supabaseへ保存しました</div></div>
 <div class="sub" id="monthSub"><div class="head"><b>月間予定</b><small>基本シフト</small></div><div class="note">1か月分の「出勤・出勤時間・休み・完売」を登録。閲覧ページでは、この予定から直近の出勤情報を自動表示する設計です。</div><div class="monthHead"><button onclick="moveMonth(-1)">‹</button><span class="monthTitle" id="monthTitle"></span><button onclick="moveMonth(1)">›</button></div><div class="monthList" id="monthList"></div><button class="save" onclick="saveMonth()">この月の予定を保存</button><div class="ok" id="monthSaved">✓ Supabaseへ保存しました</div></div></div></section>
 <section class="pane" id="newsPane"><div class="card"><div class="head"><b>お知らせ管理</b><small>POPUP NEWS</small></div><div class="note">保存すると閲覧ページのNEWSと中央ポップアップへ反映されます。</div><div class="noticeType"><button class="active" id="normalBtn" onclick="setNoticeType(false)">通常</button><button id="importantBtn" onclick="setNoticeType(true)">🔴 重要</button></div><div class="field"><label>定型文</label><div class="preset"><button onclick="preset('x')">Xアカウント変更</button><button onclick="preset('line')">LINEアカウント変更</button></div></div><div class="field"><label>見出し</label><input id="noticeTitle" placeholder="例：29日空いてます❤️"></div><div class="field"><label>詳細本文（ポップアップに表示）</label><textarea id="noticeText" placeholder="お知らせの詳細内容を入力"></textarea></div><div class="field"><label>公開開始（任意）</label><input id="newsStartAt" type="datetime-local"></div><div class="field"><label>掲載終了（任意）</label><input id="newsEndAt" type="datetime-local"></div><div class="field"><label>公開設定</label><select id="noticePublic"><option value="public">公開する</option><option value="private">非公開</option></select></div><input type="hidden" id="noticeEditId"><button class="save" id="noticeSaveBtn" onclick="saveNews()">お知らせを保存</button><button class="ghost" id="noticeCancelBtn" style="display:none;margin-top:7px" onclick="resetNewsForm()">編集をキャンセル</button><div class="ok" id="newsSaved">✓ Supabaseへ保存しました</div><div class="head" style="margin-top:22px"><b>登録済みのお知らせ</b><small>NEWS LIST</small></div><div class="adminNewsPreview" id="adminNewsPreview"><div><span>読み込み中…</span></div></div></div></section>
-<section class="pane" id="photoPane"><div class="card"><div class="head"><b>PHOTO管理</b><small>PHOTO</small></div><div class="photoGuide"><b>📷 3：4の縦画像を推奨しています</b><br>画像はSupabase Storageへ保存します。写真は「↑」「↓」で並び替えできます。</div><div class="photoCount" id="photoCount">読み込み中…</div><div class="photoAdmin" id="photoAdmin"></div><input class="photoFile" type="file" id="photoFile" accept="image/*" onchange="previewPhoto(event)"><div class="previewBox" id="previewBox"><img id="previewImg"><p></p><button class="save" id="photoSaveBtn" onclick="savePhoto()">この画像を保存</button><button class="ghost" style="margin-top:7px" onclick="cancelPhoto()">キャンセル</button><div class="ok" id="photoSaved">✓ Supabaseへ保存しました</div></div><div class="note">最大20枚。追加・変更・削除はSupabaseへ保存され、閲覧ページへ反映されます。</div></div></section>
+<section class="pane" id="photoPane"><div class="card"><div class="head"><b>PHOTO管理</b><small>PHOTO</small></div><div class="photoGuide"><b>📷 3：4の縦画像を推奨しています</b><br>画像はSupabase Storageへ保存します。写真は「↑」「↓」で並び替えできます。</div><div class="photoCount" id="photoCount">読み込み中…</div><div class="photoAdmin" id="photoAdmin"></div><input class="photoFile" type="file" id="photoFile" accept="image/*" onchange="previewPhoto(event)"><div class="previewBox" id="previewBox"><img id="previewImg"><p></p><button class="save" id="photoSaveBtn" onclick="savePhoto()">この画像を保存</button><button class="ghost" style="margin-top:7px" onclick="cancelPhoto()">キャンセル</button><div class="ok" id="photoSaved">✓ Supabaseへ保存しました</div></div><div class="note">最大20枚。追加・変更・削除はSupabaseへ保存され、閲覧ページへ反映されます。</div>
+<div class="head" style="margin-top:24px"><b>MOVIE管理</b><small>MP4</small></div>
+<div class="note">MP4動画を1本登録できます。閲覧ページではPHOTO直下に表示されます。未登録時はMOVIE欄を非表示にします。</div>
+<video id="moviePreview" controls preload="metadata" style="display:none;width:100%;aspect-ratio:16/9;background:#111;border-radius:9px;margin:10px 0"></video>
+<input type="file" id="movieFile" accept="video/mp4" onchange="previewMovie(this)">
+<button class="save" id="movieSaveBtn" type="button" style="margin-top:10px" onclick="saveMovie()">動画を保存</button>
+<button class="ghost" id="movieDeleteBtn" type="button" style="margin-top:7px;display:none" onclick="deleteMovie()">登録動画を削除</button>
+<div class="ok" id="movieSaved">✓ 動画を保存しました</div>
+</div></section>
 <section class="pane" id="snsPane"><div class="card"><div class="head"><b>SNS設定</b><small>ACCOUNT</small></div><div class="note">アカウント変更時はここだけ更新してください。保存すると閲覧ページのSNS・姫予約リンクへ一括反映されます。</div>
 <div class="snsBlock"><div class="snsBlockTitle">X</div><div class="snsField"><label for="snsXId">X ID</label><input type="text" id="snsXId" value="@PonchaRose"></div><div class="snsField"><label for="snsXUrl">X URL</label><input type="url" id="snsXUrl" value="https://x.com/PonchaRose"></div><label class="snsToggle"><input type="checkbox" id="snsXEnabled" checked> Xを表示する</label></div>
 <div class="snsBlock"><div class="snsBlockTitle">02</div><div class="snsField"><label for="sns02Id">02 ID</label><input type="text" id="sns02Id" value="@PonchaRose"></div><div class="snsField"><label for="sns02Url">02 URL</label><input type="url" id="sns02Url" value="https://m-sns.net/profile/@PonchaRose"></div><label class="snsToggle"><input type="checkbox" id="sns02Enabled" checked> 02を表示する</label></div>
@@ -60,7 +68,7 @@
 const SB_URL='https://vjjnkflbfsjihwzjsjpr.supabase.co';
 const SB_KEY='sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos';
 const sb=supabase.createClient(SB_URL,SB_KEY);
-async function initAuth(){const {data}=await sb.auth.getSession();authGate.style.display=data.session?'none':'flex';if(data.session){await refreshSchedule();await loadNewsAdmin();await loadPhotosAdmin();await loadSnsAdmin();await loadPageSettings();await loadDashboard()}}
+async function initAuth(){const {data}=await sb.auth.getSession();authGate.style.display=data.session?'none':'flex';if(data.session){await refreshSchedule();await loadNewsAdmin();await loadPhotosAdmin();await loadMovieAdmin();await loadSnsAdmin();await loadPageSettings();await loadDashboard()}}
 async function login(){authErr.textContent='';const {error}=await sb.auth.signInWithPassword({email:loginEmail.value.trim(),password:loginPassword.value});if(error){authErr.textContent='ログインできません。メールアドレスとパスワードを確認してください。';return}authGate.style.display='none';loginPassword.value='';await refreshSchedule();await loadNewsAdmin();await loadPhotosAdmin();await loadSnsAdmin();await loadPageSettings();await loadDashboard()}
 async function logout(){await sb.auth.signOut();authGate.style.display='flex'}
 function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
@@ -235,5 +243,43 @@ adminResetTop();
 document.addEventListener('DOMContentLoaded',adminResetTop);
 window.addEventListener('load',()=>{adminResetTop();requestAnimationFrame(adminResetTop)});
 window.addEventListener('pageshow',()=>{adminResetTop();setTimeout(adminResetTop,50);setTimeout(adminResetTop,250)});
+
+let currentMoviePath='',currentMovieUrl='';
+function previewMovie(input){
+ const f=input.files&&input.files[0];if(!f)return;
+ if(f.type!=='video/mp4'){alert('MP4動画を選択してください');input.value='';return}
+ if(f.size>100*1024*1024){alert('動画は100MB以下にしてください');input.value='';return}
+ moviePreview.src=URL.createObjectURL(f);moviePreview.style.display='block';
+}
+async function loadMovieAdmin(){
+ const {data,error}=await sb.from('miyu_page').select('movie_url,movie_storage_path').eq('id',1).maybeSingle();
+ if(error){console.error('MOVIE load error',error);return}
+ currentMovieUrl=(data&&data.movie_url)||'';currentMoviePath=(data&&data.movie_storage_path)||'';
+ if(currentMovieUrl){moviePreview.src=currentMovieUrl;moviePreview.style.display='block';movieDeleteBtn.style.display='block'}
+}
+async function saveMovie(){
+ const f=movieFile.files&&movieFile.files[0];if(!f){alert('先にMP4動画を選択してください');return}
+ if(f.type!=='video/mp4'){alert('MP4動画を選択してください');return}
+ if(f.size>100*1024*1024){alert('動画は100MB以下にしてください');return}
+ movieSaveBtn.disabled=true;movieSaveBtn.textContent='アップロード中…';
+ const path='miyu/movie/movie-'+Date.now()+'.mp4';
+ try{
+  const up=await sb.storage.from('miyu-photos').upload(path,f,{contentType:'video/mp4',upsert:false});if(up.error)throw up.error;
+  const url=sb.storage.from('miyu-photos').getPublicUrl(path).data.publicUrl;
+  const q=await sb.from('miyu_page').update({movie_url:url,movie_storage_path:path,updated_at:new Date().toISOString()}).eq('id',1);if(q.error){await sb.storage.from('miyu-photos').remove([path]);throw q.error}
+  if(currentMoviePath)await sb.storage.from('miyu-photos').remove([currentMoviePath]);
+  currentMoviePath=path;currentMovieUrl=url;moviePreview.src=url;moviePreview.style.display='block';movieDeleteBtn.style.display='block';movieFile.value='';flash('movieSaved');
+ }catch(e){alert('動画保存エラー：'+e.message)}
+ finally{movieSaveBtn.disabled=false;movieSaveBtn.textContent='動画を保存'}
+}
+async function deleteMovie(){
+ if(!confirm('登録中の動画を削除しますか？'))return;
+ try{
+  const q=await sb.from('miyu_page').update({movie_url:null,movie_storage_path:null,updated_at:new Date().toISOString()}).eq('id',1);if(q.error)throw q.error;
+  if(currentMoviePath)await sb.storage.from('miyu-photos').remove([currentMoviePath]);
+  currentMoviePath='';currentMovieUrl='';moviePreview.removeAttribute('src');moviePreview.load();moviePreview.style.display='none';movieDeleteBtn.style.display='none';movieFile.value='';
+ }catch(e){alert('動画削除エラー：'+e.message)}
+}
+
 initAuth();
 </script></body></html>
