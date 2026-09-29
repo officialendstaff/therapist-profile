@@ -22,6 +22,15 @@
 .officialLogo{margin:4px auto 28px;padding:22px 12px;text-align:center;background:#050505;color:#fff;line-height:1;white-space:nowrap}
 .officialLogo span{font-family:Georgia,"Times New Roman",serif;font-size:clamp(30px,8.2vw,48px);font-weight:700;letter-spacing:-.035em}
 .officialLogo i{display:inline-block;margin-left:.12em;font-family:Georgia,"Times New Roman",serif;font-size:clamp(34px,9vw,54px);font-weight:400;font-style:italic;letter-spacing:-.08em}
+</style><style>
+.brandCircle{width:66px;height:66px;border:1px solid #bba98f;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;background:#fff}
+.brandCircle svg{width:36px;height:36px}
+.tabelogMark{flex-direction:column;gap:0;color:#111;line-height:1}
+.tabelogMark .chop{font-size:17px;height:18px;overflow:hidden}
+.tabelogMark b{font-size:11px;letter-spacing:-.05em}
+.uberMark{flex-direction:column;font-family:Arial,sans-serif;line-height:.9}
+.uberMark b{font-size:17px;color:#000}
+.uberMark strong{font-size:17px;color:#06c167}
 </style></head><body>
 <button class="floatingMenu" onclick="openNav()" aria-label="メニュー">☰</button>
 <div class="menuOverlay" id="menuOverlay" onclick="if(event.target===this)closeNav()"><nav class="menuPanel"><button class="menuClose" onclick="closeNav()">×</button><b>MENU</b>
@@ -47,10 +56,10 @@
 <dt>TEL</dt><dd id="fiTel"><a href="tel:05058720987" style="color:inherit">050-5872-0987</a></dd>
 <dt>支払い</dt><dd id="fiPayment">カード・電子マネー・QRコード決済対応</dd>
 <dt>サービス料</dt><dd><button id="fiChargeBtn" type="button" onclick="openChargePhoto()" style="border:0;background:none;padding:0;color:inherit;font:inherit;font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer">お通し代として300円　<span style="color:#b42318;font-size:10px">お通しを見る →</span></button></dd>
-</dl><div class="infoSocials" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:26px 0 8px;text-align:center">
-<a href="https://www.instagram.com/chinesediningf1014?igsh=Z3RsaHRiM2trNW0%3D&utm_source=qr" target="_blank" rel="noopener" style="color:inherit;text-decoration:none"><span style="width:58px;height:58px;border:1px solid #bba98f;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font:700 23px Georgia,serif">◎</span><small>Instagram</small></a>
-<a href="https://tabelog.com/osaka/A2701/A270205/27145989/" target="_blank" rel="noopener" style="color:inherit;text-decoration:none"><span style="width:58px;height:58px;border:1px solid #bba98f;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:18px;font-weight:700">食</span><small>食べログ</small></a>
-<a href="https://www.ubereats.com/jp/store/%E3%83%81%E3%83%A3%E3%82%A4%E3%83%8B%E3%83%BC%E3%82%B9%E3%82%BF%E3%82%A4%E3%83%8B%E3%82%B0f-chinese-diningf/Rq1kry32S3qjqJ4gBLbEQg?srsltid=AU7gw4XY0H04asmbbSw-cchhTFoSRKYg-qVqsS1SeoquvtLFIxmwn85B" target="_blank" rel="noopener" style="color:inherit;text-decoration:none"><span style="width:58px;height:58px;border:1px solid #bba98f;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:12px;font-weight:800;line-height:1.05">Uber<br>Eats</span><small>Uber Eats</small></a>
+</dl><div class="infoSocials" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:28px 0 10px;text-align:center">
+<a href="https://www.instagram.com/chinesediningf1014?igsh=Z3RsaHRiM2trNW0%3D&utm_source=qr" target="_blank" rel="noopener" style="color:inherit;text-decoration:none"><span class="brandCircle"><svg viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="ig" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#ffdc80"/><stop offset=".35" stop-color="#fcaf45"/><stop offset=".62" stop-color="#f77737"/><stop offset=".82" stop-color="#c13584"/><stop offset="1" stop-color="#833ab4"/></linearGradient></defs><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" fill="none" stroke="url(#ig)" stroke-width="2.4"/><circle cx="12" cy="12" r="4.1" fill="none" stroke="url(#ig)" stroke-width="2.4"/><circle cx="17.5" cy="6.6" r="1.25" fill="url(#ig)"/></svg></span><small>Instagram</small></a>
+<a href="https://tabelog.com/osaka/A2701/A270205/27145989/" target="_blank" rel="noopener" style="color:inherit;text-decoration:none"><span class="brandCircle tabelogMark"><span class="chop">🥢</span><b>食べログ</b></span><small>食べログ</small></a>
+<a href="https://www.ubereats.com/jp/store/%E3%83%81%E3%83%A3%E3%82%A4%E3%83%8B%E3%83%BC%E3%82%B9%E3%82%BF%E3%82%A4%E3%83%8B%E3%83%B3%E3%82%AFf-chinese-diningf/Rq1kry32S3qjqJ4gBLbEQg?srsltid=AU7gw4XY0H04asmbbSw-cchhTFoSRKYg-qVqsS1SeoquvtLFIxmwn85B" target="_blank" rel="noopener" style="color:inherit;text-decoration:none"><span class="brandCircle uberMark"><b>Uber</b><strong>Eats</strong></span><small>Uber Eats</small></a>
 </div><div id="storefrontWrap" style="display:none;margin-top:24px"><img id="storefrontImg" alt="Chinese Dining f 店舗外観" style="width:100%;display:block;border-radius:3px;cursor:zoom-in" onclick="openPhoto(this.src)"><div style="font-size:10px;color:#8a7867;margin-top:7px">店舗外観</div></div></section>
 <section class="section" id="lunch"><div class="head"><b>LUNCH</b><small>ランチメニュー</small></div>
 <div id="lunchImages" style="display:grid;gap:16px">
