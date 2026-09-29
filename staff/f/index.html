@@ -18,7 +18,11 @@
   window.addEventListener('pageshow',function(e){ if(e.persisted) resetTop(); else requestAnimationFrame(resetTop); });
   window.addEventListener('load',function(){ requestAnimationFrame(function(){requestAnimationFrame(resetTop)}); },{once:true});
 })();
-</script></head><body>
+</script><style>
+.officialLogo{margin:4px auto 28px;padding:22px 12px;text-align:center;background:#050505;color:#fff;line-height:1;white-space:nowrap}
+.officialLogo span{font-family:Georgia,"Times New Roman",serif;font-size:clamp(30px,8.2vw,48px);font-weight:700;letter-spacing:-.035em}
+.officialLogo i{display:inline-block;margin-left:.12em;font-family:Georgia,"Times New Roman",serif;font-size:clamp(34px,9vw,54px);font-weight:400;font-style:italic;letter-spacing:-.08em}
+</style></head><body>
 <button class="floatingMenu" onclick="openNav()" aria-label="メニュー">☰</button>
 <div class="menuOverlay" id="menuOverlay" onclick="if(event.target===this)closeNav()"><nav class="menuPanel"><button class="menuClose" onclick="closeNav()">×</button><b>MENU</b>
 <a href="#home" onclick="closeNav()">HOME<small>トップ</small></a>
@@ -33,7 +37,7 @@
 <a href="#shopinfo" onclick="closeNav()">SHOP INFO<small>公式・外部ページ</small></a>
 </nav></div><main class="app">
 <section class="hero" id="home" aria-label="Chinese Dining f"></section>
-<section class="section" id="about"><div class="head"><b>ABOUT</b><small>Chinese Dining「f」について</small></div><div class="intro"><strong style="display:block;font-size:19px;margin-bottom:14px;color:#201b17">気軽に楽しめる、本格創作中華。</strong>高級中華料理店やホテルで経験を積んだシェフが手がけるChinese Dining「f」。<br><br>麻婆豆腐、自家製餃子、海老を主役にしたエビチリなど、定番の中華料理にシェフならではの工夫を加え、季節感も大切にした料理を楽しめます。<br><br>紹興酒は5年・10年・15年ものをラインナップ。<br><br>ご家族での食事から、おひとりでのランチやディナーまで。駅近ながら落ち着いて食事を楽しめる、隠れ家的な中国料理店です。 と聞いています。</div><div class="aboutGallery" id="aboutGallery"></div></section>
+<section class="section" id="about"><div class="officialLogo" aria-label="Chinese Dining f"><span>Chinese Dining</span><i>「f」</i></div><div class="head"><b>ABOUT</b><small>Chinese Dining「f」について</small></div><div class="intro"><strong style="display:block;font-size:19px;margin-bottom:14px;color:#201b17">気軽に楽しめる、本格創作中華。</strong>高級中華料理店やホテルで経験を積んだシェフが手がけるChinese Dining「f」。<br><br>麻婆豆腐、自家製餃子、海老を主役にしたエビチリなど、定番の中華料理にシェフならではの工夫を加え、季節感も大切にした料理を楽しめます。<br><br>紹興酒は5年・10年・15年ものをラインナップ。<br><br>ご家族での食事から、おひとりでのランチやディナーまで。駅近ながら落ち着いて食事を楽しめる、隠れ家的な中国料理店です。 と聞いています。</div><div class="aboutGallery" id="aboutGallery"></div></section>
 <section class="section" id="information"><div class="head"><b>INFORMATION</b><small>営業案内</small></div><dl class="info" id="fInfo">
 <dt>住所</dt><dd id="fiAddress">大阪府大阪市天王寺区生玉町9-17 GARE生玉 1F</dd>
 <dt>アクセス</dt><dd id="fiAccess">地下鉄谷町線 谷町九丁目駅 3番出口から徒歩約2分</dd>
