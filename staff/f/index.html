@@ -31,7 +31,12 @@
 <dt>支払い</dt><dd id="fiPayment">カード・電子マネー・QRコード決済対応</dd>
 <dt>サービス料</dt><dd id="fiCharge">お通し代として300円</dd>
 </dl></section>
-<section class="section" id="lunch"><div class="head"><b>LUNCH</b><small>ランチメニュー</small></div><div class="notice"><small>MENU IMAGE</small><h3>ランチメニュー</h3><p>黒板・POPの素材を整理し、ここにWEB用メニューを配置予定です。</p></div></section>
+<section class="section" id="lunch"><div class="head"><b>LUNCH</b><small>ランチメニュー</small></div>
+<div id="lunchImages" style="display:grid;gap:16px">
+<div id="lunchFrontWrap" style="display:none"><img id="lunchFront" alt="ランチメニュー 表面" style="width:100%;display:block;cursor:zoom-in;border-radius:3px" onclick="openPhoto(this.src)"></div>
+<div id="lunchBackWrap" style="display:none"><img id="lunchBack" alt="ランチメニュー 裏面" style="width:100%;display:block;cursor:zoom-in;border-radius:3px" onclick="openPhoto(this.src)"></div>
+<div id="lunchEmpty" style="font-size:12px;color:#8a7867">ランチメニュー準備中</div>
+</div></section>
 <section class="section" id="weekly"><div class="head"><b>WEEKLY LUNCH</b><small>今週の週替り</small></div><div class="notice"><small>THIS WEEK</small><h3>週替りランチ</h3><p>ホワイトボードの内容をもとに、今週のメニューを掲載予定です。</p></div></section>
 <section class="section" id="dinner"><div class="head"><b>DINNER</b><small>ディナーメニュー</small></div><div class="notice"><small>MENU BOOK</small><h3>ディナーメニュー</h3><p>複数ページのメニューブックとして構成予定です。料理写真との連携はページ構成確定後に追加します。</p></div></section>
 <section class="section" id="recommend"><div class="head"><b>RECOMMEND</b><small>ディナーのお勧め</small></div><div class="notice"><small>CHEF'S RECOMMEND</small><h3>おすすめ料理</h3><p>店内黒板の内容をWEB用に整えて掲載予定です。</p></div></section>
@@ -51,7 +56,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
 const sb=supabase.createClient('https://vjjnkflbfsjihwzjsjpr.supabase.co','sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos');
 async function loadAboutGallery(){let {data,error}=await sb.from('f_images').select('*').eq('about_selected',true).order('about_order',{ascending:true}).limit(6);if(error){console.error(error);return}aboutGallery.innerHTML=(data||[]).map(x=>'<button onclick="openPhoto(\''+x.image_url+'\')"><img src="'+x.image_url+'" alt="Chinese Dining f 料理写真" loading="lazy"></button>').join('')}
-async function loadFInfo(){let {data}=await sb.from('f_info').select('*').eq('id',1).maybeSingle();if(!data)return;let set=(id,v)=>{if(v)document.getElementById(id).innerHTML=String(v).replace(/\n/g,'<br>')};set('fiAddress',data.address);set('fiAccess',data.access);set('fiHours',data.hours);set('fiClosed',data.closed);set('fiReserve',data.reserve_text);if(data.tel){fiTel.innerHTML='<a href="tel:'+data.tel.replace(/[^0-9+]/g,'')+'" style="color:inherit">'+data.tel+'</a>'}set('fiPayment',data.payment);set('fiCharge',data.charge)}
+async function loadFInfo(){let {data}=await sb.from('f_info').select('*').eq('id',1).maybeSingle();if(!data)return;let set=(id,v)=>{if(v)document.getElementById(id).innerHTML=String(v).replace(/\n/g,'<br>')};set('fiAddress',data.address);set('fiAccess',data.access);set('fiHours',data.hours);set('fiClosed',data.closed);set('fiReserve',data.reserve_text);if(data.lunch_front_url){lunchFront.src=data.lunch_front_url;lunchFrontWrap.style.display='block';lunchEmpty.style.display='none'}if(data.lunch_back_url){lunchBack.src=data.lunch_back_url;lunchBackWrap.style.display='block';lunchEmpty.style.display='none'}if(data.tel){fiTel.innerHTML='<a href="tel:'+data.tel.replace(/[^0-9+]/g,'')+'" style="color:inherit">'+data.tel+'</a>'}set('fiPayment',data.payment);set('fiCharge',data.charge)}
 function openNav(){menuOverlay.classList.add('open');document.body.style.overflow='hidden'}function closeNav(){menuOverlay.classList.remove('open');document.body.style.overflow=''}
 function openPhoto(url){photoModalImg.src=url;photoModal.classList.add('open');document.body.style.overflow='hidden'}function closePhoto(){photoModal.classList.remove('open');document.body.style.overflow=''}loadAboutGallery();loadFInfo();
 </script></body></html>
