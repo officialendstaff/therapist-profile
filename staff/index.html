@@ -53,7 +53,7 @@ async function load(){
  worksList.innerHTML=(works.data||[]).map(x=>'<a class="card work" '+(x.link_url?'href="'+x.link_url+'"':'')+' style="text-decoration:none;color:inherit;'+(x.image_url?'background:linear-gradient(#0008,#000b),url('+x.image_url+') center/cover':'')+'"><strong>'+esc(x.title)+'</strong><span>'+esc(x.category)+'</span></a>').join('');
  groupList.innerHTML=(groups.data||[]).map(x=>'<a class="card shop" href="'+(x.official_url||'#')+'"><div class="logo">'+(x.logo_url?'<img src="'+x.logo_url+'" alt="">':esc(x.shop_name))+'</div><div><b>'+esc(x.shop_name)+'</b><p>'+esc(x.description||'')+'</p></div></a>').join('');
  booksList.innerHTML=(books.data||[]).map(x=>'<div class="card book"><div class="cover">'+(x.cover_url?'<img src="'+x.cover_url+'" alt="">':esc(x.title))+'</div><div><b>『'+esc(x.title)+'』</b><div class="price">'+esc(x.price_text||'')+'</div><p class="sub">'+esc(x.description||'')+'</p>'+(x.detail_url?'<a class="more" href="'+x.detail_url+'">'+(x.is_for_sale?'詳細・購入':'詳細を見る')+' →</a>':'')+'</div></div>').join('');
- diaryList.innerHTML=(diary.data||[]).map(x=>'<div class="diaryItem"><time>'+esc(x.diary_date)+'</time><b>'+esc(x.title)+'</b><p>'+esc(x.body||'')+'</p></div>').join('');
+ diaryList.innerHTML=(diary.data||[]).map(x=>'<div class="diaryItem">'+(x.image_url?'<img src="'+x.image_url+'" alt="'+esc(x.title)+'" style="width:100%;display:block;border-radius:12px;margin:0 0 12px;object-fit:cover;max-height:420px">':'')+'<time>'+esc(x.diary_date)+'</time><b>'+esc(x.title)+'</b><p>'+esc(x.body||'').replace(/\n/g,'<br>')+'</p></div>').join('');
  let pg=page.data;if(pg){if(pg.hero_image_url){hero.style.background='url('+pg.hero_image_url+') center center/contain no-repeat,#fff';heroArt.style.display='none'}}
 }
 load();
