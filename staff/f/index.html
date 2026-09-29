@@ -5,10 +5,23 @@
 <style>
 :root{--bg:#f4f0e8;--paper:#fffdf8;--ink:#201b17;--muted:#756c62;--red:#7b241f;--gold:#a47a39;--line:#d9cdbd}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#e9e2d8;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP","Yu Gothic",sans-serif}.app{max-width:520px;margin:auto;background:var(--bg);min-height:100vh}.hero{aspect-ratio:1/1;min-height:0;padding:0;background:#000 url("./hero-logo.png") center/contain no-repeat}.eyebrow{font-size:10px;letter-spacing:.28em;color:#e1bd78}.hero h1{font-family:Georgia,"Yu Mincho",serif;font-size:38px;margin:9px 0 8px;font-weight:500}.hero p{margin:0;color:#e5ddd3;font-size:12px;line-height:1.9}.section{padding:42px 20px;border-top:1px solid var(--line)}.head{margin-bottom:22px}.head b{display:block;font-family:Georgia,serif;font-size:24px;letter-spacing:.08em;font-weight:500}.head small{color:var(--gold);font-size:10px;letter-spacing:.15em}.intro{font-family:"Yu Mincho",serif;font-size:15px;line-height:2;color:#4f4740}.aboutGallery{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:26px}.aboutGallery button{padding:0;border:0;background:#ddd;aspect-ratio:1;overflow:hidden;cursor:pointer}.aboutGallery img{width:100%;height:100%;object-fit:cover;display:block}.photoModal{position:fixed;inset:0;z-index:90;background:#000e;display:none;align-items:center;justify-content:center;padding:18px}.photoModal.open{display:flex}.photoModal img{max-width:100%;max-height:88vh;object-fit:contain}.photoModal button{position:absolute;right:16px;top:16px;width:38px;height:38px;border:0;border-radius:50%;background:#fff;color:#111;font-size:22px}.info{display:grid;grid-template-columns:90px 1fr;gap:10px 12px;font-size:12px;line-height:1.7}.info dt{color:var(--muted)}.info dd{margin:0;font-weight:600}.menuGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.menuCard{aspect-ratio:1/1.05;border:1px solid #cdbda8;background:var(--paper);padding:17px;display:flex;flex-direction:column;justify-content:flex-end;text-decoration:none;color:inherit;box-shadow:0 8px 25px #4b38200c}.menuCard em{font-family:Georgia,serif;color:var(--red);font-size:10px;letter-spacing:.14em;font-style:normal}.menuCard strong{font-size:17px;margin-top:5px}.menuCard span{font-size:10px;color:var(--muted);margin-top:7px}.notice{background:#251c17;color:#fff;padding:22px}.notice small{color:#d5b476;letter-spacing:.14em}.notice h3{margin:7px 0 10px;font-size:19px}.notice p{margin:0;color:#d7cec5;font-size:12px;line-height:1.8}.notes{display:grid;gap:11px}.note{display:block;text-decoration:none;color:inherit;background:var(--paper);border:1px solid var(--line);padding:18px}.note small{color:var(--red);font-size:9px;font-weight:800;letter-spacing:.12em}.note b{display:block;margin:7px 0;font-size:15px}.note p{margin:0;color:var(--muted);font-size:11px;line-height:1.7}.links{display:grid;gap:10px}.links a{display:flex;justify-content:space-between;align-items:center;padding:16px;border:1px solid #bda98d;background:var(--paper);color:inherit;text-decoration:none;font-weight:700;font-size:13px}.back{display:block;text-align:center;padding:28px;color:#77695c;font-size:11px;text-decoration:none}.footer{text-align:center;padding:25px 15px 38px;color:#958779;font-size:9px}
-</style></head><body><main class="app">
-<section class="hero" aria-label="Chinese Dining f"></section>
-<section class="section"><div class="head"><b>ABOUT</b><small>Chinese Dining「f」について</small></div><div class="intro"><strong style="display:block;font-size:19px;margin-bottom:14px;color:#201b17">気軽に楽しめる、本格創作中華。</strong>高級中華料理店やホテルで経験を積んだシェフが手がけるChinese Dining「f」。<br><br>麻婆豆腐、自家製餃子、海老を主役にしたエビチリなど、定番の中華料理にシェフならではの工夫を加え、季節感も大切にした料理を楽しめます。<br><br>紹興酒は5年・10年・15年ものをラインナップ。<br><br>ご家族での食事から、おひとりでのランチやディナーまで。駅近ながら落ち着いて食事を楽しめる、隠れ家的な中国料理店です。 と聞いています。</div><div class="aboutGallery" id="aboutGallery"></div></section>
-<section class="section"><div class="head"><b>INFORMATION</b><small>営業案内</small></div><dl class="info" id="fInfo">
+.floatingMenu{position:fixed;right:max(14px,calc((100vw - 520px)/2 + 14px));top:14px;z-index:80;width:44px;height:44px;border:1px solid #ffffff55;border-radius:50%;background:#050505e8;color:#fff;font-size:23px;display:grid;place-items:center;box-shadow:0 5px 18px #0005;cursor:pointer}.menuOverlay{position:fixed;inset:0;z-index:79;background:#000d;display:none}.menuOverlay.open{display:block}.menuPanel{position:absolute;right:0;top:0;width:min(330px,86vw);height:100%;background:#090909;color:#fff;padding:78px 24px 30px;overflow:auto}.menuPanel b{display:block;font-family:Georgia,serif;font-size:20px;margin-bottom:18px;letter-spacing:.1em}.menuPanel a{display:block;color:#fff;text-decoration:none;padding:14px 2px;border-bottom:1px solid #ffffff1f;font-size:12px;font-weight:800;letter-spacing:.05em}.menuPanel a small{display:block;color:#888;margin-top:3px;font-size:9px;font-weight:500}.menuClose{position:absolute;right:15px;top:15px;width:42px;height:42px;border:1px solid #444;border-radius:50%;background:#111;color:#fff;font-size:22px}</style></head><body>
+<button class="floatingMenu" onclick="openNav()" aria-label="メニュー">☰</button>
+<div class="menuOverlay" id="menuOverlay" onclick="if(event.target===this)closeNav()"><nav class="menuPanel"><button class="menuClose" onclick="closeNav()">×</button><b>MENU</b>
+<a href="#home" onclick="closeNav()">HOME<small>トップ</small></a>
+<a href="#about" onclick="closeNav()">ABOUT<small>Chinese Dining「f」について</small></a>
+<a href="#information" onclick="closeNav()">INFORMATION<small>営業案内</small></a>
+<a href="#lunch" onclick="closeNav()">LUNCH<small>ランチメニュー</small></a>
+<a href="#weekly" onclick="closeNav()">WEEKLY LUNCH<small>週替りランチ</small></a>
+<a href="#dinner" onclick="closeNav()">DINNER<small>ディナーメニュー</small></a>
+<a href="#recommend" onclick="closeNav()">RECOMMEND<small>おすすめ</small></a>
+<a href="#nextweek" onclick="closeNav()">NEXT WEEK<small>来週の予告・定休日</small></a>
+<a href="#mattan-eats" onclick="closeNav()">末端、fを食う。<small>NOTE / 実食記録</small></a>
+<a href="#shopinfo" onclick="closeNav()">SHOP INFO<small>公式・外部ページ</small></a>
+</nav></div><main class="app">
+<section class="hero" id="home" aria-label="Chinese Dining f"></section>
+<section class="section" id="about"><div class="head"><b>ABOUT</b><small>Chinese Dining「f」について</small></div><div class="intro"><strong style="display:block;font-size:19px;margin-bottom:14px;color:#201b17">気軽に楽しめる、本格創作中華。</strong>高級中華料理店やホテルで経験を積んだシェフが手がけるChinese Dining「f」。<br><br>麻婆豆腐、自家製餃子、海老を主役にしたエビチリなど、定番の中華料理にシェフならではの工夫を加え、季節感も大切にした料理を楽しめます。<br><br>紹興酒は5年・10年・15年ものをラインナップ。<br><br>ご家族での食事から、おひとりでのランチやディナーまで。駅近ながら落ち着いて食事を楽しめる、隠れ家的な中国料理店です。 と聞いています。</div><div class="aboutGallery" id="aboutGallery"></div></section>
+<section class="section" id="information"><div class="head"><b>INFORMATION</b><small>営業案内</small></div><dl class="info" id="fInfo">
 <dt>住所</dt><dd id="fiAddress">大阪府大阪市天王寺区生玉町9-17 GARE生玉 1F</dd>
 <dt>アクセス</dt><dd id="fiAccess">地下鉄谷町線 谷町九丁目駅 3番出口から徒歩約2分</dd>
 <dt>営業時間</dt><dd id="fiHours">火・水・金・土・日　11:30〜14:30／18:00〜23:00<br>木　18:00〜23:00</dd>
@@ -18,24 +31,18 @@
 <dt>支払い</dt><dd id="fiPayment">カード・電子マネー・QRコード決済対応</dd>
 <dt>サービス料</dt><dd id="fiCharge">お通し代として300円</dd>
 </dl></section>
-<section class="section" id="menu"><div class="head"><b>MENU</b><small>メニュー</small></div><div class="menuGrid">
-<a class="menuCard" href="#lunch"><em>LUNCH</em><strong>ランチ</strong><span>定番ランチメニュー</span></a>
-<a class="menuCard" href="#weekly"><em>WEEKLY</em><strong>週替りランチ</strong><span>今週のメニュー</span></a>
-<a class="menuCard" href="#dinner"><em>DINNER</em><strong>ディナー</strong><span>定番ディナーメニュー</span></a>
-<a class="menuCard" href="#recommend"><em>RECOMMEND</em><strong>おすすめ</strong><span>ディナーのお勧め</span></a>
-</div></section>
 <section class="section" id="lunch"><div class="head"><b>LUNCH</b><small>ランチメニュー</small></div><div class="notice"><small>MENU IMAGE</small><h3>ランチメニュー</h3><p>黒板・POPの素材を整理し、ここにWEB用メニューを配置予定です。</p></div></section>
 <section class="section" id="weekly"><div class="head"><b>WEEKLY LUNCH</b><small>今週の週替り</small></div><div class="notice"><small>THIS WEEK</small><h3>週替りランチ</h3><p>ホワイトボードの内容をもとに、今週のメニューを掲載予定です。</p></div></section>
 <section class="section" id="dinner"><div class="head"><b>DINNER</b><small>ディナーメニュー</small></div><div class="notice"><small>MENU BOOK</small><h3>ディナーメニュー</h3><p>複数ページのメニューブックとして構成予定です。料理写真との連携はページ構成確定後に追加します。</p></div></section>
 <section class="section" id="recommend"><div class="head"><b>RECOMMEND</b><small>ディナーのお勧め</small></div><div class="notice"><small>CHEF'S RECOMMEND</small><h3>おすすめ料理</h3><p>店内黒板の内容をWEB用に整えて掲載予定です。</p></div></section>
-<section class="section"><div class="head"><b>NEXT WEEK</b><small>来週の予告・定休日</small></div><div class="notice"><small>SCHEDULE</small><h3>来週のお知らせ</h3><p>週替りランチの予告と定休日を掲載するエリアです。</p></div></section>
-<section class="section"><div class="head"><b>末端、fを食う。</b><small>NOTE / 実食記録</small></div><div class="notes">
+<section class="section" id="nextweek"><div class="head"><b>NEXT WEEK</b><small>来週の予告・定休日</small></div><div class="notice"><small>SCHEDULE</small><h3>来週のお知らせ</h3><p>週替りランチの予告と定休日を掲載するエリアです。</p></div></section>
+<section class="section" id="mattan-eats"><div class="head"><b>末端、fを食う。</b><small>NOTE / 実食記録</small></div><div class="notes">
 <a class="note" href="https://note.com/rose_staff/n/n1ca2cd81dda3" target="_blank" rel="noopener"><small>WEEKLY LUNCH</small><b>週替りランチ</b><p>Chinese Dining「f」の週替りを追いかける実食記録。魚香肉絲の記事もこちらの系統です。</p></a>
 <a class="note" href="https://note.com/rose_staff/n/n925aa9dd9be6" target="_blank" rel="noopener"><small>RECOMMEND</small><b>末端のおすすめ！</b><p>定番メニューなど、末端目線でおすすめ料理を紹介。</p></a>
 <a class="note" href="https://note.com/rose_staff/n/n0a22a930b6cd" target="_blank" rel="noopener"><small>ABOUT F</small><b>絶品中華</b><p>Chinese Dining「f」の料理を実際に食べた記録。</p></a>
 <a class="note" href="https://note.com/rose_staff/n/ne7fe6829de06" target="_blank" rel="noopener"><small>SPECIAL DINNER</small><b>春節ディナー2026</b><p>季節限定・特別ディナーの実食記録。</p></a>
 </div></section>
-<section class="section"><div class="head"><b>SHOP INFO</b><small>公式・外部ページ</small></div><div class="links">
+<section class="section" id="shopinfo"><div class="head"><b>SHOP INFO</b><small>公式・外部ページ</small></div><div class="links">
 <a href="https://www.instagram.com/chinesediningf1014?igsh=Z3RsaHRiM2trNW0%3D&utm_source=qr" target="_blank" rel="noopener">Instagram <span>→</span></a>
 <a href="https://tabelog.com/osaka/A2701/A270205/27145989/" target="_blank" rel="noopener">食べログ <span>→</span></a>
 </div></section>
@@ -45,5 +52,6 @@
 const sb=supabase.createClient('https://vjjnkflbfsjihwzjsjpr.supabase.co','sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos');
 async function loadAboutGallery(){let {data,error}=await sb.from('f_images').select('*').eq('about_selected',true).order('about_order',{ascending:true}).limit(6);if(error){console.error(error);return}aboutGallery.innerHTML=(data||[]).map(x=>'<button onclick="openPhoto(\''+x.image_url+'\')"><img src="'+x.image_url+'" alt="Chinese Dining f 料理写真" loading="lazy"></button>').join('')}
 async function loadFInfo(){let {data}=await sb.from('f_info').select('*').eq('id',1).maybeSingle();if(!data)return;let set=(id,v)=>{if(v)document.getElementById(id).innerHTML=String(v).replace(/\n/g,'<br>')};set('fiAddress',data.address);set('fiAccess',data.access);set('fiHours',data.hours);set('fiClosed',data.closed);set('fiReserve',data.reserve_text);if(data.tel){fiTel.innerHTML='<a href="tel:'+data.tel.replace(/[^0-9+]/g,'')+'" style="color:inherit">'+data.tel+'</a>'}set('fiPayment',data.payment);set('fiCharge',data.charge)}
+function openNav(){menuOverlay.classList.add('open');document.body.style.overflow='hidden'}function closeNav(){menuOverlay.classList.remove('open');document.body.style.overflow=''}
 function openPhoto(url){photoModalImg.src=url;photoModal.classList.add('open');document.body.style.overflow='hidden'}function closePhoto(){photoModal.classList.remove('open');document.body.style.overflow=''}loadAboutGallery();loadFInfo();
 </script></body></html>
