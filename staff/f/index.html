@@ -8,7 +8,16 @@
 </style></head><body><main class="app">
 <section class="hero" aria-label="Chinese Dining f"></section>
 <section class="section"><div class="head"><b>ABOUT</b><small>Chinese Dining「f」について</small></div><div class="intro"><strong style="display:block;font-size:19px;margin-bottom:14px;color:#201b17">気軽に楽しめる、本格創作中華。</strong>高級中華料理店やホテルで経験を積んだシェフが手がけるChinese Dining「f」。<br><br>麻婆豆腐、自家製餃子、海老を主役にしたエビチリなど、定番の中華料理にシェフならではの工夫を加え、季節感も大切にした料理を楽しめます。<br><br>紹興酒は5年・10年・15年ものをラインナップ。<br><br>ご家族での食事から、おひとりでのランチやディナーまで。駅近ながら落ち着いて食事を楽しめる、隠れ家的な中国料理店です。 と聞いています。</div><div class="aboutGallery" id="aboutGallery"></div></section>
-<section class="section"><div class="head"><b>INFORMATION</b><small>営業案内</small></div><dl class="info"><dt>営業時間</dt><dd>正式情報を確認後に掲載</dd><dt>定休日</dt><dd>営業カレンダーにてご案内</dd><dt>店舗情報</dt><dd>食べログでもご確認いただけます</dd></dl></section>
+<section class="section"><div class="head"><b>INFORMATION</b><small>営業案内</small></div><dl class="info" id="fInfo">
+<dt>住所</dt><dd id="fiAddress">大阪府大阪市天王寺区生玉町9-17 GARE生玉 1F</dd>
+<dt>アクセス</dt><dd id="fiAccess">地下鉄谷町線 谷町九丁目駅 3番出口から徒歩約2分</dd>
+<dt>営業時間</dt><dd id="fiHours">火・水・金・土・日　11:30〜14:30／18:00〜23:00<br>木　18:00〜23:00</dd>
+<dt>定休日</dt><dd id="fiClosed">月曜日</dd>
+<dt>予約</dt><dd id="fiReserve">予約可</dd>
+<dt>TEL</dt><dd id="fiTel"><a href="tel:05058720987" style="color:inherit">050-5872-0987</a></dd>
+<dt>支払い</dt><dd id="fiPayment">カード・電子マネー・QRコード決済対応</dd>
+<dt>サービス料</dt><dd id="fiCharge">お通し代として300円</dd>
+</dl></section>
 <section class="section" id="menu"><div class="head"><b>MENU</b><small>メニュー</small></div><div class="menuGrid">
 <a class="menuCard" href="#lunch"><em>LUNCH</em><strong>ランチ</strong><span>定番ランチメニュー</span></a>
 <a class="menuCard" href="#weekly"><em>WEEKLY</em><strong>週替りランチ</strong><span>今週のメニュー</span></a>
@@ -35,5 +44,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
 const sb=supabase.createClient('https://vjjnkflbfsjihwzjsjpr.supabase.co','sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos');
 async function loadAboutGallery(){let {data,error}=await sb.from('f_images').select('*').eq('about_selected',true).order('about_order',{ascending:true}).limit(6);if(error){console.error(error);return}aboutGallery.innerHTML=(data||[]).map(x=>'<button onclick="openPhoto(\''+x.image_url+'\')"><img src="'+x.image_url+'" alt="Chinese Dining f 料理写真" loading="lazy"></button>').join('')}
-function openPhoto(url){photoModalImg.src=url;photoModal.classList.add('open');document.body.style.overflow='hidden'}function closePhoto(){photoModal.classList.remove('open');document.body.style.overflow=''}loadAboutGallery();
+async function loadFInfo(){let {data}=await sb.from('f_info').select('*').eq('id',1).maybeSingle();if(!data)return;let set=(id,v)=>{if(v)document.getElementById(id).innerHTML=String(v).replace(/\n/g,'<br>')};set('fiAddress',data.address);set('fiAccess',data.access);set('fiHours',data.hours);set('fiClosed',data.closed);set('fiReserve',data.reserve_text);if(data.tel){fiTel.innerHTML='<a href="tel:'+data.tel.replace(/[^0-9+]/g,'')+'" style="color:inherit">'+data.tel+'</a>'}set('fiPayment',data.payment);set('fiCharge',data.charge)}
+function openPhoto(url){photoModalImg.src=url;photoModal.classList.add('open');document.body.style.overflow='hidden'}function closePhoto(){photoModal.classList.remove('open');document.body.style.overflow=''}loadAboutGallery();loadFInfo();
 </script></body></html>
