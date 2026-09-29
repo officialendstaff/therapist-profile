@@ -34,6 +34,6 @@
 </main><div class="photoModal" id="photoModal" onclick="if(event.target===this)closePhoto()"><button onclick="closePhoto()">×</button><img id="photoModalImg" alt=""></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
 const sb=supabase.createClient('https://vjjnkflbfsjihwzjsjpr.supabase.co','sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos');
-async function loadAboutGallery(){let {data,error}=await sb.from('f_images').select('*').eq('about_selected',true).order('about_order',{ascending:true}).limit(6);if(error)return;aboutGallery.innerHTML=(data||[]).map(x=>'<button onclick="openPhoto(\''+x.image_url+'\')"><img src="'+x.image_url+'" alt="Chinese Dining f 料理写真" loading="lazy"></button>').join('')}
+async function loadAboutGallery(){let {data,error}=await sb.from('f_images').select('*').eq('about_selected',true).order('about_order',{ascending:true}).limit(6);if(error){console.error(error);return}aboutGallery.innerHTML=(data||[]).map(x=>'<button onclick="openPhoto(\''+x.image_url+'\')"><img src="'+x.image_url+'" alt="Chinese Dining f 料理写真" loading="lazy"></button>').join('')}
 function openPhoto(url){photoModalImg.src=url;photoModal.classList.add('open');document.body.style.overflow='hidden'}function closePhoto(){photoModal.classList.remove('open');document.body.style.overflow=''}loadAboutGallery();
 </script></body></html>
