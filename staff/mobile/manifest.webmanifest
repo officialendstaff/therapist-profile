@@ -1,0 +1,11 @@
+{
+  "name": "末端管理",
+  "short_name": "末端管理",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f2ed",
+  "theme_color": "#201b18",
+  "orientation": "portrait-primary",
+  "icons": []
+}
