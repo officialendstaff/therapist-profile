@@ -240,7 +240,7 @@ async function loadPageSettings(){
   document.querySelectorAll('.catBubble').forEach(e=>e.textContent=(data.nickname||'麗')+'に話しかける');
   managedStatusImages={work:data.work_image_url||'',off:data.off_image_url||'',full:data.full_image_url||''};
   const managedImages={heroImage:data.hero_image_url,profileImage:data.profile_image_url,personalImage:data.personal_image_url,calendarImage:data.calendar_image_url};
-  Object.entries(managedImages).forEach(([id,u])=>{const e=document.getElementById(id);if(e&&u)e.src=u});
+  Object.entries(managedImages).forEach(([id,u])=>{const e=document.getElementById(id);if(e&&u){e.src=u;e.style.display='block';if(id==='personalImage'&&e.nextElementSibling)e.nextElementSibling.style.display='none';}});
   managedThemeImage=data.theme_image_url||'';
   if(managedThemeImage){
     document.documentElement.style.setProperty('--theme-character','url("'+managedThemeImage.replace(/"/g,'%22')+'")');
