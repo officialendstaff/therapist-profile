@@ -4,7 +4,7 @@
 <div class="gate" id="gate"><div class="card"><h2>末端 MOBILE</h2><p class="note">NEWS・STAFF NOW・STAFF DIARY 専用</p><label>メールアドレス</label><input id="email" type="email"><label>パスワード</label><input id="password" type="password"><button class="btn" onclick="login()">ログイン</button><div class="msg" id="authMsg"></div></div></div>
 <header class="head"><b>（株）末端興業 MOBILE</b><small>スマホ簡易更新</small><div class="quicklinks"><a href="https://officialendstaff.github.io/therapist-profile/staff/" target="_blank" rel="noopener">末端興業</a><a href="https://x.com/official_staffD" target="_blank" rel="noopener">𝕏</a><a href="https://m-sns.net/u/@end_staff" target="_blank" rel="noopener">02</a><a href="https://www.instagram.com/official_insyushi?stkn=MTIyOTUyZnFtZXZrMA%3D%3D&utm_source=qr" target="_blank" rel="noopener">Instagram</a></div></header>
 <section class="panel active" id="schedule"><div class="card"><h2>予定 <span id="scheduleLamp" style="display:none;color:#d00">●</span></h2>
-<div class="scheduleSection"><h3>面接シート</h3><button class="btn compactBtn" onclick="loadInterviewSheets()">情報更新</button><div id="interviewSheetList" class="links"></div></div><div class="scheduleSection"><h3>在籍者</h3><div id="activeEmployeeList" class="links"></div></div><div class="scheduleSection"><h3>退職者</h3><div id="retiredEmployeeList" class="links"></div></div>
+<div class="scheduleSection"><h3>面接シート</h3><button class="btn compactBtn" onclick="loadInterviewSheets()">情報更新</button><div id="interviewSheetList" class="links"></div></div>
 <div class="scheduleSection"><h3>面接予定</h3><div id="scheduleToday" class="links">読み込み中...</div><div id="scheduleCalendar"></div></div>
 <div class="scheduleSection"><h3>対応設定</h3><label>日付</label><input id="blockDate" class="dateField" type="date"><div class="availabilityChoices"><label><input id="blockAllDay" name="blockMode" type="radio" value="all" checked onchange="toggleBlockTime()"> 終日不可</label><label><input id="blockFromTime" name="blockMode" type="radio" value="time" onchange="toggleBlockTime()"> 19:00～不可</label></div><div id="blockTimes" style="display:none"><label>開始時間</label><select id="blockStart"></select><input id="blockEnd" type="hidden" value="23:00"></div><button class="btn compactBtn" onclick="saveBlock()">対応を登録</button><div id="blockList" class="blockList"></div></div>
 <div class="scheduleSection"><h3>明日以降の面接</h3><div id="scheduleList"></div></div>
@@ -55,8 +55,7 @@ async function loadInterviewSheets(){
  const rowHtml=x=>'<button type="button" onclick="openInterviewSheet(\''+x.id+'\')" style="width:100%;text-align:left;border:0;border-bottom:1px solid #eee;background:#fff;padding:13px 2px"><b style="font-size:15px">'+escInterview(x.name)+'</b><span style="float:right;font-size:11px">'+escInterview(x.status||'面接前')+'</span><br><small>'+escInterview(x.kana)+' ｜ '+interviewAge(x.birth_date)+' ｜ '+fmtInterviewDate(x.submitted_at)+'</small></button>';
  const pending=window.interviewApplicants.filter(x=>!['在籍','退職'].includes(x.status)),active=window.interviewApplicants.filter(x=>x.status==='在籍'),retired=window.interviewApplicants.filter(x=>x.status==='退職');
  interviewSheetList.innerHTML=pending.length?pending.map(rowHtml).join(''):'<span class="note">面接シートはありません。</span>';
- if(window.activeEmployeeList)activeEmployeeList.innerHTML=active.length?active.map(rowHtml).join(''):'<span class="note">在籍者はいません。</span>';
- if(window.retiredEmployeeList)retiredEmployeeList.innerHTML=retired.length?retired.map(rowHtml).join(''):'<span class="note">退職者はいません。</span>';
+
 }
 function updateInterviewSheetAlert(){
  const rows=window.interviewApplicants||[];
