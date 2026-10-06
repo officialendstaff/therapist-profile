@@ -15,7 +15,7 @@
 <section class="card"><h2>基本情報</h2>
 <div class="field"><label>氏名<span class="req">必須</span></label><input name="name" autocomplete="name" required></div>
 <div class="field"><label>フリガナ<span class="req">必須</span></label><input name="kana" required></div>
-<div class="row"><div class="field"><label>生年月日（西暦）<span class="req">必須</span></label><input type="date" name="birth_date" id="birth" required></div><div class="field"><label>年齢</label><input id="age" class="age" readonly placeholder="自動計算"></div></div>
+<div class="field"><label>生年月日（西暦）<span class="req">必須</span></label><input type="date" name="birth_date" id="birth" required></div><div class="field"><label>年齢</label><input id="age" class="age" readonly placeholder="生年月日から自動計算"></div>
 <div class="field"><label>電話番号<span class="req">必須</span></label><input type="tel" name="phone" inputmode="tel" autocomplete="tel" required></div>
 </section>
 <section class="card"><h2>住所</h2>
@@ -30,7 +30,7 @@
 <div class="field"><label>身分証の種類<span class="req">必須</span></label><select name="id_type" id="idType" required><option value="">選択してください</option><option>運転免許証</option><option>パスポート</option><option>マイナンバーカード</option><option>在留カード</option><option>本籍地記載住民票</option><option>その他</option></select></div>
 <div class="field"><label>表面・本人確認面<span class="req">必須</span></label><input type="file" id="idFront" accept="image/*" capture="environment" required><img id="frontPreview" class="preview hidden"></div>
 <div class="field"><label>裏面（ある場合）</label><input type="file" id="idBack" accept="image/*" capture="environment"><img id="backPreview" class="preview hidden"></div>
-<p class="privacy">撮影画像は本人確認・入店手続きのために使用します。</p>
+<p class="privacy">年齢確認のため身分証を撮影して添付してください。</p>
 </section>
 <section class="card"><h2>喫煙・タトゥー</h2>
 <div class="field"><label>喫煙<span class="req">必須</span></label><select name="smoking" required><option value="">選択してください</option><option>喫煙する</option><option>喫煙しない</option></select></div>
@@ -55,7 +55,7 @@ let postalTimer;postal.addEventListener('input',()=>{clearTimeout(postalTimer);l
 async function lookupPostal(z){try{let r=await fetch('https://zipcloud.ibsnet.co.jp/api/search?zipcode='+z),j=await r.json();if(j.results&&j.results[0]){let x=j.results[0];pref.value=x.address1;city.value=x.address2+x.address3}else alert('住所が見つかりませんでした。住所から入力してください。')}catch(e){alert('住所の自動取得ができませんでした。住所から入力してください。')}}
 tattoo.onchange=()=>tattooDetail.classList.toggle('hidden',tattoo.value!=='あり');
 experience.onchange=()=>{historyArea.classList.toggle('hidden',experience.value!=='あり');if(experience.value==='あり'&&!histories.children.length)addHistory()};
-function addHistory(){let d=document.createElement('div');d.className='history';d.innerHTML='<h3>勤務歴</h3><button type="button" class="remove">削除</button><div class="field"><label>店名</label><input data-k="shop"></div><div class="field"><label>源氏名</label><input data-k="stage_name"></div><div class="field"><label>勤務期間</label><input data-k="period" placeholder="例：2025年4月〜2026年3月"></div><div class="field"><label>退店理由</label><textarea data-k="reason"></textarea></div>';d.querySelector('.remove').onclick=()=>d.remove();histories.append(d)}
+function addHistory(){let d=document.createElement('div');d.className='history';d.innerHTML='<h3>勤務歴</h3><button type="button" class="remove">削除</button><div class="field"><label>店名</label><input data-k="shop"></div><div class="field"><label>源氏名</label><input data-k="stage_name"></div><div class="field"><label>勤務期間</label><input data-k="period" placeholder="例：1年6か月"></div><div class="field"><label>退店理由</label><textarea data-k="reason"></textarea></div>';d.querySelector('.remove').onclick=()=>d.remove();histories.append(d)}
 addHistory.onclick=addHistory;
 function preview(input,img){input.onchange=()=>{let f=input.files[0];if(!f)return;img.src=URL.createObjectURL(f);img.classList.remove('hidden')}}preview(idFront,frontPreview);preview(idBack,backPreview);
 function uuid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2)}
