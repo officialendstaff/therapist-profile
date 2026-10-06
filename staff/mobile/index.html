@@ -50,7 +50,7 @@ async function interviewSignedUrl(path){if(!path)return null;let {data,error}=aw
 async function openInterviewSheet(id){
  const x=(window.interviewApplicants||[]).find(v=>v.id===id);if(!x)return;
  const modal=document.getElementById('interviewSheetModal'),detail=document.getElementById('interviewSheetDetail');
- modal.classList.add('on');modal.style.display='flex';detail.style.display='block';detail.style.minHeight='220px';detail.innerHTML='<div style="padding:30px;text-align:center">読み込み中...</div>';document.body.style.overflow='hidden';
+ modal.classList.add('on');modal.style.cssText='display:block;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.58)';detail.style.cssText='display:block;position:fixed;left:10px;right:10px;top:5vh;bottom:5vh;z-index:9999;box-sizing:border-box;overflow-y:auto;background:#fff;color:#201b18;border-radius:18px;padding:18px;box-shadow:0 12px 40px rgba(0,0,0,.35)';detail.innerHTML='<div style="padding:30px;text-align:center;color:#201b18">読み込み中...</div>';document.body.style.overflow='hidden';
  const hist=Array.isArray(x.work_history)?x.work_history:[],addr=(x.prefecture||'')+(x.city||'')+(x.street||''),postal=x.postal_code?'〒'+escInterview(x.postal_code)+'　':'';
  detail.innerHTML='<div class="sheetTop"><div><div class="sheetName">'+escInterview(x.name)+'</div><div class="sheetKana">'+escInterview(x.kana)+'</div></div><button class="sheetClose" onclick="closeInterviewSheet()">×</button></div>'+
  '<div class="sheetLines"><strong>'+escInterview(x.birth_date)+'　'+interviewAge(x.birth_date)+'</strong><br><a href="tel:'+escInterview(x.phone)+'" style="color:inherit">'+escInterview(x.phone)+'</a><br>'+postal+escInterview(addr)+'<br><span style="color:#777">'+escInterview(x.recruit_source||'—')+'</span></div>'+
@@ -66,7 +66,7 @@ async function openInterviewSheet(id){
    box.innerHTML=(urls[0]?'<a href="'+urls[0]+'" target="_blank" rel="noopener"><img src="'+urls[0]+'"></a>':'')+(urls[1]?'<a href="'+urls[1]+'" target="_blank" rel="noopener"><img src="'+urls[1]+'"></a>':'')||'<span class="note">身分証画像を表示できません。</span>';
  }catch(err){box.innerHTML='<span class="note">身分証画像を表示できません。</span>'}
 }
-function closeInterviewSheet(){const m=document.getElementById('interviewSheetModal');m.classList.remove('on');m.style.display='none';document.body.style.overflow=''}
+function closeInterviewSheet(){const m=document.getElementById('interviewSheetModal'),d=document.getElementById('interviewSheetDetail');m.classList.remove('on');m.style.cssText='display:none';d.style.cssText='';document.body.style.overflow=''}
 async function deleteInterviewSheet(id){
  let x=(window.interviewApplicants||[]).find(v=>v.id===id);if(!x||!confirm('この面接シートを削除しますか？\n身分証画像も削除され、元に戻せません。'))return;
  let paths=[x.id_front_path,x.id_back_path].filter(Boolean);
