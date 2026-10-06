@@ -98,7 +98,7 @@ function closeInterviewSheet(){const m=document.getElementById('interviewSheetMo
 function openOnboarding(id){
  const x=(window.interviewApplicants||[]).find(v=>v.id===id),a=document.getElementById('onboardingArea');if(!x||!a)return;
  const today=new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Tokyo'});
- a.innerHTML='<div class="onboardForm"><b>入店情報</b><div><label>採用年月日</label><input id="obHireDate" type="date" value="'+today+'"></div><div><label>研修日</label><input id="obTrainingDate" type="date"></div>'+
+ a.innerHTML='<div class="onboardForm"><b>入店情報</b><div><label>研修日</label><input id="obTrainingDate" type="date"></div>'+
  '<div><label>初回出勤日</label><input id="obFirstShift" type="date"></div><div><label>源氏名</label><input id="obStageName"></div>'+
  '<label>従事する業務内容</label><input id="obWorkDescription" value="従業員業務">'+
  '<label>国籍</label><input id="obNationality" value="日本">'+
