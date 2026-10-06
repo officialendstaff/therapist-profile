@@ -110,7 +110,10 @@ async function saveOnboarding(id){
   const {error}=await sb.from('interview_applicants').update(payload).eq('id',id);
   if(error)throw error;
   msg.textContent='保存しました。';
-  await loadInterviewSheets();
+  const current=(window.interviewApplicants||[]).find(x=>x.id===id);
+  if(current)Object.assign(current,payload);
+  setTimeout(()=>closeInterviewSheet(),500);
+  setTimeout(()=>loadInterviewSheets(),650);
  }catch(e){console.error(e);msg.textContent='保存できません：'+(e?.message||String(e));}
 }
 async function deleteInterviewSheet(id){
