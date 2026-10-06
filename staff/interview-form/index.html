@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>面接フォーム</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f2ed;color:#211b17;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}.wrap{max-width:620px;margin:auto;padding:20px 14px 70px}.head{text-align:center;margin:8px 0 20px}.head h1{font-size:23px;margin:0 0 7px}.head p,.note{font-size:12px;color:#766b63;line-height:1.6}.card{background:#fff;border:1px solid #e1d8ce;border-radius:18px;padding:17px;margin-bottom:14px}h2{font-size:17px;margin:0 0 14px}.field{margin:0 0 15px}.field:last-child{margin-bottom:0}label{display:block;font-size:13px;font-weight:800;margin-bottom:6px}.req{color:#a13b32;font-size:10px;margin-left:5px}input,select,textarea{width:100%;border:1px solid #d8cec3;background:#fff;border-radius:11px;padding:13px;font-size:16px;color:#211b17}textarea{min-height:78px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.age{background:#f4f1ed}.switches{display:grid;grid-template-columns:1fr 1fr;gap:8px}.pick{border:1px solid #d8cec3;background:#fff;border-radius:11px;padding:12px;font-weight:800}.pick.on{background:#211b17;color:#fff}.hidden{display:none!important}.addressMode{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}.history{border:1px solid #e4ddd5;border-radius:13px;padding:13px;margin-top:10px;position:relative}.history h3{font-size:13px;margin:0 0 12px}.remove{position:absolute;right:10px;top:8px;border:0;background:none;color:#a13b32;font-weight:800}.add{width:100%;border:1px dashed #9c8875;background:#faf8f5;border-radius:11px;padding:12px;font-weight:900;margin-top:10px}.submit{width:100%;border:0;border-radius:14px;background:#8b643c;color:#fff;padding:16px;font-size:16px;font-weight:900}.submit:disabled{opacity:.5}.msg{font-size:13px;margin-top:12px;text-align:center}.preview{max-width:220px;max-height:150px;display:block;margin-top:8px;border-radius:8px;border:1px solid #ddd}.privacy{font-size:11px;color:#766b63;line-height:1.7}
+</style>
+</head>
+<body><main class="wrap">
+<div class="head"><h1>面接フォーム</h1><p>面接前にご入力をお願いいたします。</p></div>
+<form id="form">
+<section class="card"><h2>基本情報</h2>
+<div class="field"><label>氏名<span class="req">必須</span></label><input name="name" autocomplete="name" required></div>
+<div class="field"><label>フリガナ<span class="req">必須</span></label><input name="kana" required></div>
+<div class="row"><div class="field"><label>生年月日（西暦）<span class="req">必須</span></label><input type="date" name="birth_date" id="birth" required></div><div class="field"><label>年齢</label><input id="age" class="age" readonly placeholder="自動計算"></div></div>
+<div class="field"><label>電話番号<span class="req">必須</span></label><input type="tel" name="phone" inputmode="tel" autocomplete="tel" required></div>
+</section>
+<section class="card"><h2>住所</h2>
+<div class="addressMode"><button type="button" class="pick on" data-mode="postal">郵便番号から</button><button type="button" class="pick" data-mode="manual">住所から</button></div>
+<div id="postalBox"><div class="field"><label>郵便番号</label><input id="postal" inputmode="numeric" maxlength="8" placeholder="例：5420072"><p class="note">入力すると都道府県・市区町村・町域を自動表示します。</p></div></div>
+<div class="field"><label>都道府県<span class="req">必須</span></label><select id="pref" name="prefecture" required></select></div>
+<div class="field"><label>市区町村・町域<span class="req">必須</span></label><input id="city" name="city" required></div>
+<div class="field"><label>番地・建物名<span class="req">必須</span></label><input name="street" required></div>
+</section>
+<section class="card"><h2>求人媒体</h2><div class="field"><label>応募のきっかけ<span class="req">必須</span></label><select name="recruit_source" required><option value="">選択してください</option><option>オフィシャルHP</option><option>エステ魂</option><option>メンズエステワーク</option><option>エステラブワーク</option><option>リラクジョブ</option><option>エステクイーン</option><option>Richセラピ</option><option>エステアイ</option><option>メンズリクルート</option><option>その他</option></select></div></section>
+<section class="card"><h2>身分証</h2>
+<div class="field"><label>身分証の種類<span class="req">必須</span></label><select name="id_type" id="idType" required><option value="">選択してください</option><option>運転免許証</option><option>パスポート</option><option>マイナンバーカード</option><option>在留カード</option><option>本籍地記載住民票</option><option>その他</option></select></div>
+<div class="field"><label>表面・本人確認面<span class="req">必須</span></label><input type="file" id="idFront" accept="image/*" capture="environment" required><img id="frontPreview" class="preview hidden"></div>
+<div class="field"><label>裏面（ある場合）</label><input type="file" id="idBack" accept="image/*" capture="environment"><img id="backPreview" class="preview hidden"></div>
+<p class="privacy">撮影画像は本人確認・入店手続きのために使用します。</p>
+</section>
+<section class="card"><h2>喫煙・タトゥー</h2>
+<div class="field"><label>喫煙<span class="req">必須</span></label><select name="smoking" required><option value="">選択してください</option><option>喫煙する</option><option>喫煙しない</option></select></div>
+<div class="field"><label>タトゥー<span class="req">必須</span></label><select name="tattoo" id="tattoo" required><option value="">選択してください</option><option value="なし">なし</option><option value="あり">あり</option></select></div>
+<div class="field hidden" id="tattooDetail"><label>場所・大きさ</label><input name="tattoo_detail"></div>
+</section>
+<section class="card"><h2>エステ経験</h2>
+<div class="field"><label>経験の有無<span class="req">必須</span></label><select name="experience" id="experience" required><option value="">選択してください</option><option value="なし">なし</option><option value="あり">あり</option></select></div>
+<div id="historyArea" class="hidden"><div id="histories"></div><button type="button" class="add" id="addHistory">＋ 勤務歴を追加</button></div>
+</section>
+<button class="submit" id="submitBtn" type="submit">入力内容を送信</button><div class="msg" id="msg"></div>
+</form></main>
+<script>
+const SUPABASE_URL='https://vjjnkflbfsjihwzjsjpr.supabase.co';
+const SUPABASE_KEY='sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const prefs=['大阪府','兵庫県','京都府','奈良県','和歌山県','滋賀県','北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県','茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県','新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県','静岡県','愛知県','三重県','鳥取県','島根県','岡山県','広島県','山口県','徳島県','香川県','愛媛県','高知県','福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県'];
+pref.innerHTML='<option value="">選択してください</option>'+prefs.map(x=>'<option>'+x+'</option>').join('');
+function calcAge(){if(!birth.value){age.value='';return}const b=new Date(birth.value+'T00:00:00'),n=new Date();let a=n.getFullYear()-b.getFullYear();if(n.getMonth()<b.getMonth()||(n.getMonth()===b.getMonth()&&n.getDate()<b.getDate()))a--;age.value=a>=0?a+'歳':''}birth.addEventListener('change',calcAge);
+document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-mode]').forEach(x=>x.classList.toggle('on',x===b));postalBox.classList.toggle('hidden',b.dataset.mode==='manual')});
+let postalTimer;postal.addEventListener('input',()=>{clearTimeout(postalTimer);let z=postal.value.replace(/\D/g,'');postal.value=z.length>3?z.slice(0,3)+'-'+z.slice(3,7):z;if(z.length===7)postalTimer=setTimeout(()=>lookupPostal(z),250)});
+async function lookupPostal(z){try{let r=await fetch('https://zipcloud.ibsnet.co.jp/api/search?zipcode='+z),j=await r.json();if(j.results&&j.results[0]){let x=j.results[0];pref.value=x.address1;city.value=x.address2+x.address3}else alert('住所が見つかりませんでした。住所から入力してください。')}catch(e){alert('住所の自動取得ができませんでした。住所から入力してください。')}}
+tattoo.onchange=()=>tattooDetail.classList.toggle('hidden',tattoo.value!=='あり');
+experience.onchange=()=>{historyArea.classList.toggle('hidden',experience.value!=='あり');if(experience.value==='あり'&&!histories.children.length)addHistory()};
+function addHistory(){let d=document.createElement('div');d.className='history';d.innerHTML='<h3>勤務歴</h3><button type="button" class="remove">削除</button><div class="field"><label>店名</label><input data-k="shop"></div><div class="field"><label>源氏名</label><input data-k="stage_name"></div><div class="field"><label>勤務期間</label><input data-k="period" placeholder="例：2025年4月〜2026年3月"></div><div class="field"><label>退店理由</label><textarea data-k="reason"></textarea></div>';d.querySelector('.remove').onclick=()=>d.remove();histories.append(d)}
+addHistory.onclick=addHistory;
+function preview(input,img){input.onchange=()=>{let f=input.files[0];if(!f)return;img.src=URL.createObjectURL(f);img.classList.remove('hidden')}}preview(idFront,frontPreview);preview(idBack,backPreview);
+function uuid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2)}
+async function upload(file,folder,label){if(!file)return null;let ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');let path=folder+'/'+label+'.'+ext;let {error}=await sb.storage.from('interview-id-documents').upload(path,file,{upsert:false,contentType:file.type||'image/jpeg'});if(error)throw error;return path}
+form.onsubmit=async e=>{e.preventDefault();submitBtn.disabled=true;msg.textContent='送信中です…';try{let fd=new FormData(form),applicantId=uuid(),front=await upload(idFront.files[0],applicantId,'front'),back=await upload(idBack.files[0],applicantId,'back');let historiesData=[...histories.querySelectorAll('.history')].map(h=>Object.fromEntries([...h.querySelectorAll('[data-k]')].map(i=>[i.dataset.k,i.value.trim()]))).filter(x=>Object.values(x).some(Boolean));let payload={applicant_id:applicantId,name:String(fd.get('name')||'').trim(),kana:String(fd.get('kana')||'').trim(),birth_date:fd.get('birth_date'),phone:String(fd.get('phone')||'').trim(),prefecture:fd.get('prefecture'),city:String(fd.get('city')||'').trim(),street:String(fd.get('street')||'').trim(),postal_code:postal.value.replace(/\D/g,''),recruit_source:fd.get('recruit_source'),id_type:fd.get('id_type'),id_front_path:front,id_back_path:back,smoking:fd.get('smoking'),tattoo:fd.get('tattoo'),tattoo_detail:String(fd.get('tattoo_detail')||'').trim(),experience:fd.get('experience'),work_history:historiesData,status:'面接前'};let {error}=await sb.from('interview_applicants').insert(payload);if(error)throw error;form.innerHTML='<section class="card" style="text-align:center"><h2>送信完了</h2><p class="note">ご入力ありがとうございました。スタッフへ送信しました。</p></section>'}catch(err){console.error(err);msg.textContent='送信できませんでした。スタッフへお声がけください。';submitBtn.disabled=false}};
+</script></body></html>
