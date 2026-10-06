@@ -60,7 +60,7 @@ function interviewAge(v){if(!v)return '—';let d=new Date(v+'T00:00:00');if(isN
 async function loadInterviewSheets(){
  if(!window.interviewSheetList)return;
  interviewSheetList.style.display='block';interviewSheetDetail.style.display='none';interviewSheetList.innerHTML='<span class="note">読み込み中...</span>';
- let {data,error}=await sb.from('interview_applicants').select('id,name,kana,birth_date,status,submitted_at,phone,postal_code,prefecture,city,street,recruit_source,id_type,id_front_path,id_back_path,smoking,tattoo,tattoo_detail,experience,work_history,hire_date,training_date,first_shift_date,stage_name,work_description,nationality,residence_status,residence_period,work_permission').not('status','in','("在籍","退職")').order('submitted_at',{ascending:false});
+ let {data,error}=await sb.from('interview_applicants').select('id,name,kana,birth_date,status,submitted_at,phone,postal_code,prefecture,city,street,recruit_source,id_type,id_front_path,id_back_path,smoking,tattoo,tattoo_detail,experience,work_history,hire_date,training_date,first_shift_date,stage_name,work_description,nationality,residence_status,residence_period,work_permission').not('status','in','("在籍","退職","不採用")').order('submitted_at',{ascending:false});
  if(error){interviewSheetList.innerHTML='<span class="msg">読み込みできません：'+escInterview(error.message)+'</span>';return}
  window.interviewApplicants=data||[];
  updateInterviewSheetAlert();
@@ -101,7 +101,7 @@ async function openInterviewSheet(id){
  (x.tattoo_detail?'<div class="sheetHistory">'+escInterview(x.tattoo_detail)+'</div>':'')+
  '<div class="sheetId"><b>'+escInterview(x.id_type||'身分証')+'</b><div class="sheetIdImgs" id="sheetIdImgs"><span class="note">身分証を読み込み中...</span></div></div>'+
  (hist.length?hist.map((h,i)=>{let q=[h.prefecture||'',h.shop||'',h.stage_name||'','メンズエステ'].filter(Boolean).join(' ');return '<div class="sheetHistory"><b>'+escInterview([h.prefecture||'',h.shop||'',h.stage_name||''].filter(Boolean).join('　')||'勤務歴 '+(i+1))+'</b><br>'+escInterview(h.period||'')+(h.reason?' ／ '+escInterview(h.reason):'')+'<br><a class="webSearch" href="https://www.google.com/search?q='+encodeURIComponent(q)+'" target="_blank" rel="noopener">WEB検索</a></div>'}).join(''):'')+
- (x.status==='採用'?'<button class="onboardBtn" onclick="createEntryDocuments(\''+x.id+'\')">入店書類一式を作成・印刷</button><button class="onboardBtn" style="margin-top:8px" onclick="completeOnboarding(\''+x.id+'\')">入店処理完了</button>':x.status==='在籍'?'<button class="onboardBtn" onclick="createEntryDocuments(\''+x.id+'\')">入店書類を再作成・印刷</button>':x.status==='退職'?'<div class="note" style="margin-top:12px">退職者</div>':'<button class="onboardBtn" onclick="openOnboarding(\''+x.id+'\')">採用・入店処理へ</button>')+'<div id="onboardingArea"></div><button class="sheetDelete" onclick="deleteInterviewSheet(\''+x.id+'\')">この面接シートを削除</button><div class="sheetMeta">'+fmtInterviewDate(x.submitted_at)+'</div>';
+ (x.status==='採用'?'<button class="onboardBtn" onclick="createEntryDocuments(\''+x.id+'\')">入店書類一式を作成・印刷</button><button class="onboardBtn" style="margin-top:8px" onclick="completeOnboarding(\''+x.id+'\')">入店処理完了</button>':x.status==='在籍'?'<button class="onboardBtn" onclick="createEntryDocuments(\''+x.id+'\')">入店書類を再作成・印刷</button>':x.status==='退職'?'<div class="note" style="margin-top:12px">退職者</div>':x.status==='不採用'?'<div class="note" style="margin-top:12px">不採用処理済み</div>':'<button class="onboardBtn" onclick="openOnboarding(\''+x.id+'\')">採用・入店処理へ</button><button class="sheetDelete" style="margin-top:8px" onclick="rejectInterviewSheet(\''+x.id+'\')">不採用</button>')+'<div id="onboardingArea"></div><div class="sheetMeta">'+fmtInterviewDate(x.submitted_at)+'</div>';
  const box=document.getElementById('sheetIdImgs');
  try{
    const urls=await Promise.all([interviewSignedUrl(x.id_front_path),interviewSignedUrl(x.id_back_path)]);
@@ -110,6 +110,13 @@ async function openInterviewSheet(id){
  }catch(err){box.innerHTML='<span class="note">身分証画像を表示できません。</span>'}
 }
 function closeInterviewSheet(){const m=document.getElementById('interviewSheetModal'),d=document.getElementById('interviewSheetDetail');m.classList.remove('on');m.style.cssText='display:none';d.style.cssText='';document.body.style.overflow=''}
+async function rejectInterviewSheet(id){
+ if(!confirm('不採用として処理しますか？'))return;
+ const {error}=await sb.from('interview_applicants').update({status:'不採用'}).eq('id',id);
+ if(error)return alert('不採用処理できません：'+error.message);
+ const x=(window.interviewApplicants||[]).find(v=>v.id===id);if(x)x.status='不採用';
+ closeInterviewSheet();await loadInterviewSheets();
+}
 async function completeOnboarding(id){
  if(!confirm('入店処理を完了して在籍者へ移しますか？'))return;
  const {error}=await sb.from('interview_applicants').update({status:'在籍'}).eq('id',id);
