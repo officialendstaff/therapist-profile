@@ -83,10 +83,14 @@ function openOnboarding(id){
 }
 async function saveOnboarding(id){
  const msg=document.getElementById('obMsg');msg.textContent='保存中...';
- const payload={status:'採用',hire_date:obHireDate.value||null,training_date:obTrainingDate.value||null,first_shift_date:obFirstShift.value||null,stage_name:obStageName.value.trim()||null,work_description:obWorkDescription.value.trim()||null,nationality:obNationality.value.trim()||null,residence_status:document.getElementById('obResidenceStatus')?.value.trim()||null,residence_period:document.getElementById('obResidencePeriod')?.value.trim()||null,work_permission:document.getElementById('obWorkPermission')?.value.trim()||null,verification_date:obVerificationDate.value||null,remarks:obRemarks.value.trim()||null};
- let {error}=await sb.from('interview_applicants').update(payload).eq('id',id);
- if(error){msg.textContent='保存できません：'+error.message;return}
- msg.textContent='保存しました。';await loadInterviewSheets();
+ try{
+  const v=n=>document.getElementById(n);
+  const payload={status:'採用',hire_date:v('obHireDate').value||null,training_date:v('obTrainingDate').value||null,first_shift_date:v('obFirstShift').value||null,stage_name:v('obStageName').value.trim()||null,work_description:v('obWorkDescription').value.trim()||null,nationality:v('obNationality').value.trim()||null,residence_status:v('obResidenceStatus')?.value.trim()||null,residence_period:v('obResidencePeriod')?.value.trim()||null,work_permission:v('obWorkPermission')?.value.trim()||null,verification_date:v('obVerificationDate').value||null,remarks:v('obRemarks').value.trim()||null};
+  const {error}=await sb.from('interview_applicants').update(payload).eq('id',id);
+  if(error)throw error;
+  msg.textContent='保存しました。';
+  await loadInterviewSheets();
+ }catch(e){console.error(e);msg.textContent='保存できません：'+(e?.message||String(e));}
 }
 async function deleteInterviewSheet(id){
  let x=(window.interviewApplicants||[]).find(v=>v.id===id);if(!x||!confirm('この面接シートを削除しますか？\n身分証画像も削除され、元に戻せません。'))return;
