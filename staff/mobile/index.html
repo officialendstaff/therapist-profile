@@ -129,11 +129,12 @@ async function saveOnboarding(id){
   const x=(window.interviewApplicants||[]).find(r=>r.id===id);const interviewDate=new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Tokyo'});const payload={status:'採用',hire_date:interviewDate,training_date:v('obTrainingDate').value||null,first_shift_date:v('obFirstShift').value||null,stage_name:v('obStageName').value.trim()||null,work_description:v('obWorkDescription').value.trim()||null,nationality:v('obNationality').value.trim()||null,residence_status:v('obResidenceStatus')?.value.trim()||null,residence_period:v('obResidencePeriod')?.value.trim()||null,work_permission:v('obWorkPermission')?.value.trim()||null};
   const {error}=await sb.from('interview_applicants').update(payload).eq('id',id);
   if(error)throw error;
-  msg.textContent='保存しました。';
   const current=(window.interviewApplicants||[]).find(x=>x.id===id);
   if(current)Object.assign(current,payload);
-  setTimeout(()=>closeInterviewSheet(),500);
-  setTimeout(()=>loadInterviewSheets(),650);
+  const area=document.getElementById('onboardingArea');
+  if(area)area.innerHTML='<div style="margin-top:12px"><div style="font-size:12px;color:#287a3f;font-weight:800;margin-bottom:8px">入店情報を保存しました。</div><button class="onboardBtn" onclick="createEntryDocuments(\''+id+'\')">入店書類一式を作成・印刷</button></div>';
+  const mainBtn=area?.previousElementSibling;if(mainBtn&&mainBtn.classList.contains('onboardBtn'))mainBtn.style.display='none';
+  msg.textContent='';
  }catch(e){console.error(e);msg.textContent='保存できません：'+(e?.message||String(e));}
 }
 async function deleteInterviewSheet(id){
