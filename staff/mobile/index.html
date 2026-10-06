@@ -48,17 +48,23 @@ async function loadInterviewSheets(){
 }
 async function interviewSignedUrl(path){if(!path)return null;let {data,error}=await sb.storage.from('interview-id-documents').createSignedUrl(path,300);return error?null:data.signedUrl}
 async function openInterviewSheet(id){
- let x=(window.interviewApplicants||[]).find(v=>v.id===id);if(!x)return;
- let [front,back]=await Promise.all([interviewSignedUrl(x.id_front_path),interviewSignedUrl(x.id_back_path)]),hist=Array.isArray(x.work_history)?x.work_history:[];
- let addr=(x.prefecture||'')+(x.city||'')+(x.street||''),postal=x.postal_code?'〒'+escInterview(x.postal_code)+'　':'';
- interviewSheetDetail.innerHTML='<div class="sheetTop"><div><div class="sheetName">'+escInterview(x.name)+'</div><div class="sheetKana">'+escInterview(x.kana)+'</div></div><button class="sheetClose" onclick="closeInterviewSheet()">×</button></div>'+
+ const x=(window.interviewApplicants||[]).find(v=>v.id===id);if(!x)return;
+ const modal=document.getElementById('interviewSheetModal'),detail=document.getElementById('interviewSheetDetail');
+ const hist=Array.isArray(x.work_history)?x.work_history:[],addr=(x.prefecture||'')+(x.city||'')+(x.street||''),postal=x.postal_code?'〒'+escInterview(x.postal_code)+'　':'';
+ detail.innerHTML='<div class="sheetTop"><div><div class="sheetName">'+escInterview(x.name)+'</div><div class="sheetKana">'+escInterview(x.kana)+'</div></div><button class="sheetClose" onclick="closeInterviewSheet()">×</button></div>'+
  '<div class="sheetLines"><strong>'+escInterview(x.birth_date)+'　'+interviewAge(x.birth_date)+'</strong><br><a href="tel:'+escInterview(x.phone)+'" style="color:inherit">'+escInterview(x.phone)+'</a><br>'+postal+escInterview(addr)+'<br><span style="color:#777">'+escInterview(x.recruit_source||'—')+'</span></div>'+
  '<div class="sheetFacts"><div class="sheetFact">喫煙<b>'+escInterview(x.smoking||'—')+'</b></div><div class="sheetFact">タトゥー<b>'+escInterview(x.tattoo||'—')+'</b></div><div class="sheetFact">経験<b>'+escInterview(x.experience||'—')+'</b></div></div>'+
  (x.tattoo_detail?'<div class="sheetHistory">'+escInterview(x.tattoo_detail)+'</div>':'')+
- '<div class="sheetId"><b>'+escInterview(x.id_type||'身分証')+'</b><div class="sheetIdImgs">'+(front?'<a href="'+front+'" target="_blank" rel="noopener"><img src="'+front+'"></a>':'')+(back?'<a href="'+back+'" target="_blank" rel="noopener"><img src="'+back+'"></a>':'')+'</div></div>'+
+ '<div class="sheetId"><b>'+escInterview(x.id_type||'身分証')+'</b><div class="sheetIdImgs" id="sheetIdImgs"><span class="note">身分証を読み込み中...</span></div></div>'+
  (hist.length?hist.map((h,i)=>'<div class="sheetHistory"><b>'+escInterview(h.shop||'勤務歴 '+(i+1))+'</b>'+(h.stage_name?'　'+escInterview(h.stage_name):'')+'<br>'+escInterview(h.period||'')+(h.reason?' ／ '+escInterview(h.reason):'')+'</div>').join(''):'')+
  '<button class="sheetDelete" onclick="deleteInterviewSheet(\''+x.id+'\')">この面接シートを削除</button><div class="sheetMeta">'+fmtInterviewDate(x.submitted_at)+'</div>';
- interviewSheetModal.classList.add('on');document.body.style.overflow='hidden';
+ modal.classList.add('on');document.body.style.overflow='hidden';
+ const box=document.getElementById('sheetIdImgs');
+ try{
+   const urls=await Promise.all([interviewSignedUrl(x.id_front_path),interviewSignedUrl(x.id_back_path)]);
+   if(!modal.classList.contains('on'))return;
+   box.innerHTML=(urls[0]?'<a href="'+urls[0]+'" target="_blank" rel="noopener"><img src="'+urls[0]+'"></a>':'')+(urls[1]?'<a href="'+urls[1]+'" target="_blank" rel="noopener"><img src="'+urls[1]+'"></a>':'')||'<span class="note">身分証画像を表示できません。</span>';
+ }catch(err){box.innerHTML='<span class="note">身分証画像を表示できません。</span>'}
 }
 function closeInterviewSheet(){interviewSheetModal.classList.remove('on');document.body.style.overflow=''}
 async function deleteInterviewSheet(id){
