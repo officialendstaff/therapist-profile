@@ -86,7 +86,7 @@ async function openInterviewSheet(id){
  (x.tattoo_detail?'<div class="sheetHistory">'+escInterview(x.tattoo_detail)+'</div>':'')+
  '<div class="sheetId"><b>'+escInterview(x.id_type||'身分証')+'</b><div class="sheetIdImgs" id="sheetIdImgs"><span class="note">身分証を読み込み中...</span></div></div>'+
  (hist.length?hist.map((h,i)=>{let q=[h.prefecture||'',h.shop||'',h.stage_name||'','メンズエステ'].filter(Boolean).join(' ');return '<div class="sheetHistory"><b>'+escInterview([h.prefecture||'',h.shop||'',h.stage_name||''].filter(Boolean).join('　')||'勤務歴 '+(i+1))+'</b><br>'+escInterview(h.period||'')+(h.reason?' ／ '+escInterview(h.reason):'')+'<br><a class="webSearch" href="https://www.google.com/search?q='+encodeURIComponent(q)+'" target="_blank" rel="noopener">WEB検索</a></div>'}).join(''):'')+
- '<button class="onboardBtn" onclick="openOnboarding(\''+x.id+'\')">採用・入店処理へ</button><div id="onboardingArea"></div><button class="sheetDelete" onclick="deleteInterviewSheet(\''+x.id+'\')">この面接シートを削除</button><div class="sheetMeta">'+fmtInterviewDate(x.submitted_at)+'</div>';
+ (x.status==='採用'?'<button class="onboardBtn" onclick="createEntryDocuments(\''+x.id+'\')">入店書類一式を作成・印刷</button>':'<button class="onboardBtn" onclick="openOnboarding(\''+x.id+'\')">採用・入店処理へ</button>')+'<div id="onboardingArea"></div><button class="sheetDelete" onclick="deleteInterviewSheet(\''+x.id+'\')">この面接シートを削除</button><div class="sheetMeta">'+fmtInterviewDate(x.submitted_at)+'</div>';
  const box=document.getElementById('sheetIdImgs');
  try{
    const urls=await Promise.all([interviewSignedUrl(x.id_front_path),interviewSignedUrl(x.id_back_path)]);
@@ -95,6 +95,19 @@ async function openInterviewSheet(id){
  }catch(err){box.innerHTML='<span class="note">身分証画像を表示できません。</span>'}
 }
 function closeInterviewSheet(){const m=document.getElementById('interviewSheetModal'),d=document.getElementById('interviewSheetDetail');m.classList.remove('on');m.style.cssText='display:none';d.style.cssText='';document.body.style.overflow=''}
+async function createEntryDocuments(id){
+ const x=(window.interviewApplicants||[]).find(v=>v.id===id);if(!x)return;
+ const [front,back]=await Promise.all([interviewSignedUrl(x.id_front_path),interviewSignedUrl(x.id_back_path)]);
+ const addr=(x.prefecture||'')+(x.city||'')+(x.street||'');
+ const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+ const d=s=>s?String(s).replace(/-/g,'/'):'';
+ const html='<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>入店書類一式</title><style>@page{size:A4;margin:12mm}*{box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;color:#111;margin:0}.page{min-height:270mm;page-break-after:always}.page:last-child{page-break-after:auto}h1{text-align:center;font-size:22px;margin:0 0 14mm}table{width:100%;border-collapse:collapse;font-size:13px}th,td{border:1px solid #222;padding:8px;vertical-align:middle}th{width:25%;background:#f7f7f7;text-align:left}.idimg{display:block;max-width:100%;max-height:105mm;margin:8mm auto;object-fit:contain}.pledge{font-size:15px;line-height:2}.sign{margin-top:28mm;line-height:2.6}.printbar{position:fixed;right:12px;bottom:12px;z-index:5}@media print{.printbar{display:none}}</style></head><body><button class="printbar" onclick="print()">印刷</button>'+
+ '<section class="page"><h1>従業者名簿</h1><table><tr><th>ふりがな</th><td>'+esc(x.kana)+'</td></tr><tr><th>氏名</th><td>'+esc(x.name)+'</td></tr><tr><th>生年月日</th><td>'+esc(d(x.birth_date))+'</td></tr><tr><th>住所</th><td>'+esc(addr)+'</td></tr><tr><th>電話番号</th><td>'+esc(x.phone)+'</td></tr><tr><th>従事する業務内容</th><td>'+esc(x.work_description||'従業員業務')+'</td></tr><tr><th>採用年月日</th><td>'+esc(d(x.hire_date))+'</td></tr><tr><th>退職年月日</th><td></td></tr><tr><th>国籍</th><td>'+esc(x.nationality||'日本')+'</td></tr><tr><th>在留資格</th><td>'+esc(x.residence_status)+'</td></tr><tr><th>在留期間</th><td>'+esc(x.residence_period)+'</td></tr><tr><th>資格外活動許可</th><td>'+esc(x.work_permission)+'</td></tr><tr><th>確認年月日</th><td></td></tr></table></section>'+
+ '<section class="page"><h1>身分証コピー</h1>'+(front?'<img class="idimg" src="'+front+'">':'')+(back?'<img class="idimg" src="'+back+'">':'')+'</section>'+
+ '<section class="page"><h1>誓約書</h1><div class="pledge"><p>現在使用している誓約書の正式本文をここへ反映します。</p><div class="sign">日付　'+esc(d(x.hire_date))+'<br>住所　'+esc(addr)+'<br>氏名　________________________________</div></div></section></body></html>';
+ const w=window.open('','_blank');if(!w)return alert('ポップアップを許可してください。');
+ w.document.open();w.document.write(html);w.document.close();
+}
 function openOnboarding(id){
  const x=(window.interviewApplicants||[]).find(v=>v.id===id),a=document.getElementById('onboardingArea');if(!x||!a)return;
  const today=new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Tokyo'});
