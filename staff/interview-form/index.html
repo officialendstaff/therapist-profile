@@ -40,7 +40,7 @@
 </section>
 <section class="card"><h2>エステ経験</h2>
 <div class="field"><label>経験の有無<span class="req">必須</span></label><select name="experience" id="experience" required><option value="">選択してください</option><option value="なし">なし</option><option value="あり">あり</option></select></div>
-<div id="historyArea" class="hidden"><div id="histories"></div><button type="button" class="add" id="addHistory">＋ 勤務歴を追加</button></div>
+<div id="historyArea" class="hidden"><div id="histories"></div><button type="button" class="add" id="addHistoryBtn">＋ 勤務歴を追加</button></div>
 </section>
 <button class="submit" id="submitBtn" type="submit">入力内容を送信</button><div class="msg" id="msg"></div>
 </form></main>
@@ -55,9 +55,9 @@ document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{document.quer
 let postalTimer;postal.addEventListener('input',()=>{clearTimeout(postalTimer);let z=postal.value.replace(/\D/g,'');postal.value=z.length>3?z.slice(0,3)+'-'+z.slice(3,7):z;if(z.length===7)postalTimer=setTimeout(()=>lookupPostal(z),250)});
 async function lookupPostal(z){try{let r=await fetch('https://zipcloud.ibsnet.co.jp/api/search?zipcode='+z),j=await r.json();if(j.results&&j.results[0]){let x=j.results[0];pref.value=x.address1;city.value=x.address2+x.address3}else alert('住所が見つかりませんでした。住所から入力してください。')}catch(e){alert('住所の自動取得ができませんでした。住所から入力してください。')}}
 tattoo.onchange=()=>tattooDetail.classList.toggle('hidden',tattoo.value!=='あり');
-experience.onchange=()=>{historyArea.classList.toggle('hidden',experience.value!=='あり');if(experience.value==='あり'&&!histories.children.length)addHistory()};
-function addHistory(){let d=document.createElement('div');d.className='history';d.innerHTML='<h3>勤務歴</h3><button type="button" class="remove">削除</button><div class="field"><label>店名</label><input data-k="shop"></div><div class="field"><label>源氏名</label><input data-k="stage_name"></div><div class="field"><label>勤務期間</label><input data-k="period" placeholder="例：1年6か月"></div><div class="field"><label>退店理由</label><textarea data-k="reason"></textarea></div>';d.querySelector('.remove').onclick=()=>d.remove();histories.append(d)}
-addHistory.onclick=addHistory;
+experience.onchange=()=>{historyArea.classList.toggle('hidden',experience.value!=='あり');if(experience.value==='あり'&&!histories.children.length)appendHistory()};
+function appendHistory(){let d=document.createElement('div');d.className='history';d.innerHTML='<h3>勤務歴</h3><button type="button" class="remove">削除</button><div class="field"><label>店名</label><input data-k="shop"></div><div class="field"><label>源氏名</label><input data-k="stage_name"></div><div class="field"><label>勤務期間</label><input data-k="period" placeholder="例：1年6か月"></div><div class="field"><label>退店理由</label><textarea data-k="reason"></textarea></div>';d.querySelector('.remove').onclick=()=>d.remove();histories.append(d)}
+document.getElementById('addHistoryBtn').addEventListener('click',appendHistory);
 function preview(input,img){input.onchange=()=>{let f=input.files[0];if(!f)return;img.src=URL.createObjectURL(f);img.classList.remove('hidden')}}preview(idFront,frontPreview);preview(idBack,backPreview);
 function uuid(){return crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2)}
 async function upload(file,folder,label){if(!file)return null;let ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');let path=folder+'/'+label+'.'+ext;let {error}=await sb.storage.from('interview-id-documents').upload(path,file,{upsert:false,contentType:file.type||'image/jpeg'});if(error)throw error;return path}
