@@ -106,7 +106,7 @@ async function saveOnboarding(id){
  const msg=document.getElementById('obMsg');msg.textContent='保存中...';
  try{
   const v=n=>document.getElementById(n);
-  const payload={status:'採用',hire_date:v('obHireDate').value||null,training_date:v('obTrainingDate').value||null,first_shift_date:v('obFirstShift').value||null,stage_name:v('obStageName').value.trim()||null,work_description:v('obWorkDescription').value.trim()||null,nationality:v('obNationality').value.trim()||null,residence_status:v('obResidenceStatus')?.value.trim()||null,residence_period:v('obResidencePeriod')?.value.trim()||null,work_permission:v('obWorkPermission')?.value.trim()||null};
+  const x=(window.interviewApplicants||[]).find(r=>r.id===id);const interviewDate=new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Tokyo'});const payload={status:'採用',hire_date:interviewDate,training_date:v('obTrainingDate').value||null,first_shift_date:v('obFirstShift').value||null,stage_name:v('obStageName').value.trim()||null,work_description:v('obWorkDescription').value.trim()||null,nationality:v('obNationality').value.trim()||null,residence_status:v('obResidenceStatus')?.value.trim()||null,residence_period:v('obResidencePeriod')?.value.trim()||null,work_permission:v('obWorkPermission')?.value.trim()||null};
   const {error}=await sb.from('interview_applicants').update(payload).eq('id',id);
   if(error)throw error;
   msg.textContent='保存しました。';
