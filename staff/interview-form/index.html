@@ -71,7 +71,7 @@ helpBtn.onclick=async()=>{
  if(!confirm('スタッフを呼びますか？'))return;
  helpBtn.disabled=true;helpMsg.textContent='スタッフを呼んでいます…';
  try{
-  const applicantId=uuid(),payload=currentPayload(applicantId,'HELP');
+  const applicantId=uuid(),payload=currentPayload(applicantId,'面接前');payload.remarks='HELP';
   const {error}=await sb.from('interview_applicants').insert(payload);if(error)throw error;
   [...form.elements].forEach(el=>{if(el.id!=='helpBtn')el.disabled=true});
   helpBtn.textContent='スタッフを呼び出し中…';helpMsg.innerHTML='<span class="helpDone">スタッフを呼びました。そのままお待ちください。</span>';
