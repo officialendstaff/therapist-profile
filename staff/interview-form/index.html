@@ -75,7 +75,7 @@ helpBtn.onclick=async()=>{
   const {error}=await sb.from('interview_applicants').insert(payload);if(error)throw error;
   [...form.elements].forEach(el=>{if(el.id!=='helpBtn')el.disabled=true});
   helpBtn.textContent='スタッフを呼び出し中…';helpMsg.innerHTML='<span class="helpDone">スタッフを呼びました。そのままお待ちください。</span>';
- }catch(err){console.error(err);helpMsg.textContent='呼び出しを送信できませんでした。直接スタッフへお声がけください。';helpBtn.disabled=false}
+ }catch(err){console.error(err);helpMsg.textContent='呼び出しを送信できませんでした。エラー：'+(err?.message||String(err));helpBtn.disabled=false}
 };
 form.onsubmit=async e=>{e.preventDefault();submitBtn.disabled=true;msg.textContent='送信中です…';try{let applicantId=uuid(),front=await upload(idFront.files[0],applicantId,'front'),back=await upload(idBack.files[0],applicantId,'back');let payload=currentPayload(applicantId,'面接前');payload.id_front_path=front;payload.id_back_path=back;let {error}=await sb.from('interview_applicants').insert(payload);if(error)throw error;form.innerHTML='<section class="card" style="text-align:center"><h2>送信完了</h2><p class="note">ご入力ありがとうございました。スタッフへ送信しました。</p></section>'}catch(err){console.error(err);msg.textContent='送信できませんでした。スタッフへお声がけください。';submitBtn.disabled=false}};
 </script></body></html>
