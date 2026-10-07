@@ -21,6 +21,7 @@
 <button data-panel="books" onclick="showPanel('books',this)">BOOKS</button>
 <button data-panel="contact" onclick="showPanel('contact',this)">SNS</button>
 <button data-panel="fAdmin" onclick="showPanel('fAdmin',this)">F PAGE</button>
+<button data-panel="interviewAdmin" onclick="showPanel('interviewAdmin',this);loadInterviewAdmin()">INTERVIEW</button>
 <button data-panel="settings" onclick="showPanel('settings',this)">SETTINGS</button>
 </nav><div class="wrap">
 <section class="card adminPanel" id="aboutAdmin"><h2>ABOUT <span>企業紹介</span></h2><label>キャッチコピー</label><input id="aboutCatchInput" value="業界の変化を、最前線から。"><label>企業紹介本文</label><textarea id="aboutBodyInput" style="min-height:220px">（株）末端興業は2000年の創業以来、風俗・メンズエステ業界を中心に事業を展開してきました。
@@ -106,6 +107,14 @@
 <button class="btn" onclick="resetFNoteForm()">入力をクリア</button>
 <div id="fNoteArticleList"></div></div></details>
 <details class="fAdminFold"><summary>ABOUT｜画像ライブラリ<span>＋</span></summary><div class="fAdminFoldBody"><div id="fLibrary" class="nowLib"></div><label>画像を追加</label><input id="fImageAdd" type="file" accept="image/*" multiple><button class="btn" onclick="addFImages()">画像ライブラリに追加</button><p class="note">ABOUTに使う画像を最大6枚選択してください。選択順が公開ページの左上→右下の表示順になります。</p><button class="btn gold" onclick="saveFAbout()">ABOUTの6枚を保存</button></div></details></section>
+<section class="card adminPanel" id="interviewAdmin"><h2>INTERVIEW <span>面接管理</span></h2>
+<div class="grid"><div><label>集計月</label><input id="interviewAdminMonth" type="month" onchange="loadInterviewAdmin()"></div><div><label>フォーム店舗</label><select id="interviewAdminShop" onchange="renderInterviewApplicantsAdmin()"><option value="">すべて</option><option>薔薇と紳士</option><option>BUSTY OSAKA</option></select></div></div>
+<h3 style="margin:20px 0 8px">月間｜面接予定</h3><div id="interviewScheduleStats"><p class="note">読み込み中...</p></div>
+<h3 style="margin:20px 0 8px">月間｜面接結果</h3><div id="interviewResultStats"><p class="note">読み込み中...</p></div>
+<h3 style="margin:22px 0 8px">面接フォームデータ</h3>
+<label>氏名検索</label><input id="interviewAdminSearch" placeholder="氏名・フリガナ" oninput="renderInterviewApplicantsAdmin()">
+<div id="interviewApplicantsAdmin"></div>
+</section>
 <section class="card adminPanel" id="settings"><h2>PAGE SETTINGS <span>HERO / IMAGE</span></h2><label>HERO画像</label><input id="heroImage" type="file" accept="image/*"><div class="preview" id="heroPreview">HERO IMAGE</div><label>MASTERキャラクター</label><input id="masterImage" type="file" accept="image/*"><div class="preview" id="masterPreview">MASTER CHARACTER</div><button class="btn gold" onclick="saveMainImages()">画像を保存</button><p class="note">※ 現在は管理画面UIの土台です。Supabase接続後に保存・アップロードが実際の公開ページへ反映されます。</p></section>
 </div></main><nav class="tabs"><a href="#now">NOW</a><a href="#news">NEWS</a><a href="#works">WORKS</a><a href="#books">BOOKS</a><a href="#contact">SNS</a></nav>
 <script>
@@ -118,7 +127,7 @@ async function init(){let {data}=await sb.auth.getSession();authGate.style.displ
 async function upload(file,folder){if(!file)return null;if(file.size>10*1024*1024)throw Error('画像は10MB以下にしてください');let ext=(file.name.split('.').pop()||'jpg').replace(/[^a-z0-9]/gi,'');let path=folder+'/'+Date.now()+'-'+Math.random().toString(36).slice(2,7)+'.'+ext;let {error}=await sb.storage.from('staff-assets').upload(path,file,{contentType:file.type});if(error)throw error;return {url:sb.storage.from('staff-assets').getPublicUrl(path).data.publicUrl,path}}
 async function saveAbout(){try{let row={id:1,about_catch:aboutCatchInput.value.trim(),about_body:aboutBodyInput.value.trim()};let {error}=await sb.from('staff_page').upsert(row);if(error)throw error;alert('ABOUTを保存しました')}catch(e){alert(e.message)}}
 async function loadAbout(){let {data,error}=await sb.from('staff_page').select('about_catch,about_body').eq('id',1).maybeSingle();if(error)return;if(!data)return;if(data.about_catch)aboutCatchInput.value=data.about_catch;if(data.about_body)aboutBodyInput.value=data.about_body}
-async function loadAll(){await Promise.all([loadAbout(),loadNow(),loadNowImages(),loadNews(),loadProfile(),loadWorks(),loadInvitation(),loadGroups(),loadBooks(),loadDiary(),loadContact(),loadPage(),loadFImages(),loadFInfo(),loadMenuPopupAdmin(),loadDinnerPagesAdmin(),loadFNoteArticlesAdmin(),loadFSpecialNoticesAdmin()])}
+async function loadAll(){await Promise.all([loadAbout(),loadNow(),loadNowImages(),loadNews(),loadProfile(),loadWorks(),loadInvitation(),loadGroups(),loadBooks(),loadDiary(),loadContact(),loadPage(),loadFImages(),loadFInfo(),loadMenuPopupAdmin(),loadDinnerPagesAdmin(),loadFNoteArticlesAdmin(),loadFSpecialNoticesAdmin()]);if(location.hash==='#interviewAdmin')loadInterviewAdmin()}
 async function loadNow(){let {data}=await sb.from('staff_now').select('*').eq('id',1).maybeSingle();if(!data)return;nowStatus.value=data.status||'勤務中';nowMessage.value=data.message||'';nowHours.value=data.interview_hours||'';selectedNowImageId=data.selected_image_id||null;if(!selectedNowImageId&&data.image_url){let hit=nowImages.find(x=>x.image_url===data.image_url);if(hit)selectedNowImageId=hit.id}renderNowLibrary()}
 
 async function loadNowImages(){let {data,error}=await sb.from('staff_now_images').select('*').order('sort_order').order('id');if(error)return alert(error.message);nowImages=data||[];renderNowLibrary()}
@@ -209,4 +218,43 @@ async function saveFAbout(){try{let {error}=await sb.from('f_images').update({ab
 async function deleteFImage(id){if(!confirm('この画像をライブラリから削除しますか？'))return;let x=fImages.find(v=>v.id===id);let {error}=await sb.from('f_images').delete().eq('id',id);if(error)return alert(error.message);if(x&&x.storage_path)await sb.storage.from('staff-assets').remove([x.storage_path]);await loadFImages()}
 async function delRow(t,id,cb){if(!confirm('削除しますか？'))return;let {error}=await sb.from(t).delete().eq('id',id);if(error)alert(error.message);else cb()}
 init();restorePanel();
+
+let interviewAdminApplicants=[];
+function iaEsc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function iaMonthNow(){return new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Tokyo'}).slice(0,7)}
+async function loadInterviewAdmin(){
+ if(!window.interviewAdminMonth)return;
+ if(!interviewAdminMonth.value)interviewAdminMonth.value=iaMonthNow();
+ const month=interviewAdminMonth.value,start=month+'-01',d=new Date(Number(month.slice(0,4)),Number(month.slice(5,7)),1),end=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-01';
+ interviewScheduleStats.innerHTML=interviewResultStats.innerHTML='<p class="note">読み込み中...</p>';
+ const [ir,ar]=await Promise.all([
+  sb.from('staff_interviews').select('id,interview_date,shop,status').gte('interview_date',start).lt('interview_date',end),
+  sb.from('interview_applicants').select('id,name,kana,birth_date,phone,postal_code,prefecture,city,street,recruit_source,id_type,id_front_path,id_back_path,smoking,tattoo,tattoo_detail,experience,work_history,status,submitted_at,shop,remarks').order('submitted_at',{ascending:false})
+ ]);
+ if(ir.error){interviewScheduleStats.innerHTML=interviewResultStats.innerHTML='<p class="note">'+iaEsc(ir.error.message)+'</p>'}
+ else{
+  const rows=ir.data||[],shops=['薔薇と紳士','BUSTY OSAKA'];
+  interviewScheduleStats.innerHTML=shops.map(shop=>'<div class="listItem"><b>'+shop+'</b><div style="font-size:24px;font-weight:900;margin-top:5px">'+rows.filter(x=>x.shop===shop).length+'件</div></div>').join('');
+  interviewResultStats.innerHTML=shops.map(shop=>{const r=rows.filter(x=>x.shop===shop),hire=r.filter(x=>x.status==='採用').length,reject=r.filter(x=>x.status==='不採用').length,cancel=r.filter(x=>['キャンセル','トビ（キャンセル）'].includes(x.status)).length,done=hire+reject;return '<div class="listItem"><b>'+shop+'</b><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-top:8px"><span>面接実施<br><strong>'+done+'件</strong></span><span>採用<br><strong>'+hire+'件</strong></span><span>不採用<br><strong>'+reject+'件</strong></span><span>キャンセル等<br><strong>'+cancel+'件</strong></span></div></div>'}).join('');
+ }
+ if(ar.error){interviewApplicantsAdmin.innerHTML='<p class="note">面接フォームデータを読み込めません：'+iaEsc(ar.error.message)+'</p>';interviewAdminApplicants=[]}
+ else{interviewAdminApplicants=ar.data||[];renderInterviewApplicantsAdmin()}
+}
+function renderInterviewApplicantsAdmin(){
+ if(!window.interviewApplicantsAdmin)return;
+ const shop=interviewAdminShop.value,q=interviewAdminSearch.value.trim().toLowerCase();
+ const rows=interviewAdminApplicants.filter(x=>(!shop||x.shop===shop)&&(!q||String(x.name||'').toLowerCase().includes(q)||String(x.kana||'').toLowerCase().includes(q)));
+ interviewApplicantsAdmin.innerHTML=rows.map(x=>'<button type="button" class="listItem" style="display:block;width:100%;text-align:left;background:#fff" onclick="openInterviewApplicantAdmin(\''+x.id+'\')"><b>'+iaEsc(x.name||'氏名未入力')+'</b><small>'+iaEsc(x.shop||'店舗未設定')+' ｜ '+iaEsc(x.status||'面接前')+' ｜ '+iaEsc(String(x.submitted_at||'').slice(0,10))+'</small></button>').join('')||'<p class="note">該当データなし</p>';
+}
+async function openInterviewApplicantAdmin(id){
+ const x=interviewAdminApplicants.find(v=>v.id===id);if(!x)return;
+ const hist=Array.isArray(x.work_history)?x.work_history:[],addr=(x.prefecture||'')+(x.city||'')+(x.street||'');
+ let ids='';
+ for(const p of [x.id_front_path,x.id_back_path])if(p){let {data}=await sb.storage.from('interview-id-documents').createSignedUrl(p,300);if(data?.signedUrl)ids+='<a href="'+data.signedUrl+'" target="_blank" rel="noopener"><img src="'+data.signedUrl+'" style="width:100%;max-width:360px;display:block;margin:8px 0;border-radius:8px"></a>'}
+ const w=window.open('','_blank','width=720,height=900');
+ if(!w)return alert('ポップアップを許可してください');
+ w.document.write('<!doctype html><meta charset="utf-8"><title>面接フォームデータ</title><style>body{font-family:-apple-system,BlinkMacSystemFont,"Yu Gothic",sans-serif;padding:24px;line-height:1.7;color:#222}h2{margin:0 0 4px}.box{padding:12px 0;border-bottom:1px solid #ddd}small{color:#777}</style><h2>'+iaEsc(x.name||'氏名未入力')+'</h2><small>'+iaEsc(x.kana||'')+'</small><div class="box"><b>店舗：</b>'+iaEsc(x.shop||'未設定')+'<br><b>状態：</b>'+iaEsc(x.status||'面接前')+'</div><div class="box"><b>生年月日：</b>'+iaEsc(x.birth_date||'')+'<br><b>電話：</b>'+iaEsc(x.phone||'')+'<br><b>住所：</b>'+iaEsc((x.postal_code?'〒'+x.postal_code+' ':'')+addr)+'<br><b>求人媒体：</b>'+iaEsc(x.recruit_source||'')+'</div><div class="box"><b>喫煙：</b>'+iaEsc(x.smoking||'')+'　<b>タトゥー：</b>'+iaEsc(x.tattoo||'')+'　<b>経験：</b>'+iaEsc(x.experience||'')+(x.tattoo_detail?'<br>'+iaEsc(x.tattoo_detail):'')+'</div><div class="box"><b>身分証：</b>'+ids+'</div><div class="box"><b>勤務歴</b><br>'+hist.map((h,i)=>iaEsc([h.prefecture,h.shop,h.stage_name,h.period,h.reason].filter(Boolean).join(' ｜ '))).join('<br>')+'</div>');
+ w.document.close();
+}
+
 </script></body></html>
