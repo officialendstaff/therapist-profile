@@ -11,11 +11,14 @@ declare
 begin
   if TG_TABLE_NAME = 'staff_interviews' then
     if TG_OP = 'INSERT' then
+      if NEW.status IS DISTINCT FROM '面接予定' then return NEW; end if;
       kind := 'interview_new';
-    elsif NEW.status = 'キャンセル' and OLD.status is distinct from 'キャンセル' then
+    elsif NEW.status IN ('キャンセル', 'トビ（キャンセル）')
+      and OLD.status IS DISTINCT FROM NEW.status then
       kind := 'interview_cancel';
-    elsif NEW.interview_date is distinct from OLD.interview_date
-       or NEW.interview_time is distinct from OLD.interview_time then
+    elsif NEW.status = '面接予定' AND
+      (NEW.interview_date is distinct from OLD.interview_date
+       or NEW.interview_time is distinct from OLD.interview_time) then
       kind := 'interview_reschedule';
     else
       return NEW;
