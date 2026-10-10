@@ -23,7 +23,7 @@ for(let n=1;n<=3;n++)newsLinks.insertAdjacentHTML('beforeend','<label>リンク'
 function tab(id,b){document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');scrollTo(0,0)}
 // Set only the PUBLIC VAPID key here after the server key pair is configured.
 // Never place the VAPID private key or Supabase service role key in this file.
-const INTERVIEW_PUSH_VAPID_PUBLIC_KEY = '';
+const INTERVIEW_PUSH_VAPID_PUBLIC_KEY = 'BNMSVKW33jokluXtV9UNWH2_EkoHzj6x0uExNJy14cZUPoi-aWSIjEdwiG1jyeN_tlcCJBermEEhOWu0ri_lV9U';
 function decodeVapidKey(value){
  const padded=value.replace(/-/g,'+').replace(/_/g,'/');
  const raw=atob(padded.padEnd(Math.ceil(padded.length/4)*4,'='));
