@@ -57,4 +57,39 @@ create index if not exists staff_push_events_pending_idx
 alter table public.staff_push_events enable row level security;
 revoke all on public.staff_push_events from anon, authenticated;
 
+-- Dispatcher lease: claim each event atomically across concurrent invocations.
+alter table public.staff_push_events
+  add column if not exists claimed_until timestamptz;
+create index if not exists staff_push_events_claim_idx
+  on public.staff_push_events (created_at)
+  where delivered_at is null;
+
+create or replace function public.claim_staff_push_events(batch_size integer default 10)
+returns setof public.staff_push_events
+language plpgsql security definer
+set search_path = pg_catalog, public
+as $
+begin
+  return query
+  with selected as (
+    select e.id
+    from public.staff_push_events e
+    where e.delivered_at is null
+      and e.attempts < 5
+      and (e.claimed_until is null or e.claimed_until < now())
+    order by e.created_at
+    limit least(greatest(batch_size, 1), 20)
+    for update skip locked
+  )
+  update public.staff_push_events e
+  set claimed_until = now() + interval '3 minutes',
+      attempts = e.attempts + 1
+  from selected
+  where e.id = selected.id
+  returning e.*;
+end;
+$;
+revoke all on function public.claim_staff_push_events(integer) from public, anon, authenticated;
+grant execute on function public.claim_staff_push_events(integer) to service_role;
+
 commit;
