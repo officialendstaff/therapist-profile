@@ -4,6 +4,7 @@
 <div class="gate" id="gate"><div class="card"><h2>末端 MOBILE</h2><p class="note">NEWS・STAFF NOW・STAFF DIARY 専用</p><label>メールアドレス</label><input id="email" type="email"><label>パスワード</label><input id="password" type="password"><button class="btn" onclick="login()">ログイン</button><div class="msg" id="authMsg"></div></div></div>
 <header class="head"><b>（株）末端興業 MOBILE</b><small>スマホ簡易更新</small><div class="quicklinks"><a href="https://officialendstaff.github.io/therapist-profile/staff/" target="_blank" rel="noopener">末端興業</a><a href="https://x.com/official_staffD" target="_blank" rel="noopener">𝕏</a><a href="https://m-sns.net/u/@end_staff" target="_blank" rel="noopener">02</a><a href="https://www.instagram.com/official_insyushi?stkn=MTIyOTUyZnFtZXZrMA%3D%3D&utm_source=qr" target="_blank" rel="noopener">Instagram</a></div></header>
 <section class="panel active" id="schedule"><div class="card"><h2>予定 <span id="scheduleLamp" style="display:none;color:#d00">●</span></h2>
+<div class="scheduleSection"><h3>iPhone面接通知</h3><p class="note" id="pushSetupStatus">通知環境を確認中です。</p><button type="button" class="btn compactBtn" id="pushPermissionButton" onclick="requestInterviewNotificationPermission()">通知を許可する</button><p class="note">現在は受信準備段階です。通知の自動配信はサーバー側の設定完了後に利用できます。</p></div>
 <div class="scheduleSection"><h3>面接シート <span id="sheetHelpLamp" style="display:none;color:#d00;font-weight:900">HELP</span></h3><button class="btn compactBtn" onclick="loadInterviewSheets()">情報更新</button><div id="interviewSheetList" class="links"></div></div>
 <div class="scheduleSection"><h3>面接予定</h3><div id="scheduleToday" class="links">読み込み中...</div><div id="scheduleCalendar"></div></div>
 <div class="scheduleSection"><h3>対応設定</h3><label>日付</label><input id="blockDate" class="dateField" type="date"><div class="availabilityChoices"><label><input id="blockAllDay" name="blockMode" type="radio" value="all" checked onchange="toggleBlockTime()"> 終日不可</label><label><input id="blockFromTime" name="blockMode" type="radio" value="time" onchange="toggleBlockTime()"> 19:00～不可</label></div><div id="blockTimes" style="display:none"><label>開始時間</label><select id="blockStart"></select><input id="blockEnd" type="hidden" value="23:00"></div><button class="btn compactBtn" onclick="saveBlock()">対応を登録</button><div id="blockList" class="blockList"></div></div>
@@ -20,6 +21,22 @@
 const SB_URL='https://vjjnkflbfsjihwzjsjpr.supabase.co',SB_KEY='sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos',sb=supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage,storageKey:'mattan-mobile-auth'}});let nowImages=[],selectedNowImageId=null;
 for(let n=1;n<=3;n++)newsLinks.insertAdjacentHTML('beforeend','<label>リンク'+n+' 表示名</label><input id="linkLabel'+n+'" placeholder="例：Xを見る / @account"><label>リンク'+n+' URL</label><input id="linkUrl'+n+'" placeholder="https://">');
 function tab(id,b){document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');scrollTo(0,0)}
+function refreshInterviewPushStatus(){
+ const status=document.getElementById('pushSetupStatus'),button=document.getElementById('pushPermissionButton');
+ if(!status||!button)return;
+ const supported='Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
+ const standalone=window.matchMedia('(display-mode: standalone)').matches || navigator.standalone===true;
+ if(!supported){status.textContent='この環境ではWeb Pushを利用できません。iOS 16.4以降のホーム画面アプリで開いてください。';button.hidden=true;return}
+ if(!standalone){status.textContent='iPhoneのホーム画面に追加した「末端管理」アプリから開いてください。';button.hidden=true;return}
+ if(Notification.permission==='granted'){status.textContent='通知の許可：オン（自動配信の設定は未完了）';button.hidden=true;return}
+ if(Notification.permission==='denied'){status.textContent='通知が拒否されています。iPhoneの設定から通知を許可してください。';button.hidden=true;return}
+ status.textContent='通知の許可：未設定';button.hidden=false;
+}
+async function requestInterviewNotificationPermission(){
+ try{await Notification.requestPermission()}catch(e){console.error('Notification permission request failed',e)}
+ refreshInterviewPushStatus();
+}
+document.addEventListener('DOMContentLoaded',refreshInterviewPushStatus);
 async function login(){authMsg.textContent='';const btn=document.querySelector('.gate .btn');btn.disabled=true;btn.textContent='確認中...';try{const address=email.value.trim();if(!address||!password.value){authMsg.textContent='メールアドレスとパスワードを入力してください。';return}const {error}=await sb.auth.signInWithPassword({email:address,password:password.value});if(error){const code=error.code||'';const status=error.status||'';authMsg.textContent=(code==='invalid_credentials'?'メールアドレスまたはパスワードが一致しません。':code==='email_not_confirmed'?'メールアドレスの確認が完了していません。':code==='over_request_rate_limit'?'試行回数の制限中です。時間をおいて再試行してください。':'ログインに失敗しました。')+'（エラー: '+(code||'unknown')+(status?'/'+status:'')+'）';return}gate.style.display='none';load();loadSchedule();loadInterviewSheets();loadMobileNews();loadMobileDiary()}catch(e){authMsg.textContent='接続または処理でエラーが発生しました。通信状態を確認してください。'}finally{btn.disabled=false;btn.textContent='ログイン'}}
 async function init(){let d=new Date().toISOString().slice(0,10);newsDate.value=d;diaryDate.value=d;let {data}=await sb.auth.getSession();if(data.session){gate.style.display='none';load();loadSchedule();loadInterviewSheets();loadMobileNews();loadMobileDiary()}}
 async function upload(file,folder){if(!file)return null;if(file.size>10*1024*1024)throw Error('画像は10MB以下にしてください');let ext=(file.name.split('.').pop()||'jpg').replace(/[^a-z0-9]/gi,''),path=folder+'/'+Date.now()+'-'+Math.random().toString(36).slice(2,7)+'.'+ext;let {error}=await sb.storage.from('staff-assets').upload(path,file,{contentType:file.type});if(error)throw error;return {url:sb.storage.from('staff-assets').getPublicUrl(path).data.publicUrl,path}}
