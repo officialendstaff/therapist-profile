@@ -34,18 +34,19 @@ Deno.serve(async (request: Request) => {
   if (![url, serviceKey, userId, publicKey, privateKey].every(Boolean)) {
     return new Response('Missing server configuration', { status: 503 });
   }
-  webpush.setVapidDetails('mailto:admin@example.invalid', publicKey!, privateKey!);
+  webpush.setVapidDetails('mailto:officialendstaff@gmail.com', publicKey!, privateKey!);
   const db = createClient(url!, serviceKey!, { auth: { persistSession: false } });
-  // A single dispatcher should be scheduled. Do not schedule overlapping calls
-  // until an atomic claim/lease mechanism is added to the queue.
-  const { data: events, error: eventError } = await db.from('staff_push_events')
-    .select('id,event_type,payload,attempts').is('delivered_at', null)
-    .lt('attempts', 5).order('created_at', { ascending: true }).limit(20);
+  // Atomic row claim prevents overlapping invocations from selecting the same event.
+  // Attempts are incremented by the database at claim time.
+  const { data: events, error: eventError } = await db.rpc('claim_staff_push_events', { batch_size: 10 });
   if (eventError) return new Response('Queue unavailable', { status: 500 });
   const { data: subscriptions, error: subscriptionError } = await db.from('staff_push_subscriptions')
     .select('id,subscription').eq('user_id', userId!);
   if (subscriptionError) return new Response('Subscriptions unavailable', { status: 500 });
-  if (!subscriptions?.length) return Response.json({ pending: events?.length || 0, sent: 0, reason: 'no_subscriptions' });
+  if (!subscriptions?.length) {
+    for (const event of events || []) await db.from('staff_push_events').update({ claimed_until: null, last_error: 'No registered devices' }).eq('id', event.id);
+    return Response.json({ pending: events?.length || 0, sent: 0, reason: 'no_subscriptions' });
+  }
   let delivered = 0, failed = 0;
   for (const event of events || []) {
     if (!(event.event_type in types)) continue;
@@ -71,7 +72,7 @@ Deno.serve(async (request: Request) => {
       }
     }
     await db.from('staff_push_events').update({
-      attempts: (event.attempts || 0) + 1,
+      claimed_until: null,
       ...(allSent ? { delivered_at: new Date().toISOString(), last_error: null } : { last_error: 'One or more push deliveries failed' }),
     }).eq('id', event.id).is('delivered_at', null);
   }
