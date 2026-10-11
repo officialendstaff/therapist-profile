@@ -185,7 +185,7 @@ function timeRangeEditor(parent,label,initial,onChange){
  const selects=[];
  for(const [i,caption] of ['開始','終了'].entries()){
   const cell=document.createElement('label');cell.textContent=caption;
-  const select=document.createElement('select');for(let h=0;h<24;h++)for(let m=0;m<60;m+=5){const value=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');const opt=document.createElement('option');opt.value=value;opt.textContent=value;select.append(opt)}
+  const select=document.createElement('select');for(let h=0;h<24;h++)for(let m=0;m<60;m+=30){const value=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');const opt=document.createElement('option');opt.value=value;opt.textContent=value;select.append(opt)}
   select.value=values[i];select.onchange=()=>onChange(selects[0].value+'–'+selects[1].value);selects.push(select);cell.append(select);controls.append(cell)
  }
  wrap.append(controls);parent.append(wrap);
