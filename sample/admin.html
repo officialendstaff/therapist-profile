@@ -19,7 +19,7 @@ const PAGE_SECTIONS={
  shifts:['出勤カレンダー・一括設定'],links:['リンク・URL一元管理'],
  booking:['姫予約フォームの項目','料金シミュレーター'],
  areas:['出張・交通費','LOCATION GUIDE'],
- layout:['下部メニューバーのアイコン','セクションの表示・並び順'],
+ layout:['セクションの表示・並び順','見出し・装飾の設定','下部メニューバーのアイコン'],
  ogp:['OGP・SNS共有設定']
 };
 const pageInfo=ADMIN_PAGES.find(x=>x[0]===currentPage);
@@ -48,32 +48,6 @@ function items(s,arr,fields,make,opts={}){let host=document.createElement('div')
 
 let photos=d.photos.map(x=>({url:x}));
 if(currentPage!=='shifts'){
-// Each of the five bottom-nav images can be chosen independently.
-{
-const panel=section('下部メニューバーのアイコン');
-const note=document.createElement('p');note.className='muted';note.textContent='新デザインを初期設定にしました。従来の6パターンからの選択や独自画像の登録もできます。5個を別々に変更できます。変更後は「すべての設定を保存」を押してください。';panel.append(note);
-d.navIcons=d.navIcons||{};
-const labels={home:'HOME',line:'LINE',x:'X',sub:'02',booking:'予約'};
-const sample=document.createElement('div');sample.style.cssText='display:flex;justify-content:space-between;gap:5px;background:#1b1520;padding:12px 5px;border-radius:14px';panel.append(sample);
-const previews={};
-for(const key of NAV_KEYS){const im=document.createElement('img');im.alt=labels[key];im.style.cssText='width:18%;aspect-ratio:1;object-fit:contain';sample.append(im);previews[key]=im}
-function refresh(){for(const key of NAV_KEYS)previews[key].src=navIconPath(key,d.navIcons[key])}
-const all=document.createElement('div');all.className='row';const allSelect=document.createElement('select');{let o=document.createElement('option');o.value='new';o.textContent='新デザイン（初期設定）';allSelect.append(o)}for(let i=1;i<=6;i++){let o=document.createElement('option');o.value=String(i);o.textContent='パターン '+i;allSelect.append(o)}const allBtn=document.createElement('button');allBtn.textContent='5個すべてに適用';allBtn.onclick=()=>{for(const key of NAV_KEYS)d.navIcons[key]=allSelect.value;panel.querySelectorAll('[data-icon-choice]').forEach(el=>el.value=allSelect.value);refresh()};all.append(allSelect,allBtn);panel.append(all);
-for(const key of NAV_KEYS){
- const item=document.createElement('div');item.className='item';const label=document.createElement('label');label.textContent=labels[key];item.append(label);
- const preview=document.createElement('img');preview.style.cssText='width:76px;height:76px;object-fit:contain;display:block;margin:8px auto';item.append(preview);
- const sel=document.createElement('select');sel.dataset.iconChoice=key;{let opt=document.createElement('option');opt.value='new';opt.textContent='新デザイン（初期設定）';sel.append(opt)}for(let i=1;i<=6;i++){let opt=document.createElement('option');opt.value=String(i);opt.textContent='パターン '+i;sel.append(opt)}let custom=document.createElement('option');custom.value='custom';custom.textContent='独自画像';sel.append(custom);
- const setting=d.navIcons[key]||'new';sel.value=setting.startsWith('custom:')?'custom':setting;
- const url=document.createElement('input');url.placeholder='画像URL（https://...）';url.value=setting.startsWith('custom:')&&setting.slice(7).startsWith('http')?setting.slice(7):'';
- function setPreview(){preview.src=navIconPath(key,d.navIcons[key]);refresh()}
- sel.onchange=()=>{if(sel.value==='custom'){d.navIcons[key]='custom:'+(url.value||'');}else d.navIcons[key]=sel.value;setPreview()};
- url.oninput=()=>{sel.value='custom';d.navIcons[key]='custom:'+url.value;setPreview()};
- const file=document.createElement('input');file.type='file';file.accept='image/png,image/jpeg,image/webp';file.onchange=()=>{const f=file.files?.[0];if(!f)return;const reader=new FileReader();reader.onload=()=>{const image=new Image();image.onload=()=>{const canvas=document.createElement('canvas');canvas.width=192;canvas.height=192;const ctx=canvas.getContext('2d');ctx.clearRect(0,0,192,192);const scale=Math.min(192/image.width,192/image.height);ctx.drawImage(image,(192-image.width*scale)/2,(192-image.height*scale)/2,image.width*scale,image.height*scale);d.navIcons[key]='custom:'+canvas.toDataURL('image/png');sel.value='custom';url.value='';setPreview()};image.src=reader.result};reader.readAsDataURL(f)};
- item.append(sel);const desc=document.createElement('p');desc.className='muted';desc.textContent='独自画像のURLまたは画像ファイルを指定';item.append(desc,url,file);panel.append(item);setPreview();
-}
-refresh();
-}
-
 let s; // 見出し言語設定は廃止
 s=section('OGP・SNS共有設定');{
  const note=document.createElement('p');note.className='muted';note.textContent='画像・タイトル・説明文を登録し、SNS共有カードの見た目を確認できます。【重要】このデモはブラウザ内保存のため、保存だけではX・LINEが取得する公開OGPは変わりません。公開反映にはサーバー側の更新機能が必要です。';s.append(note);
@@ -130,6 +104,40 @@ s=section('料金シミュレーター');check(s,'料金設定を公開する',d
 s=section('出張・交通費');check(s,'出張対応あり',d,'travelEnabled');selectfield(s,'交通費方式',d,'travelMode',[['area','エリア別'],['flat','一律'],['free','無料']]);textfield(s,'一律交通費（円）',d,'travelFlat','number');items(s,d.travelAreas,[['エリア名','name'],['交通費（円）','price','number']],()=>({name:'AREA',price:0}));
 s=section('LOCATION GUIDE');textfield(s,'セクション見出し',d,'locationTitle');items(s,d.areas,[['エリア名','name'],['形式','type','select',[['image','画像'],['map','Google Maps埋め込み']]],['画像URL','image'],['Google Maps埋め込みURL','map'],['表示','visible','checkbox']],()=>({name:'NEW AREA',type:'image',image:'',map:'',visible:true}));
 s=section('セクションの表示・並び順');let host=document.createElement('div');s.append(host);function drawSections(){host.innerHTML='';d.sections.forEach((id,i)=>{let r=document.createElement('div');r.className='row item';let name=SECTIONS.find(x=>x[0]===id)?.[1]||id;let c=document.createElement('input');c.type='checkbox';c.checked=!d.hidden.includes(id);c.style.flex='0 0 25px';c.onchange=()=>{d.hidden=d.hidden.filter(x=>x!==id);if(!c.checked)d.hidden.push(id)};let label=document.createElement('span');label.textContent=name;let up=document.createElement('button');up.textContent='↑';up.onclick=()=>{if(i){[d.sections[i-1],d.sections[i]]=[d.sections[i],d.sections[i-1]];drawSections()}};let down=document.createElement('button');down.textContent='↓';down.onclick=()=>{if(i<d.sections.length-1){[d.sections[i+1],d.sections[i]]=[d.sections[i],d.sections[i+1]];drawSections()}};r.append(c,label,up,down);host.append(r)})}drawSections();
+
+if(currentPage==='layout'){
+const decorations=section('見出し・装飾の設定');
+selectfield(decorations,'見出し装飾の配置',d,'headingDecoration',[['both','左右'],['left','左のみ'],['none','なし']]);
+check(decorations,'装飾キャラクターを表示',d,'decorationVisible');
+textfield(decorations,'装飾キャラクター画像URL',d,'decorationImage');
+selectfield(decorations,'区切り線',d,'dividerStyle',[['standard','標準'],['ornament','装飾'],['none','なし']]);
+}
+// Each of the five bottom-nav images can be chosen independently.
+{
+const panel=section('下部メニューバーのアイコン');
+const note=document.createElement('p');note.className='muted';note.textContent='新デザインを初期設定にしました。従来の6パターンからの選択や独自画像の登録もできます。5個を別々に変更できます。変更後は「すべての設定を保存」を押してください。';panel.append(note);
+d.navIcons=d.navIcons||{};
+const labels={home:'HOME',line:'LINE',x:'X',sub:'02',booking:'予約'};
+const sample=document.createElement('div');sample.style.cssText='display:flex;justify-content:space-between;gap:5px;background:#1b1520;padding:12px 5px;border-radius:14px';panel.append(sample);
+const previews={};
+for(const key of NAV_KEYS){const im=document.createElement('img');im.alt=labels[key];im.style.cssText='width:18%;aspect-ratio:1;object-fit:contain';sample.append(im);previews[key]=im}
+function refresh(){for(const key of NAV_KEYS)previews[key].src=navIconPath(key,d.navIcons[key])}
+const all=document.createElement('div');all.className='row';const allSelect=document.createElement('select');{let o=document.createElement('option');o.value='new';o.textContent='新デザイン（初期設定）';allSelect.append(o)}for(let i=1;i<=6;i++){let o=document.createElement('option');o.value=String(i);o.textContent='パターン '+i;allSelect.append(o)}const allBtn=document.createElement('button');allBtn.textContent='5個すべてに適用';allBtn.onclick=()=>{for(const key of NAV_KEYS)d.navIcons[key]=allSelect.value;panel.querySelectorAll('[data-icon-choice]').forEach(el=>el.value=allSelect.value);refresh()};all.append(allSelect,allBtn);panel.append(all);
+for(const key of NAV_KEYS){
+ const item=document.createElement('div');item.className='item';const label=document.createElement('label');label.textContent=labels[key];item.append(label);
+ const preview=document.createElement('img');preview.style.cssText='width:76px;height:76px;object-fit:contain;display:block;margin:8px auto';item.append(preview);
+ const sel=document.createElement('select');sel.dataset.iconChoice=key;{let opt=document.createElement('option');opt.value='new';opt.textContent='新デザイン（初期設定）';sel.append(opt)}for(let i=1;i<=6;i++){let opt=document.createElement('option');opt.value=String(i);opt.textContent='パターン '+i;sel.append(opt)}let custom=document.createElement('option');custom.value='custom';custom.textContent='独自画像';sel.append(custom);
+ const setting=d.navIcons[key]||'new';sel.value=setting.startsWith('custom:')?'custom':setting;
+ const url=document.createElement('input');url.placeholder='画像URL（https://...）';url.value=setting.startsWith('custom:')&&setting.slice(7).startsWith('http')?setting.slice(7):'';
+ function setPreview(){preview.src=navIconPath(key,d.navIcons[key]);refresh()}
+ sel.onchange=()=>{if(sel.value==='custom'){d.navIcons[key]='custom:'+(url.value||'');}else d.navIcons[key]=sel.value;setPreview()};
+ url.oninput=()=>{sel.value='custom';d.navIcons[key]='custom:'+url.value;setPreview()};
+ const file=document.createElement('input');file.type='file';file.accept='image/png,image/jpeg,image/webp';file.onchange=()=>{const f=file.files?.[0];if(!f)return;const reader=new FileReader();reader.onload=()=>{const image=new Image();image.onload=()=>{const canvas=document.createElement('canvas');canvas.width=192;canvas.height=192;const ctx=canvas.getContext('2d');ctx.clearRect(0,0,192,192);const scale=Math.min(192/image.width,192/image.height);ctx.drawImage(image,(192-image.width*scale)/2,(192-image.height*scale)/2,image.width*scale,image.height*scale);d.navIcons[key]='custom:'+canvas.toDataURL('image/png');sel.value='custom';url.value='';setPreview()};image.src=reader.result};reader.readAsDataURL(f)};
+ item.append(sel);const desc=document.createElement('p');desc.className='muted';desc.textContent='独自画像のURLまたは画像ファイルを指定';item.append(desc,url,file);panel.append(item);setPreview();
+}
+refresh();
+}
+
 }
 s=section('出勤カレンダー・一括設定');d.templates.forEach((t,i)=>{let x=document.createElement('div');x.className='item';textfield(x,'基本シフト '+(i+1)+' 名称',t,'name');textfield(x,'基本シフト '+(i+1)+' 時間',t,'time');s.append(x)});let nav=document.createElement('div');nav.className='row';s.append(nav);let prev=document.createElement('button'),next=document.createElement('button'),title=document.createElement('b');prev.textContent='← 前月';next.textContent='翌月 →';nav.append(prev,title,next);let grid=document.createElement('div');grid.className='dategrid';s.append(grid);function drawCalendar(){title.textContent=`${month.getFullYear()}年 ${month.getMonth()+1}月`;grid.innerHTML='';let last=new Date(month.getFullYear(),month.getMonth()+1,0).getDate();for(let day=1;day<=last;day++){let date=new Date(month.getFullYear(),month.getMonth(),day),key=dayKey(date),b=document.createElement('button');b.textContent=day;b.className=(selected.has(key)?'selected ':'')+(d.shifts[key]?'shift':'');b.title=d.soldout[key]?'完売':d.shifts[key]||'休み';b.onclick=()=>{if(selected.has(key))selected.delete(key);else selected.add(key);drawCalendar()};grid.append(b)}}prev.onclick=()=>{month.setMonth(month.getMonth()-1);drawCalendar()};next.onclick=()=>{month.setMonth(month.getMonth()+1);drawCalendar()};drawCalendar();let info=document.createElement('p');info.className='muted';info.textContent='日付を複数選択し、下の操作を適用できます。青枠は出勤登録済み。完売にしても勤務時間は保持します。';s.append(info);let custom=textfield(s,'個別の勤務時間（例：10:00–14:00）',{value:''},'value');let apply=(fn)=>{if(!selected.size){alert('日付を選択してください');return}selected.forEach(fn);selected.clear();drawCalendar()};[['シフトA',()=>apply(k=>d.shifts[k]=d.templates[0].time)],['シフトB',()=>apply(k=>d.shifts[k]=d.templates[1].time)],['指定時間',()=>apply(k=>d.shifts[k]=custom.value)],['休み',()=>apply(k=>{delete d.shifts[k];delete d.soldout[k]})],['完売ON',()=>apply(k=>d.soldout[k]=true)],['完売OFF',()=>apply(k=>delete d.soldout[k])]].forEach(([label,fn])=>{let b=document.createElement('button');b.textContent=label;b.onclick=fn;s.append(b)});
 function save(){d.headingLanguage='ja';d.photos=photos.map(x=>x.url).filter(Boolean);if(d.profileRows.length!==3){alert('PROFILEは3項目にしてください');return}if(d.pricePublished&&!d.courses.length){alert('料金公開にはコース登録が必要です');return}saveData(d);alert('保存しました。公開ページを再読み込みして確認してください。（このデモは同じブラウザ内で反映）')}
