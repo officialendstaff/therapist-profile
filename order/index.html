@@ -15,7 +15,10 @@ button,.btn{border:0;border-radius:11px;background:var(--pink);color:white;paddi
 </section>
 <section class="panel"><div class="num">02 / CUSTOMIZE</div><h2>ページのご要望</h2>
 <h3>① カラー</h3><div class="grid" id="colors"></div>
+<label for="colorReferenceUrl">その他の配色をご希望の場合：参考URL（任意）</label><input id="colorReferenceUrl" type="url" placeholder="https://...（希望する色合いが分かるページ）">
+<label for="colorNotes">希望する配色・備考（任意）</label><textarea id="colorNotes" placeholder="例：背景は黒、文字はゴールド、アクセントはワインレッド"></textarea>
 <h3 style="margin-top:26px">② 表記言語</h3><div class="grid" id="languages"></div>
+<div id="otherLanguageFields" class="hidden"><label for="otherLanguage">その他の希望言語</label><input id="otherLanguage" placeholder="例：中国語、タイ語、ベトナム語"></div>
 <h3 style="margin-top:26px">③ フォント</h3><p class="sub">選んだ言語に対応するフォントを表示します。</p><div class="grid" id="fonts"></div>
 <h3 style="margin-top:26px">④ 見出しの言葉の雰囲気</h3><p class="sub">本文の口調ではなく、NEWSなどのセクション見出しの表記です。</p>
 <div class="grid"><label class="pick"><input type="radio" name="tone" value="formal" checked>FORMAL<small id="formalExample"></small></label><label class="pick"><input type="radio" name="tone" value="frank">FRANK<small id="frankExample"></small></label></div>
@@ -58,12 +61,14 @@ const $=id=>document.getElementById(id);
 const palettes=[
 ["BABY PINK","#ff79b0","#ffd0e3","#fff6fa"],["BLACK PINK","#17141b","#ff5caa","#fff0f7"],["MILKY WHITE","#f5b9d4","#ffffff","#f8f5fb"],["LAVENDER","#a58bea","#e3d7ff","#faf6ff"],["KOREAN BLUE","#6f9ee9","#dbe8ff","#ffffff"],["CHERRY RED","#c9234c","#ffb7c8","#fff6f7"],["BUTTER YELLOW","#e6ad35","#ffe9a2","#fffdf2"],["MINT SODA","#35b8a8","#b8f2e9","#f4fffc"]];
 $("colors").innerHTML=palettes.map((p,i)=>`<label class="pick"><input type="radio" name="color" value="${p[0]}" ${i===0?"checked":""}><span class="choice-title">${p[0]}</span><span class="swatches">${p.slice(1).map(c=>`<i style="background:${c}"></i>`).join("")}</span></label>`).join("");
-const langs=[["ja","日本語"],["en","English"],["ko","한국어"]];
+const langs=[["ja","日本語"],["en","English"],["ko","한국어"],["other","その他"]];
 $("languages").innerHTML=langs.map((p,i)=>`<label class="pick"><input type="radio" name="language" value="${p[0]}" ${i===0?"checked":""}>${p[1]}</label>`).join("");
 const fontData={ja:[["ゴシック","'Yu Gothic',sans-serif","あなたの特別な時間"],["明朝","'Yu Mincho',serif","あなたの特別な時間"],["丸ゴシック","'Hiragino Maru Gothic ProN',sans-serif","あなたの特別な時間"]],en:[["Modern Sans","Arial,sans-serif","Your Special Moment"],["Elegant Serif","Georgia,serif","Your Special Moment"],["Classic","'Times New Roman',serif","Your Special Moment"]],ko:[["Modern","'Malgun Gothic',sans-serif","당신만의 특별한 시간"],["Classic","'Batang',serif","당신만의 특별한 시간"]]};
-const toneData={ja:["お知らせ","最近のできごと"],en:["NEWS","WHAT’S NEW"],ko:["공지사항","새로운 소식"]};
+fontData.other=[["ゴシック","Arial,sans-serif","Font preview"],["明朝","Georgia,serif","Font preview"],["丸ゴシック","sans-serif","Font preview"]];
+for(const lang of Object.keys(fontData)){const sample=lang==="ja"?"あなたの特別な時間":lang==="ko"?"당신만의 특별한 시간":lang==="en"?"Your Special Moment":"Font preview";fontData[lang].push(["手書き風","'Comic Sans MS','Segoe Print',cursive",sample])}
+const toneData={ja:["お知らせ","最近のできごと"],en:["NEWS","WHAT’S NEW"],ko:["공지사항","새로운 소식"],other:["NEWS","UPDATES"]};
 function selected(name){return document.querySelector(`input[name="${name}"]:checked`)?.value||""}
-function updateFonts(){let lang=selected("language");$("fonts").innerHTML=fontData[lang].map((f,i)=>`<label class="pick"><input type="radio" name="font" value="${f[0]}" ${i===0?"checked":""}>${f[0]}<span class="fontpreview" style="font-family:${f[1]}">${f[2]}</span></label>`).join("");$("formalExample").textContent=toneData[lang][0];$("frankExample").textContent=toneData[lang][1]}
+function updateFonts(){let lang=selected("language");$("otherLanguageFields").classList.toggle("hidden",lang!=="other");$("fonts").innerHTML=fontData[lang].map((f,i)=>`<label class="pick"><input type="radio" name="font" value="${f[0]}" ${i===0?"checked":""}>${f[0]}<span class="fontpreview" style="font-family:${f[1]}">${f[2]}</span></label>`).join("");$("formalExample").textContent=toneData[lang][0];$("frankExample").textContent=toneData[lang][1]}
 document.querySelectorAll('input[name="language"]').forEach(x=>x.addEventListener("change",updateFonts));updateFonts();
 document.querySelectorAll('input[name="character"]').forEach(x=>x.addEventListener("change",()=>$("characterFields").classList.toggle("hidden",selected("character")!=="yes")));
 const extras=[["og","OG画像の作成","缶コーヒー（ブラックに限る） 1本","can",1],["top","TOP画像の作成","コンビニコーヒー 1杯（LAWSON・セブンイレブン限定）","cup",1],["status","出勤画像の作成（出勤・休み・完売）","テリア・メンソール 1箱","tobacco",1],["calendar","カレンダー画像の作成","缶コーヒー（ブラックに限る） 1本","can",1],["sns","SNSアイコンの作成","テリア・メンソール 2箱","tobacco",2]];
@@ -73,7 +78,7 @@ function updatePrice(){let selected=chosenExtras(),count={can:0,cup:0,tobacco:0}
 document.querySelectorAll('input[name="extra"]').forEach(x=>x.addEventListener("change",updatePrice));updatePrice();
 function detailsText(){const e=chosenExtras();return [
 "【セラピスト個人ページ 制作依頼】","■ 基本制作費：1,100円（税込）","■ 運用費：0円（現時点）",
-"■ カラー："+selected("color"),"■ 表記言語："+langs.find(x=>x[0]===selected("language"))[1],"■ フォント："+selected("font"),
+"■ カラー："+selected("color"),"■ 配色参考URL："+($("colorReferenceUrl").value||"なし"),"■ 配色のご要望："+($("colorNotes").value||"なし"),"■ 表記言語："+(selected("language")==="other"?("その他："+($("otherLanguage").value||"未記入")):langs.find(x=>x[0]===selected("language"))[1]),"■ フォント："+selected("font"),
 "■ 見出し："+(selected("tone")==="formal"?"FORMAL":"FRANK"),
 "■ キャラ装飾："+(selected("character")==="yes"?"あり":"なし"),
 ...(selected("character")==="yes"?["掲載URL："+$("characterUrl").value,"希望キャラ："+$("characterName").value,"表現スタイル："+$("characterStyle").value,"装飾要望："+$("characterNotes").value]:[]),
