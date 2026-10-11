@@ -15,7 +15,7 @@ const ADMIN_PAGES=[
 const currentPage=new URLSearchParams(location.search).get('page')||'top';
 const PAGE_SECTIONS={
  basic:['HERO / NEWS / INTRODUCTION','PROFILE（右側3項目）'],
- news:[],images:['画像管理（URL指定）'],photos:['PHOTO（3:4）'],
+ news:['NEWS管理・お知らせ一覧'],images:['画像管理（URL指定）'],photos:['PHOTO（3:4）'],
  shifts:['出勤カレンダー・一括設定'],links:['リンク・URL一元管理'],
  booking:['姫予約フォームの項目','料金シミュレーター'],
  areas:['出張・交通費','LOCATION GUIDE'],
@@ -94,6 +94,14 @@ s=section('HERO / NEWS / INTRODUCTION');textfield(s,'お名前',d,'name');{
  modeWrap.append(modeLabel,sel,settings);s.append(modeWrap)
 }
 textfield(s,'PERSONAL（項目名・回答などの文章）',d,'personalText','textarea');textfield(s,'紹介文',d,'intro','textarea');
+s=section('NEWS管理・お知らせ一覧');{
+ const note=document.createElement('p');note.className='muted';note.textContent='新しいお知らせを先頭に表示します。重要設定をONにすると閲覧ページに「重要」と表示します。';s.append(note);
+ d.newsItems=Array.isArray(d.newsItems)?d.newsItems:[];
+ if(!d.newsItems.length&&d.news){d.newsItems.push({title:'お知らせ',body:d.news,date:new Date().toISOString().slice(0,10),important:false,visible:true})}
+ const list=document.createElement('div');s.append(list);
+ function drawNews(){list.replaceChildren();d.newsItems.forEach((item,i)=>{const box=document.createElement('div');box.className='item';textfield(box,'タイトル',item,'title');textfield(box,'日付',item,'date','date');textfield(box,'本文',item,'body','textarea');check(box,'重要なお知らせ',item,'important');check(box,'公開する',item,'visible');const del=document.createElement('button');del.className='secondary';del.textContent='削除';del.onclick=()=>{if(confirm('このお知らせを削除しますか？')){d.newsItems.splice(i,1);drawNews()}};box.append(del);list.append(box)})}
+ const add=document.createElement('button');add.textContent='＋ お知らせを追加';add.onclick=()=>{d.newsItems.unshift({title:'',body:'',date:new Date().toISOString().slice(0,10),important:false,visible:true});drawNews()};s.append(add);drawNews()
+}
 s=section('画像管理（URL指定）');[['hero','HERO 3:4'],['personal','PERSONAL 1:1'],['profile','PROFILE 3:4'],['calendar','CALENDAR 1:1'],['working','出勤画像 1:1'],['off','休み画像 1:1'],['soldout','完売画像 1:1']].forEach(([k,l])=>textfield(s,l,d.images,k));
 s=section('PHOTO（3:4）');let photos=d.photos.map(x=>({url:x}));items(s,photos,[['画像URL','url']],()=>({url:''}));
 s=section('PROFILE（右側3項目）');items(s,d.profileRows,[['項目名（6文字程度）','label'],['回答（10文字程度）','value']],()=>({label:'ITEM',value:''}),{limit:3});
