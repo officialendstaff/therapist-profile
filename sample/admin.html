@@ -16,7 +16,7 @@ const currentPage=new URLSearchParams(location.search).get('page')||'top';
 const PAGE_SECTIONS={
  basic:['HERO / NEWS / INTRODUCTION','PROFILE（右側3項目）'],
  news:['NEWS管理・お知らせ一覧'],images:['画像管理（ファイル登録）'],photos:['PHOTO（3:4）'],
- shifts:['出勤カレンダー・一括設定'],links:['リンク・URL一元管理'],
+ shifts:['出勤カレンダー・一括設定'],links:['SNS画像管理','リンク・URL一元管理'],
  booking:['姫予約フォームの項目','料金シミュレーター'],
  areas:['出張・交通費','LOCATION GUIDE'],
  layout:['セクションの表示・並び順','見出し・装飾の設定','下部メニューバーのアイコン'],
@@ -105,6 +105,21 @@ function drawPhotos(){gallery.replaceChildren();addLabel.textContent='＋ 写真
 const add=document.createElement('input');add.type='file';add.accept='image/*';add.multiple=true;add.setAttribute('aria-label','写真を追加');add.onchange=async()=>{for(const file of Array.from(add.files||[])){if(photos.length>=20){alert('PHOTOは最大20枚までです');break}try{photos.push({url:await photoFile(file)})}catch(e){alert(e.message)}}add.value='';drawPhotos()};const addLabel=document.createElement('label');addLabel.textContent='＋ 写真を追加（複数選択可）';s.append(addLabel,add);drawPhotos()
 }
 s=section('PROFILE（右側3項目）');items(s,d.profileRows,[['項目名（6文字程度）','label'],['回答（10文字程度）','value']],()=>({label:'ITEM',value:''}),{limit:3,fixed:true});
+s=section('SNS画像管理');{
+ const info=document.createElement('p');info.className='muted';info.textContent='ページ本文のSNSボタン用画像です。下部固定メニューのアイコンとは別管理です。リンク先URLは下の一括管理で設定します。画像は1:1推奨です。';s.append(info);
+ d.snsImages=d.snsImages||{};
+ const gallery=document.createElement('div');gallery.className='nav-icon-grid';s.append(gallery);
+ [['line','LINE'],['x','X'],['sub','02']].forEach(([key,name])=>{
+ const card=document.createElement('div');card.className='nav-icon-card';
+ const title=document.createElement('strong');title.textContent=name;
+ const img=document.createElement('img');img.alt=name+'のSNS画像';img.style.cssText='width:92px;height:92px;object-fit:contain';
+ const refresh=()=>{img.src=d.snsImages[key]||'assets/icons/new-'+key+'.png'};
+ const file=document.createElement('input');file.type='file';file.accept='image/png,image/jpeg,image/webp';file.setAttribute('aria-label',name+'の画像を登録・変更');
+ file.onchange=async()=>{const chosen=file.files?.[0];if(!chosen)return;if(!chosen.type.startsWith('image/')){alert('画像ファイルを選択してください');return}const url=URL.createObjectURL(chosen);try{const source=new Image();await new Promise((ok,ng)=>{source.onload=ok;source.onerror=ng;source.src=url});const canvas=document.createElement('canvas');canvas.width=256;canvas.height=256;const ctx=canvas.getContext('2d');const scale=Math.min(256/source.naturalWidth,256/source.naturalHeight);ctx.drawImage(source,(256-source.naturalWidth*scale)/2,(256-source.naturalHeight*scale)/2,source.naturalWidth*scale,source.naturalHeight*scale);d.snsImages[key]=canvas.toDataURL('image/png');refresh()}catch(e){alert('画像を読み込めませんでした')}finally{URL.revokeObjectURL(url)}};
+ const remove=document.createElement('button');remove.type='button';remove.className='secondary';remove.textContent='初期画像に戻す';remove.onclick=()=>{delete d.snsImages[key];file.value='';refresh()};
+ card.append(title,img,file,remove);gallery.append(card);refresh()
+ });
+}
 s=section('リンク・URL一元管理');{const p=document.createElement('p');p.className='muted';p.textContent='ここで変更したURLは、上部・下部SNS、固定ナビ、OFFICIAL、CONTACT、予約ポップアップなど同じリンクを使う全箇所に反映されます。※このデモでは同じブラウザ内で保存・反映されます。';s.append(p)}['line','x','sub'].forEach(k=>textfield(s,k==='sub'?'02 URL':k.toUpperCase()+' URL',d.sns,k));textfield(s,'店舗電話番号',d,'phone');textfield(s,'店舗公式LINE URL',d,'shopLine');textfield(s,'店舗公式HP URL',d,'official');textfield(s,'SNS移動前の注意喚起文',d,'snsWarning','textarea');
 s=section('姫予約フォームの項目');items(s,d.bookingFields,[['項目名','label'],['入力形式','type','select',[['text','テキスト'],['tel','電話番号'],['email','メール'],['date','日付'],['time','時刻'],['datetime-local','日時'],['number','数字'],['textarea','長文'],['select','選択式']]],['選択肢（選択式の場合は1行1項目）','options','textarea'],['必須','required','checkbox'],['表示','visible','checkbox']],()=>({label:'NEW FIELD',type:'text',required:false,visible:true,options:''}));
 s=section('料金シミュレーター');check(s,'料金設定を公開する',d,'pricePublished');items(s,d.courses,[['コース名','name'],['料金（円）','price','number']],()=>({name:'NEW COURSE',price:0}));items(s,d.extras,[['追加料金名','name'],['金額（円）','price','number']],()=>({name:'NEW FEE',price:0}));textfield(s,'消費税率（%）',d,'tax','number');check(s,'登録料金は税込',d,'taxIncluded');
