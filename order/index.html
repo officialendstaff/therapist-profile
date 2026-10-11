@@ -9,9 +9,9 @@ label{display:block;font-size:14px;font-weight:700;margin:17px 0 7px}input,texta
 button,.btn{border:0;border-radius:11px;background:var(--pink);color:white;padding:13px 17px;font:inherit;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block;text-align:center}button.secondary,.btn.secondary{background:#f8edf3;color:#a32d6a}.full{width:100%}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.pick{border:1px solid var(--line);border-radius:12px;padding:13px;cursor:pointer;background:white;display:block;margin:0}.pick:has(input:checked){border-color:var(--pink);background:#fff2f8;box-shadow:inset 0 0 0 1px var(--pink)}.pick input{width:auto;margin-right:7px;accent-color:var(--pink)}.pick small{display:block;color:var(--sub);font-weight:400;margin-left:22px}.swatches{display:flex;gap:4px;margin:8px 0}.swatches i{height:17px;width:32px;border-radius:5px;border:1px solid #0000000b}.choice-title{font-size:13px;font-weight:700}.fontpreview{display:block;font-size:20px;margin:6px 0}.phone{width:min(300px,100%);height:450px;border:9px solid #24222a;border-radius:35px;margin:16px auto;overflow:auto;background:white;box-shadow:0 15px 30px #0002}.phone .hero{height:240px;background:linear-gradient(155deg,#f2c6db,#fff1f8);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}.phone .hero b{font:italic 30px Georgia,serif;color:#7d365b}.phone .hero span{font-size:12px}.phone .sample{padding:20px 16px;text-align:center}.phone .sample strong{display:block;color:#ae5480;letter-spacing:.1em}.phone .sample p{font-size:12px}.phone .tile{background:#f9eff5;border-radius:9px;padding:16px;margin:12px 0;font-size:12px}.notice{background:#fff7fb;padding:13px;border-radius:10px;color:#6d5262;font-size:12px}.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:14px;margin:8px 0;cursor:pointer}.opt:has(input:checked){background:#fff2f8;border-color:var(--pink)}.opt input{width:auto;margin:5px 0;accent-color:var(--pink)}.opt span{flex:1}.opt small{display:block;color:var(--sub);font-size:12px}.summary{background:#fbf7fa;border-radius:14px;padding:18px}.line{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid #e9dfe6;font-size:14px}.line:last-child{border:0}.total{font-size:22px;font-weight:800}.coffee-line{align-items:center}.coffee-line span{white-space:nowrap;font-size:clamp(9px,2.7vw,14px);letter-spacing:-.035em}.coffee-line strong{white-space:nowrap;flex-shrink:0}.hidden{display:none}.sticky{position:sticky;bottom:8px;z-index:3;display:flex;gap:10px;background:#ffffffed;padding:10px;border:1px solid var(--line);border-radius:14px;backdrop-filter:blur(8px)}.sticky>*{flex:1}details{border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:8px}summary{cursor:pointer;font-weight:700}@media(max-width:480px){.panel{padding:18px}.grid{grid-template-columns:1fr 1fr}.sticky{bottom:0;border-radius:12px 12px 0 0}}
 </style></head><body><main>
 <header><small>MATTAN / WEB PRODUCTION</small><h1>セラピスト個人ページ<br>制作依頼</h1><p class="sub">あなた専用のページを、好きな雰囲気で。</p></header>
-<section class="panel"><div class="num">01 / SAMPLE</div><h2>完成イメージ</h2><p class="sub">スマートフォン型の表示部分は、構成説明用の簡易プレビューです。実際の納品ページの再現ではありません。</p>
-<div class="phone" aria-label="構成イメージ（スクロール可能）"><div class="hero"><span>THERAPIST PERSONAL PAGE</span><b>Your Name</b><span>OFFICIAL PAGE</span></div><div class="sample"><strong>NEWS</strong><div class="tile">最新のお知らせ</div><strong>PERSONAL</strong><div class="tile">あなたらしさを紹介</div><strong>PHOTO</strong><div class="tile">PHOTO GALLERY</div><strong>TODAY</strong><div class="tile">本日の出勤情報</div><strong>SCHEDULE</strong><div class="tile">出勤予定</div><strong>SIMULATOR</strong><div class="tile">料金シミュレーター</div><strong>PROFILE</strong><div class="tile">プロフィール</div></div></div>
-<p class="notice">実際の構成・機能は、下の西野さんの公開ページでご確認ください。</p><a id="sampleLink" class="btn secondary full hidden" target="_blank" rel="noopener">実際のサンプルページを見る ↗</a>
+<section class="panel"><div class="num">01 / SAMPLE</div><h2>完成イメージ</h2><p class="sub">確定済みサンプル閲覧ページを、そのまま表示しています。</p>
+<div class="phone" aria-label="確定済みサンプル閲覧ページ"><iframe title="セラピスト個人ページの実際のサンプル" src="https://officialendstaff.github.io/therapist-profile/sample/" loading="lazy" style="width:100%;height:100%;border:0;display:block" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+<p class="notice">こちらは確定済みのサンプル閲覧ページです。画面内をスクロールしてご確認いただけます。大きな画面で見る場合は下のリンクをご利用ください。</p><a id="sampleLink" class="btn secondary full" target="_blank" rel="noopener">実際のサンプルページを見る ↗</a>
 </section>
 <section class="panel"><div class="num">02 / CUSTOMIZE</div><h2>ページのご要望</h2>
 <h3>① カラー</h3><div class="grid" id="colors"></div>
@@ -29,7 +29,17 @@ button,.btn{border:0;border-radius:11px;background:var(--pink);color:white;paddi
 <section class="panel"><div class="num">03 / OPTIONAL</div><h2>別途制作希望</h2><p class="sub">必要な項目をタップしてください。複数選択できます。料金表はページ下部で自動更新されます。</p><div id="extras"></div>
 <label for="otherNotes">その他のご要望</label><textarea id="otherNotes" placeholder="制作についてのご要望があればご記入ください"></textarea>
 </section>
-<section class="panel" id="pricing"><div class="num">04 / ESTIMATE</div><h2>料金シミュレーション</h2><div class="summary">
+
+<section class="panel"><div class="num">04 / CONTACT</div><h2>要望を送信</h2>
+<label for="clientName">お名前・連絡先（任意）</label><input id="clientName" placeholder="お名前・LINE名など">
+<label for="currentUrl">現在掲載されているHPのURL</label><input id="currentUrl" type="url" placeholder="https://..."><p class="sub">現在在籍している店舗のセラピスト紹介ページなどをご入力ください。</p>
+<div class="notice" style="margin-top:18px"><strong>SNSアカウントの初期設定について</strong><p style="margin:6px 0 0">LINE・公式LINE・X・02のIDやURLは、ページ完成後にご自身の管理ページから登録・変更することも可能です。制作時に初期設定をご希望の場合は、以下にIDまたはURLをご入力ください。</p></div>
+<label for="snsLine">LINEのURL（任意）</label><input id="snsLine" type="url" placeholder="https://line.me/..."><label for="snsOfficialLine">公式LINEのIDまたはURL（任意）</label><input id="snsOfficialLine" placeholder="@xxxx または https://..."><label for="snsX">XのIDまたはURL（任意）</label><input id="snsX" placeholder="@xxxx または https://x.com/..."><label for="sns02">02のIDまたはURL（任意）</label><input id="sns02" placeholder="@xxxx または https://...">
+<p class="notice">「要望をコピーする」を押した後、末端興業LINEを開き、トークに貼り付けて送信してください。LINEへの自動送信ではありません。</p>
+<button class="full" id="copy">要望をコピーする</button><p id="copyMessage" class="sub" role="status"></p>
+<a class="btn secondary full hidden" id="lineLink" target="_blank" rel="noopener">末端興業LINEを開く ↗</a>
+</section>
+<section class="panel" id="pricing"><div class="num">05 / ESTIMATE</div><h2>料金シミュレーション</h2><div class="summary">
 <div class="line"><span>ページ作成費（税込）</span><strong>1,100円</strong></div>
 <div class="line"><span>ページ運用費（現時点）</span><strong>0円</strong></div>
 <h3 style="margin-top:18px">選択した別途制作</h3><div id="selectedExtras" class="sub">選択なし</div>
@@ -40,19 +50,10 @@ button,.btn{border:0;border-radius:11px;background:var(--pink);color:white;paddi
 <div class="line"><span>基本制作費（税込）</span><strong class="total">1,100円</strong></div></div>
 <p class="sub">別途制作は現物での対価表記です。基本制作費への金額換算・加算は行っていません。</p>
 </section>
-<section class="panel"><div class="num">05 / CONTACT</div><h2>要望を送信</h2>
-<label for="clientName">お名前・連絡先（任意）</label><input id="clientName" placeholder="お名前・LINE名など">
-<label for="currentUrl">現在掲載されているHPのURL</label><input id="currentUrl" type="url" placeholder="https://..."><p class="sub">現在在籍している店舗のセラピスト紹介ページなどをご入力ください。</p>
-<div class="notice" style="margin-top:18px"><strong>SNSアカウントの初期設定について</strong><p style="margin:6px 0 0">LINE・公式LINE・X・02のIDやURLは、ページ完成後にご自身の管理ページから登録・変更することも可能です。制作時に初期設定をご希望の場合は、以下にIDまたはURLをご入力ください。</p></div>
-<label for="snsLine">LINEのURL（任意）</label><input id="snsLine" type="url" placeholder="https://line.me/..."><label for="snsOfficialLine">公式LINEのIDまたはURL（任意）</label><input id="snsOfficialLine" placeholder="@xxxx または https://..."><label for="snsX">XのIDまたはURL（任意）</label><input id="snsX" placeholder="@xxxx または https://x.com/..."><label for="sns02">02のIDまたはURL（任意）</label><input id="sns02" placeholder="@xxxx または https://...">
-<p class="notice">「要望をコピーする」を押した後、末端興業LINEを開き、トークに貼り付けて送信してください。LINEへの自動送信ではありません。</p>
-<button class="full" id="copy">要望をコピーする</button><p id="copyMessage" class="sub" role="status"></p>
-<a class="btn secondary full hidden" id="lineLink" target="_blank" rel="noopener">末端興業LINEを開く ↗</a>
-</section>
 <div class="sticky"><button class="secondary" id="goPricing">料金を確認</button><button id="goContact">要望を送信</button></div>
 </main><script>
 "use strict";
-const CONFIG={sampleUrl:"https://officialendstaff.github.io/therapist-profile/nishino/",lineUrl:"https://line.me/ti/p/uKmprFU_PS"}; // 公開前に実際のURLを設定
+const CONFIG={sampleUrl:"https://officialendstaff.github.io/therapist-profile/sample/",lineUrl:"https://line.me/ti/p/uKmprFU_PS"}; // 公開前に実際のURLを設定
 const $=id=>document.getElementById(id);
 const palettes=[
 ["BABY PINK","#ff79b0","#ffd0e3","#fff6fa"],["BLACK PINK","#17141b","#ff5caa","#fff0f7"],["MILKY WHITE","#f5b9d4","#ffffff","#f8f5fb"],["LAVENDER","#a58bea","#e3d7ff","#faf6ff"],["KOREAN BLUE","#6f9ee9","#dbe8ff","#ffffff"],["CHERRY RED","#c9234c","#ffb7c8","#fff6f7"],["BUTTER YELLOW","#e6ad35","#ffe9a2","#fffdf2"],["MINT SODA","#35b8a8","#b8f2e9","#f4fffc"]];
