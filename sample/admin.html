@@ -1,6 +1,46 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>セラピスト管理｜デモ</title><style>:root{--accent:#ff5caa}*{box-sizing:border-box}body{margin:0;background:#151119;color:#fff0f7;font:14px 'Yu Gothic',sans-serif}main{max-width:700px;margin:auto;padding:16px 16px 90px}h1{font-size:23px}h2{font-size:17px;color:#ff9ccf}section{background:#29212f;border:1px solid #60415b;border-radius:15px;padding:17px;margin:16px 0}.item{background:#1d1723;border-radius:11px;padding:12px;margin:10px 0;border:1px solid #443346}label{display:block;margin:9px 0 4px;font-weight:600}input,select,textarea{width:100%;background:#151119;color:#fff;border:1px solid #70526b;border-radius:8px;padding:10px;font:inherit}textarea{min-height:65px}input[type=checkbox]{width:auto;transform:scale(1.2);margin:9px}button,a.btn{border:0;background:var(--accent);color:#211322;padding:10px 13px;border-radius:9px;font-weight:bold;cursor:pointer;margin:5px 5px 5px 0;text-decoration:none;display:inline-block}button.secondary{background:#544056;color:#fff}.muted{font-size:12px;color:#c8afc2;line-height:1.7}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.sticky{position:sticky;bottom:0;background:#151119ef;padding:12px;border-top:1px solid #77506c;z-index:4}.dategrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.dategrid button{font-size:11px;margin:0;padding:10px 2px;background:#46344b;color:#fff}.dategrid button.selected{background:#ff5caa;color:#211322}.dategrid button.shift{border:2px solid #72b5f2}.small{font-size:12px}</style></head><body><main><h1>あなたの管理ページ <span class="small">DEMO</span></h1><p class="muted">元のHTMLをベースにした改修版です。データはこのブラウザ内にのみ保存されます。ログイン認証・Supabase同期・サーバーへの画像アップロードは未実装です。下部アイコンはブラウザ内に画像を保存できます。初期状態に写真・文章・料金・出勤・エリアのサンプルデータを登録済みです。画像は外部のサンプル写真URLで指定しています。変更内容はこのブラウザ内で保存されます。</p><a class="btn" href="index.html">公開ページを見る</a><div id="root"></div><div class="sticky"><button onclick="save()">すべての設定を保存</button><button class="secondary" onclick="if(confirm('初期化しますか？')){localStorage.removeItem(KEY);location.reload()}">初期化</button></div></main><script src="shared.js"></script><script>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>セラピスト管理｜デモ</title><style>:root{--accent:#ff5caa}*{box-sizing:border-box}body{margin:0;background:#151119;color:#fff0f7;font:14px 'Yu Gothic',sans-serif}main{max-width:700px;margin:auto;padding:16px 16px 90px}h1{font-size:23px}h2{font-size:17px;color:#ff9ccf}section{background:#29212f;border:1px solid #60415b;border-radius:15px;padding:17px;margin:16px 0}.item{background:#1d1723;border-radius:11px;padding:12px;margin:10px 0;border:1px solid #443346}label{display:block;margin:9px 0 4px;font-weight:600}input,select,textarea{width:100%;background:#151119;color:#fff;border:1px solid #70526b;border-radius:8px;padding:10px;font:inherit}textarea{min-height:65px}input[type=checkbox]{width:auto;transform:scale(1.2);margin:9px}button,a.btn{border:0;background:var(--accent);color:#211322;padding:10px 13px;border-radius:9px;font-weight:bold;cursor:pointer;margin:5px 5px 5px 0;text-decoration:none;display:inline-block}button.secondary{background:#544056;color:#fff}.muted{font-size:12px;color:#c8afc2;line-height:1.7}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.sticky{position:sticky;bottom:0;background:#151119ef;padding:12px;border-top:1px solid #77506c;z-index:4}.dategrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.dategrid button{font-size:11px;margin:0;padding:10px 2px;background:#46344b;color:#fff}.dategrid button.selected{background:#ff5caa;color:#211322}.dategrid button.shift{border:2px solid #72b5f2}.small{font-size:12px}.dashboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:18px 0}.dashboard-item{position:relative;min-height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center;background:#29212f;border:1px solid #60415b;border-radius:16px;padding:16px 9px;color:#fff0f7;text-decoration:none}.dashboard-item:active{background:#403047}.dashboard-item strong{font-size:14px}.dashboard-item small{font-size:10px;color:#c8afc2;line-height:1.5}.dash-num{position:absolute;top:10px;right:12px;color:#c8afc2;font-size:10px}.dash-icon{display:grid;place-items:center;width:53px;height:53px;background:#443044;color:#ff8dc3;border-radius:14px;font-size:30px}.sticky[hidden]{display:none}.btn.secondary{background:#544056;color:#fff}</style></head><body><main><h1>あなたの管理ページ <span class="small">DEMO</span></h1><p class="muted">元のHTMLをベースにした改修版です。データはこのブラウザ内にのみ保存されます。ログイン認証・Supabase同期・サーバーへの画像アップロードは未実装です。下部アイコンはブラウザ内に画像を保存できます。初期状態に写真・文章・料金・出勤・エリアのサンプルデータを登録済みです。画像は外部のサンプル写真URLで指定しています。変更内容はこのブラウザ内で保存されます。</p><a class="btn" href="index.html">公開ページを見る</a><div id="root"></div><div class="sticky"><button onclick="save()">すべての設定を保存</button><button class="secondary" onclick="if(confirm('初期化しますか？')){localStorage.removeItem(KEY);location.reload()}">初期化</button></div></main><script src="shared.js"></script><script>
 let d=getData(),root=document.getElementById('root'),selected=new Set(),month=new Date();month.setDate(1);
-function section(title){let s=document.createElement('section');s.innerHTML='<h2>'+title+'</h2>';root.append(s);return s}
+const ADMIN_PAGES=[
+ ['basic','基本情報','user-round','名前・HERO・PERSONAL・INTRO・PROFILE'],
+ ['news','NEWS管理','megaphone','お知らせの作成・編集'],
+ ['images','画像管理','images','HERO・PERSONAL・出勤画像'],
+ ['photos','PHOTO管理','camera','写真の追加・並び替え'],
+ ['shifts','出勤管理','calendar-days','シフト・休み・完売'],
+ ['links','SNS・URL管理','link','個人SNS・店舗連絡先'],
+ ['booking','予約・料金管理','calendar-check','フォーム・料金'],
+ ['areas','エリア管理','map-pin','アクセス・交通費'],
+ ['layout','ページ構成管理','layout-template','表示順・メニュー画像'],
+ ['ogp','OGP設定','share-2','共有画像・タイトル']
+];
+const currentPage=new URLSearchParams(location.search).get('page')||'top';
+const PAGE_SECTIONS={
+ basic:['HERO / NEWS / INTRODUCTION','PROFILE（右側3項目）'],
+ news:[],images:['画像管理（URL指定）'],photos:['PHOTO（3:4）'],
+ shifts:['出勤カレンダー・一括設定'],links:['リンク・URL一元管理'],
+ booking:['姫予約フォームの項目','料金シミュレーター'],
+ areas:['出張・交通費','LOCATION GUIDE'],
+ layout:['下部メニューバーのアイコン','セクションの表示・並び順'],
+ ogp:['OGP・SNS共有設定']
+};
+const pageInfo=ADMIN_PAGES.find(x=>x[0]===currentPage);
+const header=document.querySelector('h1');
+const sticky=document.querySelector('.sticky');
+const originalIntro=document.querySelector('main > p.muted');
+const originalViewLink=document.querySelector('main > a.btn');
+if(currentPage==='top'){
+ header.textContent='あなたの管理ページ';
+ sticky.hidden=true;originalIntro.hidden=true;
+ root.innerHTML='<p class="muted">変更する項目を選択してください。</p>';
+ const grid=document.createElement('div');grid.className='dashboard';
+ ADMIN_PAGES.forEach(([id,title,icon,desc],i)=>{const a=document.createElement('a');a.className='dashboard-item';a.href='admin.html?page='+id;a.innerHTML='<span class="dash-num">'+String(i+1).padStart(2,'0')+'</span><span class="dash-icon">'+({basic:'♙',news:'✦',images:'▧',photos:'▣',shifts:'▦',links:'↗',booking:'▤',areas:'⌖',layout:'☷',ogp:'◇'}[id])+'</span><strong>'+title+'</strong><small>'+desc+'</small>';grid.append(a)});
+ root.append(grid);
+}else{
+ if(!pageInfo){location.replace('admin.html')}
+ header.textContent=pageInfo?pageInfo[1]:'管理ページ';
+ originalIntro.hidden=true;originalViewLink.insertAdjacentHTML('beforebegin','<a class="btn secondary" href="admin.html">← 管理TOPへ戻る</a>');
+}
+
+function section(title){let s=document.createElement('section');s.innerHTML='<h2>'+title+'</h2>';if(currentPage!=='top'&&(PAGE_SECTIONS[currentPage]||[]).includes(title))root.append(s);return s}
 function textfield(parent,label,obj,key,type='text'){let l=document.createElement('label');l.textContent=label;let input=document.createElement(type==='textarea'?'textarea':'input');if(type!=='textarea')input.type=type;input.value=obj[key]??'';input.oninput=()=>obj[key]=type==='number'?Number(input.value):input.value;parent.append(l,input);return input}
 function check(parent,label,obj,key){let l=document.createElement('label'),i=document.createElement('input');i.type='checkbox';i.checked=!!obj[key];i.onchange=()=>obj[key]=i.checked;l.append(i,' '+label);parent.append(l);return i}
 function selectfield(parent,label,obj,key,options){let l=document.createElement('label'),sel=document.createElement('select');l.textContent=label;options.forEach(([value,name])=>{let o=document.createElement('option');o.value=value;o.textContent=name;sel.append(o)});sel.value=obj[key]||options[0][0];sel.onchange=()=>obj[key]=sel.value;parent.append(l,sel)}
@@ -32,7 +72,7 @@ for(const key of NAV_KEYS){
 refresh();
 }
 
-let s=section('見出しの言語設定');selectfield(s,'各セクションのタイトルのみ切り替え（本文・ボタン・入力欄は変更しない）',d,'headingLanguage',[['ja','日本語'],['en','English'],['ko','한국어']]);
+let s; // 見出し言語設定は廃止
 s=section('OGP・SNS共有設定');{
  const note=document.createElement('p');note.className='muted';note.textContent='画像・タイトル・説明文を登録し、SNS共有カードの見た目を確認できます。【重要】このデモはブラウザ内保存のため、保存だけではX・LINEが取得する公開OGPは変わりません。公開反映にはサーバー側の更新機能が必要です。';s.append(note);
  textfield(s,'共有タイトル',d.ogp,'title');
@@ -46,7 +86,14 @@ s=section('OGP・SNS共有設定');{
  const reset=document.createElement('button');reset.className='secondary';reset.textContent='OG画像を解除';reset.onclick=()=>{d.ogp.image='';imageUrl.value='';upload.value='';draw()};s.append(reset);
  const hint=document.createElement('p');hint.className='muted';hint.textContent='推奨：1200×630px、JPGまたはPNG、2MB以下。ローカル画像は他の端末やSNSには配信されません。';s.append(hint);draw();
 }
-s=section('HERO / NEWS / INTRODUCTION');textfield(s,'お名前',d,'name');textfield(s,'HEROキャッチコピー',d,'catch');textfield(s,'NEWS',d,'news','textarea');textfield(s,'紹介文',d,'intro','textarea');
+s=section('HERO / NEWS / INTRODUCTION');textfield(s,'お名前',d,'name');{
+ const modeWrap=document.createElement('div');modeWrap.className='item';const modeLabel=document.createElement('label');modeLabel.textContent='HEROの文字表示';const sel=document.createElement('select');
+ [['image','画像内の文字を使用（初期設定）'],['text','テキストを重ねて表示'],['none','文字を表示しない']].forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;sel.append(o)});
+ d.heroTextMode=d.heroTextMode||'image';sel.value=d.heroTextMode;sel.onchange=()=>{d.heroTextMode=sel.value;settings.hidden=sel.value!=='text'};
+ const settings=document.createElement('div');settings.hidden=d.heroTextMode!=='text';textfield(settings,'キャッチコピー',d,'catch');textfield(settings,'文字サイズ（px）',d,'heroTextSize','number');textfield(settings,'文字色（例：#ffffff）',d,'heroTextColor');selectfield(settings,'文字の位置',d,'heroTextPosition',[['bottom','下'],['center','中央'],['top','上']]);
+ modeWrap.append(modeLabel,sel,settings);s.append(modeWrap)
+}
+textfield(s,'PERSONAL（項目名・回答などの文章）',d,'personalText','textarea');textfield(s,'紹介文',d,'intro','textarea');
 s=section('画像管理（URL指定）');[['hero','HERO 3:4'],['personal','PERSONAL 1:1'],['profile','PROFILE 3:4'],['calendar','CALENDAR 1:1'],['working','出勤画像 1:1'],['off','休み画像 1:1'],['soldout','完売画像 1:1']].forEach(([k,l])=>textfield(s,l,d.images,k));
 s=section('PHOTO（3:4）');let photos=d.photos.map(x=>({url:x}));items(s,photos,[['画像URL','url']],()=>({url:''}));
 s=section('PROFILE（右側3項目）');items(s,d.profileRows,[['項目名（6文字程度）','label'],['回答（10文字程度）','value']],()=>({label:'ITEM',value:''}),{limit:3});
@@ -57,5 +104,5 @@ s=section('出張・交通費');check(s,'出張対応あり',d,'travelEnabled');
 s=section('LOCATION GUIDE');textfield(s,'セクション見出し',d,'locationTitle');items(s,d.areas,[['エリア名','name'],['形式','type','select',[['image','画像'],['map','Google Maps埋め込み']]],['画像URL','image'],['Google Maps埋め込みURL','map'],['表示','visible','checkbox']],()=>({name:'NEW AREA',type:'image',image:'',map:'',visible:true}));
 s=section('セクションの表示・並び順');let host=document.createElement('div');s.append(host);function drawSections(){host.innerHTML='';d.sections.forEach((id,i)=>{let r=document.createElement('div');r.className='row item';let name=SECTIONS.find(x=>x[0]===id)?.[1]||id;let c=document.createElement('input');c.type='checkbox';c.checked=!d.hidden.includes(id);c.style.flex='0 0 25px';c.onchange=()=>{d.hidden=d.hidden.filter(x=>x!==id);if(!c.checked)d.hidden.push(id)};let label=document.createElement('span');label.textContent=name;let up=document.createElement('button');up.textContent='↑';up.onclick=()=>{if(i){[d.sections[i-1],d.sections[i]]=[d.sections[i],d.sections[i-1]];drawSections()}};let down=document.createElement('button');down.textContent='↓';down.onclick=()=>{if(i<d.sections.length-1){[d.sections[i+1],d.sections[i]]=[d.sections[i],d.sections[i+1]];drawSections()}};r.append(c,label,up,down);host.append(r)})}drawSections();
 s=section('出勤カレンダー・一括設定');d.templates.forEach((t,i)=>{let x=document.createElement('div');x.className='item';textfield(x,'基本シフト '+(i+1)+' 名称',t,'name');textfield(x,'基本シフト '+(i+1)+' 時間',t,'time');s.append(x)});let nav=document.createElement('div');nav.className='row';s.append(nav);let prev=document.createElement('button'),next=document.createElement('button'),title=document.createElement('b');prev.textContent='← 前月';next.textContent='翌月 →';nav.append(prev,title,next);let grid=document.createElement('div');grid.className='dategrid';s.append(grid);function drawCalendar(){title.textContent=`${month.getFullYear()}年 ${month.getMonth()+1}月`;grid.innerHTML='';let last=new Date(month.getFullYear(),month.getMonth()+1,0).getDate();for(let day=1;day<=last;day++){let date=new Date(month.getFullYear(),month.getMonth(),day),key=dayKey(date),b=document.createElement('button');b.textContent=day;b.className=(selected.has(key)?'selected ':'')+(d.shifts[key]?'shift':'');b.title=d.soldout[key]?'完売':d.shifts[key]||'休み';b.onclick=()=>{if(selected.has(key))selected.delete(key);else selected.add(key);drawCalendar()};grid.append(b)}}prev.onclick=()=>{month.setMonth(month.getMonth()-1);drawCalendar()};next.onclick=()=>{month.setMonth(month.getMonth()+1);drawCalendar()};drawCalendar();let info=document.createElement('p');info.className='muted';info.textContent='日付を複数選択し、下の操作を適用できます。青枠は出勤登録済み。完売にしても勤務時間は保持します。';s.append(info);let custom=textfield(s,'個別の勤務時間（例：10:00–14:00）',{value:''},'value');let apply=(fn)=>{if(!selected.size){alert('日付を選択してください');return}selected.forEach(fn);selected.clear();drawCalendar()};[['シフトA',()=>apply(k=>d.shifts[k]=d.templates[0].time)],['シフトB',()=>apply(k=>d.shifts[k]=d.templates[1].time)],['指定時間',()=>apply(k=>d.shifts[k]=custom.value)],['休み',()=>apply(k=>{delete d.shifts[k];delete d.soldout[k]})],['完売ON',()=>apply(k=>d.soldout[k]=true)],['完売OFF',()=>apply(k=>delete d.soldout[k])]].forEach(([label,fn])=>{let b=document.createElement('button');b.textContent=label;b.onclick=fn;s.append(b)});
-function save(){d.photos=photos.map(x=>x.url).filter(Boolean);if(d.profileRows.length!==3){alert('PROFILEは3項目にしてください');return}if(d.pricePublished&&!d.courses.length){alert('料金公開にはコース登録が必要です');return}saveData(d);alert('このブラウザに保存しました。公開ページを再読み込みして確認してください。')}
+function save(){d.headingLanguage='ja';d.photos=photos.map(x=>x.url).filter(Boolean);if(d.profileRows.length!==3){alert('PROFILEは3項目にしてください');return}if(d.pricePublished&&!d.courses.length){alert('料金公開にはコース登録が必要です');return}saveData(d);alert('保存しました。公開ページを再読み込みして確認してください。（このデモは同じブラウザ内で反映）')}
 </script></body></html>
