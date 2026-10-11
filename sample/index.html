@@ -60,6 +60,32 @@ function applyHeadingLanguage(lang){
 }
 applyHeadingLanguage(['ja','en','ko'].includes(cfg.headingLanguage)?cfg.headingLanguage:'ja');
 $('menuPanel').onclick=e=>{if(e.target.tagName==='A')$('menuPanel').hidden=true};
-function modal(title,html){$('modalTitle').textContent=title;$('modalBody').innerHTML=html;$('modal').hidden=false}function go(key){let val=key==='line'||key==='x'||key==='sub'?cfg.sns[key]:cfg[key];if(!val){modal('ただいま準備中です','<p>すみません💦</p>');return}if(key==='phone'){location.href='tel:'+val.replace(/[^+0-9]/g,'');return}try{let u=new URL(val);if(!['https:','http:'].includes(u.protocol))throw Error();window.open(u.href,'_blank','noopener,noreferrer')}catch{modal('ただいま準備中です','<p>すみません💦</p>')}}
-document.querySelectorAll('[data-sns]').forEach(e=>e.onclick=()=>go(e.dataset.sns));document.querySelectorAll('[data-go]').forEach(e=>e.onclick=()=>go(e.dataset.go));$('bookingNav').onclick=()=>modal('ご予約','<button class="btn" onclick="go(\'phone\')">お店に電話</button><button class="btn outline" onclick="go(\'shopLine\')">お店にLINE</button>');$('closeModal').onclick=()=>$('modal').hidden=true;$('modal').onclick=e=>{if(e.target===$('modal'))$('modal').hidden=true};document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('modal').hidden=true;$('menuPanel').hidden=true}});
+function modal(title,html){$('modalTitle').textContent=title;$('modalBody').innerHTML=html;$('modal').hidden=false}
+function closeModal(){$('modal').hidden=true}
+function go(key){
+ const val=linkValue(cfg,key);
+ if(!val){modal('ただいま準備中です','<p>リンクは現在準備中です。</p>');return}
+ if(key==='phone'){location.href='tel:'+String(val).replace(/[^+0-9]/g,'');return}
+ const url=externalUrl(val);
+ if(!url){modal('リンクを確認してください','<p>管理ページのURL設定を確認してください。</p>');return}
+ if(['line','x','sub'].includes(key)){
+   modal('外部サイトへ移動します','');
+   const p=document.createElement('p');p.textContent=cfg.snsWarning||'外部のSNSサイトへ移動します。リンク先をご確認ください。';
+   const cancel=document.createElement('button');cancel.type='button';cancel.className='btn outline';cancel.textContent='キャンセル';cancel.onclick=closeModal;
+   const proceed=document.createElement('a');proceed.className='btn';proceed.textContent='移動する';proceed.href=url;proceed.target='_blank';proceed.rel='noopener noreferrer';proceed.onclick=closeModal;
+   $('modalBody').replaceChildren(p,cancel,proceed);return;
+ }
+ window.open(url,'_blank','noopener,noreferrer');
+}
+document.querySelectorAll('[data-sns]').forEach(e=>e.onclick=()=>go(e.dataset.sns));
+document.querySelectorAll('[data-go]').forEach(e=>e.onclick=()=>go(e.dataset.go));
+$('bookingNav').onclick=()=>{
+ modal('ご予約','');
+ const phone=document.createElement('button');phone.type='button';phone.className='btn';phone.textContent='お店に電話';phone.onclick=()=>go('phone');
+ const line=document.createElement('button');line.type='button';line.className='btn outline';line.textContent='お店にLINE';line.onclick=()=>go('shopLine');
+ $('modalBody').replaceChildren(phone,line);
+};
+$('closeModal').onclick=closeModal;
+$('modal').onclick=e=>{if(e.target===$('modal'))closeModal()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();$('menuPanel').hidden=true}});
 </script></body></html>
