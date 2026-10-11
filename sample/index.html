@@ -10,7 +10,14 @@
 .menu-toggle{z-index:51;touch-action:manipulation}
 .menu-panel{z-index:50}
 .menu-panel:not([hidden]){display:block}
-.bottom button{border:0!important;background:transparent!important;box-shadow:none!important;overflow:hidden}.bottom button img{display:block;width:100%;height:100%;object-fit:contain}.bottom{background:#1d1621f2!important}.bottom button:focus-visible{outline:2px solid #ff5caa;outline-offset:2px}</style></head><body><div class="app"><section class="hero" id="home"><img class="hero-photo" id="heroImage" alt="メイン"><div class="hero-inner"><div class="small">セラピスト個人ページ・サンプル</div><h1 id="heroName">TEST</h1><p id="heroCatch"></p></div></section>
+.bottom button{border:0!important;background:transparent!important;box-shadow:none!important;overflow:hidden}.bottom button img{display:block;width:100%;height:100%;object-fit:contain}.bottom{background:#1d1621f2!important}.bottom button:focus-visible{outline:2px solid #ff5caa;outline-offset:2px}
+/* Mobile form: prevent iOS focus zoom and horizontal viewport drift */
+html,body{max-width:100%;overflow-x:clip}
+.app,.card,#bookingFields{min-width:0;max-width:100%}
+.field,.field input,.field select,.field textarea{min-width:0;max-width:100%;box-sizing:border-box}
+.field input,.field select,.field textarea,.price input,.price select{font-size:16px!important}
+.field input:focus,.field select:focus,.field textarea:focus{scroll-margin-inline:0}
+</style></head><body><div class="app"><section class="hero" id="home"><img class="hero-photo" id="heroImage" alt="メイン"><div class="hero-inner"><div class="small">セラピスト個人ページ・サンプル</div><h1 id="heroName">TEST</h1><p id="heroCatch"></p></div></section>
 <div class="card" id="news"><h2>NEWS</h2><div class="notice" id="newsText"></div></div>
 <div class="card" id="sns"><h2>SNS</h2><div class="sns"><button data-sns="line"><b>LINE</b></button><button data-sns="x"><b>𝕏</b></button><button data-sns="sub"><b>02</b></button></div></div>
 <div class="card" id="personal"><h2>PERSONAL</h2><img class="media-square" id="personalImage" alt="パーソナル画像"></div>
