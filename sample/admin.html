@@ -33,6 +33,19 @@ refresh();
 }
 
 let s=section('見出しの言語設定');selectfield(s,'各セクションのタイトルのみ切り替え（本文・ボタン・入力欄は変更しない）',d,'headingLanguage',[['ja','日本語'],['en','English'],['ko','한국어']]);
+s=section('OGP・SNS共有設定');{
+ const note=document.createElement('p');note.className='muted';note.textContent='画像・タイトル・説明文を登録し、SNS共有カードの見た目を確認できます。【重要】このデモはブラウザ内保存のため、保存だけではX・LINEが取得する公開OGPは変わりません。公開反映にはサーバー側の更新機能が必要です。';s.append(note);
+ textfield(s,'共有タイトル',d.ogp,'title');
+ textfield(s,'共有説明文',d.ogp,'description','textarea');
+ const imageUrl=textfield(s,'OG画像URL（公開されたhttps画像URL）',d.ogp,'image');
+ const upload=document.createElement('input');upload.type='file';upload.accept='image/jpeg,image/png,image/webp';const label=document.createElement('label');label.textContent='画像ファイルを選択（プレビュー用・公開アップロードではありません）';s.append(label,upload);
+ const preview=document.createElement('div');preview.className='item';const im=document.createElement('img');im.style.cssText='width:100%;aspect-ratio:1200/630;object-fit:contain;background:#110e14;border-radius:8px';const t=document.createElement('b'),desc=document.createElement('p');desc.className='muted';preview.append(im,t,desc);s.append(preview);
+ function draw(){im.src=d.ogp.image||demoImage('OG IMAGE','wide');t.textContent=d.ogp.title||'（タイトル未設定）';desc.textContent=d.ogp.description||'（説明文未設定）'}
+ imageUrl.addEventListener('input',draw);s.querySelectorAll('input,textarea').forEach(el=>el.addEventListener('input',draw));
+ upload.onchange=()=>{const file=upload.files?.[0];if(!file)return;if(file.size>2*1024*1024){alert('2MB以下の画像を選択してください');upload.value='';return}const reader=new FileReader();reader.onload=()=>{d.ogp.image=String(reader.result);imageUrl.value='';draw()};reader.readAsDataURL(file)};
+ const reset=document.createElement('button');reset.className='secondary';reset.textContent='OG画像を解除';reset.onclick=()=>{d.ogp.image='';imageUrl.value='';upload.value='';draw()};s.append(reset);
+ const hint=document.createElement('p');hint.className='muted';hint.textContent='推奨：1200×630px、JPGまたはPNG、2MB以下。ローカル画像は他の端末やSNSには配信されません。';s.append(hint);draw();
+}
 s=section('HERO / NEWS / INTRODUCTION');textfield(s,'お名前',d,'name');textfield(s,'HEROキャッチコピー',d,'catch');textfield(s,'NEWS',d,'news','textarea');textfield(s,'紹介文',d,'intro','textarea');
 s=section('画像管理（URL指定）');[['hero','HERO 3:4'],['personal','PERSONAL 1:1'],['profile','PROFILE 3:4'],['calendar','CALENDAR 1:1'],['working','出勤画像 1:1'],['off','休み画像 1:1'],['soldout','完売画像 1:1']].forEach(([k,l])=>textfield(s,l,d.images,k));
 s=section('PHOTO（3:4）');let photos=d.photos.map(x=>({url:x}));items(s,photos,[['画像URL','url']],()=>({url:''}));
