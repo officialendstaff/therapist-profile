@@ -60,12 +60,26 @@ if(!cfg.pricePublished||!cfg.courses.length){$('price').hidden=true}else{ $('cou
 $('guideAreas').innerHTML=cfg.areas.filter(a=>a.visible).map(a=>`<div class="field"><h3>${esc(a.name)}</h3>${a.type==='map'&&/^https:\/\/www\.google\.com\/maps\/embed/.test(a.map||'')?`<iframe class="guide-map" src="${esc(a.map)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`:`<img class="guide-img" src="${esc(a.image||demoImage(a.name,'wide'))}" alt="${esc(a.name)}">`}</div>`).join('');
 const order=['home',...cfg.sections.filter(id=>SECTIONS.some(s=>s[0]===id))];let app=document.querySelector('.app'),foot=app.querySelector('.foot');cfg.sections.forEach(id=>{let e=$(id);if(e)app.insertBefore(e,foot)});cfg.hidden.forEach(id=>{if($(id))$(id).hidden=true});if(!cfg.pricePublished||!cfg.courses.length)$('price').hidden=true;
 function applyHeadingLanguage(lang){
- document.documentElement.lang='ja';
- for(const id of Object.keys(HEADING_TRANSLATIONS)){const section=$(id),heading=section?.querySelector('h2');if(heading)heading.textContent=headingText(id,lang)}
- $('menuPanel').innerHTML='<a href="#home">ホーム</a>'+cfg.sections.filter(id=>$(id)&&!$(id).hidden).map(id=>`<a href="#${id}">${esc(headingText(id,'ja'))}</a>`).join('');
+ document.documentElement.lang=['ja','en','ko'].includes(lang)?lang:'ja';
+ for(const id of Object.keys(HEADING_TRANSLATIONS)){
+  const section=$(id),heading=section?.querySelector('h2');
+  if(heading)heading.textContent=(cfg.sectionTitles&&cfg.sectionTitles[id])||headingText(id,lang);
+ }
+ refreshMenuTitles();
+}
+function refreshMenuTitles(){
+ const menu=$('menuPanel');menu.replaceChildren();
+ const home=document.createElement('a');home.href='#home';home.textContent=(cfg.sectionTitles&&cfg.sectionTitles.home)||'HOME';menu.append(home);
+ const ids=Array.isArray(cfg.sections)?cfg.sections:[];
+ for(const id of ids){
+  const section=$(id);if(!section||section.hidden)continue;
+  const heading=section.querySelector('h2');
+  const label=heading?.textContent?.trim()||(cfg.sectionTitles&&cfg.sectionTitles[id])||headingText(id,cfg.headingLanguage||'ja');
+  const link=document.createElement('a');link.href='#'+id;link.textContent=label;menu.append(link)
+ }
 }
 applyHeadingLanguage(['ja','en','ko'].includes(cfg.headingLanguage)?cfg.headingLanguage:'ja');
-$('menuPanel').onclick=e=>{if(e.target.tagName==='A')$('menuPanel').hidden=true};
+$('menuPanel').onclick=e=>{if(e.target.closest('a')){$('menuPanel').hidden=true;$('menuToggle').textContent='☰';$('menuToggle').setAttribute('aria-expanded','false')}};
 function modal(title,html){$('modalTitle').textContent=title;$('modalBody').innerHTML=html;$('modal').hidden=false}
 function closeModal(){$('modal').hidden=true}
 function go(key){
