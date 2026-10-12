@@ -99,7 +99,7 @@ function go(key){
  if(!url){modal('リンクを確認してください','<p>管理ページのURL設定を確認してください。</p>');return}
  if(['line','x','sub'].includes(key)){
    modal('外部サイトへ移動します','');
-   const p=document.createElement('p');p.textContent=cfg.snsWarning||'外部のSNSサイトへ移動します。リンク先をご確認ください。';p.style.whiteSpace='pre-wrap';
+   const p=document.createElement('p');p.textContent=cfg.snsWarning||'外部のSNSサイトへ移動します。リンク先をご確認ください。';p.style.whiteSpace='pre-wrap';p.style.textAlign='left';
    const cancel=document.createElement('button');cancel.type='button';cancel.className='btn outline';cancel.textContent='キャンセル';cancel.onclick=closeModal;
    const proceed=document.createElement('a');proceed.className='btn';proceed.textContent='移動する';proceed.href=url;proceed.target='_blank';proceed.rel='noopener noreferrer';proceed.onclick=closeModal;
    $('modalBody').replaceChildren(p,cancel,proceed);return;
