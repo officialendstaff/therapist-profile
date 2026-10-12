@@ -47,11 +47,10 @@ try {const remote=await reiSampleReadPublished(reiSampleClient());if(!remote){do
 for(const key of NAV_KEYS){const icon=document.querySelector('[data-nav-icon="'+key+'"]');if(icon)icon.src=navIconPath(key,(cfg.navIcons||{})[key])}
 const $=id=>document.getElementById(id);function image(id,url,label,ratio){$(id).src=url||demoImage(label,ratio)}
 $('heroName').textContent=cfg.name;
-const heroUsesImage=(cfg.heroTextMode||'image')==='image';
-$('heroName').hidden=heroUsesImage;
+$('heroName').hidden=!(cfg.heroNameVisible!==undefined?cfg.heroNameVisible:cfg.heroTextMode==='text');
 $('heroSubtitle').hidden=true;
 $('heroCatch').textContent=cfg.catch;
-$('heroCatch').hidden=(cfg.heroTextMode||'image')!=='text';
+$('heroCatch').hidden=true;
 if(!$('heroCatch').hidden){$('heroCatch').style.fontSize=(Math.max(10,Math.min(60,Number(cfg.heroTextSize)||16)))+'px';$('heroCatch').style.color=/^#[0-9a-f]{6}$/i.test(cfg.heroTextColor||'')?cfg.heroTextColor:'#ffffff';$('heroCatch').style.order=cfg.heroTextPosition==='top'?-1:0}
 const publishedNews=(Array.isArray(cfg.newsItems)?cfg.newsItems:[]).filter(n=>n.visible!==false);
 if(publishedNews.length){$('newsText').replaceChildren();publishedNews.forEach(n=>{const block=document.createElement('div');block.style.cssText='padding:9px 0;border-bottom:1px solid #563448';const title=document.createElement('strong');title.textContent=(n.important?'【重要】':'')+(n.title||'お知らせ');const date=document.createElement('small');date.style.cssText='display:block;color:#c5acbd';date.textContent=n.date||'';const body=document.createElement('p');body.style.whiteSpace='pre-wrap';body.textContent=n.body||'';block.append(title,date,body);if(n.image){const photo=document.createElement('img');photo.src=n.image;photo.alt=(n.title||'お知らせ')+'の画像';photo.loading='lazy';photo.style.cssText='display:block;width:100%;max-width:460px;height:auto;border-radius:10px;margin:12px 0';block.append(photo)}$('newsText').append(block)})}else $('newsText').textContent=Array.isArray(cfg.newsItems)&&cfg.newsItems.length?'現在、公開中のお知らせはありません。':(cfg.news||'現在、公開中のお知らせはありません。');
