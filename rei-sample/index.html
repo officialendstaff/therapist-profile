@@ -85,9 +85,9 @@ if(cfg.travelEnabled){$('travel').innerHTML=cfg.travelMode==='area'?cfg.travelAr
 const calc=()=>{
 const course=cfg.courses[Number($('course').value)]||{price:0};
 const extra=[...document.querySelectorAll('[data-extra]:checked')].reduce((sum,e)=>sum+Number(cfg.extras[Number(e.dataset.extra)]?.price||0),0);
-const nomination=show('priceShowNomination')?Number(cfg.priceNomination||0):0;
-const special=show('priceShowSpecial')?Number(cfg.priceSpecial||0):0;
-const travel=show('priceShowTravel')&&cfg.travelEnabled?(cfg.travelMode==='free'?0:cfg.travelMode==='flat'?Number(cfg.travelFlat||0):Number(cfg.travelAreas[Number($('travel').value)]?.price||0)):0;
+const nomination=Number(cfg.priceNomination||0);
+const special=Number(cfg.priceSpecial||0);
+const travel=cfg.travelEnabled?(cfg.travelMode==='free'?0:cfg.travelMode==='flat'?Number(cfg.travelFlat||0):Number(cfg.travelAreas[Number($('travel').value)]?.price||0)):0;
 const coursePrice=Number(course.price||0);
 const sub=coursePrice+extra+nomination+special+travel;
 const total=cfg.taxIncluded?sub:Math.round(sub*(1+Number(cfg.tax||0)/100));
