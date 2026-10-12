@@ -31,7 +31,7 @@ body{background:#0d0b0f;color:#fff0f7;font-family:Georgia,'Times New Roman',seri
 <div class="card" id="schedule-detail"><h2>SCHEDULE</h2><div class="schedule" id="scheduleRows"></div></div>
 <div class="card" id="calendar-section"><h2>CALENDAR</h2><img class="media-square" id="calendarImage" alt="カレンダー"></div>
 <div class="card" id="hime"><h2>PRIVATE ご予約</h2><div id="bookingFields"></div><button class="btn outline" id="copyBooking">予約内容をコピー</button></div>
-<div class="card" id="price"><h2>PRICE SIMULATOR</h2><div class="field"><label>コース<select id="course"></select></label></div><div id="extras"></div><div class="field" id="travelWrap"><label>交通費<select id="travel"></select></label></div><div class="total" id="total"></div><p class="smallnote" id="breakdown"></p></div>
+<div class="card" id="price"><h2>PRICE SIMULATOR</h2><div class="field" id="courseWrap"><label>コース<select id="course"></select></label></div><div id="extras"></div><div class="field" id="nominationWrap"><label>指名料</label><div id="nominationValue"></div></div><div class="field" id="specialWrap"><label>特別指名料</label><div id="specialValue"></div></div><div class="field" id="travelWrap"><label>交通費<select id="travel"></select></label></div><div id="totalWrap"><div class="total" id="total"></div><p class="smallnote" id="breakdown"></p></div><p class="smallnote" id="priceCaution" style="white-space:pre-wrap"></p><p id="priceNotes" style="white-space:pre-wrap"></p></div>
 <div class="card" id="location"><h2 id="locationTitle">LOCATION GUIDE</h2><div id="guideAreas"></div></div>
 <div class="card" id="profile"><h2>PROFILE</h2><div class="profile-flex"><img id="profileImage" alt="プロフィール"><div class="profile-rows" id="profileRows"></div></div></div>
 <div class="card" id="official"><h2>OFFICIAL</h2><button class="btn outline" data-go="official">店舗公式ページを見る</button></div>
@@ -65,7 +65,37 @@ window.addEventListener('storage',event=>{if(event.key===KEY)location.reload()})
 let renderedShiftDay=dayKey(new Date());setInterval(()=>{if(dayKey(new Date())!==renderedShiftDay)location.reload()},60000);
 $('bookingFields').innerHTML=cfg.bookingFields.filter(f=>f.visible).map((f,i)=>{let name=esc(f.label);let control=f.type==='select'?`<select data-label="${name}" ${f.required?'required':''}><option value="">選択してください</option>${(f.options||'').split('\n').filter(Boolean).map(o=>`<option>${esc(o)}</option>`).join('')}</select>`:f.type==='textarea'?`<textarea data-label="${name}" ${f.required?'required':''}></textarea>`:`<input data-label="${name}" type="${['text','tel','date','time','datetime-local','email','number'].includes(f.type)?f.type:'text'}" ${f.required?'required':''}>`;return `<div class="field"><label>${name}${f.required?' *':''}</label>${control}</div>`}).join('');
 $('copyBooking').onclick=async()=>{let nodes=[...document.querySelectorAll('#bookingFields [data-label]')],missing=nodes.find(n=>n.required&&!n.value.trim());if(missing){missing.focus();alert('入力してください：'+missing.dataset.label);return}let text=nodes.map(n=>n.dataset.label+': '+n.value).join('\n');try{await navigator.clipboard.writeText(text);alert('コピーしました')}catch{alert('コピーできませんでした')}};
-if(!cfg.pricePublished||!cfg.courses.length){$('price').hidden=true}else{ $('course').innerHTML=cfg.courses.map((x,i)=>`<option value="${i}">${esc(x.name)} — ¥${Number(x.price).toLocaleString()}</option>`).join('');$('extras').innerHTML=cfg.extras.map((x,i)=>`<label class="field" style="display:block"><input type="checkbox" data-extra="${i}" style="width:auto"> ${esc(x.name)} — ¥${Number(x.price).toLocaleString()}</label>`).join('');$('travelWrap').hidden=!cfg.travelEnabled;if(cfg.travelEnabled){$('travel').innerHTML=cfg.travelMode==='area'?cfg.travelAreas.map((x,i)=>`<option value="${i}">${esc(x.name)} — ¥${Number(x.price).toLocaleString()}</option>`).join(''):'<option value="0">'+(cfg.travelMode==='free'?'FREE':'FLAT FEE')+'</option>'}let calc=()=>{let course=cfg.courses[+$('course').value]||{price:0},extra=[...document.querySelectorAll('[data-extra]:checked')].reduce((s,e)=>s+Number(cfg.extras[+e.dataset.extra]?.price||0),0),travel=!cfg.travelEnabled||cfg.travelMode==='free'?0:cfg.travelMode==='flat'?Number(cfg.travelFlat):Number(cfg.travelAreas[+$('travel').value]?.price||0),sub=Number(course.price)+extra+travel,total=cfg.taxIncluded?sub:Math.round(sub*(1+Number(cfg.tax)/100));$('total').textContent='¥'+total.toLocaleString();$('breakdown').textContent=`Course ¥${course.price} / Extras ¥${extra} / Travel ¥${travel} / Tax ${cfg.taxIncluded?'included':cfg.tax+'%'}`};$('price').addEventListener('change',calc);calc()}
+if(!cfg.pricePublished||!cfg.courses.length){$('price').hidden=true}else{
+const show=(key)=>cfg[key]!==false;
+$('courseWrap').hidden=!show('priceShowCourse');
+$('nominationWrap').hidden=!show('priceShowNomination');
+$('specialWrap').hidden=!show('priceShowSpecial');
+$('totalWrap').hidden=!show('priceShowTotal');
+$('priceCaution').hidden=!show('priceShowCaution');
+$('priceNotes').hidden=!show('priceShowNotes')||!cfg.priceNotes;
+$('priceCaution').textContent=cfg.priceCaution||'※表示金額は目安です。実際の料金と異なる場合があります。';
+$('priceNotes').textContent=cfg.priceNotes||'';
+const money=n=>'¥'+(Number(n)||0).toLocaleString();
+$('nominationValue').textContent=money(cfg.priceNomination);
+$('specialValue').textContent=money(cfg.priceSpecial);
+$('course').innerHTML=cfg.courses.map((x,i)=>`<option value="${i}">${esc(x.name)} — ${money(x.price)}</option>`).join('');
+$('extras').innerHTML=cfg.extras.map((x,i)=>`<label class="field" style="display:block"><input type="checkbox" data-extra="${i}" style="width:auto"> ${esc(x.name)} — ${money(x.price)}</label>`).join('');
+$('travelWrap').hidden=!show('priceShowTravel')||!cfg.travelEnabled;
+if(cfg.travelEnabled){$('travel').innerHTML=cfg.travelMode==='area'?cfg.travelAreas.map((x,i)=>`<option value="${i}">${esc(x.name)} — ${money(x.price)}</option>`).join(''):'<option value="0">'+(cfg.travelMode==='free'?'無料':'一律交通費')+'</option>'}
+const calc=()=>{
+const course=cfg.courses[Number($('course').value)]||{price:0};
+const extra=[...document.querySelectorAll('[data-extra]:checked')].reduce((sum,e)=>sum+Number(cfg.extras[Number(e.dataset.extra)]?.price||0),0);
+const nomination=show('priceShowNomination')?Number(cfg.priceNomination||0):0;
+const special=show('priceShowSpecial')?Number(cfg.priceSpecial||0):0;
+const travel=show('priceShowTravel')&&cfg.travelEnabled?(cfg.travelMode==='free'?0:cfg.travelMode==='flat'?Number(cfg.travelFlat||0):Number(cfg.travelAreas[Number($('travel').value)]?.price||0)):0;
+const coursePrice=Number(course.price||0);
+const sub=coursePrice+extra+nomination+special+travel;
+const total=cfg.taxIncluded?sub:Math.round(sub*(1+Number(cfg.tax||0)/100));
+$('total').textContent=money(total);
+$('breakdown').textContent=['コース '+money(coursePrice),...(extra?['追加料金 '+money(extra)]:[]),...(show('priceShowNomination')?['指名料 '+money(nomination)]:[]),...(show('priceShowSpecial')?['特別指名料 '+money(special)]:[]),...(show('priceShowTravel')?['交通費 '+money(travel)]:[]),'消費税 '+(cfg.taxIncluded?'税込':String(cfg.tax)+'%')].join(' / ');
+};
+$('price').addEventListener('change',calc);calc();
+}
 $('guideAreas').innerHTML=cfg.areas.filter(a=>a.visible).map(a=>`<div class="field"><h3>${esc(a.name)}</h3>${a.type==='map'&&/^https:\/\/www\.google\.com\/maps\/embed/.test(a.map||'')?`<iframe class="guide-map" src="${esc(a.map)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`:`<img class="guide-img" src="${esc(a.image||demoImage(a.name,'wide'))}" alt="${esc(a.name)}">`}</div>`).join('');
 const order=['home',...cfg.sections.filter(id=>SECTIONS.some(s=>s[0]===id))];let app=document.querySelector('.app'),foot=app.querySelector('.foot');cfg.sections.forEach(id=>{let e=$(id);if(e)app.insertBefore(e,foot)});cfg.hidden.forEach(id=>{if($(id))$(id).hidden=true});if(!cfg.pricePublished||!cfg.courses.length)$('price').hidden=true;
 function applyHeadingLanguage(lang){
