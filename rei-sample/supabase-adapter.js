@@ -36,4 +36,7 @@ async function reiSampleSaveOwner(client,config){
     .eq('therapist_key',REI_SAMPLE_DB.therapistKey).select('therapist_key');
   if(error)throw error;
   if(data?.length!==1)throw new Error('更新件数を確認できませんでした');
+  const {data:check,error:checkError}=await client.from(REI_SAMPLE_DB.table).select('config').eq('therapist_key',REI_SAMPLE_DB.therapistKey).single();
+  if(checkError)throw new Error('保存後の読み取り確認に失敗しました：'+checkError.message);
+  if(JSON.stringify(check?.config?.areas??[])!==JSON.stringify(config.areas??[]))throw new Error('エリア設定の保存内容が一致しません。再読み込み前に管理者へ確認してください');
 }
