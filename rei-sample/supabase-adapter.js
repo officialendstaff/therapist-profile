@@ -14,7 +14,7 @@ function reiSampleClient(){
 async function reiSampleReadPublished(client){
   const {data,error}=await client.from(REI_SAMPLE_DB.table)
     .select('config').eq('therapist_key',REI_SAMPLE_DB.therapistKey)
-    .eq('published',true).maybeSingle();
+    .maybeSingle();
   if(error)throw error;
   return data?.config??null;
 }
