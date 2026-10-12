@@ -139,7 +139,7 @@ s=section('HERO / NEWS / INTRODUCTION');textfield(s,'お名前',d,'name');{
  y.onchange=()=>{if(y.checked)d.heroNameVisible=true};n.onchange=()=>{if(n.checked)d.heroNameVisible=false};
  yes.append(y,' 表示する');no.append(n,' 表示しない');row.append(label,yes,no);s.append(row);
 }
-textfield(s,'PERSONAL（項目名・回答などの文章）',d,'personalText','textarea');textfield(s,'紹介文',d,'intro','textarea');
+textfield(s,'紹介文',d,'intro','textarea');
 s=section('NEWS管理・お知らせ一覧');{
  const note=document.createElement('p');note.className='muted';note.textContent='新規NEWSは先頭に追加します。↑↓で公開ページの表示順を変更できます。非公開のNEWSも一覧に残ります。';s.append(note);
  d.newsItems=Array.isArray(d.newsItems)?d.newsItems:[];
