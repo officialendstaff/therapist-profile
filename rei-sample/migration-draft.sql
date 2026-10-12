@@ -4,6 +4,7 @@ create table if not exists public.therapist_sample_pages (
   therapist_key text primary key,
   owner_uid uuid not null references auth.users(id),
   config jsonb not null default '{}'::jsonb,
+  published boolean not null default false,
   updated_at timestamptz not null default now(),
   constraint therapist_sample_pages_key_check check (therapist_key ~ '^[a-z0-9_-]+$')
 );
@@ -12,7 +13,7 @@ alter table public.therapist_sample_pages enable row level security;
 -- Restrict draft data (including personal contact details) from anonymous access.
 create policy "Public read published therapist pages"
 on public.therapist_sample_pages for select to anon
-using (coalesce((config->>'published')::boolean,false));
+using (published = true);
 create policy "Owners read their pages"
 on public.therapist_sample_pages for select to authenticated
 using (owner_uid = (select auth.uid()));
