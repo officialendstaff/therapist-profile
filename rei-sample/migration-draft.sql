@@ -18,9 +18,7 @@ create policy "Owners read their pages"
 on public.therapist_sample_pages for select to authenticated
 using (owner_uid = (select auth.uid()));
 -- WARNING: Do not apply the INSERT policy below until ownership provisioning is redesigned.
-create policy "Owners insert their pages"
-on public.therapist_sample_pages for insert to authenticated
-with check (owner_uid = (select auth.uid()));
+-- Only an authorized administrator provisions therapist ownership.
 create policy "Owners update their pages"
 on public.therapist_sample_pages for update to authenticated
 using (owner_uid = (select auth.uid()))
