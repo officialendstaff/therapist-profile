@@ -19,3 +19,5 @@ create policy "Therapist owner update"
  using (owner_uid = (select auth.uid()))
  with check (owner_uid = (select auth.uid()));
 -- No client INSERT or DELETE policy. Admin provisions owner_uid.
+-- Before execution, check whether these policies already exist: repeated CREATE POLICY fails.
+-- Never run this file against an unverified Supabase project.
