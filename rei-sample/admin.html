@@ -129,11 +129,15 @@ s=section('OGP・SNS共有設定');{
  const hint=document.createElement('p');hint.className='muted';hint.textContent='推奨：1200×630px、JPGまたはPNG。登録した画像はデモ版ではこのブラウザ内に保存され、SNSには直接配信されません。';s.append(hint);draw();
 }
 s=section('HERO / NEWS / INTRODUCTION');textfield(s,'お名前',d,'name');{
- const modeWrap=document.createElement('div');modeWrap.className='item';const modeLabel=document.createElement('label');modeLabel.textContent='HEROの文字表示';const sel=document.createElement('select');
- [['image','画像内の文字を使用（初期設定）'],['text','テキストを重ねて表示'],['none','文字を表示しない']].forEach(([v,t])=>{const o=document.createElement('option');o.value=v;o.textContent=t;sel.append(o)});
- d.heroTextMode=d.heroTextMode||'image';sel.value=d.heroTextMode;sel.onchange=()=>{d.heroTextMode=sel.value;settings.hidden=sel.value!=='text'};
- const settings=document.createElement('div');settings.hidden=d.heroTextMode!=='text';textfield(settings,'キャッチコピー',d,'catch');textfield(settings,'文字サイズ（px）',d,'heroTextSize','number');textfield(settings,'文字色（例：#ffffff）',d,'heroTextColor');selectfield(settings,'文字の位置',d,'heroTextPosition',[['bottom','下'],['center','中央'],['top','上']]);
- modeWrap.append(modeLabel,sel,settings);s.append(modeWrap)
+ const row=document.createElement('div');row.className='item';
+ const label=document.createElement('label');label.textContent='HEROに名前を表示';
+ const yes=document.createElement('label'),no=document.createElement('label');
+ yes.style.display=no.style.display='inline-flex';yes.style.alignItems=no.style.alignItems='center';yes.style.marginRight='20px';
+ const y=document.createElement('input'),n=document.createElement('input');y.type=n.type='radio';y.name=n.name='hero-name-visible';y.value='yes';n.value='no';
+ const visible=d.heroNameVisible!==undefined?d.heroNameVisible:d.heroTextMode==='text';
+ y.checked=!!visible;n.checked=!visible;
+ y.onchange=()=>{if(y.checked)d.heroNameVisible=true};n.onchange=()=>{if(n.checked)d.heroNameVisible=false};
+ yes.append(y,' 表示する');no.append(n,' 表示しない');row.append(label,yes,no);s.append(row);
 }
 textfield(s,'PERSONAL（項目名・回答などの文章）',d,'personalText','textarea');textfield(s,'紹介文',d,'intro','textarea');
 s=section('NEWS管理・お知らせ一覧');{
