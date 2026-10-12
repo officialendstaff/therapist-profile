@@ -132,8 +132,8 @@ s=section('HERO / NEWS / INTRODUCTION');textfield(s,'お名前',d,'name');{
  const row=document.createElement('div');row.className='item';
  const label=document.createElement('label');label.textContent='HEROに名前を表示';
  const yes=document.createElement('label'),no=document.createElement('label');
- yes.style.display=no.style.display='inline-flex';yes.style.alignItems=no.style.alignItems='center';yes.style.marginRight='20px';
- const y=document.createElement('input'),n=document.createElement('input');y.type=n.type='radio';y.name=n.name='hero-name-visible';y.value='yes';n.value='no';
+ yes.style.cssText=no.style.cssText='display:inline-flex;align-items:center;gap:7px;margin:8px 20px 8px 0;width:auto;white-space:nowrap;cursor:pointer';
+ const y=document.createElement('input'),n=document.createElement('input');y.type=n.type='radio';y.name=n.name='hero-name-visible';y.value='yes';n.value='no';y.style.cssText=n.style.cssText='width:18px;height:18px;min-width:18px;flex:0 0 18px;margin:0;transform:none';
  const visible=d.heroNameVisible!==undefined?d.heroNameVisible:d.heroTextMode==='text';
  y.checked=!!visible;n.checked=!visible;
  y.onchange=()=>{if(y.checked)d.heroNameVisible=true};n.onchange=()=>{if(n.checked)d.heroNameVisible=false};
