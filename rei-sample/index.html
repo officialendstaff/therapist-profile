@@ -155,4 +155,19 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closePhotoLightbox(
 
 }
 initReiViewer().catch(console.error);
+async function trackReiSampleAccess(){
+ try{
+  const p=new URLSearchParams(location.search),ref=document.referrer||'';
+  const raw=(p.get('utm_source')||'').toLowerCase();
+  const sources={x:'X',line:'LINE',instagram:'Instagram',google:'Google',chatgpt:'ChatGPT','02':'02'};
+  let source=sources[raw]||raw;
+  if(!source){if(/x\\.com|twitter\\.com/i.test(ref))source='X';else if(/line\\.me|line\\.naver/i.test(ref))source='LINE';else if(/instagram\\.com/i.test(ref))source='Instagram';else if(/google\\./i.test(ref))source='Google';else if(/chatgpt\\.com|openai\\.com/i.test(ref))source='ChatGPT';else source=ref?'その他':'直接'}
+  let visitorId;try{visitorId=localStorage.getItem('lg_visit_id');if(!visitorId){visitorId=crypto.randomUUID?crypto.randomUUID():String(Date.now())+'-'+Math.random();localStorage.setItem('lg_visit_id',visitorId)}}catch(_){visitorId='session-'+Date.now()}
+  const payload={page_key:'rei-sample',page_name:'麗サンプル',path:location.pathname,source,utm_medium:p.get('utm_medium')||'',utm_campaign:p.get('utm_campaign')||'',referrer:ref,device:/Mobi|Android|iPhone/i.test(navigator.userAgent)?'mobile':(/iPad|Tablet/i.test(navigator.userAgent)?'tablet':'pc'),visitor_id:visitorId};
+  const res=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/rest/v1/staff_access_logs',{method:'POST',headers:{apikey:'sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos',Authorization:'Bearer sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos','Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify(payload),keepalive:true});
+  if(!res.ok)console.error('REI SAMPLE ACCESS TRACK ERROR',res.status);
+ }catch(e){console.error('REI SAMPLE ACCESS TRACK ERROR',e)}
+}
+trackReiSampleAccess();
+
 </script></body></html>
