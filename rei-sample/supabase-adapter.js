@@ -24,15 +24,15 @@ async function reiSampleReadOwner(client){
   const {data,error}=await client.from(REI_SAMPLE_DB.table)
     .select('config,owner_uid,published').eq('therapist_key',REI_SAMPLE_DB.therapistKey).maybeSingle();
   if(error)throw error;
-  if(data&&data.owner_uid!==user.id)throw new Error('管理権限がありません');
+  if(!data)throw new Error('管理権限がないか、ページが未登録です');
   return {user,record:data};
 }
 async function reiSampleSaveOwner(client,config){
   const {user,record}=await reiSampleReadOwner(client);
-  if(!record)throw new Error('管理者と麗さんのページの紐付けが未設定です。保存を中止しました。');
+  if(!record)throw new Error('管理対象ページが未登録です');
   // Never change owner, publication state, or another therapist's record.
   const {error}=await client.from(REI_SAMPLE_DB.table)
     .update({config,updated_at:new Date().toISOString()})
-    .eq('therapist_key',REI_SAMPLE_DB.therapistKey).eq('owner_uid',user.id);
+    .eq('therapist_key',REI_SAMPLE_DB.therapistKey);
   if(error)throw error;
 }
