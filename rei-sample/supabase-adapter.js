@@ -31,8 +31,9 @@ async function reiSampleSaveOwner(client,config){
   const {user,record}=await reiSampleReadOwner(client);
   if(!record)throw new Error('管理対象ページが未登録です');
   // Never change owner, publication state, or another therapist's record.
-  const {error}=await client.from(REI_SAMPLE_DB.table)
+  const {data,error}=await client.from(REI_SAMPLE_DB.table)
     .update({config,updated_at:new Date().toISOString()})
-    .eq('therapist_key',REI_SAMPLE_DB.therapistKey);
+    .eq('therapist_key',REI_SAMPLE_DB.therapistKey).select('therapist_key');
   if(error)throw error;
+  if(data?.length!==1)throw new Error('更新件数を確認できませんでした');
 }
