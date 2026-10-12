@@ -73,7 +73,7 @@ $('specialWrap').hidden=!show('priceShowSpecial');
 $('totalWrap').hidden=!show('priceShowTotal');
 $('priceCaution').hidden=!show('priceShowCaution');
 $('priceNotes').hidden=!show('priceShowNotes')||!cfg.priceNotes;
-$('priceCaution').textContent=cfg.priceCaution||'※表示金額は目安です。実際の料金と異なる場合があります。';
+$('priceCaution').textContent=cfg.priceCaution||'※表示される合計金額は、ご予約内容に基づく参考金額です。ご利用条件や追加オプション等により異なる場合がございます。';
 $('priceNotes').textContent=cfg.priceNotes||'';
 const money=n=>'¥'+(Number(n)||0).toLocaleString();
 $('nominationValue').textContent=money(cfg.priceNomination);
