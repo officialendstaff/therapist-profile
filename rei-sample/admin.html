@@ -60,6 +60,43 @@ function check(parent,label,obj,key){let l=document.createElement('label'),i=doc
 function selectfield(parent,label,obj,key,options){let l=document.createElement('label'),sel=document.createElement('select');l.textContent=label;options.forEach(([value,name])=>{let o=document.createElement('option');o.value=value;o.textContent=name;sel.append(o)});sel.value=obj[key]||options[0][0];sel.onchange=()=>obj[key]=sel.value;parent.append(l,sel)}
 function items(s,arr,fields,make,opts={}){let host=document.createElement('div');s.append(host);function render(){host.innerHTML='';arr.forEach((o,i)=>{let box=document.createElement('div');box.className='item';fields.forEach(f=>{if(f[2]==='checkbox')check(box,f[0],o,f[1]);else if(f[2]==='select')selectfield(box,f[0],o,f[1],f[3]);else textfield(box,f[0],o,f[1],f[2]||'text')});let row=document.createElement('div');row.className='row';[['↑',()=>{if(i){[arr[i-1],arr[i]]=[arr[i],arr[i-1]];render()}}],['↓',()=>{if(i<arr.length-1){[arr[i+1],arr[i]]=[arr[i],arr[i+1]];render()}}],...(opts.fixed?[]:[['削除',()=>{arr.splice(i,1);render();if(opts.autoSave)save()}]])].forEach(([t,fn])=>{let b=document.createElement('button');b.textContent=t;b.className='secondary';b.onclick=fn;row.append(b)});box.append(row);host.append(box)})}let add=document.createElement('button');add.textContent='＋ 追加';add.onclick=()=>{if(opts.limit&&arr.length>=opts.limit){alert('最大'+opts.limit+'項目です');return}arr.push(make());render();if(opts.autoSave)save()};if(!opts.fixed)s.append(add);render()}
 
+function compactBookingItems(s,arr,fields,make){
+ const host=document.createElement('div');s.append(host);
+ function render(){
+  host.replaceChildren();
+  arr.forEach((obj,i)=>{
+   const details=document.createElement('details');details.className='item';details.style.padding='0';
+   const summary=document.createElement('summary');summary.style.cssText='cursor:pointer;padding:15px;font-weight:700;list-style:auto';summary.textContent=(obj.label||'新規項目')+'　'+(obj.visible===false?'非表示':obj.required?'必須':'任意');details.append(summary);
+   const editor=document.createElement('div');editor.style.padding='0 14px 14px';
+   fields.forEach(field=>{
+    if(field[1]==='options'){
+     const wrap=document.createElement('div');
+     const input=textfield(wrap,field[0],obj,field[1],'textarea');
+     input.rows=3;input.style.minHeight='85px';input.style.height='85px';
+     const update=()=>{wrap.hidden=obj.type!=='select'};
+     details.addEventListener('change',update);update();editor.append(wrap);
+    }else if(field[2]==='checkbox')check(editor,field[0],obj,field[1]);
+    else if(field[2]==='select')selectfield(editor,field[0],obj,field[1],field[3]);
+    else textfield(editor,field[0],obj,field[1],field[2]||'text');
+   });
+   const actions=document.createElement('div');actions.className='row';
+   [['↑',()=>{if(i>0){[arr[i-1],arr[i]]=[arr[i],arr[i-1]];render()}}],
+    ['↓',()=>{if(i<arr.length-1){[arr[i+1],arr[i]]=[arr[i],arr[i+1]];render()}}],
+    ['削除',()=>{if(confirm('この項目を削除しますか？')){arr.splice(i,1);render()}}]]
+    .forEach(([label,fn])=>{const b=document.createElement('button');b.type='button';b.className='secondary';b.textContent=label;b.onclick=fn;actions.append(b)});
+   editor.append(actions);details.append(editor);host.append(details);
+  });
+ }
+ const add=document.createElement('button');add.type='button';add.textContent='＋ 追加';add.onclick=()=>{arr.push(make());render();host.lastElementChild.open=true};s.append(add);render();
+}
+function compactBookingSection(section){
+ if(currentPage!=='booking')return;
+ const heading=section.querySelector('h2');if(!heading)return;
+ const details=document.createElement('details');details.style.marginTop='8px';
+ const summary=document.createElement('summary');summary.style.cssText='cursor:pointer;padding:10px 0;font-weight:700';summary.textContent=heading.textContent+'　（タップして編集）';
+ while(heading.nextSibling)details.append(heading.nextSibling);
+ heading.replaceWith(summary);section.append(details);details.prepend(summary);
+}
 let photos=d.photos.map(x=>({url:x}));
 if(currentPage!=='shifts'){
 let s; // 見出し言語設定は廃止
@@ -133,9 +170,11 @@ s=section('SNS画像管理');{
  });
 }
 s=section('リンク・URL一元管理');{const p=document.createElement('p');p.className='muted';p.textContent='ここで変更したURLは、上部・下部SNS、固定ナビ、OFFICIAL、CONTACT、予約ポップアップなど同じリンクを使う全箇所に反映されます。※このデモでは同じブラウザ内で保存・反映されます。';s.append(p)}['line','x','sub'].forEach(k=>textfield(s,k==='sub'?'02 URL':k.toUpperCase()+' URL',d.sns,k));textfield(s,'店舗電話番号',d,'phone');textfield(s,'店舗公式LINE URL',d,'shopLine');textfield(s,'店舗公式HP URL',d,'official');textfield(s,'SNS移動前の注意喚起文',d,'snsWarning','textarea');
-s=section('姫予約フォームの項目');items(s,d.bookingFields,[['項目名','label'],['入力形式','type','select',[['text','テキスト'],['tel','電話番号'],['email','メール'],['date','日付'],['time','時刻'],['datetime-local','日時'],['number','数字'],['textarea','長文'],['select','選択式']]],['選択肢（選択式の場合は1行1項目）','options','textarea'],['必須','required','checkbox'],['表示','visible','checkbox']],()=>({label:'NEW FIELD',type:'text',required:false,visible:true,options:''}));
+s=section('姫予約フォームの項目');compactBookingItems(s,d.bookingFields,[['項目名','label'],['入力形式','type','select',[['text','テキスト'],['tel','電話番号'],['email','メール'],['date','日付'],['time','時刻'],['datetime-local','日時'],['number','数字'],['textarea','長文'],['select','選択式']]],['選択肢（選択式の場合は1行1項目）','options','textarea'],['必須','required','checkbox'],['表示','visible','checkbox']],()=>({label:'NEW FIELD',type:'text',required:false,visible:true,options:''}));
+compactBookingSection(s);
 s=section('料金シミュレーター');check(s,'料金設定を公開する',d,'pricePublished');items(s,d.courses,[['コース名','name'],['料金（円）','price','number']],()=>({name:'NEW COURSE',price:0}));items(s,d.extras,[['追加料金名','name'],['金額（円）','price','number']],()=>({name:'NEW FEE',price:0}));textfield(s,'消費税率（%）',d,'tax','number');check(s,'登録料金は税込',d,'taxIncluded');
 textfield(s,'指名料（円）',d,'priceNomination','number');textfield(s,'特別指名料（円）',d,'priceSpecial','number');[['コース','priceShowCourse'],['指名料','priceShowNomination'],['特別指名料','priceShowSpecial'],['交通費','priceShowTravel'],['合計金額','priceShowTotal'],['注意書き','priceShowCaution'],['備考','priceShowNotes']].forEach(([label,key])=>check(s,label+'を表示',d,key));textfield(s,'合計金額の注意書き',d,'priceCaution','textarea');textfield(s,'備考',d,'priceNotes','textarea');
+compactBookingSection(s);
 s=section('出張・交通費');check(s,'出張対応あり',d,'travelEnabled');selectfield(s,'交通費方式',d,'travelMode',[['area','エリア別'],['flat','一律'],['free','無料']]);textfield(s,'一律交通費（円）',d,'travelFlat','number');items(s,d.travelAreas,[['エリア名','name'],['交通費（円）','price','number']],()=>({name:'AREA',price:0}));
 s=section('LOCATION GUIDE');textfield(s,'セクション見出し',d,'locationTitle');items(s,d.areas,[['エリア名','name'],['形式','type','select',[['image','画像'],['map','Google Maps埋め込み']]],['画像URL','image'],['Google Maps埋め込みURL','map'],['表示','visible','checkbox']],()=>({name:'NEW AREA',type:'image',image:'',map:'',visible:true}),{autoSave:true});
 s=section('セクションの表示・並び順');{
