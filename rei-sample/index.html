@@ -60,7 +60,30 @@ $('heroCatch').textContent=cfg.catch;
 $('heroCatch').hidden=true;
 if(!$('heroCatch').hidden){$('heroCatch').style.fontSize=(Math.max(10,Math.min(60,Number(cfg.heroTextSize)||16)))+'px';$('heroCatch').style.color=/^#[0-9a-f]{6}$/i.test(cfg.heroTextColor||'')?cfg.heroTextColor:'#ffffff';$('heroCatch').style.order=cfg.heroTextPosition==='top'?-1:0}
 const publishedNews=(Array.isArray(cfg.newsItems)?cfg.newsItems:[]).filter(n=>n.visible!==false);
-if(publishedNews.length){$('newsText').replaceChildren();publishedNews.forEach(n=>{const block=document.createElement('div');block.style.cssText='padding:9px 0;border-bottom:1px solid #563448';const title=document.createElement('strong');title.textContent=(n.important?'【重要】':'')+(n.title||'お知らせ');const date=document.createElement('small');date.style.cssText='display:block;color:#c5acbd';date.textContent=n.date||'';const body=document.createElement('p');body.style.whiteSpace='pre-wrap';body.textContent=n.body||'';block.append(title,date,body);if(n.image){const photo=document.createElement('img');photo.src=n.image;photo.alt=(n.title||'お知らせ')+'の画像';photo.loading='lazy';photo.style.cssText='display:block;width:100%;max-width:460px;height:auto;border-radius:10px;margin:12px 0';block.append(photo)}$('newsText').append(block)})}else $('newsText').textContent=Array.isArray(cfg.newsItems)&&cfg.newsItems.length?'現在、公開中のお知らせはありません。':(cfg.news||'現在、公開中のお知らせはありません。');
+function newsContents(parent,n){
+ const title=document.createElement('strong');title.textContent=(n.important?'【重要】':'')+(n.title||'お知らせ');
+ const date=document.createElement('small');date.style.cssText='display:block;color:#c5acbd;margin:5px 0 10px';date.textContent=n.date||'';
+ const body=document.createElement('p');body.style.cssText='white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.7';body.textContent=n.body||'';
+ parent.append(title,date,body);
+ if(n.image){const photo=document.createElement('img');photo.src=n.image;photo.alt=(n.title||'お知らせ')+'の画像';photo.loading='lazy';photo.style.cssText='display:block;width:100%;max-width:460px;height:auto;border-radius:10px;margin:12px 0';parent.append(photo)}
+}
+if(publishedNews.length){
+ const target=$('newsText');target.replaceChildren();
+ const latest=document.createElement('div');latest.style.cssText='padding:9px 0 14px;border-bottom:1px solid #563448';
+ newsContents(latest,publishedNews[0]);target.append(latest);
+ if(publishedNews.length>1){
+  const heading=document.createElement('h3');heading.textContent='過去のお知らせ';heading.style.cssText='font-size:15px;margin:18px 0 8px';target.append(heading);
+  publishedNews.slice(1).forEach(n=>{
+   const button=document.createElement('button');button.type='button';button.style.cssText='display:flex;align-items:center;gap:10px;width:100%;padding:13px 5px;border:0;border-bottom:1px solid #563448;background:transparent;color:inherit;text-align:left;cursor:pointer;font:inherit';
+   const date=document.createElement('small');date.textContent=n.date||'';date.style.cssText='color:#c5acbd;white-space:nowrap;font-size:11px';
+   const title=document.createElement('span');title.textContent=(n.important?'【重要】':'')+(n.title||'お知らせ');title.style.cssText='font-size:13px;overflow-wrap:anywhere;flex:1';
+   const arrow=document.createElement('span');arrow.textContent='›';arrow.setAttribute('aria-hidden','true');
+   button.append(date,title,arrow);
+   button.onclick=()=>{modal('お知らせ','');$('modalBody').replaceChildren();newsContents($('modalBody'),n)};
+   target.append(button);
+  });
+ }
+}else $('newsText').textContent=Array.isArray(cfg.newsItems)&&cfg.newsItems.length?'現在、公開中のお知らせはありません。':(cfg.news||'現在、公開中のお知らせはありません。');
 $('introText').textContent=cfg.intro;
 image('heroImage',cfg.images.hero,'HERO','portrait');image('personalImage',cfg.images.personal,'PERSONAL');image('profileImage',cfg.images.profile,'PROFILE','portrait');image('calendarImage',cfg.images.calendar,'CALENDAR');
 $('photoGallery').innerHTML=(cfg.photos.length?cfg.photos:Array(6).fill('')).map((url,i)=>`<img src="${esc(url||demoImage('PHOTO '+(i+1),'portrait'))}" alt="Photo ${i+1}">`).join('');
