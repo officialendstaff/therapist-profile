@@ -21,7 +21,7 @@ html,body{max-width:100%;overflow-x:clip}
 /* Booking datetime field: 60% width */
 #bookingFields input[type="datetime-local"],#bookingFields input[type="date"]{width:60%;max-width:60%;display:block}
 body{background:#0d0b0f;color:#fff0f7;font-family:Georgia,'Times New Roman',serif}.app{background:#17141b;color:#fff0f7}:root{--pink:#ff5caa;--bg:#17141b;--panel:#27212d;--text:#fff0f7;--muted:#c5acbd}.hero{background:radial-gradient(circle at 50% 20%,#763455 0%,#302033 48%,#17141b 80%)}
-</style></head><body><div class="app"><section class="hero" id="home"><img class="hero-photo" id="heroImage" alt="メイン"><div class="hero-inner"><div class="small">セラピスト個人ページ・サンプル</div><h1 id="heroName">TEST</h1><p id="heroCatch"></p></div></section>
+</style></head><body><div class="app"><section class="hero" id="home"><img class="hero-photo" id="heroImage" alt="メイン"><div class="hero-inner"><div class="small" id="heroSubtitle"></div><h1 id="heroName">TEST</h1><p id="heroCatch"></p></div></section>
 <div class="card" id="news"><h2>NEWS</h2><div class="notice" id="newsText"></div></div>
 <div class="card" id="sns"><h2>SNS</h2><div class="sns"><button data-sns="line"><img data-sns-image="line" alt="LINE"></button><button data-sns="x"><img data-sns-image="x" alt="X"></button><button data-sns="sub"><img data-sns-image="sub" alt="02"></button></div></div>
 <div class="card" id="personal"><h2>PERSONAL</h2><img class="media-square" id="personalImage" alt="パーソナル画像"></div>
@@ -47,6 +47,9 @@ try {const remote=await reiSampleReadPublished(reiSampleClient());if(!remote){do
 for(const key of NAV_KEYS){const icon=document.querySelector('[data-nav-icon="'+key+'"]');if(icon)icon.src=navIconPath(key,(cfg.navIcons||{})[key])}
 const $=id=>document.getElementById(id);function image(id,url,label,ratio){$(id).src=url||demoImage(label,ratio)}
 $('heroName').textContent=cfg.name;
+const heroUsesImage=(cfg.heroTextMode||'image')==='image';
+$('heroName').hidden=heroUsesImage;
+$('heroSubtitle').hidden=true;
 $('heroCatch').textContent=cfg.catch;
 $('heroCatch').hidden=(cfg.heroTextMode||'image')!=='text';
 if(!$('heroCatch').hidden){$('heroCatch').style.fontSize=(Math.max(10,Math.min(60,Number(cfg.heroTextSize)||16)))+'px';$('heroCatch').style.color=/^#[0-9a-f]{6}$/i.test(cfg.heroTextColor||'')?cfg.heroTextColor:'#ffffff';$('heroCatch').style.order=cfg.heroTextPosition==='top'?-1:0}
