@@ -31,8 +31,8 @@ const PAGE_SECTIONS={
  basic:['HERO / NEWS / INTRODUCTION','PROFILE（右側3項目）'],
  news:['NEWS管理・お知らせ一覧'],images:['画像管理（ファイル登録）'],photos:['PHOTO（3:4）'],
  shifts:['出勤カレンダー・一括設定'],links:['SNS画像管理','リンク・URL一元管理'],
- booking:['姫予約フォームの項目','料金シミュレーター'],
- areas:['出張・交通費','LOCATION GUIDE'],
+ booking:['姫予約フォームの項目','料金シミュレーター','出張・交通費'],
+ areas:['LOCATION GUIDE'],
  layout:['セクションの表示・並び順','見出し・装飾の設定','下部メニューバーのアイコン'],
  ogp:['OGP・SNS共有設定']
 };
@@ -186,6 +186,7 @@ s=section('料金シミュレーター');check(s,'料金設定を公開する',d
 textfield(s,'指名料（円）',d,'priceNomination','number');textfield(s,'特別指名料（円）',d,'priceSpecial','number');textfield(s,'合計金額の注意書き',d,'priceCaution','textarea');textfield(s,'備考',d,'priceNotes','textarea');[['コース','priceShowCourse'],['指名料','priceShowNomination'],['特別指名料','priceShowSpecial'],['交通費','priceShowTravel'],['合計金額','priceShowTotal'],['注意書き','priceShowCaution'],['備考','priceShowNotes']].forEach(([label,key])=>check(s,label+'を表示',d,key));
 compactBookingSection(s);
 s=section('出張・交通費');check(s,'出張対応あり',d,'travelEnabled');selectfield(s,'交通費方式',d,'travelMode',[['area','エリア別'],['flat','一律'],['free','無料']]);textfield(s,'一律交通費（円）',d,'travelFlat','number');items(s,d.travelAreas,[['エリア名','name'],['交通費（円）','price','number']],()=>({name:'AREA',price:0}));
+compactBookingSection(s);
 s=section('LOCATION GUIDE');textfield(s,'セクション見出し',d,'locationTitle');items(s,d.areas,[['エリア名','name'],['形式','type','select',[['image','画像'],['map','Google Maps埋め込み']]],['画像URL','image'],['Google Maps埋め込みURL','map'],['表示','visible','checkbox']],()=>({name:'NEW AREA',type:'image',image:'',map:'',visible:true}),{autoSave:true});
 s=section('セクションの表示・並び順');{
 const tip=document.createElement('p');tip.className='muted';tip.textContent='右端の ≡ を押したまま上下に移動して並び替えます。左のチェックで表示・非表示を切り替えます。';s.append(tip);
