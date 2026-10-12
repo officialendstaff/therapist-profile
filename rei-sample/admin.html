@@ -221,7 +221,13 @@ if(currentPage==='layout'){
 const decorations=section('見出し・装飾の設定');
 selectfield(decorations,'見出し装飾の配置',d,'headingDecoration',[['both','左右'],['left','左のみ'],['none','なし']]);
 check(decorations,'装飾キャラクターを表示',d,'decorationVisible');
-textfield(decorations,'装飾キャラクター画像URL',d,'decorationImage');
+const characterLabel=document.createElement('label');characterLabel.textContent='装飾キャラクター画像（透過PNG）';decorations.append(characterLabel);
+const characterInput=document.createElement('input');characterInput.type='file';characterInput.accept='image/png';decorations.append(characterInput);
+const characterPreview=document.createElement('img');characterPreview.alt='装飾キャラクターのプレビュー';characterPreview.style.cssText='display:block;max-width:160px;max-height:160px;object-fit:contain;margin:10px 0;background:repeating-conic-gradient(#ddd 0% 25%,#fff 0% 50%) 50%/16px 16px;border-radius:8px';
+function showCharacter(){characterPreview.hidden=!d.decorationImage;if(d.decorationImage)characterPreview.src=d.decorationImage}
+decorations.append(characterPreview);showCharacter();
+characterInput.onchange=()=>{const file=characterInput.files&&characterInput.files[0];if(!file)return;if(file.type!=='image/png'){alert('透過PNG画像を選択してください');characterInput.value='';return}const reader=new FileReader();reader.onload=()=>{d.decorationImage=String(reader.result||'');showCharacter()};reader.onerror=()=>alert('画像を読み込めませんでした');reader.readAsDataURL(file)};
+const clearCharacter=document.createElement('button');clearCharacter.type='button';clearCharacter.className='secondary';clearCharacter.textContent='装飾キャラクター画像を削除';clearCharacter.onclick=()=>{d.decorationImage='';characterInput.value='';showCharacter()};decorations.append(clearCharacter);
 selectfield(decorations,'区切り線',d,'dividerStyle',[['standard','標準'],['ornament','装飾'],['none','なし']]);
 }
 // Compact bottom navigation image editor: one default style and per-icon uploads.
