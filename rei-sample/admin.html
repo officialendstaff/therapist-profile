@@ -59,7 +59,7 @@ if(currentPage==='top'){
 // ブログ連携設定。自動取得は取得元の仕様確認後に接続する。
 if(currentPage==='blog'){
  const blogSection=document.createElement('section');
- blogSection.innerHTML='<h2>公式ブログ連携</h2><p class="muted">公式HPのブログ一覧URLと表示件数を保存します。記事の自動取得・表示は現在未接続です。</p>';
+ blogSection.innerHTML='<h2>公式ブログ連携</h2><p class="muted">公式HPのブログを手動で取得します。表示件数は保存ボタンで確定してください。</p>';
  root.append(blogSection);
  if(!d.officialBlog||typeof d.officialBlog!=='object')d.officialBlog={};
  const blog=d.officialBlog;
@@ -67,7 +67,20 @@ if(currentPage==='blog'){
  const url=document.createElement('input');url.type='url';url.placeholder='https://grandluxe-osaka.com/bloglist.php?id=1463';url.value=blog.listUrl||'https://grandluxe-osaka.com/bloglist.php?id=1463';blog.listUrl=url.value;url.addEventListener('input',()=>blog.listUrl=url.value.trim());blogSection.append(url);
  const countLabel=document.createElement('label');countLabel.textContent='表示件数';blogSection.append(countLabel);
  const count=document.createElement('select');[1,2,3].forEach(n=>{const opt=document.createElement('option');opt.value=n;opt.textContent=n+'件';count.append(opt)});count.value=String([1,2,3].includes(Number(blog.count))?blog.count:1);blog.count=Number(count.value);count.addEventListener('change',()=>blog.count=Number(count.value));blogSection.append(count);
- const note=document.createElement('p');note.className='muted';note.textContent='現在は設定の保存のみ可能です。記事取得の確認ができるまで、公開ページには未取得の記事を表示しません。';blogSection.append(note);
+ const status=document.createElement('p');status.className='muted';status.textContent='更新状況を確認しています…';blogSection.append(status);
+ const refresh=document.createElement('button');refresh.type='button';refresh.textContent='ブログを最新に更新';refresh.className='btn';blogSection.append(refresh);
+ const client=reiSampleClient();
+ client.from('therapist_blog_cache').select('fetched_at,posts').eq('therapist_key','rei').maybeSingle().then(({data,error})=>{status.textContent=error?'更新状況を取得できません':data?.fetched_at?'最終更新：'+new Date(data.fetched_at).toLocaleString('ja-JP')+' ／保存記事 '+(data.posts?.length||0)+'件':'まだ記事を取得していません'});
+ refresh.addEventListener('click',async()=>{
+  if(refresh.disabled)return;refresh.disabled=true;refresh.textContent='更新中…';status.textContent='公式HPから取得しています';
+  try{
+   const {data:{session}}=await client.auth.getSession();if(!session)throw Error('ログインが必要です');
+   const res=await fetch(REI_SAMPLE_DB.url+'/functions/v1/refresh-rei-blog',{method:'POST',headers:{'Content-Type':'application/json',apikey:REI_SAMPLE_DB.anonKey,Authorization:'Bearer '+session.access_token},body:'{}'});
+   const result=await res.json();if(!res.ok||!result.ok)throw Error(result.detail||result.error||'更新失敗');
+   status.textContent='更新成功：'+result.count+'件確認 ／ '+new Date().toLocaleString('ja-JP');
+  }catch(e){status.textContent='更新失敗：'+(e.message||String(e))+'（公開中の記事は維持されます）'}
+  finally{refresh.disabled=false;refresh.textContent='ブログを最新に更新'}
+ });
 }
 function section(title){let s=document.createElement('section');s.innerHTML='<h2>'+title+'</h2>';if(currentPage!=='top'&&(PAGE_SECTIONS[currentPage]||[]).includes(title))root.append(s);return s}
 function textfield(parent,label,obj,key,type='text'){let l=document.createElement('label');l.textContent=label;let input=document.createElement(type==='textarea'?'textarea':'input');if(type!=='textarea')input.type=type;input.value=obj[key]??'';if(type==='textarea'){input.classList.add('longtext');input.rows=9;const resize=()=>{input.style.height='auto';input.style.height=Math.max(230,input.scrollHeight+3)+'px'};input.addEventListener('input',resize);requestAnimationFrame(resize)}input.oninput=()=>obj[key]=type==='number'?Number(input.value):input.value;if(type==='textarea'){input.setAttribute('wrap','soft');input.style.cssText+=';width:100%;max-width:100%;min-width:0;overflow-x:hidden;overflow-wrap:anywhere;word-break:break-word;white-space:pre-wrap';input.addEventListener('focus',()=>{input.scrollLeft=0});input.addEventListener('input',()=>{if(input.scrollLeft)input.scrollLeft=0})}parent.append(l,input);return input}
