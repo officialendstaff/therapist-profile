@@ -52,7 +52,7 @@ if(currentPage==='top'){
  originalViewLink.insertAdjacentElement('afterend',blogRefresh);
  const status=document.createElement('p');status.className='muted';status.style.cssText='font-size:12px;margin:8px 0';originalViewLink.parentNode.insertBefore(status,originalViewLink.nextSibling.nextSibling);
  const refresh=blogRefresh;
-  const client=reiSampleClient();
+  const client=reiDbClient;
  client.from('therapist_blog_cache').select('fetched_at,posts').eq('therapist_key','rei').maybeSingle().then(({data,error})=>{status.textContent=error?'更新状況を取得できません':data?.fetched_at?'最終更新：'+new Date(data.fetched_at).toLocaleString('ja-JP')+' ／保存記事 '+(data.posts?.length||0)+'件':'まだ記事を取得していません'});
  refresh.addEventListener('click',async()=>{
   if(refresh.disabled)return;refresh.disabled=true;refresh.textContent='更新中…';status.textContent='公式HPから取得しています';
