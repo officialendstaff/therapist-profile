@@ -193,7 +193,7 @@ try{
    const item=document.createElement('div');item.style.cssText='padding:12px 0;border-bottom:1px solid rgba(180,130,150,.25)';
    const date=document.createElement('div');date.style.cssText='font-size:12px;opacity:.7;margin-bottom:7px';date.textContent=post.date||'';item.append(date);
    const link=document.createElement('a');link.href=post.url;link.target='_blank';link.rel='noopener noreferrer';link.style.cssText='color:inherit;text-decoration:none;font-weight:bold';link.textContent=post.title||'記事を読む';
-   if(post.image){const img=document.createElement('img');img.src=post.image;img.alt=post.title||'ブログ画像';img.loading='lazy';img.style.cssText='width:100%;max-height:300px;object-fit:cover;border-radius:10px;margin-bottom:8px';img.onerror=()=>img.remove();item.append(img)}
+   if(post.image){const img=document.createElement('img');img.src=post.image;img.alt=post.title||'ブログ画像';img.loading='lazy';img.style.cssText='display:block;width:100%;max-width:360px;height:auto;object-fit:contain;border-radius:10px;margin:0 auto 12px';img.onerror=()=>img.remove();item.append(img)}
    item.append(link);
    if(post.excerpt){const p=document.createElement('p');p.textContent=post.excerpt;p.style.cssText='font-size:13px;line-height:1.7;white-space:normal;overflow-wrap:anywhere';item.append(p)}
    const more=document.createElement('a');more.href=post.url;more.target='_blank';more.rel='noopener noreferrer';more.textContent='続きを読む →';more.style.cssText='display:inline-block;margin-top:5px;font-size:13px';item.append(more);
