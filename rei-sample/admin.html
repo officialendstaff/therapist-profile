@@ -204,9 +204,9 @@ const preview=document.createElement('div');preview.className='muted';s.append(p
 let parsedPaid=null;
 const parseButton=document.createElement('button');parseButton.type='button';parseButton.textContent='一覧を解析';parseButton.onclick=()=>{
  const entries=[],errors=[],seen=new Map();
- bulk.value.split(/\\r?\\n/).forEach((raw,i)=>{
+ bulk.value.split(/\r?\n/).forEach((raw,i)=>{
   const line=raw.trim();if(!line)return;
-  const match=line.match(/^([\\d,，]+)\\s*円?\\s*[｜|：:]\\s*(.+)$/);
+  const match=line.match(/^([\d,，]+)\s*円?\s*[｜|：:]\s*(.+)$/);
   if(!match){errors.push((i+1)+'行目：金額とエリア名を確認してください');return}
   const price=Number(match[1].replace(/[,，]/g,''));if(!Number.isFinite(price)||price<1000){errors.push((i+1)+'行目：有料エリアは1,000円以上です');return}
   const names=match[2].split(/[、,，]/).map(x=>x.trim()).filter(Boolean);
