@@ -193,6 +193,17 @@ if(cfg.dividerStyle!=='none'&&Array.isArray(cfg.dividerAfter)){
  }
 }
 cfg.hidden.forEach(id=>{if($(id))$(id).hidden=true});if(!cfg.pricePublished||!cfg.courses.length)$('price').hidden=true;
+const menuPanel=$('menuPanel');
+if(menuPanel){
+ for(const link of menuPanel.querySelectorAll('a[href^="#"]')){
+  const id=decodeURIComponent(link.getAttribute('href').slice(1));
+  const target=$(id);
+  if(!target){link.hidden=true;continue}
+  const isDisabled=cfg.hidden.includes(id)||(id==='price'&&(!cfg.pricePublished||!cfg.courses.length));
+  link.hidden=isDisabled||target.hidden;
+ }
+}
+
 function applyHeadingLanguage(lang){
  document.documentElement.lang=['ja','en','ko'].includes(lang)?lang:'ja';
  for(const id of Object.keys(HEADING_TRANSLATIONS)){
