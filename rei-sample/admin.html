@@ -193,7 +193,42 @@ compactBookingSection(s);
 s=section('料金シミュレーター');check(s,'料金設定を公開する',d,'pricePublished');items(s,d.courses,[['コース名','name'],['料金（円）','price','number']],()=>({name:'NEW COURSE',price:0}));items(s,d.extras,[['追加料金名','name'],['金額（円）','price','number']],()=>({name:'NEW FEE',price:0}));textfield(s,'消費税率（%）',d,'tax','number');check(s,'登録料金は税込',d,'taxIncluded');
 textfield(s,'指名料（円）',d,'priceNomination','number');textfield(s,'特別指名料（円）',d,'priceSpecial','number');textfield(s,'合計金額の注意書き',d,'priceCaution','textarea');textfield(s,'備考',d,'priceNotes','textarea');[['コース','priceShowCourse'],['指名料','priceShowNomination'],['特別指名料','priceShowSpecial'],['交通費','priceShowTravel'],['合計金額','priceShowTotal'],['注意書き','priceShowCaution'],['備考','priceShowNotes']].forEach(([label,key])=>check(s,label+'を表示',d,key));
 compactBookingSection(s);
-s=section('出張・交通費');check(s,'出張対応あり',d,'travelEnabled');selectfield(s,'交通費方式',d,'travelMode',[['area','エリア別'],['flat','一律'],['free','無料']]);textfield(s,'一律交通費（円）',d,'travelFlat','number');items(s,d.travelAreas,[['エリア名','name'],['交通費（円）','price','number']],()=>({name:'AREA',price:0}));
+s=section('出張・交通費');check(s,'出張対応あり',d,'travelEnabled');selectfield(s,'交通費方式',d,'travelMode',[['area','エリア別'],['flat','一律'],['free','無料']]);textfield(s,'一律交通費（円）',d,'travelFlat','number');if(!Array.isArray(d.travelAreas))d.travelAreas=[];
+if(!Array.isArray(d.travelFreeAreas))d.travelFreeAreas=[{name:'日本橋｜指定ホテル',visible:true},{name:'谷町九丁目｜指定ホテル',visible:true},{name:'梅田｜指定ホテル',visible:true}];
+const freeHead=document.createElement('h3');freeHead.textContent='無料エリア（追加・非表示可能）';s.append(freeHead);
+items(s,d.travelFreeAreas,[['エリア名','name'],['表示','visible','checkbox']],()=>({name:'新しい無料エリア',visible:true}));
+const paidHead=document.createElement('h3');paidHead.textContent='有料エリア（1,000円以上）';s.append(paidHead);
+const help=document.createElement('p');help.className='muted';help.textContent='1行に「1000円｜北区、福島区」の形式で貼り付けてください。区名・地域名ごとに個別の選択肢になります。既存データは確認なしに上書きしません。';s.append(help);
+const bulk=document.createElement('textarea');bulk.rows=7;bulk.placeholder='1000円｜北区、福島区、中央区\n2000円｜港区、此花区、大正区';s.append(bulk);
+const preview=document.createElement('div');preview.className='muted';s.append(preview);
+let parsedPaid=null;
+const parseButton=document.createElement('button');parseButton.type='button';parseButton.textContent='一覧を解析';parseButton.onclick=()=>{
+ const entries=[],errors=[],seen=new Map();
+ bulk.value.split(/\\r?\\n/).forEach((raw,i)=>{
+  const line=raw.trim();if(!line)return;
+  const match=line.match(/^([\\d,，]+)\\s*円?\\s*[｜|：:]\\s*(.+)$/);
+  if(!match){errors.push((i+1)+'行目：金額とエリア名を確認してください');return}
+  const price=Number(match[1].replace(/[,，]/g,''));if(!Number.isFinite(price)||price<1000){errors.push((i+1)+'行目：有料エリアは1,000円以上です');return}
+  const names=match[2].split(/[、,，]/).map(x=>x.trim()).filter(Boolean);
+  if(!names.length){errors.push((i+1)+'行目：エリア名がありません');return}
+  for(const name of names){if(seen.has(name)){errors.push('重複：'+name+'（'+seen.get(name)+'円／'+price+'円）');continue}seen.set(name,price);entries.push({name,price,visible:true})}
+ });
+ parsedPaid=errors.length?null:entries;
+ preview.textContent=errors.length?errors.join(' ／ '):entries.length?entries.length+'エリアを解析しました。内容：'+entries.map(x=>x.name+' '+x.price.toLocaleString()+'円').join('、'):'登録可能なエリアがありません';
+};
+s.append(parseButton);
+const applyButton=document.createElement('button');applyButton.type='button';applyButton.textContent='確認して一括登録';applyButton.onclick=()=>{
+ if(!parsedPaid||!parsedPaid.length){alert('先に一覧を解析してください');return}
+ const existing=d.travelAreas.filter(x=>Number(x.price)>=1000);
+ const conflicts=parsedPaid.filter(x=>existing.some(y=>y.name===x.name&&Number(y.price)!==x.price));
+ if(conflicts.length){alert('既存エリアと金額が異なります：'+conflicts.map(x=>x.name).join('、')+'。既存設定を確認してください');return}
+ const additions=parsedPaid.filter(x=>!existing.some(y=>y.name===x.name));
+ if(!confirm(additions.length+'件の有料エリアを追加します。既存のエリアは保持します。よろしいですか？'))return;
+ d.travelAreas.push(...additions);parsedPaid=null;preview.textContent=additions.length+'件を追加しました。下部の「設定を保存」で確定してください。';renderPaid();
+};s.append(applyButton);
+const paidList=document.createElement('div');s.append(paidList);
+function renderPaid(){paidList.replaceChildren();d.travelAreas.filter(x=>Number(x.price)>=1000).forEach(x=>{const row=document.createElement('div');row.className='item';textfield(row,'エリア名',x,'name');textfield(row,'交通費（円）',x,'price','number');check(row,'表示',x,'visible');const del=document.createElement('button');del.type='button';del.className='secondary';del.textContent='削除';del.onclick=()=>{const i=d.travelAreas.indexOf(x);if(i>=0)d.travelAreas.splice(i,1);renderPaid()};row.append(del);paidList.append(row)})}
+renderPaid();
 compactBookingSection(s);
 s=section('LOCATION GUIDE');textfield(s,'セクション見出し',d,'locationTitle');items(s,d.areas,[['エリア名','name'],['形式','type','select',[['image','画像'],['map','Google Maps埋め込み']]],['画像URL','image'],['Google Maps埋め込みURL','map'],['表示','visible','checkbox']],()=>({name:'NEW AREA',type:'image',image:'',map:'',visible:true}),{autoSave:true});
 s=section('セクションの表示・並び順');{
