@@ -103,37 +103,29 @@ function travelGroups(areas){
 }
 function makeTravelButtons(host,areas,onSelect,selectedIndex=-1){
  host.replaceChildren();
- const groups=travelGroups(areas),free=groups.find(([price])=>price===0)?.[1]||[],paid=groups.filter(([price])=>price>0);
- const freeTitle=document.createElement('div');freeTitle.textContent='【無料エリア】';freeTitle.style.cssText='font-weight:700;color:#ff65ad;margin:12px 0 9px';host.append(freeTitle);
- const freeRow=document.createElement('div');freeRow.style.cssText='display:flex;flex-wrap:wrap;gap:8px';host.append(freeRow);
- const buttons=[];
- const choose=i=>{
-  onSelect(i);
-  buttons.forEach(({button,index})=>{const active=index===i;button.style.background=active?'#a52c70':'#211b28';button.style.borderColor=active?'#ff86c4':'#865b78';button.setAttribute('aria-pressed',String(active))});
+ const groups=travelGroups(areas);
+ const free=groups.find(([price])=>price===0)?.[1]||[];
+ const paid=groups.filter(([price])=>price>0);
+ const makeSelect=(label,placeholder)=>{
+  const heading=document.createElement('div');heading.textContent=label;
+  heading.style.cssText='font-weight:700;color:#ff65ad;margin:14px 0 9px';host.append(heading);
+  const select=document.createElement('select');select.setAttribute('aria-label',label);
+  select.style.cssText='display:block;width:100%;max-width:440px;margin-bottom:12px';
+  select.append(new Option(placeholder,''));host.append(select);return select;
  };
- for(const {area,index} of free){
-  const button=document.createElement('button');button.type='button';button.textContent=area.name;
-  button.style.cssText='font:inherit;font-size:14px;padding:9px 12px;border-radius:9px;border:1px solid #865b78;color:inherit;background:#211b28;cursor:pointer';
-  button.onclick=()=>{feeSelect.value='';areaSelect.value='';areaSelect.disabled=true;choose(index)};
-  freeRow.append(button);buttons.push({button,index});
+ const freeSelect=makeSelect('【無料エリア】','無料エリアを選択してください');
+ for(const {area,index} of free)freeSelect.append(new Option(area.name,String(index)));
+ const paidSelect=makeSelect('【有料エリア】','有料エリアを選択してください');
+ for(const [price,entries] of paid){
+  const group=document.createElement('optgroup');group.label=Number(price).toLocaleString('ja-JP')+'円';
+  for(const {area,index} of entries)group.append(new Option(area.name,String(index)));
+  paidSelect.append(group);
  }
- const paidTitle=document.createElement('div');paidTitle.textContent='【有料エリア】';paidTitle.style.cssText='font-weight:700;color:#ff65ad;margin:18px 0 9px';host.append(paidTitle);
- const feeSelect=document.createElement('select');feeSelect.setAttribute('aria-label','交通費を選択');feeSelect.style.cssText='display:block;width:100%;max-width:440px;margin-bottom:10px';
- feeSelect.append(new Option('交通費を選択してください',''));
- for(const [price] of paid)feeSelect.append(new Option(Number(price).toLocaleString('ja-JP')+'円',String(price)));
- host.append(feeSelect);
- const areaSelect=document.createElement('select');areaSelect.setAttribute('aria-label','有料エリアを選択');areaSelect.style.cssText='display:block;width:100%;max-width:440px;margin-bottom:10px';areaSelect.disabled=true;areaSelect.append(new Option('先に交通費を選択してください',''));host.append(areaSelect);
- feeSelect.onchange=()=>{
-  areaSelect.replaceChildren();areaSelect.disabled=!feeSelect.value;
-  areaSelect.append(new Option(feeSelect.value?'エリアを選択してください':'先に交通費を選択してください',''));
-  const entries=paid.find(([price])=>String(price)===feeSelect.value)?.[1]||[];
-  for(const {area,index} of entries)areaSelect.append(new Option(area.name,String(index)));
- };
- areaSelect.onchange=()=>{if(areaSelect.value!=='')choose(Number(areaSelect.value))};
+ freeSelect.onchange=()=>{if(freeSelect.value==='')return;paidSelect.value='';onSelect(Number(freeSelect.value))};
+ paidSelect.onchange=()=>{if(paidSelect.value==='')return;freeSelect.value='';onSelect(Number(paidSelect.value))};
  if(selectedIndex>=0&&areas[selectedIndex]){
-  const price=Number(areas[selectedIndex].price||0);
-  if(price===0){const found=buttons.find(x=>x.index===selectedIndex);if(found)found.button.click()}
-  else{feeSelect.value=String(price);feeSelect.onchange();areaSelect.value=String(selectedIndex);choose(selectedIndex)}
+  if(Number(areas[selectedIndex].price||0)===0)freeSelect.value=String(selectedIndex);
+  else paidSelect.value=String(selectedIndex);
  }
 }
 $('bookingFields').innerHTML=cfg.bookingFields.filter(f=>f.visible).map((f,i)=>{let name=esc(f.label);const linkedArea=f.label.trim()==='エリア'&&cfg.travelEnabled&&cfg.travelMode==='area';
