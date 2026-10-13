@@ -13,7 +13,10 @@ async function initReiAdmin(){
  try{saveData(remote)}catch(e){console.warn('ローカルキャッシュへの保存に失敗しました',e)}
  const initialData=remote;
  reiLoadingShield.remove();
-let d=initialData,root=document.getElementById('root'),selected=new Set(),month=new Date();month.setDate(1);
+let d=initialData,root=document.getElementById('root'),selected=new Set(),month=new Date();
+if(!Array.isArray(d.sections))d.sections=SECTIONS.map(x=>x[0]);
+if(!d.sections.includes('official-blog')){const i=d.sections.indexOf('profile');d.sections.splice(i>=0?i+1:d.sections.length,0,'official-blog');}
+if(!Array.isArray(d.hidden))d.hidden=[];month.setDate(1);
 const ADMIN_PAGES=[
  ['basic','基本情報','user-round','名前・HERO・PERSONAL・INTRO・PROFILE'],
  ['news','NEWS管理','megaphone','お知らせの作成・編集'],
