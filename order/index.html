@@ -44,8 +44,7 @@ button,.btn{border:0;border-radius:11px;background:var(--pink);color:white;paddi
 <section class="panel"><div class="num">04 / CONTACT</div><h2>要望を送信</h2>
 <label for="clientName">お名前・連絡先（任意）</label><input id="clientName" placeholder="お名前・LINE名など">
 <label for="currentUrl">現在掲載されているHPのURL</label><input id="currentUrl" type="url" placeholder="https://..."><p class="sub">現在在籍している店舗のセラピスト紹介ページなどをご入力ください。</p>
-<div class="notice" style="margin-top:18px"><strong>SNSアカウントの初期設定について</strong><p style="margin:6px 0 0">LINE・公式LINE・X・02のIDやURLは、ページ完成後にご自身の管理ページから登録・変更することも可能です。制作時に初期設定をご希望の場合は、以下にIDまたはURLをご入力ください。</p></div>
-<label for="snsLine">LINEのURL（任意）</label><input id="snsLine" type="url" placeholder="https://line.me/..."><label for="snsOfficialLine">公式LINEのIDまたはURL（任意）</label><input id="snsOfficialLine" placeholder="@xxxx または https://..."><label for="snsX">XのIDまたはURL（任意）</label><input id="snsX" placeholder="@xxxx または https://x.com/..."><label for="sns02">02のIDまたはURL（任意）</label><input id="sns02" placeholder="@xxxx または https://...">
+<div class="notice" style="margin-top:18px"><strong>納品後のページ管理について</strong><p style="margin:6px 0 0">納品後は専用の管理ページから、ご自身でプロフィール・画像・SNS・出勤情報などを自由に登録・変更できます。これらの初期登録・更新はご自身でお願いいたします。</p></div>
 <p class="notice">「要望をコピーする」を押した後、末端興業LINEを開き、トークに貼り付けて送信してください。LINEへの自動送信ではありません。</p>
 <button class="full" id="copy">要望をコピーする</button><p id="copyMessage" class="sub" role="status"></p>
 <a class="btn secondary full hidden" id="lineLink" target="_blank" rel="noopener">末端興業LINEを開く ↗</a>
@@ -93,11 +92,7 @@ function detailsText(){const e=chosenExtras();return [
 ...(selected("character")==="yes"?(selected("characterType")==="self"?["キャラクターの種類：自分の写真をイラスト化","表現スタイル："+$("selfCharacterStyle").value,"イラスト化の要望："+($("selfCharacterNotes").value||"なし"),"写真：受注後にLINEで送付"] : ["キャラクターの種類：動物・その他のキャラクター","掲載URL："+($("characterUrl").value||"なし"),"希望キャラ："+($("characterName").value||"未記入"),"表現スタイル："+$("characterStyle").value,"装飾要望："+($("characterNotes").value||"なし")]):[]),
 "■ 別途制作："+(e.length?e.map(x=>x[1]+"（"+x[2]+"）").join("／"):"なし"),
 "■ その他："+($("otherNotes").value||"なし"),"■ お名前・連絡先："+($("clientName").value||"未記入"),
-"■ 現在のHP："+($("currentUrl").value||"未記入"),
-"■ LINE URL："+($("snsLine").value||"未記入"),
-"■ 公式LINE ID/URL："+($("snsOfficialLine").value||"未記入"),
-"■ X ID/URL："+($("snsX").value||"未記入"),
-"■ 02 ID/URL："+($("sns02").value||"未記入")
+"■ 現在のHP："+($("currentUrl").value||"未記入")
 ].join("\n")}
 $("copy").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(detailsText());$("copyMessage").textContent="要望をコピーしました。LINEのトークに貼り付けてください。"}catch(e){const t=document.createElement("textarea");t.value=detailsText();document.body.appendChild(t);t.select();try{document.execCommand("copy");$("copyMessage").textContent="要望をコピーしました。"}catch(e2){$("copyMessage").textContent="コピーできませんでした。HTTPSで開いてお試しください。"}t.remove()}});
 $("goPricing").addEventListener("click",()=>$("pricing").scrollIntoView({behavior:"smooth"}));
