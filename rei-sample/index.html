@@ -51,6 +51,17 @@ body{background:#0d0b0f;color:#fff0f7;font-family:Georgia,'Times New Roman',seri
 .bottom{transform:translate(-50%,calc(100% + 8px))!important;opacity:0;visibility:hidden;pointer-events:none;transition:transform .28s ease,opacity .28s ease,visibility .28s ease}
 .bottom.nav-visible{transform:translate(-50%,0)!important;opacity:1;visibility:visible;pointer-events:auto}
 @media(prefers-reduced-motion:reduce){.bottom{transition:none}}
+
+/* Compact PRIVATE BOOKING; keep narrow native datetime controls on mobile */
+#hime .booking-guide{font-size:12px;line-height:1.7;color:#e8d4e0;margin:0 0 12px}
+#hime .field{margin:7px 0}
+#hime .field label{font-size:12px;margin-bottom:3px}
+#hime .field input:not([type=hidden]),#hime .field select,#hime .field textarea{padding:8px 10px;min-height:38px;border-radius:8px}
+#hime .field textarea{min-height:66px}
+#hime input[type=datetime-local],#hime input[type=date]{width:60%!important;max-width:60%!important;min-width:0}
+#hime .linked-booking-area select{width:100%;max-width:100%;box-sizing:border-box}
+#hime #copyBooking{margin-top:14px}
+#hime .booking-footnote{font-size:11px;line-height:1.6;color:#c5acbd;margin:9px 0 0}
 </style></head><body><div class="app"><section class="hero" id="home"><img class="hero-photo" id="heroImage" alt=""><div class="hero-inner"><div class="small" id="heroSubtitle"></div><h1 id="heroName"></h1><p id="heroCatch"></p></div></section>
 <div class="card" id="news"><h2>NEWS</h2><div class="notice" id="newsText"></div></div>
 <div class="card" id="sns"><h2>SNS</h2><div class="sns"><button data-sns="line"><img data-sns-image="line" alt="LINE"></button><button data-sns="x"><img data-sns-image="x" alt="X"></button><button data-sns="sub"><img data-sns-image="sub" alt="02"></button></div></div>
@@ -60,7 +71,7 @@ body{background:#0d0b0f;color:#fff0f7;font-family:Georgia,'Times New Roman',seri
 <div class="card" id="today"><h2>TODAY</h2><img class="media-square" id="todayImage" alt="本日の出勤状況"><div class="status-label" id="todayText"></div></div>
 <div class="card" id="schedule-detail"><h2>SCHEDULE</h2><div class="schedule" id="scheduleRows"></div></div>
 <div class="card" id="calendar-section"><h2>CALENDAR</h2><img class="media-square" id="calendarImage" alt="カレンダー"></div>
-<div class="card" id="hime"><h2>PRIVATE ご予約</h2><div id="bookingFields"></div><button class="btn outline" id="copyBooking">予約内容をコピー</button></div>
+<div class="card" id="hime"><h2>PRIVATE BOOKING</h2><p class="booking-guide">セラピストへ直接ご予約をお申し込みいただけます。<br>必要事項を入力し、予約内容をコピーして、画面下部のLINE・X・02のDMへお送りください。</p><div id="bookingFields"></div><button class="btn outline" id="copyBooking" type="button">予約内容をコピー</button><p class="booking-footnote" id="bookingCopyStatus" role="status" aria-live="polite">※セラピストからの返信をもって予約確定となります。</p></div>
 <div class="card" id="price"><h2>PRICE SIMULATOR</h2><div class="field" id="courseWrap"><label>コース<select id="course"></select></label></div><div id="extras"></div><div class="field" id="nominationWrap"><label>指名料</label><div id="nominationValue"></div></div><div class="field" id="specialWrap"><label>特別指名料</label><div id="specialValue"></div></div><div class="field" id="travelWrap"><label>交通費<select id="travel"></select></label></div><div id="totalWrap"><div class="total" id="total"></div><p class="smallnote" id="breakdown"></p></div><p class="smallnote" id="priceCaution" style="white-space:pre-wrap"></p><p id="priceNotes" style="white-space:pre-wrap"></p></div>
 <div class="card" id="location"><h2 id="locationTitle">LOCATION GUIDE</h2><div id="guideAreas"></div></div>
 <div class="card" id="profile"><h2>PROFILE</h2><div class="profile-flex"><img id="profileImage" alt="プロフィール"><div class="profile-rows" id="profileRows"></div></div></div>
@@ -160,9 +171,13 @@ let control=linkedArea?`<div class="linked-booking-area"><input data-label="${na
 document.querySelectorAll('.linked-booking-area').forEach(wrap=>{
  const input=wrap.querySelector('[data-label]'),host=wrap.querySelector('.travel-button-host');
  const areas=[...(Array.isArray(cfg.travelFreeAreas)?cfg.travelFreeAreas:[{name:'日本橋｜指定ホテル',visible:true},{name:'谷町九丁目｜指定ホテル',visible:true},{name:'梅田｜指定ホテル',visible:true}]).filter(x=>x.visible!==false).map(x=>({name:x.name,price:0})),...(cfg.travelAreas||[]).filter(x=>Number(x.price)>=1000&&x.visible!==false)];
- makeTravelButtons(host,areas,i=>{input.value=areas[i].name});
+ const select=document.createElement('select');select.setAttribute('aria-label','ご利用エリア');
+ select.append(new Option('エリアを選択してください',''));
+ areas.forEach((area,i)=>select.append(new Option(area.name+(Number(area.price)>0?'（交通費 '+Number(area.price).toLocaleString('ja-JP')+'円）':'（無料）'),String(i))));
+ select.onchange=()=>{input.value=select.value===''?'':areas[Number(select.value)].name};
+ host.replaceChildren(select);
 });
-$('copyBooking').onclick=async()=>{let nodes=[...document.querySelectorAll('#bookingFields [data-label]')],missing=nodes.find(n=>n.required&&!n.value.trim());if(missing){missing.focus();alert('入力してください：'+missing.dataset.label);return}let text=nodes.map(n=>n.dataset.label+': '+n.value).join('\n');try{await navigator.clipboard.writeText(text);alert('コピーしました')}catch{alert('コピーできませんでした')}};
+$('copyBooking').onclick=async()=>{let nodes=[...document.querySelectorAll('#bookingFields [data-label]')],missing=nodes.find(n=>n.required&&!n.value.trim());if(missing){missing.focus();alert('入力してください：'+missing.dataset.label);return}let text=nodes.map(n=>n.dataset.label+': '+n.value).join('\n');try{await navigator.clipboard.writeText(text);$('bookingCopyStatus').textContent='コピーしました。画面下部のLINE・X・02からセラピストへ送信してください。※返信をもって予約確定となります。';$('bookingCopyStatus').scrollIntoView({block:'nearest',behavior:'smooth'})}catch{alert('コピーできませんでした。ブラウザのコピー権限をご確認ください。')}};
 if(!cfg.pricePublished||!cfg.courses.length){$('price').hidden=true}else{
 const show=(key)=>cfg[key]!==false;
 $('courseWrap').hidden=!show('priceShowCourse');
