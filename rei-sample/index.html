@@ -177,7 +177,21 @@ $('breakdown').textContent=['コース '+money(coursePrice),...(extra?['追加�
 $('price').addEventListener('change',calc);calc();
 }
 $('guideAreas').innerHTML=cfg.areas.filter(a=>a.visible).map(a=>`<div class="field"><h3>${esc(a.name)}</h3>${a.type==='map'&&/^https:\/\/www\.google\.com\/maps\/embed/.test(a.map||'')?`<iframe class="guide-map" src="${esc(a.map)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`:`<img class="guide-img" src="${esc(a.image||demoImage(a.name,'wide'))}" alt="${esc(a.name)}">`}</div>`).join('');
-const order=['home',...cfg.sections.filter(id=>SECTIONS.some(s=>s[0]===id))];let app=document.querySelector('.app'),foot=app.querySelector('.foot');cfg.sections.forEach(id=>{let e=$(id);if(e)app.insertBefore(e,foot)});cfg.hidden.forEach(id=>{if($(id))$(id).hidden=true});if(!cfg.pricePublished||!cfg.courses.length)$('price').hidden=true;
+const order=['home',...cfg.sections.filter(id=>SECTIONS.some(s=>s[0]===id))];let app=document.querySelector('.app'),foot=app.querySelector('.foot');cfg.sections.forEach(id=>{let e=$(id);if(e)app.insertBefore(e,foot)});
+document.querySelectorAll('.rei-section-divider').forEach(el=>el.remove());
+if(cfg.dividerStyle!=='none'&&Array.isArray(cfg.dividerAfter)){
+ for(const id of cfg.dividerAfter){
+  const section=$(id);if(!section||section.hidden||!app.contains(section))continue;
+  const divider=document.createElement('div');divider.className='rei-section-divider';divider.setAttribute('aria-hidden','true');
+  divider.style.cssText='height:1px;margin:24px 12px;background:linear-gradient(90deg,transparent,#c56a9d,transparent);position:relative;';
+  if(cfg.dividerStyle==='ornament'){
+   divider.style.margin='30px 12px';
+   const center=document.createElement('span');center.textContent='◆';center.style.cssText='position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#261e2b;color:#e98ab7;padding:0 12px;font-size:12px';divider.append(center);
+  }
+  section.after(divider);
+ }
+}
+cfg.hidden.forEach(id=>{if($(id))$(id).hidden=true});if(!cfg.pricePublished||!cfg.courses.length)$('price').hidden=true;
 function applyHeadingLanguage(lang){
  document.documentElement.lang=['ja','en','ko'].includes(lang)?lang:'ja';
  for(const id of Object.keys(HEADING_TRANSLATIONS)){
