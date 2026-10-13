@@ -202,27 +202,33 @@ const help=document.createElement('p');help.className='muted';help.textContent='
 const bulk=document.createElement('textarea');bulk.rows=7;bulk.placeholder='1000円｜北区、福島区、中央区\n2000円｜港区、此花区、大正区';s.append(bulk);
 const preview=document.createElement('div');preview.className='muted';s.append(preview);
 let parsedPaid=null;
-const parseButton=document.createElement('button');parseButton.type='button';parseButton.textContent='一覧を解析';parseButton.onclick=()=>{
+const parseButton=document.createElement('button');parseButton.type='button';parseButton.textContent='一覧を解析';
+function parsePaidAreas(){
  const entries=[],errors=[],seen=new Map();
+ const normalizeDigits=str=>String(str).replace(/[０-９]/g,c=>String(c.charCodeAt(0)-65296));
  bulk.value.split(/\r?\n/).forEach((raw,i)=>{
-  const line=raw.trim();if(!line)return;
-  const match=line.match(/^([\d,，]+)\s*円?\s*[｜|：:]\s*(.+)$/);
-  if(!match){errors.push((i+1)+'行目：金額とエリア名を確認してください');return}
-  const price=Number(match[1].replace(/[,，]/g,''));if(!Number.isFinite(price)||price<1000){errors.push((i+1)+'行目：有料エリアは1,000円以上です');return}
+  const line=normalizeDigits(raw).trim();if(!line)return;
+  const match=line.match(/^([\d,，]+)\s*(?:円|￥|¥)?\s*[｜|：:]\s*(.+)$/);
+  if(!match){errors.push((i+1)+'行目：形式を確認してください（例：1000円｜北区、福島区）');return}
+  const price=Number(match[1].replace(/[,，]/g,''));
+  if(!Number.isFinite(price)||price<1000){errors.push((i+1)+'行目：有料エリアは1,000円以上です');return}
   const names=match[2].split(/[、,，]/).map(x=>x.trim()).filter(Boolean);
   if(!names.length){errors.push((i+1)+'行目：エリア名がありません');return}
   for(const name of names){if(seen.has(name)){errors.push('重複：'+name+'（'+seen.get(name)+'円／'+price+'円）');continue}seen.set(name,price);entries.push({name,price,visible:true})}
  });
  parsedPaid=errors.length?null:entries;
  preview.textContent=errors.length?errors.join(' ／ '):entries.length?entries.length+'エリアを解析しました。内容：'+entries.map(x=>x.name+' '+x.price.toLocaleString()+'円').join('、'):'登録可能なエリアがありません';
-};
+ return !!parsedPaid&&parsedPaid.length>0;
+}
+parseButton.onclick=parsePaidAreas;bulk.addEventListener('input',()=>{parsedPaid=null;preview.textContent='入力内容が変更されました。「一覧を解析」を押してください。'});
 s.append(parseButton);
 const applyButton=document.createElement('button');applyButton.type='button';applyButton.textContent='確認して一括登録';applyButton.onclick=()=>{
- if(!parsedPaid||!parsedPaid.length){alert('先に一覧を解析してください');return}
+ if(!parsedPaid&&!parsePaidAreas()){alert('解析できませんでした。入力欄の下に表示されたエラーを確認してください');return}
  const existing=d.travelAreas.filter(x=>Number(x.price)>=1000);
  const conflicts=parsedPaid.filter(x=>existing.some(y=>y.name===x.name&&Number(y.price)!==x.price));
  if(conflicts.length){alert('既存エリアと金額が異なります：'+conflicts.map(x=>x.name).join('、')+'。既存設定を確認してください');return}
  const additions=parsedPaid.filter(x=>!existing.some(y=>y.name===x.name));
+ if(!additions.length){preview.textContent='すべて登録済みです。新規追加はありません。';return}
  if(!confirm(additions.length+'件の有料エリアを追加します。既存のエリアは保持します。よろしいですか？'))return;
  d.travelAreas.push(...additions);parsedPaid=null;preview.textContent=additions.length+'件を追加しました。下部の「設定を保存」で確定してください。';renderPaid();
 };s.append(applyButton);
