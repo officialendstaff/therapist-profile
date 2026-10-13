@@ -62,7 +62,11 @@ body{background:#0d0b0f;color:#fff0f7;font-family:Georgia,'Times New Roman',seri
 #hime .linked-booking-area select{width:100%;max-width:100%;box-sizing:border-box}
 #hime #copyBooking{margin-top:14px}
 #hime .booking-footnote{font-size:11px;line-height:1.6;color:#c5acbd;margin:9px 0 0}
-</style></head><body><div class="app"><section class="hero" id="home"><img class="hero-photo" id="heroImage" alt=""><div class="hero-inner"><div class="small" id="heroSubtitle"></div><h1 id="heroName"></h1><p id="heroCatch"></p></div></section>
+.hero{position:relative}
+.hero-loading{position:absolute;inset:0;z-index:2;background:#fff;display:flex;align-items:center;justify-content:center;opacity:1;visibility:visible;transition:opacity .35s ease,visibility .35s ease;pointer-events:none}
+.hero-loading img{width:100%;height:100%;object-fit:contain}
+.hero-loading.is-ready{opacity:0;visibility:hidden}
+</style></head><body><div class="app"><section class="hero" id="home"><div class="hero-loading" id="heroLoading" aria-hidden="true"><img src="./mattan-loading.webp" alt="" fetchpriority="high"></div><img class="hero-photo" id="heroImage" alt=""><div class="hero-inner"><div class="small" id="heroSubtitle"></div><h1 id="heroName"></h1><p id="heroCatch"></p></div></section>
 <div class="card" id="news"><h2>NEWS</h2><div class="notice" id="newsText"></div></div>
 <div class="card" id="sns"><h2>SNS</h2><div class="sns"><button data-sns="line"><img data-sns-image="line" alt="LINE"></button><button data-sns="x"><img data-sns-image="x" alt="X"></button><button data-sns="sub"><img data-sns-image="sub" alt="02"></button></div></div>
 <div class="card" id="personal"><h2>PERSONAL</h2><img class="media-square" id="personalImage" alt="パーソナル画像"></div>
@@ -125,7 +129,11 @@ if(publishedNews.length){
  }
 }else $('newsText').textContent=Array.isArray(cfg.newsItems)&&cfg.newsItems.length?'現在、公開中のお知らせはありません。':(cfg.news||'現在、公開中のお知らせはありません。');
 $('introText').textContent=cfg.intro;
-image('heroImage',cfg.images.hero,'HERO','portrait');document.querySelector('.hero').style.setProperty('--hero-backdrop',cfg.images.hero?'url('+JSON.stringify(cfg.images.hero)+')':'none');image('personalImage',cfg.images.personal,'PERSONAL');image('profileImage',cfg.images.profile,'PROFILE','portrait');image('calendarImage',cfg.images.calendar,'CALENDAR');
+const heroImg=$('heroImage'),heroLoading=$('heroLoading');
+const finishHero=()=>{if(heroImg.naturalWidth>0)heroLoading.classList.add('is-ready')};
+heroImg.addEventListener('load',()=>{if(heroImg.decode)heroImg.decode().catch(()=>{}).finally(finishHero);else finishHero()},{once:true});
+image('heroImage',cfg.images.hero,'HERO','portrait');
+if(heroImg.complete&&heroImg.naturalWidth>0)finishHero();document.querySelector('.hero').style.setProperty('--hero-backdrop',cfg.images.hero?'url('+JSON.stringify(cfg.images.hero)+')':'none');image('personalImage',cfg.images.personal,'PERSONAL');image('profileImage',cfg.images.profile,'PROFILE','portrait');image('calendarImage',cfg.images.calendar,'CALENDAR');
 $('photoGallery').innerHTML=(cfg.photos.length?cfg.photos:Array(6).fill('')).map((url,i)=>`<img src="${esc(url||demoImage('PHOTO '+(i+1),'portrait'))}" alt="Photo ${i+1}">`).join('');
 $('profileRows').innerHTML=cfg.profileRows.slice(0,3).map(x=>`<label>${esc(x.label)}</label><strong>${esc(x.value)}</strong>`).join('');
 const today=new Date(),todayKey=dayKey(today),todayShift=cfg.shifts[todayKey],sold=cfg.soldout[todayKey];image('todayImage',sold?cfg.images.soldout:todayShift?cfg.images.working:cfg.images.off,sold?'完売':todayShift?'出勤':'お休み');$('todayText').textContent=sold?'完売':todayShift||'本日はお休みです';
