@@ -29,6 +29,12 @@ html,body{max-width:100%;overflow-x:clip}
 #bookingFields input[type="datetime-local"],#bookingFields input[type="date"]{width:60%;max-width:60%;display:block}
 body{background:#0d0b0f;color:#fff0f7;font-family:Georgia,'Times New Roman',serif}.app{background:#17141b;color:#fff0f7}:root{--pink:#ff5caa;--bg:#17141b;--panel:#27212d;--text:#fff0f7;--muted:#c5acbd}.hero{background:radial-gradient(circle at 50% 20%,#763455 0%,#302033 48%,#17141b 80%)}
 
+/* HERO: preserve complete Canva composition and original colors */
+.hero{isolation:isolate}
+.hero::after{content:"";position:absolute;inset:-20px;background-image:var(--hero-backdrop,none);background-position:center;background-size:cover;filter:blur(24px);transform:scale(1.1);z-index:0;pointer-events:none}
+.hero-photo{object-fit:contain!important;object-position:center center!important;background:transparent!important;z-index:1;opacity:1!important;filter:none!important}
+.hero .hero-inner{background:none!important;z-index:2}
+.hero::before{display:none!important}
 /* Full-screen first view with persistent bottom navigation */
 .hero{aspect-ratio:auto;height:calc(100vh - 74px);height:calc(100svh - 74px);min-height:320px}
 .hero-photo{object-fit:cover;object-position:center center}
@@ -99,7 +105,7 @@ if(publishedNews.length){
  }
 }else $('newsText').textContent=Array.isArray(cfg.newsItems)&&cfg.newsItems.length?'現在、公開中のお知らせはありません。':(cfg.news||'現在、公開中のお知らせはありません。');
 $('introText').textContent=cfg.intro;
-image('heroImage',cfg.images.hero,'HERO','portrait');image('personalImage',cfg.images.personal,'PERSONAL');image('profileImage',cfg.images.profile,'PROFILE','portrait');image('calendarImage',cfg.images.calendar,'CALENDAR');
+image('heroImage',cfg.images.hero,'HERO','portrait');document.querySelector('.hero').style.setProperty('--hero-backdrop',cfg.images.hero?'url('+JSON.stringify(cfg.images.hero)+')':'none');image('personalImage',cfg.images.personal,'PERSONAL');image('profileImage',cfg.images.profile,'PROFILE','portrait');image('calendarImage',cfg.images.calendar,'CALENDAR');
 $('photoGallery').innerHTML=(cfg.photos.length?cfg.photos:Array(6).fill('')).map((url,i)=>`<img src="${esc(url||demoImage('PHOTO '+(i+1),'portrait'))}" alt="Photo ${i+1}">`).join('');
 $('profileRows').innerHTML=cfg.profileRows.slice(0,3).map(x=>`<label>${esc(x.label)}</label><strong>${esc(x.value)}</strong>`).join('');
 const today=new Date(),todayKey=dayKey(today),todayShift=cfg.shifts[todayKey],sold=cfg.soldout[todayKey];image('todayImage',sold?cfg.images.soldout:todayShift?cfg.images.working:cfg.images.off,sold?'完売':todayShift?'出勤':'お休み');$('todayText').textContent=sold?'完売':todayShift||'本日はお休みです';
