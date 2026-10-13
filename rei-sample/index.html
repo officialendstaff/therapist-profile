@@ -179,7 +179,8 @@ $('breakdown').textContent=['コース '+money(coursePrice),...(extra?['追加�
 $('price').addEventListener('change',calc);calc();
 }
 $('guideAreas').innerHTML=cfg.areas.filter(a=>a.visible).map(a=>`<div class="field"><h3>${esc(a.name)}</h3>${a.type==='map'&&/^https:\/\/www\.google\.com\/maps\/embed/.test(a.map||'')?`<iframe class="guide-map" src="${esc(a.map)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`:`<img class="guide-img" src="${esc(a.image||demoImage(a.name,'wide'))}" alt="${esc(a.name)}">`}</div>`).join('');
-const order=['home',...cfg.sections.filter(id=>SECTIONS.some(s=>s[0]===id))];let app=document.querySelector('.app'),foot=app.querySelector('.foot');cfg.sections.forEach(id=>{let e=$(id);if(e)app.insertBefore(e,foot)});
+const order=['home',...cfg.sections.filter(id=>SECTIONS.some(s=>s[0]===id))];let app=document.querySelector('.app'),foot=app.querySelector('.foot');if(!cfg.sections.includes('official-blog')){const i=cfg.sections.indexOf('profile');cfg.sections.splice(i>=0?i+1:cfg.sections.length,0,'official-blog');}
+cfg.sections.forEach(id=>{let e=$(id);if(e)app.insertBefore(e,foot)});
 // Official blog: render only successfully cached posts; keep the rest of the page independent.
 try{
  const blogCfg=cfg.officialBlog||{};
@@ -203,6 +204,11 @@ try{
  const all=document.createElement('a');all.href=listUrl;all.target='_blank';all.rel='noopener noreferrer';all.textContent='公式ブログ一覧を見る →';all.style.cssText='display:block;margin-top:14px;text-align:center';section.append(all);
  const profile=document.getElementById('profile');
  if(profile&&profile.parentElement)profile.insertAdjacentElement('afterend',section);
+ // Apply saved order and visibility after the async BLOG card is created.
+ const blogIndex=cfg.sections.indexOf('official-blog');
+ const nextId=cfg.sections.slice(blogIndex+1).find(id=>id!=='official-blog'&&$(id)&&$(id).parentElement===app);
+ if(nextId)app.insertBefore(section,$(nextId));else app.insertBefore(section,foot);
+ section.hidden=Array.isArray(cfg.hidden)&&cfg.hidden.includes('official-blog');
 }catch(e){console.warn('Blog display unavailable',e)}
 document.querySelectorAll('.rei-section-divider').forEach(el=>el.remove());
 if(cfg.dividerStyle!=='none'&&Array.isArray(cfg.dividerAfter)){
