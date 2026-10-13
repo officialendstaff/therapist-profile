@@ -50,8 +50,10 @@ body{background:#0d0b0f;color:#fff0f7;font-family:Georgia,'Times New Roman',seri
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="shared.js"></script><script src="supabase-adapter.js"></script><script>
 // Reloads always begin at the page top; ordinary in-page navigation remains unchanged.
 try{history.scrollRestoration='manual'}catch(_){}
-window.addEventListener('load',()=>{if(!location.hash)window.scrollTo({top:0,left:0,behavior:'instant'})});
-window.addEventListener('pageshow',e=>{if(e.persisted||performance.getEntriesByType('navigation')[0]?.type==='reload'){if(!location.hash)window.scrollTo(0,0)}});
+const isPageReload=performance.getEntriesByType('navigation')[0]?.type==='reload';
+if(isPageReload&&location.hash)history.replaceState(null,'',location.pathname+location.search);
+window.addEventListener('load',()=>{if(isPageReload||!location.hash)window.scrollTo(0,0)});
+window.addEventListener('pageshow',e=>{if(e.persisted||isPageReload)window.scrollTo(0,0)});
 async function initReiViewer(){
 let cfg=getData();
 try {const remote=await reiSampleReadPublished(reiSampleClient());if(!remote){document.body.replaceChildren();const note=document.createElement('main');note.style.cssText='min-height:100vh;display:grid;place-content:center;text-align:center;padding:24px;background:#151119;color:#fff0f7';note.textContent='麗｜ページ準備中';document.body.append(note);return;}cfg={...cfg,...remote,images:{...cfg.images,...remote.images},sns:{...cfg.sns,...remote.sns}};}catch(err){console.warn("Remote data unavailable",err);document.body.replaceChildren();const note=document.createElement('main');note.style.cssText='min-height:100vh;display:grid;place-content:center;text-align:center;padding:24px;background:#151119;color:#fff0f7';note.textContent='麗｜ページ準備中';document.body.append(note);return;}
