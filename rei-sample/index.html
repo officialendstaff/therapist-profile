@@ -96,10 +96,36 @@ const today=new Date(),todayKey=dayKey(today),todayShift=cfg.shifts[todayKey],so
 for(let i=1;i<=7;i++){let d=new Date(today.getFullYear(),today.getMonth(),today.getDate()+i),key=dayKey(d);$('scheduleRows').insertAdjacentHTML('beforeend',`<div class="r"><span>${esc(d.toLocaleDateString('ja-JP',{month:'short',day:'numeric',weekday:'short'}))}</span><b>${cfg.shifts[key]&&cfg.soldout[key]?'完売':esc(cfg.shifts[key]||'お休み')}</b></div>`)}
 window.addEventListener('storage',event=>{if(event.key===KEY)location.reload()});
 let renderedShiftDay=dayKey(new Date());setInterval(()=>{if(dayKey(new Date())!==renderedShiftDay)location.reload()},60000);
+function travelGroups(areas){
+ const groups=new Map();
+ areas.forEach((a,i)=>{const p=Number(a.price||0);if(!groups.has(p))groups.set(p,[]);groups.get(p).push({area:a,index:i})});
+ return [...groups.entries()].sort((a,b)=>a[0]-b[0]);
+}
+function makeTravelButtons(host,areas,onSelect,selectedIndex=-1){
+ host.innerHTML='';
+ const buttons=[];
+ for(const [price,entries] of travelGroups(areas)){
+  const group=document.createElement('div');group.style.cssText='margin:12px 0 18px';
+  const title=document.createElement('div');title.textContent=price===0?'【無料エリア】':'【'+Number(price).toLocaleString('ja-JP')+'円】';title.style.cssText='font-weight:700;margin-bottom:10px;color:var(--pink,#ff5caa)';
+  const row=document.createElement('div');row.style.cssText='display:flex;flex-wrap:wrap;gap:8px';
+  for(const {area,index} of entries){
+   const btn=document.createElement('button');btn.type='button';btn.textContent=area.name;btn.style.cssText='font:inherit;font-size:14px;line-height:1.4;padding:9px 12px;border-radius:9px;border:1px solid #865b78;color:inherit;background:#211b28;max-width:100%;white-space:normal;text-align:left;cursor:pointer';
+   btn.onclick=()=>{onSelect(index);buttons.forEach(({button,i})=>{button.style.background=i===index?'#a52c70':'#211b28';button.style.borderColor=i===index?'#ff86c4':'#865b78';button.setAttribute('aria-pressed',String(i===index))})};
+   row.append(btn);buttons.push({button:btn,i:index});
+  }
+  group.append(title,row);host.append(group);
+ }
+ if(selectedIndex>=0){const found=buttons.find(x=>x.i===selectedIndex);if(found)found.button.click()}
+}
 $('bookingFields').innerHTML=cfg.bookingFields.filter(f=>f.visible).map((f,i)=>{let name=esc(f.label);const linkedArea=f.label.trim()==='エリア'&&cfg.travelEnabled&&cfg.travelMode==='area';
 const freeAreas=(Array.isArray(cfg.travelFreeAreas)?cfg.travelFreeAreas:[{name:'日本橋｜指定ホテル',visible:true},{name:'谷町九丁目｜指定ホテル',visible:true},{name:'梅田｜指定ホテル',visible:true}]).filter(x=>x.visible!==false);
 const paidAreas=(Array.isArray(cfg.travelAreas)?cfg.travelAreas:[]).filter(x=>Number(x.price)>=1000&&x.visible!==false);
-let control=linkedArea?`<select data-label="${name}" ${f.required?'required':''}><option value="">選択してください</option><optgroup label="無料エリア">${freeAreas.map(x=>`<option value="${esc(x.name)}">${esc(x.name)}（無料）</option>`).join('')}</optgroup><optgroup label="有料エリア">${paidAreas.map(x=>`<option value="${esc(x.name)}">${esc(x.name)}（${money(x.price)}）</option>`).join('')}</optgroup></select>`:f.type==='select'?`<select data-label="${name}" ${f.required?'required':''}><option value="">選択してください</option>${(f.options||'').split('\n').filter(Boolean).map(o=>`<option>${esc(o)}</option>`).join('')}</select>`:f.type==='textarea'?`<textarea data-label="${name}" ${f.required?'required':''}></textarea>`:`<input data-label="${name}" type="${['text','tel','date','time','datetime-local','email','number'].includes(f.type)?f.type:'text'}" ${f.required?'required':''}>`;return `<div class="field"><label>${name}${f.required?' *':''}</label>${control}</div>`}).join('');
+let control=linkedArea?`<div class="linked-booking-area"><input data-label="${name}" type="hidden" ${f.required?'required':''}><div class="travel-button-host"></div></div>`:f.type==='select'?`<select data-label="${name}" ${f.required?'required':''}><option value="">選択してください</option>${(f.options||'').split('\n').filter(Boolean).map(o=>`<option>${esc(o)}</option>`).join('')}</select>`:f.type==='textarea'?`<textarea data-label="${name}" ${f.required?'required':''}></textarea>`:`<input data-label="${name}" type="${['text','tel','date','time','datetime-local','email','number'].includes(f.type)?f.type:'text'}" ${f.required?'required':''}>`;return `<div class="field"><label>${name}${f.required?' *':''}</label>${control}</div>`}).join('');
+document.querySelectorAll('.linked-booking-area').forEach(wrap=>{
+ const input=wrap.querySelector('[data-label]'),host=wrap.querySelector('.travel-button-host');
+ const areas=[...(Array.isArray(cfg.travelFreeAreas)?cfg.travelFreeAreas:[{name:'日本橋｜指定ホテル',visible:true},{name:'谷町九丁目｜指定ホテル',visible:true},{name:'梅田｜指定ホテル',visible:true}]).filter(x=>x.visible!==false).map(x=>({name:x.name,price:0})),...(cfg.travelAreas||[]).filter(x=>Number(x.price)>=1000&&x.visible!==false)];
+ makeTravelButtons(host,areas,i=>{input.value=areas[i].name});
+});
 $('copyBooking').onclick=async()=>{let nodes=[...document.querySelectorAll('#bookingFields [data-label]')],missing=nodes.find(n=>n.required&&!n.value.trim());if(missing){missing.focus();alert('入力してください：'+missing.dataset.label);return}let text=nodes.map(n=>n.dataset.label+': '+n.value).join('\n');try{await navigator.clipboard.writeText(text);alert('コピーしました')}catch{alert('コピーできませんでした')}};
 if(!cfg.pricePublished||!cfg.courses.length){$('price').hidden=true}else{
 const show=(key)=>cfg[key]!==false;
@@ -120,6 +146,11 @@ $('travelWrap').hidden=!show('priceShowTravel')||!cfg.travelEnabled;
 const configuredFree=Array.isArray(cfg.travelFreeAreas)?cfg.travelFreeAreas:[{name:'日本橋｜指定ホテル',visible:true},{name:'谷町九丁目｜指定ホテル',visible:true},{name:'梅田｜指定ホテル',visible:true}];
 const activeTravelAreas=cfg.travelMode==='area'?[...configuredFree.filter(x=>x.visible!==false).map(x=>({name:x.name,price:0})),...cfg.travelAreas.filter(x=>Number(x.price)>=1000&&x.visible!==false)]:[];
 if(cfg.travelEnabled){$('travel').innerHTML=cfg.travelMode==='area'?activeTravelAreas.map((x,i)=>`<option value="${i}">${esc(x.name)} — ${money(x.price)}</option>`).join(''):'<option value="0">'+(cfg.travelMode==='free'?'無料':'一律交通費')+'</option>'}
+if(cfg.travelEnabled&&cfg.travelMode==='area'){
+ $('travel').style.display='none';
+ const host=document.createElement('div');host.className='travel-button-host';$('travel').after(host);
+ makeTravelButtons(host,activeTravelAreas,i=>{$('travel').value=String(i);$('travel').dispatchEvent(new Event('change',{bubbles:true}))},activeTravelAreas.length?0:-1);
+}
 const calc=()=>{
 const course=cfg.courses[Number($('course').value)]||{price:0};
 const extra=[...document.querySelectorAll('[data-extra]:checked')].reduce((sum,e)=>sum+Number(cfg.extras[Number(e.dataset.extra)]?.price||0),0);
