@@ -24,6 +24,7 @@ const ADMIN_PAGES=[
  ['booking','予約・料金管理','calendar-check','フォーム・料金'],
  ['areas','エリア管理','map-pin','アクセス・交通費'],
  ['layout','ページ構成管理','layout-template','表示順・メニュー画像'],
+ ['blog','公式ブログ連携','book-open','最新記事の表示設定'],
  ['ogp','OGP設定','share-2','共有画像・タイトル']
 ];
 const currentPage=new URLSearchParams(location.search).get('page')||'top';
@@ -34,6 +35,7 @@ const PAGE_SECTIONS={
  booking:['姫予約フォームの項目','料金シミュレーター','出張・交通費'],
  areas:['LOCATION GUIDE'],
  layout:['セクションの表示・並び順','見出し・装飾の設定','下部メニューバーのアイコン'],
+ blog:['公式ブログ連携'],
  ogp:['OGP・SNS共有設定']
 };
 const pageInfo=ADMIN_PAGES.find(x=>x[0]===currentPage);
@@ -54,6 +56,19 @@ if(currentPage==='top'){
  originalIntro.hidden=true;originalViewLink.insertAdjacentHTML('beforebegin','<a class="btn secondary" href="admin.html">管理TOP</a>');
 }
 
+// ブログ連携設定。自動取得は取得元の仕様確認後に接続する。
+if(currentPage==='blog'){
+ const blogSection=document.createElement('section');
+ blogSection.innerHTML='<h2>公式ブログ連携</h2><p class="muted">公式HPのブログ一覧URLと表示件数を保存します。記事の自動取得・表示は現在未接続です。</p>';
+ root.append(blogSection);
+ if(!d.officialBlog||typeof d.officialBlog!=='object')d.officialBlog={};
+ const blog=d.officialBlog;
+ const lab=document.createElement('label');lab.textContent='公式ブログ一覧URL';blogSection.append(lab);
+ const url=document.createElement('input');url.type='url';url.placeholder='https://grandluxe-osaka.com/bloglist.php?id=1463';url.value=blog.listUrl||'https://grandluxe-osaka.com/bloglist.php?id=1463';blog.listUrl=url.value;url.addEventListener('input',()=>blog.listUrl=url.value.trim());blogSection.append(url);
+ const countLabel=document.createElement('label');countLabel.textContent='表示件数';blogSection.append(countLabel);
+ const count=document.createElement('select');[1,2,3].forEach(n=>{const opt=document.createElement('option');opt.value=n;opt.textContent=n+'件';count.append(opt)});count.value=String([1,2,3].includes(Number(blog.count))?blog.count:1);blog.count=Number(count.value);count.addEventListener('change',()=>blog.count=Number(count.value));blogSection.append(count);
+ const note=document.createElement('p');note.className='muted';note.textContent='現在は設定の保存のみ可能です。記事取得の確認ができるまで、公開ページには未取得の記事を表示しません。';blogSection.append(note);
+}
 function section(title){let s=document.createElement('section');s.innerHTML='<h2>'+title+'</h2>';if(currentPage!=='top'&&(PAGE_SECTIONS[currentPage]||[]).includes(title))root.append(s);return s}
 function textfield(parent,label,obj,key,type='text'){let l=document.createElement('label');l.textContent=label;let input=document.createElement(type==='textarea'?'textarea':'input');if(type!=='textarea')input.type=type;input.value=obj[key]??'';if(type==='textarea'){input.classList.add('longtext');input.rows=9;const resize=()=>{input.style.height='auto';input.style.height=Math.max(230,input.scrollHeight+3)+'px'};input.addEventListener('input',resize);requestAnimationFrame(resize)}input.oninput=()=>obj[key]=type==='number'?Number(input.value):input.value;if(type==='textarea'){input.setAttribute('wrap','soft');input.style.cssText+=';width:100%;max-width:100%;min-width:0;overflow-x:hidden;overflow-wrap:anywhere;word-break:break-word;white-space:pre-wrap';input.addEventListener('focus',()=>{input.scrollLeft=0});input.addEventListener('input',()=>{if(input.scrollLeft)input.scrollLeft=0})}parent.append(l,input);return input}
 function check(parent,label,obj,key){let l=document.createElement('label'),i=document.createElement('input');i.type='checkbox';i.checked=!!obj[key];i.onchange=()=>obj[key]=i.checked;l.append(i,' '+label);parent.append(l);return i}
