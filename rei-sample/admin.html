@@ -270,6 +270,16 @@ decorations.append(characterPreview);showCharacter();
 characterInput.onchange=()=>{const file=characterInput.files&&characterInput.files[0];if(!file)return;if(file.type!=='image/png'){alert('透過PNG画像を選択してください');characterInput.value='';return}const reader=new FileReader();reader.onload=()=>{d.decorationImage=String(reader.result||'');showCharacter()};reader.onerror=()=>alert('画像を読み込めませんでした');reader.readAsDataURL(file)};
 const clearCharacter=document.createElement('button');clearCharacter.type='button';clearCharacter.className='secondary';clearCharacter.textContent='装飾キャラクター画像を削除';clearCharacter.onclick=()=>{d.decorationImage='';characterInput.value='';showCharacter()};decorations.append(clearCharacter);
 selectfield(decorations,'区切り線',d,'dividerStyle',[['standard','標準'],['ornament','装飾'],['none','なし']]);
+if(!Array.isArray(d.dividerAfter))d.dividerAfter=[];
+const dividerHelp=document.createElement('p');dividerHelp.className='muted';dividerHelp.textContent='区切り線を表示するセクションの下にチェックを入れてください。表示順を変更しても、そのセクションの直後に表示されます。';decorations.append(dividerHelp);
+const dividerLabels={home:'HERO',news:'NEWS',snsTop:'SNS',personal:'PERSONAL',intro:'INTRO',photo:'PHOTO',today:'TODAY',schedule:'SCHEDULE',calendar:'CALENDAR',hime:'姫予約',price:'料金',profile:'PROFILE',official:'OFFICIAL'};
+for(const id of d.sections||[]){
+ const label=document.createElement('label');label.style.cssText='display:flex;align-items:center;gap:8px;margin:8px 0';
+ const cb=document.createElement('input');cb.type='checkbox';cb.style.width='auto';cb.checked=d.dividerAfter.includes(id);
+ cb.onchange=()=>{if(cb.checked){if(!d.dividerAfter.includes(id))d.dividerAfter.push(id)}else d.dividerAfter=d.dividerAfter.filter(x=>x!==id)};
+ label.append(cb,document.createTextNode((dividerLabels[id]||id)+' の下'));decorations.append(label);
+}
+
 }
 // Compact bottom navigation image editor: one default style and per-icon uploads.
 {
