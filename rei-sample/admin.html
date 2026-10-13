@@ -24,7 +24,6 @@ const ADMIN_PAGES=[
  ['booking','予約・料金管理','calendar-check','フォーム・料金'],
  ['areas','エリア管理','map-pin','アクセス・交通費'],
  ['layout','ページ構成管理','layout-template','表示順・メニュー画像'],
- ['blog','公式ブログ連携','book-open','最新記事の表示設定'],
  ['ogp','OGP設定','share-2','共有画像・タイトル']
 ];
 const currentPage=new URLSearchParams(location.search).get('page')||'top';
@@ -35,7 +34,6 @@ const PAGE_SECTIONS={
  booking:['姫予約フォームの項目','料金シミュレーター','出張・交通費'],
  areas:['LOCATION GUIDE'],
  layout:['セクションの表示・並び順','見出し・装飾の設定','下部メニューバーのアイコン'],
- blog:['公式ブログ連携'],
  ogp:['OGP・SNS共有設定']
 };
 const pageInfo=ADMIN_PAGES.find(x=>x[0]===currentPage);
@@ -50,26 +48,11 @@ if(currentPage==='top'){
  const grid=document.createElement('div');grid.className='dashboard';
  ADMIN_PAGES.forEach(([id,title,icon,desc],i)=>{const a=document.createElement('a');a.className='dashboard-item';a.href='admin.html?page='+id;a.innerHTML='<span class="dash-num">'+String(i+1).padStart(2,'0')+'</span><span class="dash-icon">'+({basic:'♙',news:'✦',images:'▧',photos:'▣',shifts:'▦',links:'↗',booking:'▤',areas:'⌖',layout:'☷',ogp:'◇'}[id])+'</span><strong>'+title+'</strong><small>'+desc+'</small>';grid.append(a)});
  root.append(grid);
-}else{
- if(!pageInfo){location.replace('admin.html')}
- header.textContent=pageInfo?pageInfo[1]:'管理ページ';
- originalIntro.hidden=true;originalViewLink.insertAdjacentHTML('beforebegin','<a class="btn secondary" href="admin.html">管理TOP</a>');
-}
-
-// ブログ連携設定。自動取得は取得元の仕様確認後に接続する。
-if(currentPage==='blog'){
- const blogSection=document.createElement('section');
- blogSection.innerHTML='<h2>公式ブログ連携</h2><p class="muted">公式HPのブログを手動で取得します。表示件数は保存ボタンで確定してください。</p>';
- root.append(blogSection);
- if(!d.officialBlog||typeof d.officialBlog!=='object')d.officialBlog={};
- const blog=d.officialBlog;
- const lab=document.createElement('label');lab.textContent='公式ブログ一覧URL';blogSection.append(lab);
- const url=document.createElement('input');url.type='url';url.placeholder='https://grandluxe-osaka.com/bloglist.php?id=1463';url.value=blog.listUrl||'https://grandluxe-osaka.com/bloglist.php?id=1463';blog.listUrl=url.value;url.addEventListener('input',()=>blog.listUrl=url.value.trim());blogSection.append(url);
- const countLabel=document.createElement('label');countLabel.textContent='表示件数';blogSection.append(countLabel);
- const count=document.createElement('select');[1,2,3].forEach(n=>{const opt=document.createElement('option');opt.value=n;opt.textContent=n+'件';count.append(opt)});count.value=String([1,2,3].includes(Number(blog.count))?blog.count:1);blog.count=Number(count.value);count.addEventListener('change',()=>blog.count=Number(count.value));blogSection.append(count);
- const status=document.createElement('p');status.className='muted';status.textContent='更新状況を確認しています…';blogSection.append(status);
- const refresh=document.createElement('button');refresh.type='button';refresh.textContent='ブログを最新に更新';refresh.className='btn';blogSection.append(refresh);
- const client=reiSampleClient();
+ const blogRefresh=document.createElement('button');blogRefresh.type='button';blogRefresh.className='btn secondary';blogRefresh.textContent='↻ ブログ更新';blogRefresh.style.cssText='margin-left:10px;vertical-align:middle';
+ originalViewLink.insertAdjacentElement('afterend',blogRefresh);
+ const status=document.createElement('p');status.className='muted';status.style.cssText='font-size:12px;margin:8px 0';originalViewLink.parentNode.insertBefore(status,originalViewLink.nextSibling.nextSibling);
+ const refresh=blogRefresh;
+  const client=reiSampleClient();
  client.from('therapist_blog_cache').select('fetched_at,posts').eq('therapist_key','rei').maybeSingle().then(({data,error})=>{status.textContent=error?'更新状況を取得できません':data?.fetched_at?'最終更新：'+new Date(data.fetched_at).toLocaleString('ja-JP')+' ／保存記事 '+(data.posts?.length||0)+'件':'まだ記事を取得していません'});
  refresh.addEventListener('click',async()=>{
   if(refresh.disabled)return;refresh.disabled=true;refresh.textContent='更新中…';status.textContent='公式HPから取得しています';
@@ -81,7 +64,12 @@ if(currentPage==='blog'){
   }catch(e){status.textContent='更新失敗：'+(e.message||String(e))+'（公開中の記事は維持されます）'}
   finally{refresh.disabled=false;refresh.textContent='ブログを最新に更新'}
  });
+}else{
+ if(!pageInfo){location.replace('admin.html')}
+ header.textContent=pageInfo?pageInfo[1]:'管理ページ';
+ originalIntro.hidden=true;originalViewLink.insertAdjacentHTML('beforebegin','<a class="btn secondary" href="admin.html">管理TOP</a>');
 }
+
 function section(title){let s=document.createElement('section');s.innerHTML='<h2>'+title+'</h2>';if(currentPage!=='top'&&(PAGE_SECTIONS[currentPage]||[]).includes(title))root.append(s);return s}
 function textfield(parent,label,obj,key,type='text'){let l=document.createElement('label');l.textContent=label;let input=document.createElement(type==='textarea'?'textarea':'input');if(type!=='textarea')input.type=type;input.value=obj[key]??'';if(type==='textarea'){input.classList.add('longtext');input.rows=9;const resize=()=>{input.style.height='auto';input.style.height=Math.max(230,input.scrollHeight+3)+'px'};input.addEventListener('input',resize);requestAnimationFrame(resize)}input.oninput=()=>obj[key]=type==='number'?Number(input.value):input.value;if(type==='textarea'){input.setAttribute('wrap','soft');input.style.cssText+=';width:100%;max-width:100%;min-width:0;overflow-x:hidden;overflow-wrap:anywhere;word-break:break-word;white-space:pre-wrap';input.addEventListener('focus',()=>{input.scrollLeft=0});input.addEventListener('input',()=>{if(input.scrollLeft)input.scrollLeft=0})}parent.append(l,input);return input}
 function check(parent,label,obj,key){let l=document.createElement('label'),i=document.createElement('input');i.type='checkbox';i.checked=!!obj[key];i.onchange=()=>obj[key]=i.checked;l.append(i,' '+label);parent.append(l);return i}
@@ -209,6 +197,22 @@ function drawPhotos(){gallery.replaceChildren();addLabel.textContent='＋ 写真
 const add=document.createElement('input');add.type='file';add.accept='image/*';add.multiple=true;add.setAttribute('aria-label','写真を追加');add.onchange=async()=>{for(const file of Array.from(add.files||[])){if(photos.length>=20){alert('PHOTOは最大20枚までです');break}try{photos.push({url:await photoFile(file)})}catch(e){alert(e.message)}}add.value='';drawPhotos()};const addLabel=document.createElement('label');addLabel.textContent='＋ 写真を追加（複数選択可）';s.append(addLabel,add);drawPhotos()
 }
 s=section('PROFILE（右側3項目）');items(s,d.profileRows,[['項目名（6文字程度）','label'],['回答（10文字程度）','value']],()=>({label:'ITEM',value:''}),{limit:3,fixed:true});
+// ブログ連携設定。自動取得は取得元の仕様確認後に接続する。
+if(currentPage==='basic'){
+ const blogSection=document.createElement('section');
+ blogSection.innerHTML='<h2>公式ブログ連携</h2><p class="muted">公式HPのブログを手動で取得します。表示件数は保存ボタンで確定してください。</p>';
+ root.append(blogSection);
+ if(!d.officialBlog||typeof d.officialBlog!=='object')d.officialBlog={};
+ const blog=d.officialBlog;
+ const lab=document.createElement('label');lab.textContent='公式ブログ一覧URL';blogSection.append(lab);
+ const url=document.createElement('input');url.type='url';url.placeholder='https://grandluxe-osaka.com/bloglist.php?id=1463';url.value=blog.listUrl||'https://grandluxe-osaka.com/bloglist.php?id=1463';blog.listUrl=url.value;url.addEventListener('input',()=>blog.listUrl=url.value.trim());blogSection.append(url);
+ const countLabel=document.createElement('label');countLabel.textContent='表示件数';blogSection.append(countLabel);
+ const count=document.createElement('select');[1,2,3].forEach(n=>{const opt=document.createElement('option');opt.value=n;opt.textContent=n+'件';count.append(opt)});count.value=String([1,2,3].includes(Number(blog.count))?blog.count:1);blog.count=Number(count.value);count.addEventListener('change',()=>blog.count=Number(count.value));blogSection.append(count);
+ 
+
+
+}
+
 s=section('SNS画像管理');{
  const info=document.createElement('p');info.className='muted';info.textContent='ページ本文のSNSボタン用画像です。下部固定メニューのアイコンとは別管理です。リンク先URLは下の一括管理で設定します。画像は1:1推奨です。';s.append(info);
  d.snsImages=d.snsImages||{};
