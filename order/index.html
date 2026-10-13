@@ -24,10 +24,18 @@ button,.btn{border:0;border-radius:11px;background:var(--pink);color:white;paddi
 <div class="grid"><label class="pick"><input type="radio" name="tone" value="formal" checked>FORMAL<small id="formalExample"></small></label><label class="pick"><input type="radio" name="tone" value="frank">FRANK<small id="frankExample"></small></label></div>
 <h3 style="margin-top:26px">⑤ キャラ装飾</h3><div class="grid"><label class="pick"><input type="radio" name="character" value="no" checked>なし</label><label class="pick"><input type="radio" name="character" value="yes">あり</label></div>
 <div id="characterFields" class="hidden">
-<label for="characterUrl">使用したいキャラクターの掲載URL（任意）</label><input id="characterUrl" type="url" placeholder="https://...">
+<label>キャラクターの種類</label><div class="grid"><label class="pick"><input type="radio" name="characterType" value="self" checked>自分の写真をイラスト化</label><label class="pick"><input type="radio" name="characterType" value="other">動物・その他のキャラクター</label></div>
+<div id="selfCharacterFields">
+<label for="selfCharacterStyle">イラストの表現スタイル</label><select id="selfCharacterStyle"><option>アニメ風</option><option>イラスト風</option><option>リアルイラスト風</option><option>おまかせ</option></select>
+<label for="selfCharacterNotes">イラスト化についての要望（任意）</label><textarea id="selfCharacterNotes" placeholder="例：麗さんのような全身キャラクター。髪型や顔の特徴を残したい。"></textarea>
+<p class="notice">制作に必要なご本人の写真は、受注後にLINEでお送りください。</p>
+</div>
+<div id="otherCharacterFields" class="hidden">
 <label for="characterName">希望するキャラクター</label><input id="characterName" placeholder="例：黒猫、犬、うさぎ、好きなキャラクター">
-<label for="characterStyle">表現スタイル</label><select id="characterStyle"><option>実写風</option><option>イラスト風</option><option>アニメ風</option><option>その他・おまかせ</option></select>
-<label for="characterNotes">キャラ装飾についての要望</label><textarea id="characterNotes" placeholder="例：黒猫にピンクのリボンを付けて可愛らしく"></textarea></div>
+<label for="characterUrl">使用したいキャラクターの掲載URL（任意）</label><input id="characterUrl" type="url" placeholder="https://...">
+<label for="characterStyle">表現スタイル</label><select id="characterStyle"><option>アニメ風</option><option>イラスト風</option><option>実写風</option><option>おまかせ</option></select>
+<label for="characterNotes">キャラ装飾についての要望</label><textarea id="characterNotes" placeholder="例：黒猫にピンクのリボンを付けて可愛らしく"></textarea>
+</div></div>
 </section>
 <section class="panel"><div class="num">03 / OPTIONAL</div><h2>別途制作希望</h2><p class="sub">必要な項目をタップしてください。複数選択できます。料金表はページ下部で自動更新されます。</p><div id="extras"></div>
 <label for="otherNotes">その他のご要望</label><textarea id="otherNotes" placeholder="制作についてのご要望があればご記入ください"></textarea>
@@ -70,7 +78,8 @@ const toneData={ja:["お知らせ","最近のできごと"],en:["NEWS","WHAT’S
 function selected(name){return document.querySelector(`input[name="${name}"]:checked`)?.value||""}
 function updateFonts(){let lang=selected("language");$("otherLanguageFields").classList.toggle("hidden",lang!=="other");$("fonts").innerHTML=fontData[lang].map((f,i)=>`<label class="pick"><input type="radio" name="font" value="${f[0]}" ${i===0?"checked":""}>${f[0]}<span class="fontpreview" style="font-family:${f[1]}">${f[2]}</span></label>`).join("");$("formalExample").textContent=toneData[lang][0];$("frankExample").textContent=toneData[lang][1]}
 document.querySelectorAll('input[name="language"]').forEach(x=>x.addEventListener("change",updateFonts));updateFonts();
-document.querySelectorAll('input[name="character"]').forEach(x=>x.addEventListener("change",()=>$("characterFields").classList.toggle("hidden",selected("character")!=="yes")));
+function updateCharacterFields(){const enabled=selected("character")==="yes",self=selected("characterType")==="self";$("characterFields").classList.toggle("hidden",!enabled);$("selfCharacterFields").classList.toggle("hidden",!self);$("otherCharacterFields").classList.toggle("hidden",self)}
+document.querySelectorAll('input[name="character"],input[name="characterType"]').forEach(x=>x.addEventListener("change",updateCharacterFields));updateCharacterFields();
 const extras=[["og","OG画像の作成","缶コーヒー（ブラックに限る） 1本","can",1],["top","TOP画像の作成","コンビニコーヒー 1杯（LAWSON・セブンイレブン限定）","cup",1],["status","出勤画像の作成（出勤・休み・完売）","テリア・メンソール 1箱","tobacco",1],["calendar","カレンダー画像の作成","缶コーヒー（ブラックに限る） 1本","can",1],["sns","SNSアイコンの作成","テリア・メンソール 2箱","tobacco",2]];
 $("extras").innerHTML=extras.map(x=>`<label class="opt"><input type="checkbox" name="extra" value="${x[0]}"><span><strong>${x[1]}</strong><small>${x[2]}</small></span></label>`).join("")+`<div class="notice" style="margin-top:16px"><strong>OG画像とは？</strong><p style="margin:6px 0 0">ページのURLをLINEやXなどで共有したときに、リンクと一緒に表示される紹介画像です。</p></div><p class="sub" style="margin-top:16px"><strong>別途制作物について</strong><br>別途制作をご希望の場合は、受注後に必要な画像・素材の一覧をお送りいたします。お手数ですが、案内に沿ってLINEにてお送りください。</p>`;
 function chosenExtras(){return extras.filter(x=>document.querySelector(`input[name="extra"][value="${x[0]}"]`).checked)}
@@ -81,7 +90,7 @@ function detailsText(){const e=chosenExtras();return [
 "■ カラー："+selected("color"),"■ 配色参考URL："+($("colorReferenceUrl").value||"なし"),"■ 配色のご要望："+($("colorNotes").value||"なし"),"■ 表記言語："+(selected("language")==="other"?("その他："+($("otherLanguage").value||"未記入")):langs.find(x=>x[0]===selected("language"))[1]),"■ フォント："+selected("font"),
 "■ 見出し："+(selected("tone")==="formal"?"FORMAL":"FRANK"),
 "■ キャラ装飾："+(selected("character")==="yes"?"あり":"なし"),
-...(selected("character")==="yes"?["掲載URL："+$("characterUrl").value,"希望キャラ："+$("characterName").value,"表現スタイル："+$("characterStyle").value,"装飾要望："+$("characterNotes").value]:[]),
+...(selected("character")==="yes"?(selected("characterType")==="self"?["キャラクターの種類：自分の写真をイラスト化","表現スタイル："+$("selfCharacterStyle").value,"イラスト化の要望："+($("selfCharacterNotes").value||"なし"),"写真：受注後にLINEで送付"] : ["キャラクターの種類：動物・その他のキャラクター","掲載URL："+($("characterUrl").value||"なし"),"希望キャラ："+($("characterName").value||"未記入"),"表現スタイル："+$("characterStyle").value,"装飾要望："+($("characterNotes").value||"なし")]):[]),
 "■ 別途制作："+(e.length?e.map(x=>x[1]+"（"+x[2]+"）").join("／"):"なし"),
 "■ その他："+($("otherNotes").value||"なし"),"■ お名前・連絡先："+($("clientName").value||"未記入"),
 "■ 現在のHP："+($("currentUrl").value||"未記入"),
