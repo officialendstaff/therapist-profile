@@ -253,7 +253,13 @@ function drawSections(){
   handle.onpointermove=e=>{if(!dragging)return;e.preventDefault();if(Math.abs(e.clientY-dragging.startY)>5)dragged=true;const target=document.elementFromPoint(e.clientX,e.clientY)?.closest('.section-sort-item');host.querySelectorAll('.section-sort-item').forEach(el=>el.classList.remove('drag-over'));if(target&&target!==row)target.classList.add('drag-over')};
   handle.onpointerup=e=>{if(!dragging)return;const from=d.sections.indexOf(dragging.id);const target=document.elementFromPoint(e.clientX,e.clientY)?.closest('.section-sort-item');const to=target&&host.contains(target)?d.sections.indexOf(target.dataset.sectionId):from;dragging=null;dragged=false;if(to!==from)moveSection(from,to);else drawSections()};
   handle.onpointercancel=()=>{dragging=null;drawSections()};
-  row.dataset.sectionId=id;row.append(check,name,handle);host.append(row)
+  row.dataset.sectionId=id;
+  if(!Array.isArray(d.dividerAfter))d.dividerAfter=[];
+  const dividerLabel=document.createElement('label');dividerLabel.style.cssText='display:flex;align-items:center;gap:5px;font-size:11px;white-space:nowrap';
+  const dividerCheck=document.createElement('input');dividerCheck.type='checkbox';dividerCheck.style.width='auto';dividerCheck.checked=d.dividerAfter.includes(id);
+  dividerCheck.onchange=()=>{if(dividerCheck.checked){if(!d.dividerAfter.includes(id))d.dividerAfter.push(id)}else d.dividerAfter=d.dividerAfter.filter(x=>x!==id)};
+  dividerLabel.append(dividerCheck,document.createTextNode('下に区切り'));
+  row.append(check,name,dividerLabel,handle);host.append(row)
  })
 }
 drawSections();
@@ -269,17 +275,11 @@ function showCharacter(){characterPreview.hidden=!d.decorationImage;if(d.decorat
 decorations.append(characterPreview);showCharacter();
 characterInput.onchange=()=>{const file=characterInput.files&&characterInput.files[0];if(!file)return;if(file.type!=='image/png'){alert('透過PNG画像を選択してください');characterInput.value='';return}const reader=new FileReader();reader.onload=()=>{d.decorationImage=String(reader.result||'');showCharacter()};reader.onerror=()=>alert('画像を読み込めませんでした');reader.readAsDataURL(file)};
 const clearCharacter=document.createElement('button');clearCharacter.type='button';clearCharacter.className='secondary';clearCharacter.textContent='装飾キャラクター画像を削除';clearCharacter.onclick=()=>{d.decorationImage='';characterInput.value='';showCharacter()};decorations.append(clearCharacter);
-selectfield(decorations,'区切り線',d,'dividerStyle',[['standard','標準'],['ornament','装飾'],['none','なし']]);
-if(!Array.isArray(d.dividerAfter))d.dividerAfter=[];
-const dividerHelp=document.createElement('p');dividerHelp.className='muted';dividerHelp.textContent='区切り線を表示するセクションの下にチェックを入れてください。表示順を変更しても、そのセクションの直後に表示されます。';decorations.append(dividerHelp);
-const dividerLabels={home:'HERO',news:'NEWS',snsTop:'SNS',personal:'PERSONAL',intro:'INTRO',photo:'PHOTO',today:'TODAY',schedule:'SCHEDULE',calendar:'CALENDAR',hime:'姫予約',price:'料金',profile:'PROFILE',official:'OFFICIAL'};
-for(const id of d.sections||[]){
- const label=document.createElement('label');label.style.cssText='display:flex;align-items:center;gap:8px;margin:8px 0';
- const cb=document.createElement('input');cb.type='checkbox';cb.style.width='auto';cb.checked=d.dividerAfter.includes(id);
- cb.onchange=()=>{if(cb.checked){if(!d.dividerAfter.includes(id))d.dividerAfter.push(id)}else d.dividerAfter=d.dividerAfter.filter(x=>x!==id)};
- label.append(cb,document.createTextNode((dividerLabels[id]||id)+' の下'));decorations.append(label);
-}
-
+selectfield(decorations,'区切り線',d,'dividerStyle',[['standard','標準'],['ornament','装飾キャラ'],['none','なし']]);
+const countLabel=document.createElement('label');countLabel.textContent='装飾キャラの並び数（3〜7個）';decorations.append(countLabel);
+const countInput=document.createElement('input');countInput.type='number';countInput.min='3';countInput.max='7';countInput.step='1';countInput.value=String(d.dividerCharacterCount||5);
+countInput.onchange=()=>{d.dividerCharacterCount=Math.max(3,Math.min(7,Number(countInput.value)||5));countInput.value=String(d.dividerCharacterCount)};
+decorations.append(countInput);
 }
 // Compact bottom navigation image editor: one default style and per-icon uploads.
 {
