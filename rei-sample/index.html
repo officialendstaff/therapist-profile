@@ -32,7 +32,7 @@ body{background:#0d0b0f;color:#fff0f7;font-family:Georgia,'Times New Roman',seri
 /* HERO: preserve complete Canva composition and original colors */
 .hero{isolation:isolate}
 .hero::after{content:"";position:absolute;inset:-20px;background-image:var(--hero-backdrop,none);background-position:center;background-size:cover;filter:blur(24px);transform:scale(1.1);z-index:0;pointer-events:none}
-.hero-photo{object-fit:contain!important;object-position:center center!important;background:transparent!important;z-index:1;opacity:1!important;filter:none!important}
+.hero-photo{object-fit:fill!important;object-position:center center!important;background:transparent!important;z-index:1;opacity:1!important;filter:none!important}
 .hero .hero-inner{background:none!important;z-index:2}
 .hero::before{display:none!important}
 /* Full-screen first view with persistent bottom navigation */
