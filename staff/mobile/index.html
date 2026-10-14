@@ -35,6 +35,9 @@ input:focus,textarea:focus,select:focus{outline:2px solid #a8cafa;outline-offset
 .webSearch{border-color:var(--primary);color:var(--primary-dark)}
 .onboardBtn{background:var(--primary);color:#ffffff}
 .scheduleSection{border-bottom-color:#e0ebf7}
+
+/* Keep NEWS and DIARY date pickers within mobile card */
+#newsDate,#diaryDate{display:block;width:60%;max-width:60%;min-width:0;box-sizing:border-box}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body>
 <div class="gate" id="gate"><div class="card"><h2>末端 MOBILE</h2><p class="note">NEWS・STAFF NOW・STAFF DIARY 専用</p><label>メールアドレス</label><input id="email" type="email"><label>パスワード</label><input id="password" type="password"><button class="btn" id="mobileLoginBtn" type="button" onclick="window.mobileLoginNow()">ログイン</button><div class="msg" id="authMsg"></div></div></div>
 <header class="head"><div class="mainmenu"><button type="button" onclick="tab('now',document.querySelector('.nav button:nth-child(2)'))">✎ 更新<span>末端興業ページ</span></button><button type="button" onclick="tab('schedule',document.querySelector('.nav button:first-child'));loadSchedule()">▦ 予定<span>面接管理・通知</span></button><a href="../recruit-line/">▥ 集計<span>求人LINE分析</span></a></div></header>
