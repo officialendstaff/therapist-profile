@@ -194,6 +194,7 @@ async function openInterviewSheet(id){
  const hist=Array.isArray(x.work_history)?x.work_history:[],addr=(x.prefecture||'')+(x.city||'')+(x.street||''),postal=x.postal_code?'〒'+escInterview(x.postal_code)+'　':'';
  detail.innerHTML='<div class="sheetTop"><div><div class="sheetName">'+escInterview(x.name||'氏名未入力')+'</div><div class="sheetKana">'+escInterview(x.kana||'—')+'</div></div><button class="sheetClose" onclick="closeInterviewSheet()">×</button></div>'+
  '<div style="margin:12px 0"><label style="font-size:11px;font-weight:900">面接店舗</label><select id="sheetShop" onchange="saveInterviewShop(\''+x.id+'\',this.value)" style="width:100%;padding:12px;border:1px solid #d8d0c7;border-radius:10px;background:#fff"><option value="">店舗を選択</option><option value="薔薇と紳士"'+(x.shop==='薔薇と紳士'?' selected':'')+'>薔薇と紳士</option><option value="BUSTY OSAKA"'+(x.shop==='BUSTY OSAKA'?' selected':'')+'>BUSTY OSAKA</option></select></div>'+ 
+ '<div id="sheetLineLink" style="margin:10px 0;padding:12px;border:1px solid #c8d9ef;border-radius:10px;background:#f4f8ff"><button type="button" class="onboardBtn" style="margin:0" onclick="showLineLinkCandidates(\''+x.id+'\')">LINE応募者と紐づけ</button><div id="sheetLineLinkContent" style="font-size:12px;margin-top:6px">紐づけ状況を確認中...</div></div>'+ 
  '<div class="sheetLines"><strong>'+escInterview(x.birth_date||'未入力')+'　'+(x.birth_date?interviewAge(x.birth_date):'')+'</strong><br>'+(x.phone?'<a href="tel:'+escInterview(x.phone)+'" style="color:inherit">'+escInterview(x.phone)+'</a>':'未入力')+'<br>'+(postal+escInterview(addr)||'住所未入力')+'<br><span style="color:#777">'+escInterview(x.recruit_source||'未入力')+'</span></div>'+
  '<div class="sheetFacts"><div class="sheetFact">喫煙<b>'+escInterview(x.smoking||'—')+'</b></div><div class="sheetFact">タトゥー<b>'+escInterview(x.tattoo||'—')+'</b></div><div class="sheetFact">経験<b>'+escInterview(x.experience||'—')+'</b></div></div>'+
  (x.tattoo_detail?'<div class="sheetHistory">'+escInterview(x.tattoo_detail)+'</div>':'')+
@@ -208,6 +209,43 @@ async function openInterviewSheet(id){
  }catch(err){box.innerHTML='<span class="note">身分証画像を表示できません。</span>'}
 }
 
+async function showLineLinkCandidates(id){
+ const out=document.getElementById('sheetLineLinkContent');if(!out)return;
+ out.textContent='LINE応募者を読み込み中...';
+ const [accounts,people,links]=await Promise.all([
+  sb.from('recruit_line_accounts').select('id,store_name'),
+  sb.from('recruit_line_applicants').select('account_id,line_user_id,first_contact_at,last_contact_at').order('last_contact_at',{ascending:false}).limit(200),
+  sb.from('recruit_line_interview_links').select('interview_applicant_id,account_id,line_user_id')
+ ]);
+ if(accounts.error||people.error||links.error){out.textContent='候補を取得できません：'+(accounts.error||people.error||links.error).message;return}
+ const current=(links.data||[]).find(v=>v.interview_applicant_id===id),used=new Set((links.data||[]).filter(v=>v.interview_applicant_id!==id).map(v=>v.account_id+'|'+v.line_user_id));
+ const shops=Object.fromEntries((accounts.data||[]).map(v=>[v.id,v.store_name]));
+ const candidates=(people.data||[]).filter(v=>!used.has(v.account_id+'|'+v.line_user_id));
+ out.replaceChildren();
+ if(current){const p=document.createElement('p');p.textContent='紐づけ済み：'+(shops[current.account_id]||current.account_id)+' / '+current.line_user_id.slice(-8);out.append(p);const btn=document.createElement('button');btn.type='button';btn.textContent='紐づけを解除';btn.onclick=()=>unlinkLineInterview(id);out.append(btn)}
+ const hint=document.createElement('p');hint.textContent='LINE側の問い合わせ日時とアカウントを確認し、該当者を選択してください。';out.append(hint);
+ if(!candidates.length){out.append(document.createTextNode('未紐づけのLINE応募者がありません。'));return}
+ const select=document.createElement('select');select.id='lineLinkCandidate';select.style.cssText='width:100%;padding:11px;background:white;color:#222;border:1px solid #bdd0e7;border-radius:8px';
+ const initial=document.createElement('option');initial.value='';initial.textContent='LINE応募者を選択';select.append(initial);
+ for(const v of candidates){const opt=document.createElement('option');opt.value=v.account_id+'|'+v.line_user_id;opt.textContent=(shops[v.account_id]||v.account_id)+' ｜ '+fmtInterviewDate(v.first_contact_at)+' ｜ ID末尾 '+v.line_user_id.slice(-8);select.append(opt)}
+ out.append(select);
+ const btn=document.createElement('button');btn.type='button';btn.className='onboardBtn';btn.style.marginTop='8px';btn.textContent=current?'紐づけ先を変更':'この応募者と紐づける';btn.onclick=()=>saveLineInterviewLink(id,select.value,current);out.append(btn);
+}
+async function saveLineInterviewLink(id,value,current){
+ if(!value)return alert('LINE応募者を選択してください。');
+ const split=value.indexOf('|');const account_id=value.slice(0,split),line_user_id=value.slice(split+1);
+ if(!confirm('選択したLINE応募者と面接シートを紐づけますか？'))return;
+ if(current){const del=await sb.from('recruit_line_interview_links').delete().eq('interview_applicant_id',id);if(del.error)return alert('変更できません：'+del.error.message)}
+ const {error}=await sb.from('recruit_line_interview_links').insert({interview_applicant_id:id,account_id,line_user_id});
+ if(error){alert('紐づけできません：'+error.message);return}
+ await showLineLinkCandidates(id);
+}
+async function unlinkLineInterview(id){
+ if(!confirm('LINE応募者との紐づけを解除しますか？'))return;
+ const {error}=await sb.from('recruit_line_interview_links').delete().eq('interview_applicant_id',id);
+ if(error)return alert('解除できません：'+error.message);
+ await showLineLinkCandidates(id);
+}
 async function saveInterviewShop(id,shop){
  if(!shop)return;
  const {error}=await sb.from('interview_applicants').update({shop,updated_at:new Date().toISOString()}).eq('id',id);
