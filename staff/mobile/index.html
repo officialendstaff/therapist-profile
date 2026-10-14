@@ -38,7 +38,24 @@ input:focus,textarea:focus,select:focus{outline:2px solid #a8cafa;outline-offset
 
 /* Keep NEWS and DIARY date pickers within mobile card */
 #newsDate,#diaryDate{display:block;width:60%;max-width:60%;min-width:0;box-sizing:border-box}
-</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body>
+</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="window.__sbCdnFailed=true"></script><script>
+window.addEventListener('DOMContentLoaded',function(){
+ var btn=document.getElementById('mobileLoginBtn'),msg=document.getElementById('authMsg');
+ if(!btn||!msg)return;
+ function report(message){msg.textContent=message;btn.disabled=false;btn.textContent='ログイン';}
+ if(!window.supabase){report('認証ライブラリを読み込めません。通信状態を確認してページを再読み込みしてください。');}
+ btn.addEventListener('click',function(){
+  if(typeof window.mobileLoginNow!=='function'){
+   report('ログインプログラムの起動に失敗しました。ページを再読み込みしてください。');
+  }
+ });
+ window.addEventListener('error',function(e){
+  if(document.getElementById('gate')?.style.display!=='none' && typeof window.mobileLoginNow!=='function'){
+   report('ログインプログラムにエラーが発生しました。再読み込みしてください。');
+  }
+ });
+});
+</script></head><body>
 <div class="gate" id="gate"><div class="card"><h2>末端 MOBILE</h2><p class="note">NEWS・STAFF NOW・STAFF DIARY 専用</p><label>メールアドレス</label><input id="email" type="email"><label>パスワード</label><input id="password" type="password"><button class="btn" id="mobileLoginBtn" type="button" onclick="window.mobileLoginNow()">ログイン</button><div class="msg" id="authMsg"></div></div></div>
 <header class="head"><div class="mainmenu"><button type="button" data-main-page="now" onclick="tab('now',document.querySelector('.nav button:nth-child(2)'))">✎ 更新<span>末端興業ページ</span></button><button type="button" data-main-page="schedule" class="is-current" onclick="tab('schedule',document.querySelector('.nav button:first-child'));loadSchedule()">▦ 予定<span>面接管理・通知</span></button><a href="../recruit-line/">▥ 集計<span>求人LINE分析</span></a></div></header>
 <section class="panel active" id="schedule"><div class="card"><span id="scheduleLamp" style="display:none;color:#d00">●</span>
