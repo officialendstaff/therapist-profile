@@ -349,4 +349,47 @@ let mobileDiaryRows=[],editingDiaryId=null;async function loadMobileDiary(){let 
 async function saveDiary(){if(!diaryTitle.value.trim())return alert('タイトルを入力してください');try{let u=await upload(diaryImage.files[0],'diary'),row={diary_date:diaryDate.value,title:diaryTitle.value.trim(),body:diaryBody.value,is_public:true};if(u){row.image_url=u.url;row.storage_path=u.path}let q=editingDiaryId?sb.from('staff_diary').update(row).eq('id',editingDiaryId):sb.from('staff_diary').insert(row);let {error}=await q;if(error)throw error;editingDiaryId=null;diarySaveBtn.textContent='DIARYを投稿';diaryTitle.value='';diaryBody.value='';diaryImage.value='';await loadMobileDiary();alert('DIARYを保存しました')}catch(e){alert(e.message)}}
 timeOpts().forEach(t=>{blockStart.add(new Option(t,t));blockEnd.add(new Option(t,t))});blockEnd.add(new Option('23:30','23:30'));blockStart.value='19:00';blockEnd.value='14:00';init();
 </script><script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))}setInterval(()=>{const modal=document.getElementById('interviewSheetModal');if(document.visibilityState==='visible' && document.getElementById('schedule')?.classList.contains('active') && !document.getElementById('gate')?.offsetParent && !(modal&&modal.classList.contains('on')))loadInterviewSheets()},10000);
+
+/* SP mobile: pull-to-refresh and foreground sync */
+(function(){
+ let start=null,updating=false,last=0;
+ const button=document.createElement('button');
+ button.type='button';button.id='mobileRefreshButton';button.textContent='↻ 更新';
+ button.style.cssText='position:fixed;right:12px;bottom:85px;z-index:900;background:#17110f;color:#fff;border:1px solid #c99a45;border-radius:24px;padding:10px 14px;font-size:13px;font-weight:700;box-shadow:0 3px 12px #0003';
+ document.body.appendChild(button);
+ const notice=document.createElement('div');
+ notice.style.cssText='position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:901;background:#17110f;color:#fff;border-radius:18px;padding:9px 15px;font-size:12px;display:none;pointer-events:none';
+ document.body.appendChild(notice);let noticeTimer;
+ function message(t){notice.textContent=t;notice.style.display='block';clearTimeout(noticeTimer);noticeTimer=setTimeout(()=>notice.style.display='none',2300)}
+ function editing(){const el=document.activeElement;return !!(el&&el.matches('input,textarea,select,[contenteditable="true"]')) || !!document.querySelector('.modal.on, .modal.show, #interviewSheetModal.on')}
+ async function update(force){
+  if(updating||document.hidden||gate.style.display!=='none')return;
+  if(editing()){if(force)message('編集中のため更新を保留しました');return}
+  if(!force&&Date.now()-last<45000)return;
+  updating=true;button.disabled=true;button.textContent='更新中…';message('最新情報を取得中…');
+  try{
+   const active=document.querySelector('.page.active, section.active, .panel.active');
+   const id=active?.id||'';
+   if(id==='schedule'){await Promise.all([loadSchedule(),loadInterviewSheets()])}
+   else if(id.toLowerCase().includes('news'))await loadMobileNews();
+   else if(id.toLowerCase().includes('diary'))await loadMobileDiary();
+   else if(id.toLowerCase().includes('now'))await load();
+   else await Promise.all([loadSchedule(),loadInterviewSheets()]);
+   last=Date.now();message('更新しました');
+  }catch(e){console.error('mobile refresh',e);message('更新に失敗しました')}
+  finally{updating=false;button.disabled=false;button.textContent='↻ 更新'}
+ }
+ button.addEventListener('click',()=>update(true));
+ document.addEventListener('touchstart',e=>{
+  if(window.scrollY>3||e.touches.length!==1||e.target.closest('input,textarea,select,button')){start=null;return}
+  start={x:e.touches[0].clientX,y:e.touches[0].clientY};
+ },{passive:true});
+ document.addEventListener('touchend',e=>{
+  if(!start||!e.changedTouches.length)return;
+  const dy=e.changedTouches[0].clientY-start.y,dx=Math.abs(e.changedTouches[0].clientX-start.x);
+  start=null;if(window.scrollY<=3&&dy>75&&dx<65)update(true);
+ },{passive:true});
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)update(false)});
+ setInterval(()=>update(false),60000);
+})();
 </script></body></html>
