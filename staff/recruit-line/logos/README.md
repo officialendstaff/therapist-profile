@@ -1,0 +1,1 @@
+店舗ロゴ画像の配置先。grand-luxe.jpg / luxy.jpg / rose.jpg / un-secret.jpg / busty-osaka.jpg
