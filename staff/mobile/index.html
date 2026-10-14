@@ -190,7 +190,7 @@ function markInterviewSheetSeen(x){
  }
 }
 async function interviewSignedUrl(path){if(!path)return null;let {data,error}=await sb.storage.from('interview-id-documents').createSignedUrl(path,300);return error?null:data.signedUrl}
-async async function openSheetFromUrl(){const id=new URLSearchParams(location.search).get('sheet');if(!id||!/^[0-9a-f-]{36}$/i.test(id))return;if(window.__sheetUrlOpened===id)return;const current=(window.interviewApplicants||[]).find(x=>x.id===id);if(current){window.__sheetUrlOpened=id;openInterviewSheet(id);return}const {data,error}=await sb.from('interview_applicants').select('*').eq('id',id).maybeSingle();if(error||!data){console.warn('指定面接シートを取得できません',error?.message);return}window.interviewApplicants=window.interviewApplicants||[];window.interviewApplicants.push(data);window.__sheetUrlOpened=id;openInterviewSheet(id)}
+async function openSheetFromUrl(){const id=new URLSearchParams(location.search).get('sheet');if(!id||!/^[0-9a-f-]{36}$/i.test(id))return;if(window.__sheetUrlOpened===id)return;const current=(window.interviewApplicants||[]).find(x=>x.id===id);if(current){window.__sheetUrlOpened=id;openInterviewSheet(id);return}const {data,error}=await sb.from('interview_applicants').select('*').eq('id',id).maybeSingle();if(error||!data){console.warn('指定面接シートを取得できません',error?.message);return}window.interviewApplicants=window.interviewApplicants||[];window.interviewApplicants.push(data);window.__sheetUrlOpened=id;openInterviewSheet(id)}
 function openInterviewSheet(id){
  const x=(window.interviewApplicants||[]).find(v=>v.id===id);if(!x)return;
  markInterviewSheetSeen(x);
