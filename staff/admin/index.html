@@ -292,4 +292,40 @@ async function openInterviewApplicantAdmin(id){
  w.document.close();
 }
 
+
+/* SP管理画面：安全な自動同期とプル更新 */
+(function(){
+ let dirty=false, busy=false, touchStart=null, lastSync=0;
+ const status=document.createElement('div');
+ status.id='spSyncStatus';
+ status.style.cssText='position:fixed;right:12px;bottom:12px;z-index:9999;background:#17110f;color:#fff;padding:7px 11px;border-radius:20px;font-size:11px;opacity:.88;pointer-events:none;display:none';
+ document.body.appendChild(status);
+ let hideTimer;
+ function show(message){status.textContent=message;status.style.display='block';clearTimeout(hideTimer);hideTimer=setTimeout(()=>status.style.display='none',2200)}
+ document.addEventListener('input',e=>{if(e.target.matches('input,textarea,select'))dirty=true},true);
+ document.addEventListener('change',e=>{if(e.target.matches('input,textarea,select'))dirty=true},true);
+ document.addEventListener('click',e=>{if(e.target.closest('button')&&/保存|登録|更新|削除/.test(e.target.closest('button').textContent||''))setTimeout(()=>{dirty=false},1800)},true);
+ async function sync(force=false){
+   if(busy||document.hidden||authGate.style.display!=='none')return;
+   if(dirty){if(force)show('入力中のため更新を保留しました');return}
+   if(!force&&Date.now()-lastSync<45000)return;
+   busy=true;show('最新情報を取得中…');
+   try{await loadAll();lastSync=Date.now();show('最新情報に更新しました')}
+   catch(e){console.error('SP sync',e);show('更新できませんでした')}
+   finally{busy=false}
+ }
+ document.addEventListener('touchstart',e=>{
+   if(window.scrollY>2||e.touches.length!==1||e.target.closest('input,textarea,select')){touchStart=null;return}
+   touchStart={y:e.touches[0].clientY,x:e.touches[0].clientX};
+ },{passive:true});
+ document.addEventListener('touchend',e=>{
+   if(!touchStart||!e.changedTouches.length)return;
+   const dy=e.changedTouches[0].clientY-touchStart.y,dx=Math.abs(e.changedTouches[0].clientX-touchStart.x);
+   touchStart=null;
+   if(window.scrollY<=2&&dy>85&&dx<70)sync(true);
+ },{passive:true});
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync()});
+ window.addEventListener('focus',()=>sync());
+ setInterval(()=>sync(),60000);
+})();
 </script></body></html>
