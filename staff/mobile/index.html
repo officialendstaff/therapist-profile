@@ -39,6 +39,24 @@ input:focus,textarea:focus,select:focus{outline:2px solid #a8cafa;outline-offset
 /* Keep NEWS and DIARY date pickers within mobile card */
 #newsDate,#diaryDate{display:block;width:60%;max-width:60%;min-width:0;box-sizing:border-box}
 </style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="window.__sbCdnFailed=true"></script><script>
+(function(){
+ function setup(){
+  var b=document.getElementById('mobileLoginBtn'),m=document.getElementById('authMsg'),d=document.getElementById('loginDiag');
+  if(!b||!m)return;
+  b.onclick=null;
+  b.addEventListener('click',function(){
+   if(d)d.textContent='ログインボタンの操作を検知しました';
+   if(typeof window.mobileLoginNow!=='function'){
+    m.textContent='認証処理が起動していません（JavaScript初期化エラー）。';
+    return;
+   }
+   try{var result=window.mobileLoginNow();if(result&&typeof result.catch==='function')result.catch(function(e){m.textContent='ログイン処理エラー: '+(e.message||String(e))})}
+   catch(e){m.textContent='ログイン処理エラー: '+(e.message||String(e))}
+  });
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup);else setup();
+})();
+</script><script>
 window.addEventListener('DOMContentLoaded',function(){
  var btn=document.getElementById('mobileLoginBtn'),msg=document.getElementById('authMsg');
  if(!btn||!msg)return;
@@ -56,7 +74,7 @@ window.addEventListener('DOMContentLoaded',function(){
  });
 });
 </script></head><body>
-<div class="gate" id="gate"><div class="card"><h2>末端 MOBILE</h2><p class="note">NEWS・STAFF NOW・STAFF DIARY 専用</p><label>メールアドレス</label><input id="email" type="email"><label>パスワード</label><input id="password" type="password"><button class="btn" id="mobileLoginBtn" type="button" onclick="window.mobileLoginNow()">ログイン</button><div class="msg" id="authMsg"></div></div></div>
+<div class="gate" id="gate"><div class="card"><h2>末端 MOBILE</h2><p class="note">NEWS・STAFF NOW・STAFF DIARY 専用</p><label>メールアドレス</label><input id="email" type="email"><label>パスワード</label><input id="password" type="password"><button class="btn" id="mobileLoginBtn" type="button" onclick="window.mobileLoginNow()">ログイン</button><div id="loginDiag" style="font-size:12px;margin-top:8px;color:#73522f">診断版 2026-10-15 B</div><div class="msg" id="authMsg"></div></div></div>
 <header class="head"><div class="mainmenu"><button type="button" data-main-page="now" onclick="tab('now',document.querySelector('.nav button:nth-child(2)'))">✎ 更新<span>末端興業ページ</span></button><button type="button" data-main-page="schedule" class="is-current" onclick="tab('schedule',document.querySelector('.nav button:first-child'));loadSchedule()">▦ 予定<span>面接管理・通知</span></button><a href="../recruit-line/">▥ 集計<span>求人LINE分析</span></a></div></header>
 <section class="panel active" id="schedule"><div class="card"><span id="scheduleLamp" style="display:none;color:#d00">●</span>
 <div class="scheduleSection"><h3>面接シート <span id="sheetHelpLamp" style="display:none;color:#d00;font-weight:900">HELP</span></h3><button class="btn compactBtn" onclick="loadInterviewSheets()">情報更新</button><div id="interviewSheetList" class="links"></div></div>
