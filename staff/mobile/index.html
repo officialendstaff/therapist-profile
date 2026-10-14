@@ -155,8 +155,8 @@ async function loadInterviewSheets(){
  if(!window.interviewSheetList||interviewSheetLoading)return;
  interviewSheetLoading=true;
  if(!window.interviewApplicants){interviewSheetList.innerHTML='<span class="note">読み込み中...</span>';}
- let {data,error}=await sb.from('interview_applicants').select('id,name,kana,birth_date,status,submitted_at,phone,postal_code,prefecture,city,street,recruit_source,id_type,id_front_path,id_back_path,smoking,tattoo,tattoo_detail,experience,work_history,hire_date,training_date,first_shift_date,stage_name,work_description,nationality,residence_status,residence_period,work_permission,remarks,shop').not('status','in','("在籍","退職","不採用")').order('submitted_at',{ascending:false});
- if(error&&String(error.message||'').includes('shop'))({data,error}=await sb.from('interview_applicants').select('id,name,kana,birth_date,status,submitted_at,phone,postal_code,prefecture,city,street,recruit_source,id_type,id_front_path,id_back_path,smoking,tattoo,tattoo_detail,experience,work_history,hire_date,training_date,first_shift_date,stage_name,work_description,nationality,residence_status,residence_period,work_permission,remarks').not('status','in','("在籍","退職","不採用")').order('submitted_at',{ascending:false}));
+ let {data,error}=await sb.from('interview_applicants').select('id,name,kana,birth_date,status,submitted_at,phone,postal_code,prefecture,city,street,recruit_source,id_type,id_front_path,id_back_path,smoking,tattoo,tattoo_detail,experience,work_history,hire_date,training_date,first_shift_date,stage_name,work_description,nationality,residence_status,residence_period,work_permission,remarks,shop').not('status','in','("在籍","退職","不採用","辞退")').order('submitted_at',{ascending:false});
+ if(error&&String(error.message||'').includes('shop'))({data,error}=await sb.from('interview_applicants').select('id,name,kana,birth_date,status,submitted_at,phone,postal_code,prefecture,city,street,recruit_source,id_type,id_front_path,id_back_path,smoking,tattoo,tattoo_detail,experience,work_history,hire_date,training_date,first_shift_date,stage_name,work_description,nationality,residence_status,residence_period,work_permission,remarks').not('status','in','("在籍","退職","不採用","辞退")').order('submitted_at',{ascending:false}));
  if(error){interviewSheetList.innerHTML='<span class="msg">読み込みできません：'+escInterview(error.message)+'</span>';interviewSheetLoading=false;return}
  window.interviewApplicants=data||[];
  updateInterviewSheetAlert();
@@ -199,7 +199,7 @@ async function openInterviewSheet(id){
  (x.tattoo_detail?'<div class="sheetHistory">'+escInterview(x.tattoo_detail)+'</div>':'')+
  '<div class="sheetId"><b>'+escInterview(x.id_type||'身分証')+'</b><div class="sheetIdImgs" id="sheetIdImgs"><span class="note">身分証を読み込み中...</span></div></div>'+
  (hist.length?hist.map((h,i)=>{let q=[h.prefecture||'',h.shop||'',h.stage_name||'','メンズエステ'].filter(Boolean).join(' ');return '<div class="sheetHistory"><b>'+escInterview([h.prefecture||'',h.shop||'',h.stage_name||''].filter(Boolean).join('　')||'勤務歴 '+(i+1))+'</b><br>'+escInterview(h.period||'')+(h.reason?' ／ '+escInterview(h.reason):'')+'<br><a class="webSearch" href="https://www.google.com/search?q='+encodeURIComponent(q)+'" target="_blank" rel="noopener">WEB検索</a></div>'}).join(''):'')+
- (x.remarks==='HELP'?'<div style="padding:10px 0;color:#d00;font-weight:900" class="scheduleBlink">HELP｜スタッフを呼び出しています</div><button class="onboardBtn" onclick="openHelpEdit(\''+x.id+'\')">入力・修正</button><button class="onboardBtn" style="margin-top:8px" onclick="resolveHelp(\''+x.id+'\')">HELP解除</button>':'')+(x.status==='採用'?'<button class="onboardBtn" onclick="createEntryDocuments(\''+x.id+'\')">入店書類一式を作成・印刷</button><button class="onboardBtn" style="margin-top:8px" onclick="completeOnboarding(\''+x.id+'\')">入店処理完了</button>':x.status==='在籍'?'<button class="onboardBtn" onclick="createEntryDocuments(\''+x.id+'\')">入店書類を再作成・印刷</button>':x.status==='退職'?'<div class="note" style="margin-top:12px">退職者</div>':x.status==='不採用'?'<div class="note" style="margin-top:12px">不採用処理済み</div>':'<button class="onboardBtn" onclick="openOnboarding(\''+x.id+'\')">採用・入店処理へ</button><button class="sheetDelete" style="margin-top:8px" onclick="rejectInterviewSheet(\''+x.id+'\')">不採用</button>')+'<div id="onboardingArea"></div><div class="sheetMeta">'+fmtInterviewDate(x.submitted_at)+'</div>';
+ (x.remarks==='HELP'?'<div style="padding:10px 0;color:#d00;font-weight:900" class="scheduleBlink">HELP｜スタッフを呼び出しています</div><button class="onboardBtn" onclick="openHelpEdit(\''+x.id+'\')">入力・修正</button><button class="onboardBtn" style="margin-top:8px" onclick="resolveHelp(\''+x.id+'\')">HELP解除</button>':'')+(x.status==='採用'?'<button class="onboardBtn" onclick="createEntryDocuments(\''+x.id+'\')">入店書類一式を作成・印刷</button><button class="onboardBtn" style="margin-top:8px" onclick="completeOnboarding(\''+x.id+'\')">入店処理完了</button><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px"><button class="sheetDelete" style="margin:0;border-color:#d6a052;color:#98641c" data-outcome-id="\'+x.id+\'" onclick="setInterviewOutcome(this.dataset.outcomeId,&#39;辞退&#39;)">辞退</button><button class="sheetDelete" style="margin:0" data-outcome-id="\'+x.id+\'" onclick="setInterviewOutcome(this.dataset.outcomeId,&#39;不採用&#39;)">不採用</button></div>':x.status==='在籍'?'<button class="onboardBtn" onclick="createEntryDocuments(\''+x.id+'\')">入店書類を再作成・印刷</button>':x.status==='退職'?'<div class="note" style="margin-top:12px">退職者</div>':x.status==='不採用'?'<div class="note" style="margin-top:12px">不採用処理済み</div>':x.status==='辞退'?'<div class="note" style="margin-top:12px">辞退処理済み</div>':'<button class="onboardBtn" onclick="openOnboarding(\''+x.id+'\')">採用・入店処理へ</button><button class="sheetDelete" style="margin-top:8px" onclick="rejectInterviewSheet(\''+x.id+'\')">不採用</button>')+'<div id="onboardingArea"></div><div class="sheetMeta">'+fmtInterviewDate(x.submitted_at)+'</div>';
  const box=document.getElementById('sheetIdImgs');
  try{
    const urls=await Promise.all([interviewSignedUrl(x.id_front_path),interviewSignedUrl(x.id_back_path)]);
@@ -231,6 +231,14 @@ async function resolveHelp(id){
  if(!confirm('HELPを解除しますか？'))return;
  const {error}=await sb.from('interview_applicants').update({remarks:null}).eq('id',id);if(error)return alert('HELPを解除できません：'+error.message);
  const x=(window.interviewApplicants||[]).find(v=>v.id===id);if(x)x.remarks=null;
+ closeInterviewSheet();await loadInterviewSheets();
+}
+async function setInterviewOutcome(id,status){
+ if(!['辞退','不採用'].includes(status))return;
+ if(!confirm(status+'として処理しますか？'))return;
+ const {error}=await sb.from('interview_applicants').update({status}).eq('id',id);
+ if(error){alert('処理できません：'+error.message);return}
+ const x=(window.interviewApplicants||[]).find(v=>v.id===id);if(x)x.status=status;
  closeInterviewSheet();await loadInterviewSheets();
 }
 async function rejectInterviewSheet(id){
