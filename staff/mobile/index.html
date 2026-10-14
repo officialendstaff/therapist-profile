@@ -150,17 +150,20 @@ async function setInterviewStatus(id,status){let label=status==='トビ（キャ
 function escInterview(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function fmtInterviewDate(v){if(!v)return '—';let d=new Date(v);return isNaN(d)?escInterview(v):d.toLocaleString('ja-JP',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}
 function interviewAge(v){if(!v)return '—';let d=new Date(v+'T00:00:00');if(isNaN(d))return '—';let n=new Date(),a=n.getFullYear()-d.getFullYear();if(n.getMonth()<d.getMonth()||(n.getMonth()===d.getMonth()&&n.getDate()<d.getDate()))a--;return a+'歳'}
+let interviewSheetLoading=false;
 async function loadInterviewSheets(){
- if(!window.interviewSheetList)return;
- interviewSheetList.style.display='block';interviewSheetDetail.style.display='none';interviewSheetList.innerHTML='<span class="note">読み込み中...</span>';
+ if(!window.interviewSheetList||interviewSheetLoading)return;
+ interviewSheetLoading=true;
+ if(!window.interviewApplicants){interviewSheetList.innerHTML='<span class="note">読み込み中...</span>';}
  let {data,error}=await sb.from('interview_applicants').select('id,name,kana,birth_date,status,submitted_at,phone,postal_code,prefecture,city,street,recruit_source,id_type,id_front_path,id_back_path,smoking,tattoo,tattoo_detail,experience,work_history,hire_date,training_date,first_shift_date,stage_name,work_description,nationality,residence_status,residence_period,work_permission,remarks,shop').not('status','in','("在籍","退職","不採用")').order('submitted_at',{ascending:false});
  if(error&&String(error.message||'').includes('shop'))({data,error}=await sb.from('interview_applicants').select('id,name,kana,birth_date,status,submitted_at,phone,postal_code,prefecture,city,street,recruit_source,id_type,id_front_path,id_back_path,smoking,tattoo,tattoo_detail,experience,work_history,hire_date,training_date,first_shift_date,stage_name,work_description,nationality,residence_status,residence_period,work_permission,remarks').not('status','in','("在籍","退職","不採用")').order('submitted_at',{ascending:false}));
- if(error){interviewSheetList.innerHTML='<span class="msg">読み込みできません：'+escInterview(error.message)+'</span>';return}
+ if(error){interviewSheetList.innerHTML='<span class="msg">読み込みできません：'+escInterview(error.message)+'</span>';interviewSheetLoading=false;return}
  window.interviewApplicants=data||[];
  updateInterviewSheetAlert();
  const rowHtml=x=>'<button type="button" onclick="openInterviewSheet(\''+x.id+'\')" style="width:100%;text-align:left;border:0;border-bottom:1px solid #eee;background:#fff;padding:13px 2px"><b style="font-size:15px">'+escInterview(x.name||'氏名未入力')+'</b><span style="float:right;font-size:11px;'+(x.remarks==='HELP'?'color:#d00;font-weight:900':'')+'">'+escInterview(x.status||'面接前')+'</span><br><small>'+escInterview(x.kana||'—')+' ｜ '+(x.birth_date?interviewAge(x.birth_date):'—')+' ｜ '+fmtInterviewDate(x.submitted_at)+'</small></button>';
  const pending=window.interviewApplicants.filter(x=>!['在籍','退職'].includes(x.status)),active=window.interviewApplicants.filter(x=>x.status==='在籍'),retired=window.interviewApplicants.filter(x=>x.status==='退職');
- interviewSheetList.innerHTML=pending.length?pending.map(rowHtml).join(''):'<span class="note">面接シートはありません。</span>';
+ const nextHtml=pending.length?pending.map(rowHtml).join(''):'<span class="note">面接シートはありません。</span>';if(interviewSheetList.innerHTML!==nextHtml)interviewSheetList.innerHTML=nextHtml;
+ interviewSheetLoading=false;
 
 }
 function updateInterviewSheetAlert(){
@@ -298,5 +301,5 @@ async function deleteInterviewSheet(id){
 let mobileDiaryRows=[],editingDiaryId=null;async function loadMobileDiary(){let {data}=await sb.from('staff_diary').select('*').order('diary_date',{ascending:false});mobileDiaryRows=data||[];mobileDiaryList.innerHTML=mobileDiaryRows.map(x=>'<div style="padding:10px 0;border-bottom:1px solid #eee"><b>'+x.title+'</b><br><small>'+x.diary_date+'</small><button style="float:right" onclick="editMobileDiary('+x.id+')">編集</button></div>').join('')||'<small>掲載なし</small>'}function editMobileDiary(id){let x=mobileDiaryRows.find(v=>Number(v.id)===Number(id));if(!x)return;editingDiaryId=x.id;diaryDate.value=x.diary_date||'';diaryTitle.value=x.title||'';diaryBody.value=x.body||'';diarySaveBtn.textContent='DIARYを更新';scrollTo({top:0,behavior:'smooth'})}
 async function saveDiary(){if(!diaryTitle.value.trim())return alert('タイトルを入力してください');try{let u=await upload(diaryImage.files[0],'diary'),row={diary_date:diaryDate.value,title:diaryTitle.value.trim(),body:diaryBody.value,is_public:true};if(u){row.image_url=u.url;row.storage_path=u.path}let q=editingDiaryId?sb.from('staff_diary').update(row).eq('id',editingDiaryId):sb.from('staff_diary').insert(row);let {error}=await q;if(error)throw error;editingDiaryId=null;diarySaveBtn.textContent='DIARYを投稿';diaryTitle.value='';diaryBody.value='';diaryImage.value='';await loadMobileDiary();alert('DIARYを保存しました')}catch(e){alert(e.message)}}
 timeOpts().forEach(t=>{blockStart.add(new Option(t,t));blockEnd.add(new Option(t,t))});blockEnd.add(new Option('23:30','23:30'));blockStart.value='19:00';blockEnd.value='14:00';init();
-</script><script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))}setInterval(()=>{const modal=document.getElementById('interviewSheetModal');if(!document.getElementById('gate')?.offsetParent && !(modal&&modal.classList.contains('on')))loadInterviewSheets()},10000);
+</script><script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}))}setInterval(()=>{const modal=document.getElementById('interviewSheetModal');if(document.visibilityState==='visible' && document.getElementById('schedule')?.classList.contains('active') && !document.getElementById('gate')?.offsetParent && !(modal&&modal.classList.contains('on')))loadInterviewSheets()},10000);
 </script></body></html>
