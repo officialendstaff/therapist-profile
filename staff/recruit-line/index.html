@@ -139,7 +139,7 @@ function renderHires(){
    el.append(item);
   }
  }
- const count=joined.filter(v=>!['キャンセル','トビ（キャンセル）','面接予定','日程変更','辞退'].includes(v.appointment.status)&&v.form?.status!=='辞退').length;
+ const count=joined.filter(v=>groups.some(([,test])=>test(v))).length;
  const total=document.createElement('h3');total.textContent='面接件数　'+count+'件';total.style.marginTop='22px';el.append(total);
 }
 async function openHireFormLinkDialog(appointment){
