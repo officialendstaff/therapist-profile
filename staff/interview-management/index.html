@@ -332,7 +332,7 @@ async function saveInterviewShop(id,shop){
 }
 
 function closeInterviewSheet(){const m=document.getElementById('interviewSheetModal'),d=document.getElementById('interviewSheetDetail'),host=document.getElementById('spInlineSheetHost');if(m&&d)m.appendChild(d);if(host)host.style.display='none';const sheetListView=document.getElementById('spSheetListView');if(sheetListView)sheetListView.style.display='block';if(m){m.classList.remove('on');m.style.cssText='display:none'}if(d)d.style.cssText='';document.body.style.overflow=''}
-function previewSheetDecision(value){const a=document.getElementById('sheetDecisionActions'),id=window.spOpenSheetId;if(!a||!id)return;const onboarding=document.getElementById('onboardingArea');if(onboarding)onboarding.innerHTML='';if(value==='採用')a.innerHTML='<button class="onboardBtn" onclick="openOnboarding(\''+id+'\')">入店処理項目を表示</button>';else if(value==='不採用')a.innerHTML='<div class="note" style="padding:12px 0">不採用理由（項目は後日設定）</div><button class="sheetDelete" onclick="rejectInterviewSheet(\''+id+'\')">不採用として確定</button>';else a.innerHTML=''}
+function previewSheetDecision(value){const a=document.getElementById('sheetDecisionActions'),id=window.spOpenSheetId;if(!a||!id)return;const onboarding=document.getElementById('onboardingArea');if(onboarding)onboarding.innerHTML='';if(value==='採用')a.innerHTML='<button class="onboardBtn" onclick="openOnboarding(\''+id+'\')">入店処理項目を表示</button>';else if(value==='不採用'){const x=(window.interviewApplicants||[]).find(v=>v.id===id)||{};const reasons=['募集条件に合わない','勤務条件・シフトが合わない','接客・コミュニケーション','経験・スキル','本人確認・必要書類','本人の希望と合わない','その他'];a.innerHTML='<div class="onboardForm" style="margin-top:12px"><label for="sheetRejectReason">不採用理由（必須）</label><select id="sheetRejectReason"><option value="">選択してください</option>'+reasons.map(v=>'<option value="'+escInterview(v)+'"'+(x.rejection_reason===v?' selected':'')+'>'+escInterview(v)+'</option>').join('')+'</select><label for="sheetRejectNote">補足メモ（任意）</label><textarea id="sheetRejectNote" rows="3" style="width:100%;box-sizing:border-box;border:1px solid #c6d8eb;border-radius:8px;padding:10px">'+escInterview(x.rejection_note||'')+'</textarea><button class="sheetDelete" onclick="rejectInterviewSheet(\''+id+'\')">'+(x.status==='不採用'?'不採用理由を更新':'不採用として確定')+'</button></div>'}else a.innerHTML=''}
 function openHelpEdit(id){
  const x=(window.interviewApplicants||[]).find(v=>v.id===id),a=document.getElementById('onboardingArea');if(!x||!a)return;
  const opts=(arr,v)=>'<option value="">選択してください</option>'+arr.map(z=>'<option'+(z===v?' selected':'')+'>'+z+'</option>').join('');
@@ -388,10 +388,13 @@ async function setInterviewOutcome(id,status){
  closeInterviewSheet();await loadInterviewSheets();
 }
 async function rejectInterviewSheet(id){
- if(!confirm('不採用として処理しますか？'))return;
- const {error}=await sb.from('interview_applicants').update({status:'不採用'}).eq('id',id);
- if(error)return alert('不採用処理できません：'+error.message);
- const x=(window.interviewApplicants||[]).find(v=>v.id===id);if(x)x.status='不採用';
+ const reason=document.getElementById('sheetRejectReason')?.value||'',note=document.getElementById('sheetRejectNote')?.value.trim()||'';
+ if(!reason)return alert('不採用理由を選択してください。');
+ const x=(window.interviewApplicants||[]).find(v=>v.id===id);
+ if(!confirm(x?.status==='不採用'?'不採用理由を更新しますか？':'この理由で不採用として確定しますか？'))return;
+ const {error}=await sb.from('interview_applicants').update({status:'不採用',rejection_reason:reason,rejection_note:note}).eq('id',id);
+ if(error)return alert('不採用理由を保存できません：'+error.message);
+ if(x){x.status='不採用';x.rejection_reason=reason;x.rejection_note=note}
  closeInterviewSheet();await loadInterviewSheets();
 }
 async function completeOnboarding(id){
