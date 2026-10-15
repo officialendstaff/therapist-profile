@@ -53,7 +53,7 @@ async function saveStoreDirectory(){
 async function openRecruitStore(id){
  const store=storeDirectory.find(v=>v.id===id);if(!store)return;
  if(!store.account_id){if(store.target_url)location.href=store.target_url;return}
- activeStore=store;document.body.dataset.storeTheme=storeTheme(store);showStorePage('reports');$('storeView').classList.add('hide');$('listView').classList.remove('hide');$('detail').classList.add('hide');$('activeStoreTitle').textContent=store.display_name+' ｜ 求人管理';
+ activeStore=store;$('storeBack').classList.remove('hide');document.body.dataset.storeTheme=storeTheme(store);showStorePage('reports');$('storeView').classList.add('hide');$('listView').classList.remove('hide');$('detail').classList.add('hide');$('activeStoreTitle').textContent=store.display_name+' ｜ 求人管理';
  let option=[...$('account').options].find(v=>v.value===store.account_id);
  if(!option){option=document.createElement('option');option.value=store.account_id;option.textContent=store.display_name;$('account').append(option)}
  $('account').value=store.account_id;savePageState();await load();
