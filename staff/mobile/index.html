@@ -349,6 +349,22 @@ async function resolveHelp(id){
  const x=(window.interviewApplicants||[]).find(v=>v.id===id);if(x)x.remarks=null;
  closeInterviewSheet();await loadInterviewSheets();
 }
+async function syncSheetInterviewOutcome(x,status){
+ if(!x||!x.shop||!x.submitted_at)return {synced:false,reason:'面接予定との紐付け情報が不足しています'};
+ const date=new Date(x.submitted_at).toLocaleDateString('sv-SE',{timeZone:'Asia/Tokyo'});
+ const submitted=new Date(x.submitted_at).getTime();
+ const {data,error}=await sb.from('staff_interviews').select('id,shop,interview_date,interview_time,status').eq('shop',x.shop).eq('interview_date',date);
+ if(error)return {synced:false,reason:error.message};
+ const candidates=(data||[]).filter(v=>!['キャンセル','トビ（キャンセル）'].includes(v.status)).map(v=>({row:v,diff:Math.abs(new Date(v.interview_date+'T'+v.interview_time+'+09:00').getTime()-submitted)})).filter(v=>v.diff<=90*60*1000).sort((a,b)=>a.diff-b.diff);
+ if(candidates.length!==1)return {synced:false,reason:'同じ日時付近の面接を一意に特定できません'};
+ const target=candidates[0].row;
+ if(target.status===status)return {synced:true};
+ if(!['面接予定','日程変更','来店済み'].includes(target.status))return {synced:false,reason:'履歴が別の結果で確定済みです'};
+ const updated=await sb.from('staff_interviews').update({status,alert:false,updated_at:new Date().toISOString()}).eq('id',target.id).eq('status',target.status).select('id');
+ if(updated.error||!updated.data?.length)return {synced:false,reason:updated.error?.message||'更新の競合が発生しました'};
+ await loadSchedule();
+ return {synced:true};
+}
 async function saveSheetOutcome(id){
  const x=(window.interviewApplicants||[]).find(v=>v.id===id);
  const status=document.getElementById('sheetOutcomeSelect')?.value;
@@ -358,8 +374,9 @@ async function saveSheetOutcome(id){
  const {error}=await sb.from('interview_applicants').update({status}).eq('id',id);
  if(error)return alert('変更できません：'+error.message);
  x.status=status;
+ const sync=await syncSheetInterviewOutcome(x,status);
  closeInterviewSheet();await loadInterviewSheets();
- alert('採否結果を「'+status+'」に変更しました。');
+ alert('採否結果を「'+status+'」に変更しました。'+(sync.synced?' 面接履歴にも反映しました。':' 面接履歴は未変更です（'+sync.reason+'）。'));
 }
 async function setInterviewOutcome(id,status){
  if(!['辞退','不採用'].includes(status))return;
