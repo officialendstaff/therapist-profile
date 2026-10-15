@@ -24,6 +24,14 @@ html,body{width:100%;max-width:100%;overflow-x:hidden;overscroll-behavior-x:none
 body:not([data-recruit-view="store"]):not([data-recruit-view="interview"]) #listView{display:none!important}
 body:not([data-recruit-view="selection"]) #storeView{display:none!important}
 body:not([data-recruit-view="interview"]) #embeddedInterviewView{display:none!important}
+/* Strictly isolate each screen and legacy tab; hidden panels must never leak into other views. */
+#app .hide{display:none!important}
+body[data-recruit-view="selection"] #listView,
+body[data-recruit-view="selection"] #embeddedInterviewView,
+body[data-recruit-view="selection"] #interviewPage{display:none!important}
+body[data-recruit-view="interview"] #listView,
+body[data-recruit-view="interview"] #storeView{display:none!important}
+#interviewPage.hide{display:none!important}
 /* LINE集計の2パネルは他タブで表示しない */
 #reports.hide,#hourReportPanel.hide{display:none!important}
 /* 面接管理：ステータスとLINE紐づけ */
