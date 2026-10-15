@@ -356,18 +356,37 @@ async function resolveHelp(id){
  closeInterviewSheet();await loadInterviewSheets();
 }
 async function syncSheetInterviewOutcome(x,status){
- if(!x||!x.shop||!x.submitted_at)return {synced:false,reason:'面接予定との紐付け情報が不足しています'};
- const date=new Date(x.submitted_at).toLocaleDateString('sv-SE',{timeZone:'Asia/Tokyo'});
- const submitted=new Date(x.submitted_at).getTime();
- const {data,error}=await sb.from('staff_interviews').select('id,shop,interview_date,interview_time,status').eq('shop',x.shop).eq('interview_date',date);
- if(error)return {synced:false,reason:error.message};
- const candidates=(data||[]).filter(v=>!['キャンセル','トビ（キャンセル）'].includes(v.status)).map(v=>({row:v,diff:Math.abs(new Date(v.interview_date+'T'+v.interview_time+'+09:00').getTime()-submitted)})).filter(v=>v.diff<=90*60*1000).sort((a,b)=>a.diff-b.diff);
- if(candidates.length!==1)return {synced:false,reason:'同じ日時付近の面接を一意に特定できません'};
- const target=candidates[0].row;
- if(target.status===status)return {synced:true};
- if(!['面接予定','日程変更','来店済み'].includes(target.status))return {synced:false,reason:'履歴が別の結果で確定済みです'};
- const updated=await sb.from('staff_interviews').update({status,alert:false,updated_at:new Date().toISOString()}).eq('id',target.id).eq('status',target.status).select('id');
- if(updated.error||!updated.data?.length)return {synced:false,reason:updated.error?.message||'更新の競合が発生しました'};
+ if(!x?.id)return {synced:false,reason:'面接シートが見つかりません'};
+ const {data:linked,error:linkError}=await sb.from('staff_interview_form_links').select('interview_id').eq('interview_applicant_id',x.id);
+ if(linkError)return {synced:false,reason:linkError.message};
+ if((linked||[]).length>1)return {synced:false,reason:'面接予定の紐付けが複数あります'};
+ let target=null;
+ if(linked?.length){
+  const {data,error}=await sb.from('staff_interviews').select('id,status').eq('id',linked[0].interview_id).maybeSingle();
+  if(error||!data)return {synced:false,reason:error?.message||'紐付け先が見つかりません'};
+  target=data;
+ }else{
+  if(!x.shop||!x.submitted_at)return {synced:false,reason:'面接日時・店舗が不足しています'};
+  const date=new Date(x.submitted_at).toLocaleDateString('sv-SE',{timeZone:'Asia/Tokyo'});
+  const submitted=new Date(x.submitted_at).getTime();
+  const {data,error}=await sb.from('staff_interviews').select('id,shop,interview_date,interview_time,status').eq('shop',x.shop).eq('interview_date',date);
+  if(error)return {synced:false,reason:error.message};
+  const candidates=(data||[]).filter(v=>!['キャンセル','トビ（キャンセル）'].includes(v.status)).map(v=>({row:v,diff:Math.abs(new Date(v.interview_date+'T'+v.interview_time+'+09:00').getTime()-submitted)})).filter(v=>v.diff<=90*60*1000);
+  if(candidates.length!==1)return {synced:false,reason:'該当する面接予定を一意に特定できません'};
+  const {data:otherLinks,error:otherError}=await sb.from('staff_interview_form_links').select('interview_applicant_id').eq('interview_id',candidates[0].row.id);
+  if(otherError)return {synced:false,reason:otherError.message};
+  if((otherLinks||[]).some(v=>v.interview_applicant_id!==x.id))return {synced:false,reason:'別の面接シートと紐付いています'};
+  target=candidates[0].row;
+ }
+ if(target.status!==status){
+  if(!['面接予定','日程変更','来店済み'].includes(target.status))return {synced:false,reason:'履歴が別の結果で確定済みです'};
+  const updated=await sb.from('staff_interviews').update({status,alert:false,updated_at:new Date().toISOString()}).eq('id',target.id).eq('status',target.status).select('id');
+  if(updated.error||!updated.data?.length)return {synced:false,reason:updated.error?.message||'更新できませんでした'};
+ }
+ if(!linked?.length){
+  const {error}=await sb.from('staff_interview_form_links').insert({interview_id:target.id,interview_applicant_id:x.id});
+  if(error)console.warn('面接シート紐付けの保存に失敗',error.message);
+ }
  await loadSchedule();
  return {synced:true};
 }
@@ -400,7 +419,9 @@ async function rejectInterviewSheet(id){
  const {error}=await sb.from('interview_applicants').update({status:'不採用',rejection_reason:reason,rejection_note:note}).eq('id',id);
  if(error)return alert('不採用理由を保存できません：'+error.message);
  if(x){x.status='不採用';x.rejection_reason=reason;x.rejection_note=note}
+ const sync=await syncSheetInterviewOutcome(x||{id},'不採用');
  closeInterviewSheet();await loadInterviewSheets();
+ if(!sync.synced)alert('不採用理由は保存しましたが、面接履歴は更新できませんでした：'+sync.reason);
 }
 async function completeOnboarding(id){
  if(!confirm('入店処理を完了して在籍者へ移しますか？'))return;
