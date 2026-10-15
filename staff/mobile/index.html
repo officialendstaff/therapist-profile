@@ -153,7 +153,7 @@ function refreshInterviewPushStatus(){
  panel.style.display='';button.style.display='none';register.style.display='none';
  if(!('Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window)){status.textContent='この環境ではWeb Pushを利用できません。';return}
  if(!(window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true)){panel.style.display='none';return}
- if(Notification.permission==='granted'){status.textContent='通知先を確認しています...';navigator.serviceWorker.ready.then(async reg=>{const sub=await reg.pushManager.getSubscription();if(sub){status.textContent='通知先登録済み。届かない場合は「テスト通知を送信」を押してください。';return}status.textContent='この端末を通知先に登録してください。';register.style.display='inline-block'}).catch(()=>{status.textContent='通知先を確認できません。再登録してください。';register.style.display='inline-block'});return}
+ if(Notification.permission==='granted'){status.textContent='通知先を確認しています...';navigator.serviceWorker.ready.then(async reg=>{const sub=await reg.pushManager.getSubscription();if(sub){status.textContent='通知先登録済み';panel.style.display='none';return}status.textContent='この端末を通知先に登録してください。';register.style.display='inline-block'}).catch(()=>{status.textContent='通知先を確認できません。再登録してください。';register.style.display='inline-block'});return}
  if(Notification.permission==='denied'){status.textContent='通知が拒否されています。iPhoneの設定で通知を許可してください。';return}
  status.textContent='通知の許可が必要です。';button.style.display='inline-block';
 }
