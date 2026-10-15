@@ -116,9 +116,10 @@ function renderHires(){
    const form=interviewForms.find(x=>x.id===formLink?.interview_applicant_id);
    return {appointment,link,form};
  });
- const groups=[['採用',v=>['採用','入店','在籍'].includes(v.form?.status)||v.appointment.status==='採用'],
- ['不採用',v=>v.form?.status==='不採用'||v.appointment.status==='不採用'],
- ['辞退',v=>v.form?.status==='辞退'||v.appointment.status==='辞退']];
+ const outcome=v=>v.form?.status||v.appointment.status;
+ const groups=[['採用',v=>['採用','入店','在籍'].includes(outcome(v))],
+ ['不採用',v=>outcome(v)==='不採用'],
+ ['辞退',v=>outcome(v)==='辞退']];
  for(const [title,test] of groups){
   const rows=joined.filter(test);
   const h=document.createElement('h3');h.textContent=title+'（'+rows.length+'件）';h.style.margin='18px 0 8px';el.append(h);
