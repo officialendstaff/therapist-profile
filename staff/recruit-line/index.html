@@ -26,6 +26,14 @@ body:not([data-recruit-view="selection"]) #storeView{display:none!important}
 body:not([data-recruit-view="interview"]) #embeddedInterviewView{display:none!important}
 /* Strictly isolate each screen and legacy tab; hidden panels must never leak into other views. */
 #app .hide{display:none!important}
+body[data-recruit-view="selection"] #app #reports,
+body[data-recruit-view="selection"] #app #applicantSection,
+body[data-recruit-view="selection"] #app #interviewPage,
+body[data-recruit-view="selection"] #app #hirePage,
+body[data-recruit-view="selection"] #app #hourReportPanel,
+body[data-recruit-view="selection"] #app #storeMenu,
+body[data-recruit-view="selection"] #app #detail,
+body[data-recruit-view="selection"] #app #interviewLinkModal{display:none!important}
 body[data-recruit-view="selection"] #listView,
 body[data-recruit-view="selection"] #embeddedInterviewView,
 body[data-recruit-view="selection"] #interviewPage{display:none!important}
@@ -91,7 +99,7 @@ function showStorePage(page){currentStorePage=page;if(activeStore)savePageState(
 $('storeMenu').onclick=e=>{const b=e.target.closest('button[data-page]');if(b)showStorePage(b.dataset.page)};
 
 $('storeEditSelect').onchange=fillStoreEdit;$('storeSave').onclick=saveStoreDirectory;
-$('storeBack').onclick=()=>{ $('storeBack').classList.add('hide');activeStore=null;savePageState();$('detail').classList.add('hide');$('listView').classList.add('hide');$('embeddedInterviewView').classList.add('hide');$('storeView').classList.remove('hide');syncRecruitHeaderActions()};
+$('storeBack').onclick=()=>{ $('storeBack').classList.add('hide');activeStore=null;currentStorePage='reports';savePageState();for(const id of ['reports','applicantSection','interviewPage','hirePage','hourReportPanel','detail','interviewLinkModal'])$(id).classList.add('hide');$('listView').classList.add('hide');$('embeddedInterviewView').classList.add('hide');$('storeView').classList.remove('hide');document.body.dataset.recruitView='selection';syncRecruitHeaderActions()};
 const date=s=>s?new Date(s).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'}):'―';
 const msg=(id,s)=>$(id).textContent=s;
 async function check(){const {data:{session}}=await sb.auth.getSession();const user=session?.user||null;const error=null;if(error||!user){$('authLoading').classList.add('hide');$('gate').classList.remove('hide');$('app').classList.add('hide');return}const {data, error:perm}=await sb.from('recruit_line_admins').select('user_id').eq('user_id',user.id).maybeSingle();if(perm||!data){$('authLoading').classList.add('hide');$('gate').classList.remove('hide');$('app').classList.add('hide');msg('error','このアカウントには求人管理権限がありません。');return}$('authLoading').classList.add('hide');$('gate').classList.add('hide');$('app').classList.remove('hide');$('storeView').classList.remove('hide');$('listView').classList.add('hide');$('detail').classList.add('hide');await loadStoreDirectory();sessionStorage.removeItem(pageStateKey);syncRecruitHeaderActions();}
