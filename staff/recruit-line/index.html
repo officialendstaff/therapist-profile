@@ -21,6 +21,8 @@ body[data-store-theme="pending"]{--accent:#9eafc3;--accent-text:#152030;--panel-
 /* Prevent horizontal panning on login and store TOP, without clipping inner content */
 html,body{width:100%;max-width:100%;overflow-x:hidden;overscroll-behavior-x:none}#gate,#storeView,#authLoading{max-width:100%;min-width:0}#gate *,#storeView *{min-width:0}#storeGrid{width:100%;max-width:100%}.wrap,.panel{min-width:0}input,select,textarea{max-width:100%}
 
+/* LINE集計の2パネルは他タブで表示しない */
+#reports.hide,#hourReportPanel.hide{display:none!important}
 /* 面接管理：ステータスとLINE紐づけ */
 .interviewEntry{display:flex;gap:12px;align-items:center;padding:12px!important}
 .interviewAvatar{width:48px;height:48px;flex:none;border-radius:50%;object-fit:cover;background:#34475a;border:1px solid #60748b}
@@ -74,7 +76,7 @@ async function openRecruitStore(id){
  if(!option){option=document.createElement('option');option.value=store.account_id;option.textContent=store.display_name;$('account').append(option)}
  $('account').value=store.account_id;savePageState();await load();
 }
-function showStorePage(page){currentStorePage=page;if(activeStore)savePageState();for(const id of ['reports','applicantSection','interviewPage','hirePage'])$(id).classList.toggle('hide',id!==page);for(const btn of document.querySelectorAll('#storeMenu button'))btn.classList.toggle('active',btn.dataset.page===page);$('detail').classList.add('hide');if(page==='applicantSection')render();if(page==='hirePage')renderHires();if(page==='interviewPage')loadInterviewManagement()}
+function showStorePage(page){currentStorePage=page;if(activeStore)savePageState();for(const id of ['reports','applicantSection','interviewPage','hirePage'])$(id).classList.toggle('hide',id!==page);$('hourReportPanel').classList.toggle('hide',page!=='reports');for(const btn of document.querySelectorAll('#storeMenu button'))btn.classList.toggle('active',btn.dataset.page===page);$('detail').classList.add('hide');if(page==='applicantSection')render();if(page==='hirePage')renderHires();if(page==='interviewPage')loadInterviewManagement()}
 $('storeMenu').onclick=e=>{const b=e.target.closest('button[data-page]');if(b)showStorePage(b.dataset.page)};
 
 $('storeEditSelect').onchange=fillStoreEdit;$('storeSave').onclick=saveStoreDirectory;
