@@ -28,7 +28,9 @@ self.addEventListener('push', event => {
     interview_cancel: '面接キャンセル',
     interview_reschedule: '面接日程変更',
     interview_form: '面接フォーム記入完了',
-    interview_help: '面接フォーム HELP'
+    interview_help: '面接フォーム HELP',
+    interview_confirmed: '面接確認済み',
+    push_test: '通知テスト'
   };
   if (!Object.prototype.hasOwnProperty.call(titles, data.type)) return;
   event.waitUntil(self.registration.showNotification(titles[data.type], {
