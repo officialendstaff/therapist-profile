@@ -245,4 +245,18 @@ async function detailLoad(){if(!selected)return;const {data,error}=await sb.from
 Promise.race([check(),new Promise((_,reject)=>setTimeout(()=>reject(new Error('ログイン確認がタイムアウトしました')),12000))]).catch(e=>{console.error('ログイン初期化エラー',e);$('authLoading').classList.remove('hide');$('authLoading').textContent='ログイン状態を確認できませんでした：'+(e?.message||String(e))+'。ページを再読み込みしてください。';});
 </script><script>function syncRecruitHeaderActions(){const selected=!!activeStore;const settings=document.getElementById('storeSettingsToggle'),interview=document.getElementById('interviewManageSwitch'),panel=document.getElementById('recruitHeaderSettings'),frameView=document.getElementById('embeddedInterviewView');const showingInterview=frameView&&!frameView.classList.contains('hide');document.body.dataset.recruitView=!selected?'selection':showingInterview?'interview':'store';if(settings)settings.style.display=selected?'none':'';if(interview){interview.style.display=selected?'':'none';interview.textContent=showingInterview?'求人管理':'面接管理'}if(selected&&panel)panel.classList.add('hide');}
 function openSelectedInterviewManagement(){if(!activeStore)return;const frameView=document.getElementById('embeddedInterviewView'),frame=document.getElementById('embeddedInterviewFrame'),list=document.getElementById('listView');if(!frameView||!frame||!list)return;const showing= !frameView.classList.contains('hide');if(showing){frameView.classList.add('hide');list.classList.remove('hide')}else{const name=String(activeStore.display_name||'').toLowerCase();const group=name.includes('grand luxe')||name.includes('un secret')?'grand':name.includes('luxy')?'luxy':'rose';const url='../mobile/?group='+encodeURIComponent(group)+'&store='+encodeURIComponent(activeStore.display_name||'')+'&embedded=1';if(frame.getAttribute('src')!==url)frame.src=url;list.classList.add('hide');document.getElementById('storeView').classList.add('hide');frameView.classList.remove('hide')}syncRecruitHeaderActions();window.scrollTo(0,0)}
-function toggleRecruitStoreSettings(){if(activeStore)return;const e=document.getElementById("recruitHeaderSettings"),b=document.getElementById("storeSettingsToggle");if(!e||!b)return;const opening=e.classList.contains("hide");e.classList.toggle("hide",!opening);b.setAttribute("aria-expanded",String(opening));if(opening){const d=e.querySelector("details");if(d)d.open=true}}</script></body></html>
+function toggleRecruitStoreSettings(){if(activeStore)return;const e=document.getElementById("recruitHeaderSettings"),b=document.getElementById("storeSettingsToggle");if(!e||!b)return;const opening=e.classList.contains("hide");e.classList.toggle("hide",!opening);b.setAttribute("aria-expanded",String(opening));if(opening){const d=e.querySelector("details");if(d)d.open=true}}</script><script>
+/* Refresh the home-screen management view after resuming from the background.
+   Preserve active edits instead of discarding unsaved input. */
+(function(){
+ let backgroundAt=0;
+ function editing(){const el=document.activeElement;return !!(el&&el.matches('input,textarea,select,[contenteditable="true"]'))}
+ document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){backgroundAt=Date.now();return}
+  if(backgroundAt&&Date.now()-backgroundAt>1500&&!editing())location.reload();
+  backgroundAt=0;
+ });
+ window.addEventListener('pageshow',e=>{if(e.persisted&&!editing())location.reload()});
+})();
+</script>
+</body></html>
