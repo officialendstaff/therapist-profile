@@ -56,12 +56,12 @@ if(currentPage==='top'){
  const status=document.createElement('p');status.className='muted';status.style.cssText='';actionRow.append(status);
  const refresh=blogRefresh;
   const client=reiDbClient;
- client.from('therapist_blog_cache').select('fetched_at,posts').eq('therapist_key','rei').maybeSingle().then(({data,error})=>{status.textContent=error?'更新状況を取得できません':data?.fetched_at?'最終更新：'+new Date(data.fetched_at).toLocaleString('ja-JP'):'まだ記事を取得していません'});
+ client.from('therapist_blog_cache').select('fetched_at,posts').eq('therapist_key','yuori').maybeSingle().then(({data,error})=>{status.textContent=error?'更新状況を取得できません':data?.fetched_at?'最終更新：'+new Date(data.fetched_at).toLocaleString('ja-JP'):'まだ記事を取得していません'});
  refresh.addEventListener('click',async()=>{
   if(refresh.disabled)return;refresh.disabled=true;refresh.textContent='更新中…';status.textContent='公式HPから取得しています';
   try{
    const {data:{session}}=await client.auth.getSession();if(!session)throw Error('ログインが必要です');
-   const res=await fetch(REI_SAMPLE_DB.url+'/functions/v1/refresh-rei-blog',{method:'POST',headers:{'Content-Type':'application/json',apikey:REI_SAMPLE_DB.anonKey,Authorization:'Bearer '+session.access_token},body:'{}'});
+   const res=await fetch(REI_SAMPLE_DB.url+'/functions/v1/refresh-yun-blog',{method:'POST',headers:{'Content-Type':'application/json',apikey:REI_SAMPLE_DB.anonKey,Authorization:'Bearer '+session.access_token},body:'{}'});
    const result=await res.json();if(!res.ok||!result.ok){const detail=result.detail||result.error||('HTTP '+res.status);throw Error(typeof detail==='string'?detail:JSON.stringify(detail));}
    status.textContent='最終更新：'+new Date().toLocaleString('ja-JP');
   }catch(e){status.textContent='更新失敗：'+(e.message||String(e))+'（公開中の記事は維持されます）'}
@@ -208,7 +208,7 @@ if(currentPage==='basic'){
  if(!d.officialBlog||typeof d.officialBlog!=='object')d.officialBlog={};
  const blog=d.officialBlog;
  const lab=document.createElement('label');lab.textContent='公式ブログ一覧URL';blogSection.append(lab);
- const url=document.createElement('input');url.type='url';url.placeholder='https://grandluxe-osaka.com/bloglist.php?id=1463';url.value=blog.listUrl||'https://grandluxe-osaka.com/bloglist.php?id=1463';blog.listUrl=url.value;url.addEventListener('input',()=>blog.listUrl=url.value.trim());blogSection.append(url);
+ const url=document.createElement('input');url.type='url';url.placeholder='https://grandluxe-osaka.com/bloglist.php?id=1465';url.value=blog.listUrl||'https://grandluxe-osaka.com/bloglist.php?id=1465';blog.listUrl=url.value;url.addEventListener('input',()=>blog.listUrl=url.value.trim());blogSection.append(url);
  const countLabel=document.createElement('label');countLabel.textContent='表示件数';blogSection.append(countLabel);
  const count=document.createElement('select');[1,2,3].forEach(n=>{const opt=document.createElement('option');opt.value=n;opt.textContent=n+'件';count.append(opt)});count.value=String([1,2,3].includes(Number(blog.count))?blog.count:1);blog.count=Number(count.value);count.addEventListener('change',()=>blog.count=Number(count.value));blogSection.append(count);
  
