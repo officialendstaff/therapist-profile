@@ -72,7 +72,7 @@ body{background:#0d0b0f;color:#fff0f7;font-family:Georgia,'Times New Roman',seri
 #price .price-fees-row .field{min-width:0}
 </style></head><body><div class="app"><section class="hero" id="home"><div class="hero-loading" id="heroLoading" aria-hidden="true"><img src="./mattan-loading.webp" alt="" fetchpriority="high"></div><img class="hero-photo" id="heroImage" alt=""><div class="hero-inner"><div class="small" id="heroSubtitle"></div><h1 id="heroName"></h1><p id="heroCatch"></p></div></section>
 <div class="card" id="news"><h2>NEWS</h2><div class="notice" id="newsText"></div></div>
-<div class="card" id="sns"><h2>SNS</h2><div class="sns"><button data-sns="line"><img data-sns-image="line" alt="LINE"></button><button data-sns="x"><img data-sns-image="x" alt="X"></button><button data-sns="sub"><img data-sns-image="sub" alt="02"></button></div></div>
+<div class="card" id="sns"><h2>SNS</h2><div class="sns"><button data-sns="line"><img data-sns-image="line" alt="LINE"></button><button data-sns="x"><img data-sns-image="x" alt="X"></button><button data-sns="instagram"><img data-sns-image="instagram" alt="Instagram"></button><button data-sns="sub"><img data-sns-image="sub" alt="02"></button><button data-sns="relaxy"><img data-sns-image="relaxy" alt="リラクシー"></button></div></div>
 <div class="card" id="personal"><h2>PERSONAL</h2><img class="media-square" id="personalImage" alt="パーソナル画像"></div>
 <div class="card" id="intro"><h2>INTRODUCTION</h2><p id="introText" style="white-space:pre-wrap"></p></div>
 <div class="card" id="photo"><h2>PHOTO</h2><div class="photo" id="photoGallery"></div></div>
@@ -328,7 +328,7 @@ function go(key){
  if(key==='phone'){location.href='tel:'+String(val).replace(/[^+0-9]/g,'');return}
  const url=externalUrl(val);
  if(!url){modal('リンクを確認してください','<p>管理ページのURL設定を確認してください。</p>');return}
- if(['line','x','sub'].includes(key)){
+ if(['line','x','instagram','sub','relaxy'].includes(key)){
    modal('','');$('modal').classList.add('sns-warning');$('modalTitle').hidden=true;
    const p=document.createElement('p');p.textContent=cfg.snsWarning||'外部のSNSサイトへ移動します。リンク先をご確認ください。';p.style.whiteSpace='pre-wrap';p.style.textAlign='left';
    const cancel=document.createElement('button');cancel.type='button';cancel.className='btn outline';cancel.textContent='キャンセル';cancel.onclick=closeModal;
