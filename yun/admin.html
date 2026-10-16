@@ -1,0 +1,383 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>セラピスト管理｜デモ</title><style>:root{--accent:#D63365}*{box-sizing:border-box}body{margin:0;background:#FBE8EF;color:#755623;font:14px 'Yu Gothic',sans-serif}main{max-width:700px;margin:auto;padding:16px 16px 90px}h1{font-size:23px}h2{font-size:17px;color:#ff9ccf}section{background:#29212f;border:1px solid #60415b;border-radius:15px;padding:17px;margin:16px 0}.item{background:#1d1723;border-radius:11px;padding:12px;margin:10px 0;border:1px solid #443346}label{display:block;margin:9px 0 4px;font-weight:600}input,select,textarea{width:100%;background:#151119;color:#fff;border:1px solid #70526b;border-radius:8px;padding:10px;font:inherit;font-size:16px}textarea{min-height:65px;resize:vertical;overflow-y:hidden;overflow-x:hidden;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}input,textarea{max-width:100%;min-width:0}html,body{max-width:100%;overflow-x:hidden}textarea.longtext{min-height:230px;line-height:1.8;max-width:100%;width:100%;overflow-x:hidden;overflow-wrap:anywhere;word-break:break-word;white-space:pre-wrap}input[type=checkbox]{width:auto;transform:scale(1.2);margin:9px}button,a.btn{border:0;background:var(--accent);color:#211322;padding:10px 13px;border-radius:9px;font-weight:bold;cursor:pointer;margin:5px 5px 5px 0;text-decoration:none;display:inline-block}button.secondary{background:#544056;color:#fff}.news-controls{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:15px 0}.news-check{display:inline-flex;align-items:center;gap:6px;margin:0;white-space:nowrap}.news-visibility{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.news-visibility>span{font-weight:bold;color:#e9d7e5}.news-check input{margin:0}.muted{font-size:12px;color:#c8afc2;line-height:1.7}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.sticky{position:fixed;bottom:0;left:0;right:0;width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;background:#151119f5;padding:10px max(12px,env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));border-top:1px solid #77506c;z-index:100;box-sizing:border-box}.sticky button,.sticky a.btn{width:100%;min-width:0;min-height:44px;display:flex;align-items:center;justify-content:center;text-align:center;padding:9px 3px;margin:0;font-size:12px;white-space:nowrap}.section-sort-item{display:flex;align-items:center;gap:12px;background:#1d1723;border:1px solid #443346;border-radius:11px;padding:8px 12px;margin:9px 0;min-height:58px}.section-sort-item>input{flex:0 0 auto;width:18px;height:18px;margin:0}.section-sort-item>span{flex:1;min-width:0}.section-drag-handle{flex:0 0 48px!important;width:48px;min-height:42px;margin:0!important;background:#544056!important;color:#fff!important;font-size:26px;line-height:1;cursor:grab;user-select:none;touch-action:none}.section-sort-item.is-dragging{opacity:.6;border-color:#ff5caa}.section-sort-item.drag-over{outline:2px solid #ff5caa;outline-offset:1px}.nav-icon-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.nav-icon-card{background:#1d1723;border:1px solid #443346;border-radius:11px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:9px;min-width:0}.nav-icon-card img{width:64px;height:64px;object-fit:contain}.nav-icon-card input[type=file]{font-size:11px;width:100%;padding:6px}.nav-icon-card button{font-size:11px;width:100%;margin:0;padding:8px 3px}.nav-icon-card button:disabled{opacity:.4}.time-range-editor{padding:10px 0}.time-range-editor>strong{display:block;margin-bottom:8px}.time-range-controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}.time-range-controls label{display:block;font-size:12px}.time-range-controls select{display:block;width:100%;margin-top:5px}.shift-presets{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px;border-top:1px solid #5b415b;padding-top:12px}.calendar-weekday{text-align:center;font-size:11px;color:#f6b3d8;padding:5px 0}.calendar-empty{min-height:32px}.dategrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.dategrid button{font-size:11px;margin:0;padding:10px 2px;background:#46344b;color:#fff}.dategrid button.selected{background:#ff5caa;color:#211322}.dategrid button.shift{border:2px solid #72b5f2}.small{font-size:12px}.dashboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:18px 0}.dashboard-item{position:relative;min-height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center;background:#29212f;border:1px solid #60415b;border-radius:16px;padding:16px 9px;color:#fff0f7;text-decoration:none}.dashboard-item:active{background:#403047}.dashboard-item strong{font-size:14px}.dashboard-item small{font-size:10px;color:#c8afc2;line-height:1.5}.dash-num{position:absolute;top:10px;right:12px;color:#c8afc2;font-size:10px}.dash-icon{display:grid;place-items:center;width:53px;height:53px;background:#443044;color:#ff8dc3;border-radius:14px;font-size:30px}.sticky[hidden]{display:none}.btn.secondary{background:#544056;color:#fff}.photo-admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.photo-admin-grid>.item{min-width:0;margin:0;padding:9px}.photo-admin-grid img{width:100%!important;max-width:100%!important;margin:8px 0!important}.photo-admin-grid input[type=file]{width:100%;min-width:0;font-size:11px;padding:5px}.photo-admin-grid .row{gap:4px;flex-wrap:nowrap}.photo-admin-grid .row button{min-width:0;flex:1;padding:9px 3px;margin:0;font-size:12px}@media(max-width:340px){.photo-admin-grid{gap:6px}.photo-admin-grid>.item{padding:6px}}details.item>summary::-webkit-details-marker{display:none}details.item>summary::marker{content:''}details.item{list-style:none}</style><style>.top-action-row{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;width:100%;margin:8px 0 4px}.top-action-row .btn{box-sizing:border-box;width:108px;min-width:108px;height:36px;min-height:36px;padding:6px 8px;margin:0;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;font-size:12px}.top-action-row .muted{font-size:10px!important;margin:0!important;white-space:nowrap;min-width:0;flex:1}.dashboard{margin-top:10px}@media(max-width:430px){.top-action-row{gap:6px}.top-action-row .btn{width:78px;min-width:78px;font-size:10px;padding:5px 2px}.top-action-row .muted{font-size:clamp(7px,2.1vw,10px)!important;letter-spacing:-.025em}}</style></head><body><main><h1>あなたの管理ページ <span class="small">DEMO</span></h1><p class="muted">元のHTMLをベースにした改修版です。データはこのブラウザ内にのみ保存されます。ログイン認証・Supabase同期・サーバーへの画像アップロードは未実装です。下部アイコンはブラウザ内に画像を保存できます。初期状態に写真・文章・料金・出勤・エリアのサンプルデータを登録済みです。画像は外部のサンプル写真URLで指定しています。変更内容はこのブラウザ内で保存されます。</p><a class="btn" href="index.html" target="_blank" rel="noopener noreferrer">公開ページ</a><div id="root"></div><div class="sticky"><button onclick="save()">設定を保存</button><a class="btn secondary" href="admin.html">管理TOP</a><a class="btn" href="index.html" target="_blank" rel="noopener noreferrer">公開ページ</a></div></main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="shared.js"></script><script src="supabase-adapter.js"></script><script>
+let reiDbClient=null;
+async function reiLoadOwner(){
+ const client=yuoriClient();const {record}=await yuoriReadOwner(client);
+ if(!record)throw new Error("優織さん専用の管理権限がまだ設定されていません");
+ reiDbClient=client;
+ return record.config;
+}
+</script><script>
+const reiLoadingShield=document.createElement('div');reiLoadingShield.style.cssText='position:fixed;inset:0;z-index:9998;background:#151119;color:#fff;display:grid;place-content:center;text-align:center;padding:24px;font-size:17px';reiLoadingShield.textContent='保存済みデータを読み込んでいます…';document.body.append(reiLoadingShield);
+async function initReiAdmin(){
+ const remote=await reiLoadOwner();
+ try{saveData(remote)}catch(e){console.warn('ローカルキャッシュへの保存に失敗しました',e)}
+ const initialData=remote;
+ reiLoadingShield.remove();
+let d=initialData,root=document.getElementById('root'),selected=new Set(),month=new Date();
+if(!Array.isArray(d.sections))d.sections=SECTIONS.map(x=>x[0]);
+if(!d.sections.includes('official-blog')){const i=d.sections.indexOf('profile');d.sections.splice(i>=0?i+1:d.sections.length,0,'official-blog');}
+if(!Array.isArray(d.hidden))d.hidden=[];month.setDate(1);
+const ADMIN_PAGES=[
+ ['basic','基本情報','user-round','名前・HERO・PERSONAL・INTRO・PROFILE'],
+ ['news','NEWS管理','megaphone','お知らせの作成・編集'],
+ ['images','画像管理','images','HERO・PERSONAL・出勤画像'],
+ ['photos','PHOTO管理','camera','写真の追加・並び替え'],
+ ['shifts','出勤管理','calendar-days','シフト・休み・完売'],
+ ['links','SNS・URL管理','link','個人SNS・店舗連絡先'],
+ ['booking','予約・料金管理','calendar-check','フォーム・料金'],
+ ['areas','エリア管理','map-pin','アクセス・交通費'],
+ ['layout','ページ構成管理','layout-template','表示順・メニュー画像'],
+ ['ogp','OGP設定','share-2','共有画像・タイトル']
+];
+const currentPage=new URLSearchParams(location.search).get('page')||'top';
+const PAGE_SECTIONS={
+ basic:['HERO / NEWS / INTRODUCTION','PROFILE（右側3項目）'],
+ news:['NEWS管理・お知らせ一覧'],images:['画像管理（ファイル登録）'],photos:['PHOTO（3:4）'],
+ shifts:['出勤カレンダー・一括設定'],links:['SNS画像管理','リンク・URL一元管理'],
+ booking:['姫予約フォームの項目','料金シミュレーター','出張・交通費'],
+ areas:['LOCATION GUIDE'],
+ layout:['セクションの表示・並び順','見出し・装飾の設定','下部メニューバーのアイコン'],
+ ogp:['OGP・SNS共有設定']
+};
+const pageInfo=ADMIN_PAGES.find(x=>x[0]===currentPage);
+const header=document.querySelector('h1');
+const sticky=document.querySelector('.sticky');
+const originalIntro=document.querySelector('main > p.muted');
+const originalViewLink=document.querySelector('main > a.btn');
+if(currentPage==='top'){
+ header.textContent='あなたの管理ページ';
+ sticky.hidden=true;originalIntro.hidden=true;
+ root.innerHTML='';
+ const grid=document.createElement('div');grid.className='dashboard';
+ ADMIN_PAGES.forEach(([id,title,icon,desc],i)=>{const a=document.createElement('a');a.className='dashboard-item';a.href='admin.html?page='+id;a.innerHTML='<span class="dash-num">'+String(i+1).padStart(2,'0')+'</span><span class="dash-icon">'+({basic:'♙',news:'✦',images:'▧',photos:'▣',shifts:'▦',links:'↗',booking:'▤',areas:'⌖',layout:'☷',ogp:'◇'}[id])+'</span><strong>'+title+'</strong><small>'+desc+'</small>';grid.append(a)});
+ root.append(grid);
+ const blogRefresh=document.createElement('button');blogRefresh.type='button';blogRefresh.className='btn secondary';blogRefresh.textContent='↻ ブログ更新';blogRefresh.style.cssText='';
+ const actionRow=document.createElement('div');actionRow.className='top-action-row';originalViewLink.parentNode.insertBefore(actionRow,originalViewLink);actionRow.append(originalViewLink,blogRefresh);
+ const status=document.createElement('p');status.className='muted';status.style.cssText='';actionRow.append(status);
+ const refresh=blogRefresh;
+  const client=reiDbClient;
+ client.from('therapist_blog_cache').select('fetched_at,posts').eq('therapist_key','rei').maybeSingle().then(({data,error})=>{status.textContent=error?'更新状況を取得できません':data?.fetched_at?'最終更新：'+new Date(data.fetched_at).toLocaleString('ja-JP'):'まだ記事を取得していません'});
+ refresh.addEventListener('click',async()=>{
+  if(refresh.disabled)return;refresh.disabled=true;refresh.textContent='更新中…';status.textContent='公式HPから取得しています';
+  try{
+   const {data:{session}}=await client.auth.getSession();if(!session)throw Error('ログインが必要です');
+   const res=await fetch(REI_SAMPLE_DB.url+'/functions/v1/refresh-rei-blog',{method:'POST',headers:{'Content-Type':'application/json',apikey:REI_SAMPLE_DB.anonKey,Authorization:'Bearer '+session.access_token},body:'{}'});
+   const result=await res.json();if(!res.ok||!result.ok){const detail=result.detail||result.error||('HTTP '+res.status);throw Error(typeof detail==='string'?detail:JSON.stringify(detail));}
+   status.textContent='最終更新：'+new Date().toLocaleString('ja-JP');
+  }catch(e){status.textContent='更新失敗：'+(e.message||String(e))+'（公開中の記事は維持されます）'}
+  finally{refresh.disabled=false;refresh.textContent='ブログを最新に更新'}
+ });
+}else{
+ if(!pageInfo){location.replace('admin.html')}
+ header.textContent=pageInfo?pageInfo[1]:'管理ページ';
+ originalIntro.hidden=true;originalViewLink.insertAdjacentHTML('beforebegin','<a class="btn secondary" href="admin.html">管理TOP</a>');
+}
+
+function section(title){let s=document.createElement('section');s.innerHTML='<h2>'+title+'</h2>';if(currentPage!=='top'&&(PAGE_SECTIONS[currentPage]||[]).includes(title))root.append(s);return s}
+function textfield(parent,label,obj,key,type='text'){let l=document.createElement('label');l.textContent=label;let input=document.createElement(type==='textarea'?'textarea':'input');if(type!=='textarea')input.type=type;input.value=obj[key]??'';if(type==='textarea'){input.classList.add('longtext');input.rows=9;const resize=()=>{input.style.height='auto';input.style.height=Math.max(230,input.scrollHeight+3)+'px'};input.addEventListener('input',resize);requestAnimationFrame(resize)}input.oninput=()=>obj[key]=type==='number'?Number(input.value):input.value;if(type==='textarea'){input.setAttribute('wrap','soft');input.style.cssText+=';width:100%;max-width:100%;min-width:0;overflow-x:hidden;overflow-wrap:anywhere;word-break:break-word;white-space:pre-wrap';input.addEventListener('focus',()=>{input.scrollLeft=0});input.addEventListener('input',()=>{if(input.scrollLeft)input.scrollLeft=0})}parent.append(l,input);return input}
+function check(parent,label,obj,key){let l=document.createElement('label'),i=document.createElement('input');i.type='checkbox';i.checked=!!obj[key];i.onchange=()=>obj[key]=i.checked;l.append(i,' '+label);parent.append(l);return i}
+function selectfield(parent,label,obj,key,options){let l=document.createElement('label'),sel=document.createElement('select');l.textContent=label;options.forEach(([value,name])=>{let o=document.createElement('option');o.value=value;o.textContent=name;sel.append(o)});sel.value=obj[key]||options[0][0];sel.onchange=()=>obj[key]=sel.value;parent.append(l,sel)}
+function items(s,arr,fields,make,opts={}){let host=document.createElement('div');s.append(host);function render(){host.innerHTML='';arr.forEach((o,i)=>{let box=document.createElement('div');box.className='item';fields.forEach(f=>{if(f[2]==='checkbox')check(box,f[0],o,f[1]);else if(f[2]==='select')selectfield(box,f[0],o,f[1],f[3]);else textfield(box,f[0],o,f[1],f[2]||'text')});let row=document.createElement('div');row.className='row';[['↑',()=>{if(i){[arr[i-1],arr[i]]=[arr[i],arr[i-1]];render()}}],['↓',()=>{if(i<arr.length-1){[arr[i+1],arr[i]]=[arr[i],arr[i+1]];render()}}],...(opts.fixed?[]:[['削除',()=>{arr.splice(i,1);render();if(opts.autoSave)save()}]])].forEach(([t,fn])=>{let b=document.createElement('button');b.textContent=t;b.className='secondary';b.onclick=fn;row.append(b)});box.append(row);host.append(box)})}let add=document.createElement('button');add.textContent='＋ 追加';add.onclick=()=>{if(opts.limit&&arr.length>=opts.limit){alert('最大'+opts.limit+'項目です');return}arr.push(make());render();if(opts.autoSave)save()};if(!opts.fixed)s.append(add);render()}
+
+function compactBookingItems(s,arr,fields,make){
+ const host=document.createElement('div');s.append(host);
+ function render(){
+  host.replaceChildren();
+  arr.forEach((obj,i)=>{
+   const details=document.createElement('details');details.className='item';details.style.padding='0';
+   const summary=document.createElement('summary');summary.style.cssText='cursor:pointer;padding:15px;font-weight:700;list-style:none;display:flex;align-items:center;flex-wrap:wrap;gap:8px';
+   const typeLabels={text:'テキスト',tel:'電話番号',email:'メール',date:'日付',time:'時刻','datetime-local':'日時',number:'数字',textarea:'長文',select:'選択式'};
+   function updateSummary(){
+    summary.replaceChildren();
+    const title=document.createElement('strong');title.textContent=obj.label||'新規項目';title.style.marginRight='auto';
+    summary.append(title);
+    for(const value of [obj.required?'必須':'任意',obj.visible===false?'非表示':'表示',typeLabels[obj.type]||obj.type||'テキスト']){
+     const status=document.createElement('span');status.textContent=value;status.style.cssText='font-size:11px;font-weight:500;border:1px solid #70526b;border-radius:5px;padding:3px 6px;white-space:nowrap';summary.append(status);
+    }
+   }
+   updateSummary();details.append(summary);
+   const editor=document.createElement('div');editor.style.padding='0 14px 14px';
+   fields.forEach(field=>{
+    if(field[1]==='options'){
+     const wrap=document.createElement('div');
+     const input=textfield(wrap,field[0],obj,field[1],'textarea');
+     input.rows=3;input.style.minHeight='85px';input.style.height='85px';
+     const update=()=>{wrap.hidden=obj.type!=='select'};
+     details.addEventListener('change',update);update();editor.append(wrap);
+    }else if(field[2]==='checkbox')check(editor,field[0],obj,field[1]);
+    else if(field[2]==='select')selectfield(editor,field[0],obj,field[1],field[3]);
+    else textfield(editor,field[0],obj,field[1],field[2]||'text');
+   });
+   const actions=document.createElement('div');actions.className='row';
+   [['↑',()=>{if(i>0){[arr[i-1],arr[i]]=[arr[i],arr[i-1]];render()}}],
+    ['↓',()=>{if(i<arr.length-1){[arr[i+1],arr[i]]=[arr[i],arr[i+1]];render()}}],
+    ['削除',()=>{if(confirm('この項目を削除しますか？')){arr.splice(i,1);render()}}]]
+    .forEach(([label,fn])=>{const b=document.createElement('button');b.type='button';b.className='secondary';b.textContent=label;b.onclick=fn;actions.append(b)});
+   editor.addEventListener('input',updateSummary);editor.addEventListener('change',updateSummary);editor.append(actions);details.append(editor);host.append(details);
+  });
+ }
+ const add=document.createElement('button');add.type='button';add.textContent='＋ 追加';add.onclick=()=>{arr.push(make());render();host.lastElementChild.open=true};s.append(add);render();
+}
+function compactBookingSection(section){
+ if(currentPage!=='booking')return;
+ const heading=section.querySelector('h2');if(!heading)return;
+ const details=document.createElement('details');details.style.marginTop='8px';
+ const summary=document.createElement('summary');summary.style.cssText='cursor:pointer;padding:10px 0;font-weight:700';summary.textContent=heading.textContent+'　（タップして編集）';
+ while(heading.nextSibling)details.append(heading.nextSibling);
+ heading.replaceWith(summary);section.append(details);details.prepend(summary);
+}
+function addDragSort(handle,element,container,array,index,redraw){
+ handle.type='button';handle.className='secondary';handle.textContent='≡';handle.title='長押しして並び替え';handle.setAttribute('aria-label','長押しして並び替え');handle.style.touchAction='none';
+ let start=null;
+ handle.onpointerdown=e=>{if(e.button!==0)return;e.preventDefault();start={id:e.pointerId,y:e.clientY,from:index};handle.setPointerCapture(e.pointerId);element.style.opacity='.65'};
+ handle.onpointermove=e=>{if(!start)return;e.preventDefault();container.querySelectorAll('[data-sort-index]').forEach(el=>el.style.outline='');const target=document.elementFromPoint(e.clientX,e.clientY)?.closest('[data-sort-index]');if(target&&container.contains(target)&&target!==element)target.style.outline='2px solid #e981b9'};
+ handle.onpointerup=e=>{if(!start)return;const from=start.from;start=null;element.style.opacity='';const target=document.elementFromPoint(e.clientX,e.clientY)?.closest('[data-sort-index]');const to=target&&container.contains(target)?Number(target.dataset.sortIndex):from;if(to!==from&&to>=0&&to<array.length){const [moved]=array.splice(from,1);array.splice(to,0,moved)}redraw()};
+ handle.onpointercancel=()=>{start=null;element.style.opacity='';container.querySelectorAll('[data-sort-index]').forEach(el=>el.style.outline='')};
+}
+
+let photos=d.photos.map(x=>({url:x}));
+if(currentPage!=='shifts'){
+let s; // 見出し言語設定は廃止
+s=section('OGP・SNS共有設定');{
+ const note=document.createElement('p');note.className='muted';note.textContent='SNSにページURLを貼った際の共有カードを設定します。このデモはブラウザ内保存のため、X・LINEへの公開OGP反映には本番サーバー側の更新が必要です。';s.append(note);
+ const imageLabel=document.createElement('label');imageLabel.textContent='① OG画像を登録・変更（1200×630px推奨）';s.append(imageLabel);
+ const upload=document.createElement('input');upload.type='file';upload.accept='image/jpeg,image/png,image/webp';s.append(upload);
+ const imagePreview=document.createElement('img');imagePreview.style.cssText='display:block;width:100%;max-width:450px;aspect-ratio:1200/630;object-fit:contain;background:#110e14;border:1px solid #70526b;border-radius:8px;margin:12px 0';s.append(imagePreview);
+ const remove=document.createElement('button');remove.className='secondary';remove.textContent='OG画像を削除';s.append(remove);
+ const titleHint=document.createElement('p');titleHint.className='muted';titleHint.textContent='② 共有タイトル：SNSのリンクカードに表示されるページ名です。目安30〜40文字。例：本田セラピスト｜薔薇と紳士【公式個人ページ】';s.append(titleHint);
+ const titleInput=textfield(s,'共有タイトル',d.ogp,'title');titleInput.placeholder='例：本田セラピスト｜薔薇と紳士【公式個人ページ】';
+ const titleCount=document.createElement('p');titleCount.className='muted';s.append(titleCount);
+ const descriptionHint=document.createElement('p');descriptionHint.className='muted';descriptionHint.textContent='③ 共有説明文：プロフィール・写真・出勤予定など、ページの内容を紹介します。目安60〜100文字。SNSによっては省略されます。';s.append(descriptionHint);
+ const descInput=textfield(s,'共有説明文',d.ogp,'description','textarea');descInput.placeholder='例：薔薇と紳士・本田セラピストの公式個人ページです。最新の出勤予定、プロフィール、PHOTO、SNS、ご予約方法をご案内しています。';
+ const descCount=document.createElement('p');descCount.className='muted';s.append(descCount);
+ function draw(){imagePreview.src=d.ogp.image||demoImage('OG IMAGE','wide');titleCount.textContent='現在 '+(d.ogp.title||'').length+'文字 ／ 目安30〜40文字';descCount.textContent='現在 '+(d.ogp.description||'').length+'文字 ／ 目安60〜100文字'}
+ titleInput.addEventListener('input',draw);descInput.addEventListener('input',draw);
+ upload.onchange=async()=>{const file=upload.files?.[0];if(!file)return;if(!['image/jpeg','image/png','image/webp'].includes(file.type)){alert('JPG・PNG・WebP画像を選択してください');return}try{const url=URL.createObjectURL(file);const img=new Image();try{await new Promise((ok,ng)=>{img.onload=ok;img.onerror=ng;img.src=url});const canvas=document.createElement('canvas');const scale=Math.min(1,1200/Math.max(img.naturalWidth,img.naturalHeight));canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);d.ogp.image=canvas.toDataURL('image/jpeg',.78);draw()}finally{URL.revokeObjectURL(url)}}catch(e){alert('画像を読み込めませんでした')}};
+ remove.onclick=()=>{if(confirm('OG画像を削除しますか？')){d.ogp.image='';upload.value='';draw()}};
+ const hint=document.createElement('p');hint.className='muted';hint.textContent='推奨：1200×630px、JPGまたはPNG。登録した画像はデモ版ではこのブラウザ内に保存され、SNSには直接配信されません。';s.append(hint);draw();
+}
+s=section('HERO / NEWS / INTRODUCTION');textfield(s,'お名前',d,'name');{
+ const row=document.createElement('div');row.className='item';
+ const label=document.createElement('label');label.textContent='HEROに名前を表示';
+ const yes=document.createElement('label'),no=document.createElement('label');
+ yes.style.cssText=no.style.cssText='display:inline-flex;align-items:center;gap:7px;margin:8px 20px 8px 0;width:auto;white-space:nowrap;cursor:pointer';
+ const y=document.createElement('input'),n=document.createElement('input');y.type=n.type='radio';y.name=n.name='hero-name-visible';y.value='yes';n.value='no';y.style.cssText=n.style.cssText='width:18px;height:18px;min-width:18px;flex:0 0 18px;margin:0;transform:none';
+ const visible=d.heroNameVisible!==undefined?d.heroNameVisible:d.heroTextMode==='text';
+ y.checked=!!visible;n.checked=!visible;
+ y.onchange=()=>{if(y.checked)d.heroNameVisible=true};n.onchange=()=>{if(n.checked)d.heroNameVisible=false};
+ yes.append(y,' 表示する');no.append(n,' 表示しない');row.append(label,yes,no);s.append(row);
+}
+textfield(s,'紹介文',d,'intro','textarea');
+s=section('NEWS管理・お知らせ一覧');{
+ const note=document.createElement('p');note.className='muted';note.textContent='新規NEWSは先頭に追加します。↑↓で公開ページの表示順を変更できます。非公開のNEWSも一覧に残ります。';s.append(note);
+ d.newsItems=Array.isArray(d.newsItems)?d.newsItems:[];
+ if(!d.newsItems.length&&d.news){d.newsItems.push({title:'お知らせ',body:d.news,date:new Date().toISOString().slice(0,10),important:false,visible:true})}
+ const newHeading=document.createElement('h3');newHeading.textContent='新規NEWS作成';s.append(newHeading);
+ const newEditor=document.createElement('div');s.append(newEditor);
+ const pastHeading=document.createElement('h3');pastHeading.textContent='過去のNEWS一覧';pastHeading.style.marginTop='28px';s.append(pastHeading);
+ const list=document.createElement('div');s.append(list);
+ const draft={title:'',body:'',date:new Date().toISOString().slice(0,10),important:false,visible:true};
+ function drawNews(){list.replaceChildren();newEditor.replaceChildren();const entries=[{item:draft,i:-1},...d.newsItems.map((item,i)=>({item,i}))];entries.forEach(({item,i})=>{const box=document.createElement('div');box.className='item';textfield(box,'タイトル',item,'title');textfield(box,'日付',item,'date','date');textfield(box,'本文',item,'body','textarea');const imageArea=document.createElement('div');imageArea.className='news-image-area';const imageLabel=document.createElement('label');imageLabel.textContent='NEWS画像（任意・1枚）';imageArea.append(imageLabel);const preview=document.createElement('img');preview.alt='NEWS画像プレビュー';preview.style.cssText='display:block;width:180px;max-width:100%;max-height:240px;object-fit:contain;border-radius:8px;margin:8px 0';const update=()=>{preview.hidden=!item.image;preview.src=item.image||''};update();imageArea.append(preview);const picker=document.createElement('input');picker.type='file';picker.accept='image/jpeg,image/png,image/webp';picker.setAttribute('aria-label','NEWS画像を選択');picker.onchange=async()=>{const file=picker.files?.[0];if(!file)return;const url=URL.createObjectURL(file);try{const img=new Image();await new Promise((ok,ng)=>{img.onload=ok;img.onerror=ng;img.src=url});const canvas=document.createElement('canvas');const scale=Math.min(1,1000/Math.max(img.naturalWidth,img.naturalHeight));canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);item.image=canvas.toDataURL('image/jpeg',.75);update()}catch(e){alert('画像を読み込めませんでした')}finally{URL.revokeObjectURL(url)}};imageArea.append(picker);const removeImage=document.createElement('button');removeImage.type='button';removeImage.className='secondary';removeImage.textContent='画像を削除';removeImage.onclick=()=>{item.image='';picker.value='';update()};imageArea.append(removeImage);box.append(imageArea);const controls=document.createElement('div');controls.className='news-controls';const important=document.createElement('label');important.className='news-check';const importantInput=document.createElement('input');importantInput.type='checkbox';importantInput.checked=!!item.important;importantInput.onchange=()=>item.important=importantInput.checked;important.append(importantInput,' 重要');controls.append(important);const visibility=document.createElement('div');visibility.className='news-visibility';const visibilityTitle=document.createElement('span');visibilityTitle.textContent='公開設定';visibility.append(visibilityTitle);[['公開',true],['非公開',false]].forEach(([label,value])=>{const choice=document.createElement('label');choice.className='news-check';const input=document.createElement('input');input.type='checkbox';input.checked=(item.visible!==false)===value;input.onchange=()=>{item.visible=value;visibility.querySelectorAll('input').forEach((other,j)=>other.checked=(j===Number(!value)))};choice.append(input,' '+label);visibility.append(choice)});controls.append(visibility);box.append(controls);const del=document.createElement('button');del.className='secondary';del.textContent='削除';del.onclick=()=>{if(confirm('このお知らせを削除しますか？')){d.newsItems.splice(i,1);drawNews()}};const order=document.createElement('div');order.className='row';const dragHandle=document.createElement('button');order.append(dragHandle);if(i===-1){const create=document.createElement('button');create.type='button';create.textContent='＋ NEWSを作成';create.onclick=()=>{if(!draft.title.trim()){alert('タイトルを入力してください');return}d.newsItems.unshift({...draft});Object.assign(draft,{title:'',body:'',date:new Date().toISOString().slice(0,10),important:false,visible:true,image:''});drawNews()};box.append(create);newEditor.append(box)}else{box.append(del);const details=document.createElement('details');details.className='item';details.style.cssText='padding:0;margin:0;min-width:0;flex:1';const summary=document.createElement('summary');summary.style.cssText='cursor:pointer;padding:11px 8px 11px 12px;list-style:none;display:flex;align-items:center;gap:10px;min-width:0';const refresh=()=>{summary.replaceChildren();const info=document.createElement('span');info.style.cssText='display:flex;flex-direction:column;gap:5px;flex:1;min-width:0';const heading=document.createElement('span');heading.style.cssText='display:flex;align-items:baseline;gap:7px;min-width:0;flex-wrap:wrap';const date=document.createElement('span');date.style.cssText='font-size:11px;color:#c8afc2;white-space:nowrap';date.textContent=item.date||'日付未設定';const title=document.createElement('strong');title.style.cssText='font-size:13px;overflow-wrap:anywhere';title.textContent=item.title||'無題';heading.append(date,title);const statuses=document.createElement('span');statuses.style.cssText='display:flex;gap:6px;flex-wrap:wrap';for(const status of [item.visible===false?'非公開':'公開',...(item.important?['重要']:[])]){const tag=document.createElement('span');tag.textContent=status;tag.style.cssText='font-size:10px;border:1px solid #70526b;border-radius:5px;padding:2px 5px';statuses.append(tag)}info.append(heading,statuses);summary.append(info);if(item.image){const thumb=document.createElement('img');thumb.src=item.image;thumb.alt='NEWS画像';thumb.style.cssText='width:48px;height:48px;flex:0 0 48px;object-fit:cover;border-radius:7px;border:1px solid #70526b';summary.append(thumb)}const chevron=document.createElement('span');chevron.textContent=details.open?'⌃':'⌄';chevron.style.cssText='font-size:17px;color:#c8afc2';summary.append(chevron)};refresh();box.addEventListener('input',refresh);box.addEventListener('change',refresh);details.addEventListener('toggle',refresh);details.append(summary,box);const entry=document.createElement('div');entry.className='news-sort-entry';entry.style.cssText='display:flex;align-items:stretch;gap:5px;margin:10px 0 14px;min-width:0';entry.dataset.sortIndex=String(i);addDragSort(dragHandle,entry,list,d.newsItems,i,drawNews);dragHandle.style.cssText='width:46px;min-width:46px;flex:0 0 46px;margin:0;touch-action:none;font-size:24px;cursor:grab';entry.append(details,dragHandle);list.append(entry)}})}
+ drawNews()
+}
+s=section('画像管理（ファイル登録）');{
+const hint=document.createElement('p');hint.className='muted';hint.textContent='スマホ・PCから画像を選択してください。登録画像はこのブラウザ内に保存されます（デモ版）。';s.append(hint);
+[['hero','HERO','3:4'],['personal','PERSONAL','1:1'],['profile','PROFILE','3:4'],['calendar','CALENDAR','1:1'],['working','出勤画像','1:1'],['off','休み画像','1:1'],['soldout','完売画像','1:1']].forEach(([key,label,ratio])=>{
+ const box=document.createElement('div');box.className='item';const heading=document.createElement('strong');heading.textContent=label+'（'+ratio+'）';box.append(heading);
+ const preview=document.createElement('img');preview.alt=label+'プレビュー';preview.style.cssText='display:block;width:180px;max-width:100%;aspect-ratio:'+ratio.replace(':','/')+';object-fit:cover;border-radius:9px;margin:12px 0;background:#120e15;border:1px solid #70526b';
+ const update=()=>{preview.src=d.images[key]||'';preview.hidden=!d.images[key]};update();box.append(preview);
+ const picker=document.createElement('input');picker.type='file';picker.accept='image/*';picker.style.cssText='max-width:100%;margin:8px 0';
+ picker.onchange=async()=>{const file=picker.files&&picker.files[0];if(!file)return;if(!file.type.startsWith('image/')){alert('画像ファイルを選択してください');return}
+ try{const url=URL.createObjectURL(file);const img=new Image();try{await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=url});const canvas=document.createElement('canvas');const scale=Math.min(1,1200/Math.max(img.naturalWidth,img.naturalHeight));canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);d.images[key]=canvas.toDataURL('image/jpeg',.78);update()}finally{URL.revokeObjectURL(url)}}catch(e){alert('画像を読み込めませんでした')}};
+ const remove=document.createElement('button');remove.textContent='画像を削除';remove.className='secondary';remove.onclick=()=>{if(confirm(label+'を削除しますか？')){d.images[key]='';picker.value='';update()}};box.append(picker,remove);s.append(box)
+});
+}
+s=section('PHOTO（3:4）');{
+const hint=document.createElement('p');hint.className='muted';hint.textContent='最大20枚まで登録できます。画像を見ながら並び替えできます。画像比率は3:4を推奨します。';s.append(hint);
+const gallery=document.createElement('div');gallery.className='photo-admin-grid';s.append(gallery);
+async function photoFile(file){if(!file||!file.type.startsWith('image/'))throw Error('画像ファイルを選択してください');const url=URL.createObjectURL(file);try{const img=new Image();await new Promise((ok,ng)=>{img.onload=ok;img.onerror=ng;img.src=url});const canvas=document.createElement('canvas');const scale=Math.min(1,1200/Math.max(img.naturalWidth,img.naturalHeight));canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);return canvas.toDataURL('image/jpeg',.78)}finally{URL.revokeObjectURL(url)}}
+function drawPhotos(){gallery.replaceChildren();addLabel.textContent='＋ 写真を追加（'+photos.length+'/20枚・複数選択可）';add.disabled=photos.length>=20;photos.forEach((photo,i)=>{const box=document.createElement('div');box.className='item';const label=document.createElement('strong');label.textContent='PHOTO '+(i+1);box.append(label);const img=document.createElement('img');img.src=photo.url;img.alt='PHOTO '+(i+1);img.style.cssText='display:block;width:150px;max-width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:9px;margin:12px 0;background:#120e15;border:1px solid #70526b';box.append(img);const picker=document.createElement('input');picker.type='file';picker.accept='image/*';picker.setAttribute('aria-label','PHOTO '+(i+1)+'を変更');picker.onchange=async()=>{try{if(picker.files?.[0]){photo.url=await photoFile(picker.files[0]);drawPhotos()}}catch(e){alert(e.message)}};box.append(picker);const row=document.createElement('div');row.className='row';const dragHandle=document.createElement('button');row.append(dragHandle);box.dataset.sortIndex=String(i);addDragSort(dragHandle,box,gallery,photos,i,drawPhotos);const del=document.createElement('button');del.className='secondary';del.textContent='削除';del.onclick=()=>{if(confirm('この写真を削除しますか？')){photos.splice(i,1);drawPhotos()}};row.append(del);box.append(row);gallery.append(box)})}
+const add=document.createElement('input');add.type='file';add.accept='image/*';add.multiple=true;add.setAttribute('aria-label','写真を追加');add.onchange=async()=>{for(const file of Array.from(add.files||[])){if(photos.length>=20){alert('PHOTOは最大20枚までです');break}try{photos.push({url:await photoFile(file)})}catch(e){alert(e.message)}}add.value='';drawPhotos()};const addLabel=document.createElement('label');addLabel.textContent='＋ 写真を追加（複数選択可）';s.append(addLabel,add);drawPhotos()
+}
+s=section('PROFILE（右側3項目）');items(s,d.profileRows,[['項目名（6文字程度）','label'],['回答（10文字程度）','value']],()=>({label:'ITEM',value:''}),{limit:3,fixed:true});
+// ブログ連携設定。自動取得は取得元の仕様確認後に接続する。
+if(currentPage==='basic'){
+ const blogSection=document.createElement('section');
+ blogSection.innerHTML='<h2>公式ブログ連携</h2><p class="muted">公式HPのブログを手動で取得します。表示件数は保存ボタンで確定してください。</p>';
+ root.append(blogSection);
+ if(!d.officialBlog||typeof d.officialBlog!=='object')d.officialBlog={};
+ const blog=d.officialBlog;
+ const lab=document.createElement('label');lab.textContent='公式ブログ一覧URL';blogSection.append(lab);
+ const url=document.createElement('input');url.type='url';url.placeholder='https://grandluxe-osaka.com/bloglist.php?id=1463';url.value=blog.listUrl||'https://grandluxe-osaka.com/bloglist.php?id=1463';blog.listUrl=url.value;url.addEventListener('input',()=>blog.listUrl=url.value.trim());blogSection.append(url);
+ const countLabel=document.createElement('label');countLabel.textContent='表示件数';blogSection.append(countLabel);
+ const count=document.createElement('select');[1,2,3].forEach(n=>{const opt=document.createElement('option');opt.value=n;opt.textContent=n+'件';count.append(opt)});count.value=String([1,2,3].includes(Number(blog.count))?blog.count:1);blog.count=Number(count.value);count.addEventListener('change',()=>blog.count=Number(count.value));blogSection.append(count);
+ 
+
+
+}
+
+s=section('SNS画像管理');{
+ const info=document.createElement('p');info.className='muted';info.textContent='ページ本文のSNSボタン用画像です。下部固定メニューのアイコンとは別管理です。リンク先URLは下の一括管理で設定します。画像は1:1推奨です。';s.append(info);
+ d.snsImages=d.snsImages||{};
+ const gallery=document.createElement('div');gallery.className='nav-icon-grid';s.append(gallery);
+ [['line','LINE'],['x','X'],['sub','02']].forEach(([key,name])=>{
+ const card=document.createElement('div');card.className='nav-icon-card';
+ const title=document.createElement('strong');title.textContent=name;
+ const img=document.createElement('img');img.alt=name+'のSNS画像';img.style.cssText='width:92px;height:92px;object-fit:contain';
+ const refresh=()=>{img.src=d.snsImages[key]||'../sample/assets/icons/new-'+key+'.png'};
+ const file=document.createElement('input');file.type='file';file.accept='image/png,image/jpeg,image/webp';file.setAttribute('aria-label',name+'の画像を登録・変更');
+ file.onchange=async()=>{const chosen=file.files?.[0];if(!chosen)return;if(!chosen.type.startsWith('image/')){alert('画像ファイルを選択してください');return}const url=URL.createObjectURL(chosen);try{const source=new Image();await new Promise((ok,ng)=>{source.onload=ok;source.onerror=ng;source.src=url});const canvas=document.createElement('canvas');canvas.width=256;canvas.height=256;const ctx=canvas.getContext('2d');const scale=Math.min(256/source.naturalWidth,256/source.naturalHeight);ctx.drawImage(source,(256-source.naturalWidth*scale)/2,(256-source.naturalHeight*scale)/2,source.naturalWidth*scale,source.naturalHeight*scale);d.snsImages[key]=canvas.toDataURL('image/png');refresh()}catch(e){alert('画像を読み込めませんでした')}finally{URL.revokeObjectURL(url)}};
+ const remove=document.createElement('button');remove.type='button';remove.className='secondary';remove.textContent='初期画像に戻す';remove.onclick=()=>{delete d.snsImages[key];file.value='';refresh()};
+ card.append(title,img,file,remove);gallery.append(card);refresh()
+ });
+}
+s=section('リンク・URL一元管理');{const p=document.createElement('p');p.className='muted';p.textContent='ここで変更したURLは、上部・下部SNS、固定ナビ、OFFICIAL、CONTACT、予約ポップアップなど同じリンクを使う全箇所に反映されます。※このデモでは同じブラウザ内で保存・反映されます。';s.append(p)}['line','x','sub'].forEach(k=>textfield(s,k==='sub'?'02 URL':k.toUpperCase()+' URL',d.sns,k));textfield(s,'店舗電話番号',d,'phone');textfield(s,'店舗公式LINE URL',d,'shopLine');textfield(s,'店舗公式HP URL',d,'official');textfield(s,'SNS移動前の注意喚起文',d,'snsWarning','textarea');
+s=section('姫予約フォームの項目');compactBookingItems(s,d.bookingFields,[['項目名','label'],['入力形式','type','select',[['text','テキスト'],['tel','電話番号'],['email','メール'],['date','日付'],['time','時刻'],['datetime-local','日時'],['number','数字'],['textarea','長文'],['select','選択式']]],['選択肢（選択式の場合は1行1項目）','options','textarea'],['必須','required','checkbox'],['表示','visible','checkbox']],()=>({label:'NEW FIELD',type:'text',required:false,visible:true,options:''}));
+compactBookingSection(s);
+s=section('料金シミュレーター');check(s,'料金設定を公開する',d,'pricePublished');items(s,d.courses,[['コース名','name'],['料金（円）','price','number']],()=>({name:'NEW COURSE',price:0}));items(s,d.extras,[['追加料金名','name'],['金額（円）','price','number']],()=>({name:'NEW FEE',price:0}));textfield(s,'消費税率（%）',d,'tax','number');check(s,'登録料金は税込',d,'taxIncluded');
+textfield(s,'指名料（円）',d,'priceNomination','number');textfield(s,'特別指名料（円）',d,'priceSpecial','number');textfield(s,'合計金額の注意書き',d,'priceCaution','textarea');textfield(s,'備考',d,'priceNotes','textarea');[['コース','priceShowCourse'],['指名料','priceShowNomination'],['特別指名料','priceShowSpecial'],['交通費','priceShowTravel'],['合計金額','priceShowTotal'],['注意書き','priceShowCaution'],['備考','priceShowNotes']].forEach(([label,key])=>check(s,label+'を表示',d,key));
+compactBookingSection(s);
+s=section('出張・交通費');check(s,'出張対応あり',d,'travelEnabled');selectfield(s,'交通費方式',d,'travelMode',[['area','エリア別'],['flat','一律'],['free','無料']]);textfield(s,'一律交通費（円）',d,'travelFlat','number');if(!Array.isArray(d.travelAreas))d.travelAreas=[];
+if(!Array.isArray(d.travelFreeAreas))d.travelFreeAreas=[{name:'日本橋｜指定ホテル',visible:true},{name:'谷町九丁目｜指定ホテル',visible:true},{name:'梅田｜指定ホテル',visible:true}];
+const freeHead=document.createElement('h3');freeHead.textContent='無料エリア（追加・非表示可能）';s.append(freeHead);
+items(s,d.travelFreeAreas,[['エリア名','name'],['表示','visible','checkbox']],()=>({name:'新しい無料エリア',visible:true}));
+const paidHead=document.createElement('h3');paidHead.textContent='有料エリア（1,000円以上）';s.append(paidHead);
+const help=document.createElement('p');help.className='muted';help.textContent='1行に「1000円｜北区、福島区」の形式で貼り付けてください。区名・地域名ごとに個別の選択肢になります。既存データは確認なしに上書きしません。';s.append(help);
+const bulk=document.createElement('textarea');bulk.rows=7;bulk.placeholder='1000円｜北区、福島区、中央区\n2000円｜港区、此花区、大正区';s.append(bulk);
+const preview=document.createElement('div');preview.className='muted';s.append(preview);
+let parsedPaid=null;
+const parseButton=document.createElement('button');parseButton.type='button';parseButton.textContent='一覧を解析';
+function parsePaidAreas(){
+ const entries=[],errors=[],seen=new Map();
+ const normalizeDigits=str=>String(str).replace(/[０-９]/g,c=>String(c.charCodeAt(0)-65296));
+ bulk.value.split(/\r?\n/).forEach((raw,i)=>{
+  const line=normalizeDigits(raw).trim();if(!line)return;
+  const match=line.match(/^([\d,，]+)\s*(?:円|￥|¥)?\s*[｜|：:]\s*(.+)$/);
+  if(!match){errors.push((i+1)+'行目：形式を確認してください（例：1000円｜北区、福島区）');return}
+  const price=Number(match[1].replace(/[,，]/g,''));
+  if(!Number.isFinite(price)||price<1000){errors.push((i+1)+'行目：有料エリアは1,000円以上です');return}
+  const names=match[2].split(/[、,，]/).map(x=>x.trim()).filter(Boolean);
+  if(!names.length){errors.push((i+1)+'行目：エリア名がありません');return}
+  for(const name of names){if(seen.has(name)){errors.push('重複：'+name+'（'+seen.get(name)+'円／'+price+'円）');continue}seen.set(name,price);entries.push({name,price,visible:true})}
+ });
+ parsedPaid=errors.length?null:entries;
+ preview.textContent=errors.length?errors.join(' ／ '):entries.length?entries.length+'エリアを解析しました。内容：'+entries.map(x=>x.name+' '+x.price.toLocaleString()+'円').join('、'):'登録可能なエリアがありません';
+ return !!parsedPaid&&parsedPaid.length>0;
+}
+parseButton.onclick=parsePaidAreas;bulk.addEventListener('input',()=>{parsedPaid=null;preview.textContent='入力内容が変更されました。「一覧を解析」を押してください。'});
+s.append(parseButton);
+const applyButton=document.createElement('button');applyButton.type='button';applyButton.textContent='確認して一括登録';applyButton.onclick=()=>{
+ if(!parsedPaid&&!parsePaidAreas()){alert('解析できませんでした。入力欄の下に表示されたエラーを確認してください');return}
+ const existing=d.travelAreas.filter(x=>Number(x.price)>=1000);
+ const conflicts=parsedPaid.filter(x=>existing.some(y=>y.name===x.name&&Number(y.price)!==x.price));
+ if(conflicts.length){alert('既存エリアと金額が異なります：'+conflicts.map(x=>x.name).join('、')+'。既存設定を確認してください');return}
+ const additions=parsedPaid.filter(x=>!existing.some(y=>y.name===x.name));
+ if(!additions.length){preview.textContent='すべて登録済みです。新規追加はありません。';return}
+ if(!confirm(additions.length+'件の有料エリアを追加します。既存のエリアは保持します。よろしいですか？'))return;
+ d.travelAreas.push(...additions);parsedPaid=null;preview.textContent=additions.length+'件を追加しました。下部の「設定を保存」で確定してください。';renderPaid();
+};s.append(applyButton);
+const paidList=document.createElement('div');s.append(paidList);
+function renderPaid(){paidList.replaceChildren();d.travelAreas.filter(x=>Number(x.price)>=1000).forEach(x=>{const row=document.createElement('div');row.className='item';textfield(row,'エリア名',x,'name');textfield(row,'交通費（円）',x,'price','number');check(row,'表示',x,'visible');const del=document.createElement('button');del.type='button';del.className='secondary';del.textContent='削除';del.onclick=()=>{const i=d.travelAreas.indexOf(x);if(i>=0)d.travelAreas.splice(i,1);renderPaid()};row.append(del);paidList.append(row)})}
+renderPaid();
+compactBookingSection(s);
+s=section('LOCATION GUIDE');textfield(s,'セクション見出し',d,'locationTitle');items(s,d.areas,[['エリア名','name'],['形式','type','select',[['image','画像'],['map','Google Maps埋め込み']]],['画像URL','image'],['Google Maps埋め込みURL','map'],['表示','visible','checkbox']],()=>({name:'NEW AREA',type:'image',image:'',map:'',visible:true}),{autoSave:true});
+s=section('セクションの表示・並び順');{
+const tip=document.createElement('p');tip.className='muted';tip.textContent='右端の ≡ を押したまま上下に移動して並び替えます。左のチェックで表示・非表示を切り替えます。';s.append(tip);
+const host=document.createElement('div');s.append(host);
+let dragging=null,dragged=false;
+function moveSection(from,to){if(from===to||from<0||to<0||from>=d.sections.length||to>=d.sections.length)return;const [item]=d.sections.splice(from,1);d.sections.splice(to,0,item);drawSections()}
+function drawSections(){
+ host.replaceChildren();
+ d.sections.forEach((id,i)=>{
+  const row=document.createElement('div');row.className='section-sort-item';row.dataset.index=String(i);
+  const check=document.createElement('input');check.type='checkbox';check.checked=!d.hidden.includes(id);check.setAttribute('aria-label','表示：'+(SECTIONS.find(x=>x[0]===id)?.[1]||id));check.onchange=()=>{d.hidden=d.hidden.filter(x=>x!==id);if(!check.checked)d.hidden.push(id)};
+  const name=document.createElement('span');name.textContent=SECTIONS.find(x=>x[0]===id)?.[1]||id;
+  const handle=document.createElement('button');handle.type='button';handle.className='section-drag-handle';handle.textContent='≡';handle.setAttribute('aria-label',name.textContent+'をドラッグして並び替え');handle.style.touchAction='none';
+  handle.onpointerdown=e=>{if(e.button!==0)return;e.preventDefault();dragging={id,startY:e.clientY,from:i};dragged=false;row.classList.add('is-dragging');handle.setPointerCapture(e.pointerId)};
+  handle.onpointermove=e=>{if(!dragging)return;e.preventDefault();if(Math.abs(e.clientY-dragging.startY)>5)dragged=true;const target=document.elementFromPoint(e.clientX,e.clientY)?.closest('.section-sort-item');host.querySelectorAll('.section-sort-item').forEach(el=>el.classList.remove('drag-over'));if(target&&target!==row)target.classList.add('drag-over')};
+  handle.onpointerup=e=>{if(!dragging)return;const from=d.sections.indexOf(dragging.id);const target=document.elementFromPoint(e.clientX,e.clientY)?.closest('.section-sort-item');const to=target&&host.contains(target)?d.sections.indexOf(target.dataset.sectionId):from;dragging=null;dragged=false;if(to!==from)moveSection(from,to);else drawSections()};
+  handle.onpointercancel=()=>{dragging=null;drawSections()};
+  row.dataset.sectionId=id;
+  if(!Array.isArray(d.dividerAfter))d.dividerAfter=[];
+  const dividerLabel=document.createElement('label');dividerLabel.style.cssText='display:flex;align-items:center;gap:5px;font-size:11px;white-space:nowrap';
+  const dividerCheck=document.createElement('input');dividerCheck.type='checkbox';dividerCheck.style.width='auto';dividerCheck.checked=d.dividerAfter.includes(id);
+  dividerCheck.onchange=()=>{if(dividerCheck.checked){if(!d.dividerAfter.includes(id))d.dividerAfter.push(id)}else d.dividerAfter=d.dividerAfter.filter(x=>x!==id)};
+  dividerLabel.append(dividerCheck,document.createTextNode('下に区切り'));
+  row.append(check,name,dividerLabel,handle);host.append(row)
+ })
+}
+drawSections();
+}
+if(currentPage==='layout'){
+const decorations=section('見出し・装飾の設定');
+selectfield(decorations,'見出し装飾の配置',d,'headingDecoration',[['both','左右'],['left','左のみ'],['none','なし']]);
+check(decorations,'装飾キャラクターを表示',d,'decorationVisible');
+const characterLabel=document.createElement('label');characterLabel.textContent='装飾キャラクター画像（透過PNG）';decorations.append(characterLabel);
+const characterInput=document.createElement('input');characterInput.type='file';characterInput.accept='image/png';decorations.append(characterInput);
+const characterPreview=document.createElement('img');characterPreview.alt='装飾キャラクターのプレビュー';characterPreview.style.cssText='display:block;max-width:160px;max-height:160px;object-fit:contain;margin:10px 0;background:repeating-conic-gradient(#ddd 0% 25%,#fff 0% 50%) 50%/16px 16px;border-radius:8px';
+function showCharacter(){characterPreview.hidden=!d.decorationImage;if(d.decorationImage)characterPreview.src=d.decorationImage}
+decorations.append(characterPreview);showCharacter();
+characterInput.onchange=()=>{const file=characterInput.files&&characterInput.files[0];if(!file)return;if(file.type!=='image/png'){alert('透過PNG画像を選択してください');characterInput.value='';return}const reader=new FileReader();reader.onload=()=>{d.decorationImage=String(reader.result||'');showCharacter()};reader.onerror=()=>alert('画像を読み込めませんでした');reader.readAsDataURL(file)};
+const clearCharacter=document.createElement('button');clearCharacter.type='button';clearCharacter.className='secondary';clearCharacter.textContent='装飾キャラクター画像を削除';clearCharacter.onclick=()=>{d.decorationImage='';characterInput.value='';showCharacter()};decorations.append(clearCharacter);
+selectfield(decorations,'区切り線',d,'dividerStyle',[['standard','標準'],['ornament','装飾キャラ'],['none','なし']]);
+const countLabel=document.createElement('label');countLabel.textContent='装飾キャラの並び数（3〜7個）';decorations.append(countLabel);
+const countInput=document.createElement('input');countInput.type='number';countInput.min='3';countInput.max='7';countInput.step='1';countInput.value=String(d.dividerCharacterCount||5);
+countInput.onchange=()=>{d.dividerCharacterCount=Math.max(3,Math.min(7,Number(countInput.value)||5));countInput.value=String(d.dividerCharacterCount)};
+decorations.append(countInput);
+}
+// Compact bottom navigation image editor: one default style and per-icon uploads.
+{
+const panel=section('下部メニューバーのアイコン');
+const note=document.createElement('p');note.className='muted';note.textContent='初期デザインまたは個別に登録した画像を使用します。リンク先URLは「SNS・URL管理」で一括設定します。';panel.append(note);
+d.navIcons=d.navIcons||{};
+const labels={home:'HOME',line:'LINE',x:'X',sub:'02',booking:'予約'};
+const grid=document.createElement('div');grid.className='nav-icon-grid';panel.append(grid);
+const items={};
+function iconSrc(key){const value=d.navIcons[key]||'new';return value.startsWith('custom:')&&value.length>7?value.slice(7):navIconPath(key,'new')}
+function updateIcons(){for(const key of NAV_KEYS){items[key].img.src=iconSrc(key);items[key].reset.disabled=!(d.navIcons[key]||'new').startsWith('custom:')}}
+for(const key of NAV_KEYS){
+ const card=document.createElement('div');card.className='nav-icon-card';
+ const name=document.createElement('strong');name.textContent=labels[key];
+ const img=document.createElement('img');img.alt=labels[key]+'のアイコン';
+ const file=document.createElement('input');file.type='file';file.accept='image/png,image/jpeg,image/webp';file.setAttribute('aria-label',labels[key]+'の画像を変更');
+ file.onchange=()=>{const selected=file.files?.[0];if(!selected)return;const reader=new FileReader();reader.onload=()=>{const image=new Image();image.onload=()=>{const canvas=document.createElement('canvas');canvas.width=192;canvas.height=192;const ctx=canvas.getContext('2d');const scale=Math.min(192/image.width,192/image.height);ctx.drawImage(image,(192-image.width*scale)/2,(192-image.height*scale)/2,image.width*scale,image.height*scale);d.navIcons[key]='custom:'+canvas.toDataURL('image/png');updateIcons()};image.onerror=()=>alert('画像を読み込めませんでした');image.src=reader.result};reader.readAsDataURL(selected)};
+ const reset=document.createElement('button');reset.type='button';reset.className='secondary';reset.textContent='初期画像に戻す';reset.onclick=()=>{d.navIcons[key]='new';file.value='';updateIcons()};
+ card.append(name,img,file,reset);grid.append(card);items[key]={img,reset}
+}
+const resetAll=document.createElement('button');resetAll.type='button';resetAll.className='secondary';resetAll.textContent='5画像すべて初期設定に戻す';resetAll.onclick=()=>{if(confirm('5画像すべてを初期デザインに戻しますか？')){for(const key of NAV_KEYS)d.navIcons[key]='new';grid.querySelectorAll('input[type=file]').forEach(x=>x.value='');updateIcons()}};panel.append(resetAll);
+updateIcons();
+}
+
+}
+function timeRangeEditor(parent,label,initial,onChange){
+ const wrap=document.createElement('div');wrap.className='time-range-editor';const heading=document.createElement('strong');heading.textContent=label;wrap.append(heading);
+ const controls=document.createElement('div');controls.className='time-range-controls';
+ const parts=String(initial||'').match(/(\d{1,2}):(\d{2})\s*[-–〜~]\s*(\d{1,2}):(\d{2})/);
+ const values=parts?[parts[1].padStart(2,'0')+':'+parts[2],parts[3].padStart(2,'0')+':'+parts[4]]:['10:00','16:00'];
+ const selects=[];
+ for(const [i,caption] of ['開始','終了'].entries()){
+  const cell=document.createElement('label');cell.textContent=caption;
+  const select=document.createElement('select');for(let h=0;h<24;h++)for(let m=0;m<60;m+=30){const value=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');const opt=document.createElement('option');opt.value=value;opt.textContent=value;select.append(opt)}
+  select.value=values[i];select.onchange=()=>onChange(selects[0].value+'–'+selects[1].value);selects.push(select);cell.append(select);controls.append(cell)
+ }
+ wrap.append(controls);parent.append(wrap);
+ return ()=>selects[0].value+'–'+selects[1].value
+}
+s=section('出勤カレンダー・一括設定');let nav=document.createElement('div');nav.className='row';s.append(nav);let prev=document.createElement('button'),next=document.createElement('button'),title=document.createElement('b');prev.textContent='← 前月';next.textContent='翌月 →';nav.append(prev,title,next);let grid=document.createElement('div');grid.className='dategrid';s.append(grid);function drawCalendar(){title.textContent=`${month.getFullYear()}年 ${month.getMonth()+1}月`;grid.innerHTML='';for(const dayName of ['日','月','火','水','木','金','土']){const label=document.createElement('span');label.className='calendar-weekday';label.textContent=dayName;grid.append(label)}const firstWeekday=new Date(month.getFullYear(),month.getMonth(),1).getDay();for(let i=0;i<firstWeekday;i++){const spacer=document.createElement('span');spacer.className='calendar-empty';grid.append(spacer)}let last=new Date(month.getFullYear(),month.getMonth()+1,0).getDate();for(let day=1;day<=last;day++){let date=new Date(month.getFullYear(),month.getMonth(),day),key=dayKey(date),b=document.createElement('button');b.textContent=day;b.className=(selected.has(key)?'selected ':'')+(d.shifts[key]?'shift':'');b.title=d.soldout[key]?'完売':d.shifts[key]||'休み';b.onclick=()=>{if(selected.has(key))selected.delete(key);else selected.add(key);drawCalendar()};grid.append(b)}}prev.onclick=()=>{month.setMonth(month.getMonth()-1);drawCalendar()};next.onclick=()=>{month.setMonth(month.getMonth()+1);drawCalendar()};drawCalendar();let info=document.createElement('p');info.className='muted';info.textContent='日付を複数選択し、下の操作を適用できます。青枠は出勤登録済み。完売にしても勤務時間は保持します。';s.append(info);const getCustom=timeRangeEditor(s,'個別の勤務時間','10:00–14:00',()=>{});let apply=(fn)=>{if(!selected.size){alert('日付を選択してください');return}selected.forEach(fn);selected.clear();drawCalendar()};[['固定シフト①',()=>apply(k=>{d.shifts[k]=d.templates[0].time;delete d.soldout[k]})],['固定シフト②',()=>apply(k=>{d.shifts[k]=d.templates[1].time;delete d.soldout[k]})],['指定時間',()=>apply(k=>{d.shifts[k]=getCustom();delete d.soldout[k]})],['休み',()=>apply(k=>{delete d.shifts[k];delete d.soldout[k]})],['完売ON',()=>{if([...selected].some(k=>!d.shifts[k])){alert('完売にするには先に出勤時間を登録してください');return}apply(k=>d.soldout[k]=true)}],['完売OFF',()=>apply(k=>delete d.soldout[k])]].forEach(([label,fn])=>{let b=document.createElement('button');b.textContent=label;b.onclick=fn;s.append(b)});
+const presets=document.createElement('div');presets.className='shift-presets';s.append(presets);d.templates.forEach((t,i)=>timeRangeEditor(presets,'固定シフト'+(i===0?'①':'②'),t.time,value=>t.time=value));
+let reiSaveInProgress=false;
+async function save(){if(reiSaveInProgress)return;reiSaveInProgress=true;const status=document.getElementById('rei-save-status');if(status)status.textContent='保存中…';d.headingLanguage='en';d.photos=photos.map(x=>x.url).filter(Boolean);if(d.profileRows.length!==3){reiSaveInProgress=false;alert('PROFILEは3項目にしてください');return}if(d.pricePublished&&!d.courses.length){reiSaveInProgress=false;alert('料金公開にはコース登録が必要です');return}for(const [date,time] of Object.entries(d.shifts||{})){const match=String(time).match(/^(\d{2}):(\d{2})[–-](\d{2}):(\d{2})$/);if(!match){reiSaveInProgress=false;alert(date+' の勤務時間を確認してください');return}const start=Number(match[1])*60+Number(match[2]),end=Number(match[3])*60+Number(match[4]);if(start<0||start>=1440||end<=start||end>1440||Number(match[2])>=60||Number(match[4])>=60){reiSaveInProgress=false;alert(date+' の勤務時間を確認してください。終了時刻は開始時刻より後に設定してください');return}}try{if(!reiDbClient)throw new Error('管理者認証が未完了です');await yuoriSaveOwner(reiDbClient,d);try{saveData(d);sessionStorage.setItem('rei_admin_snapshot',JSON.stringify(d))}catch(cacheError){console.warn('ローカルキャッシュを更新できませんでした',cacheError);sessionStorage.removeItem('rei_admin_snapshot')}if(status)status.textContent='保存済み・公開ページへ反映';alert('保存内容を再取得して確認しました')}catch(e){if(status)status.textContent='保存失敗・公開ページ未反映';alert('保存できませんでした：'+e.message);console.error(e)}finally{reiSaveInProgress=false}}
+
+window.save=save;
+}
+initReiAdmin().catch(async e=>{
+ console.error('Rei admin initialization failed',e);
+ reiLoadingShield.remove();
+ document.querySelectorAll('button').forEach(x=>x.disabled=true);
+ let user=null;
+ try{user=(await yuoriClient().auth.getUser()).data?.user}catch(authError){console.error(authError)}
+ if(user){const notice=document.createElement('main');notice.style.cssText='position:fixed;inset:0;z-index:9999;background:#151119;color:white;display:grid;place-content:center;padding:24px;text-align:center';notice.textContent='管理画面を開けませんでした。変更は保存できません。原因：'+(e?.message||String(e));document.body.append(notice);return}
+ const form=document.createElement('form');form.style.cssText='position:fixed;inset:0;background:#151119;color:white;z-index:9999;display:grid;place-content:center;gap:12px;padding:24px';form.innerHTML='<h2>優織｜管理者ログイン</h2><input type="email" required placeholder="メールアドレス" autocomplete="username"><input type="password" required placeholder="パスワード" autocomplete="current-password"><button type="submit">ログイン</button><p role="alert"></p>';document.body.append(form);
+ form.onsubmit=async event=>{event.preventDefault();const inputs=form.querySelectorAll('input');const result=await yuoriClient().auth.signInWithPassword({email:inputs[0].value.trim(),password:inputs[1].value});if(result.error){form.querySelector('p').textContent=result.error.message;return}location.reload()};
+});
+</script></body></html>
