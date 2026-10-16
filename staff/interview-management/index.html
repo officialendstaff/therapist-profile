@@ -397,7 +397,9 @@ async function syncSheetInterviewOutcome(x,status){
  await loadSchedule();
  return {synced:true};
 }
+function requireSheetShop(id){const x=(window.interviewApplicants||[]).find(v=>v.id===id);const selected=document.getElementById('sheetShop')?.value||x?.shop||'';if(!['Grand Luxe','Un Secret','LUXY','薔薇と紳士','BUSTY OSAKA'].includes(selected)){alert('先に面接店舗を選択・保存してください。');document.getElementById('sheetShop')?.focus();return false}return true}
 async function saveSheetOutcome(id){
+ if(!requireSheetShop(id))return;
  const x=(window.interviewApplicants||[]).find(v=>v.id===id);
  const status=document.getElementById('sheetOutcomeSelect')?.value;
  if(!x||!['採用','不採用','辞退'].includes(status))return alert('採否結果を選択してください。');
@@ -411,6 +413,7 @@ async function saveSheetOutcome(id){
  alert('採否結果を「'+status+'」に変更しました。'+(sync.synced?' 面接履歴にも反映しました。':' 面接履歴は未変更です（'+sync.reason+'）。'));
 }
 async function setInterviewOutcome(id,status){
+ if(!requireSheetShop(id))return;
  if(!['辞退','不採用'].includes(status))return;
  if(!confirm(status+'として処理しますか？'))return;
  const {error}=await sb.from('interview_applicants').update({status}).eq('id',id);
@@ -419,6 +422,7 @@ async function setInterviewOutcome(id,status){
  closeInterviewSheet();await loadInterviewSheets();
 }
 async function rejectInterviewSheet(id){
+ if(!requireSheetShop(id))return;
  const reasons=[...document.querySelectorAll('#sheetRejectChoices input:checked')].map(e=>e.value),reason=JSON.stringify(reasons),note=(window.interviewApplicants||[]).find(v=>v.id===id)?.rejection_note||'';
  if(!reasons.length)return alert('不採用理由を1つ以上選択してください。');
  const x=(window.interviewApplicants||[]).find(v=>v.id===id);
@@ -431,6 +435,7 @@ async function rejectInterviewSheet(id){
  if(!sync.synced)alert('不採用理由は保存しましたが、面接履歴は更新できませんでした：'+sync.reason);
 }
 async function completeOnboarding(id){
+ if(!requireSheetShop(id))return;
  if(!confirm('入店処理を完了して在籍者へ移しますか？'))return;
  const {error}=await sb.from('interview_applicants').update({status:'在籍'}).eq('id',id);
  if(error)return alert('入店処理を完了できません：'+error.message);
