@@ -217,10 +217,10 @@ if(currentPage==='basic'){
 }
 
 s=section('SNS画像管理');{
- const info=document.createElement('p');info.className='muted';info.textContent='ページ本文のSNSボタン用画像です。下部固定メニューのアイコンとは別管理です。リンク先URLは下の一括管理で設定します。画像は1:1推奨です。';s.append(info);
+ const info=document.createElement('p');info.className='muted';info.textContent='ページ本文のSNSボタン用画像です。下部固定メニューのアイコンとは別管理です。リンク先URLは下の一括管理で設定します。標準はLINE・X・02の3個を1段、追加3種類のURLがすべて登録された場合のみ6個を2段で表示します。画像は1:1推奨です。';s.append(info);
  d.snsImages=d.snsImages||{};
  const gallery=document.createElement('div');gallery.className='nav-icon-grid';s.append(gallery);
- [['line','LINE'],['x','X'],['sub','02']].forEach(([key,name])=>{
+ [['line','LINE'],['x','X'],['sub','02'],['instagram','Instagram'],['relaxy','リラクシー'],['other','その他SNS']].forEach(([key,name])=>{
  const card=document.createElement('div');card.className='nav-icon-card';
  const title=document.createElement('strong');title.textContent=name;
  const img=document.createElement('img');img.alt=name+'のSNS画像';img.style.cssText='width:92px;height:92px;object-fit:contain';
@@ -231,7 +231,7 @@ s=section('SNS画像管理');{
  card.append(title,img,file,remove);gallery.append(card);refresh()
  });
 }
-s=section('リンク・URL一元管理');{const p=document.createElement('p');p.className='muted';p.textContent='ここで変更したURLは、上部・下部SNS、固定ナビ、OFFICIAL、CONTACT、予約ポップアップなど同じリンクを使う全箇所に反映されます。※このデモでは同じブラウザ内で保存・反映されます。';s.append(p)}['line','x','sub'].forEach(k=>textfield(s,k==='sub'?'02 URL':k.toUpperCase()+' URL',d.sns,k));textfield(s,'店舗電話番号',d,'phone');textfield(s,'店舗公式LINE URL',d,'shopLine');textfield(s,'店舗公式HP URL',d,'official');textfield(s,'SNS移動前の注意喚起文',d,'snsWarning','textarea');
+s=section('リンク・URL一元管理');{const p=document.createElement('p');p.className='muted';p.textContent='ここで変更したURLは、上部・下部SNS、固定ナビ、OFFICIAL、CONTACT、予約ポップアップなど同じリンクを使う全箇所に反映されます。※このデモでは同じブラウザ内で保存・反映されます。';s.append(p)}['line','x','sub','instagram','relaxy','other'].forEach(k=>textfield(s,k==='sub'?'02 URL':k==='relaxy'?'リラクシー URL':k==='other'?'その他SNS URL':k.toUpperCase()+' URL',d.sns,k));textfield(s,'店舗電話番号',d,'phone');textfield(s,'店舗公式LINE URL',d,'shopLine');textfield(s,'店舗公式HP URL',d,'official');textfield(s,'SNS移動前の注意喚起文',d,'snsWarning','textarea');
 s=section('姫予約フォームの項目');compactBookingItems(s,d.bookingFields,[['項目名','label'],['入力形式','type','select',[['text','テキスト'],['tel','電話番号'],['email','メール'],['date','日付'],['time','時刻'],['datetime-local','日時'],['number','数字'],['textarea','長文'],['select','選択式']]],['選択肢（選択式の場合は1行1項目）','options','textarea'],['必須','required','checkbox'],['表示','visible','checkbox']],()=>({label:'NEW FIELD',type:'text',required:false,visible:true,options:''}));
 compactBookingSection(s);
 s=section('料金シミュレーター');check(s,'料金設定を公開する',d,'pricePublished');items(s,d.courses,[['コース名','name'],['料金（円）','price','number']],()=>({name:'NEW COURSE',price:0}));items(s,d.extras,[['追加料金名','name'],['金額（円）','price','number']],()=>({name:'NEW FEE',price:0}));textfield(s,'消費税率（%）',d,'tax','number');check(s,'登録料金は税込',d,'taxIncluded');
