@@ -266,7 +266,7 @@ function rememberInterviewResearch(){try{sessionStorage.setItem('interview-resea
 async function goToRecruitHireManagement(){if(window.parent!==window){window.parent.postMessage({type:'recruit-open-hire-management'},location.origin)}else{location.href='../recruit-line/?page=hirePage'}}
 function goToRecruitSheetArchive(){const p=new URLSearchParams(location.search);const store=p.get('store')||'';const url='../sheet-list/'+(store?'?store='+encodeURIComponent(store):'');if(window.parent!==window&&new URLSearchParams(location.search).get('embedded')==='1'){window.parent.postMessage({type:'recruit-open-sheet-list',url:new URL(url,location.href).href},location.origin)}else{location.href=url}}
 function updateInterviewDetailNavigation(open){const back=document.querySelector('#spDetailBack button');if(back){back.textContent=open?'‹ 採用管理に戻る':'‹ トップに戻る';back.onclick=open?goToRecruitHireManagement:()=>openSpSection('home')}}
-function openInterviewSheet(id){
+async function openInterviewSheet(id){
  const x=(window.interviewApplicants||[]).find(v=>v.id===id);if(!x)return;
  openSpSection('sheets');updateInterviewDetailNavigation(true);markInterviewSheetSeen(x);window.spOpenSheetId=id;
  const modal=document.getElementById('interviewSheetModal'),detail=document.getElementById('interviewSheetDetail');
