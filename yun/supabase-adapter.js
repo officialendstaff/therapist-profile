@@ -42,6 +42,10 @@ async function yuoriSaveOwner(client,config){
   if(data?.length!==1)throw new Error('他の画面でデータが更新されています。内容をコピーしてから再読み込みしてください。');
   const {data:check,error:checkError}=await client.from(YUORI_DB.table).select('config').eq('therapist_key',YUORI_DB.therapistKey).single();
   if(checkError)throw new Error('保存後の読み取り確認に失敗しました：'+checkError.message);
-  if(JSON.stringify(reiCanonical(check?.config))!==JSON.stringify(reiCanonical(config)))throw new Error('保存内容が一致しません。再読み込み前に管理者へ確認してください');
+  if(JSON.stringify(reiCanonical(check?.config))!==JSON.stringify(reiCanonical(config))){
+    // The write has succeeded; preserve the returned revision to prevent a stale-revision lockout.
+    yuoriLoadedRevision=data[0].updated_at;
+    throw new Error('保存後のデータ検証で差異が見つかりました。入力内容をコピーしてから管理者へ確認してください。');
+  }
   yuoriLoadedRevision=data[0].updated_at;
 }
