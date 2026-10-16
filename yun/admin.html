@@ -11,7 +11,7 @@ const reiLoadingShield=document.createElement('div');reiLoadingShield.style.cssT
 async function initReiAdmin(){
  const remote=await reiLoadOwner();
  try{saveData(remote)}catch(e){console.warn('ローカルキャッシュへの保存に失敗しました',e)}
- const initialData=remote;
+ const base=getData();const initialData={...base,...remote,images:{...base.images,...(remote.images||{})},sns:{...base.sns,...(remote.sns||{})},snsImages:{...base.snsImages,...(remote.snsImages||{})},ogp:{...base.ogp,...(remote.ogp||{})}};
  reiLoadingShield.remove();
 let d=initialData,root=document.getElementById('root'),selected=new Set(),month=new Date();
 if(!Array.isArray(d.sections))d.sections=SECTIONS.map(x=>x[0]);
