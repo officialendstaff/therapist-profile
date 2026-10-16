@@ -1,20 +1,20 @@
 <!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>面接シート一覧｜L GROUP</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><style>
-*{box-sizing:border-box}html,body{width:100%;margin:0}body{background:#f5f2ed;color:#201b18;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;font-size:14px}
-header{background:#201b18;color:#fff;padding:20px 18px;font-size:16px;font-weight:800;letter-spacing:.03em}
+*{box-sizing:border-box}html,body{width:100%;margin:0}body{background:#eaf3fd;color:#102235;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;font-size:14px}
+header{background:#0e1924;color:#fff;padding:20px 18px;font-size:16px;font-weight:800;letter-spacing:.03em}
 main{max-width:760px;margin:auto;padding:20px 16px 80px}h1{font-size:22px;margin:20px 0 18px;letter-spacing:.02em}
-a{color:#8b643c}main>a{display:inline-flex;align-items:center;text-decoration:none;font-size:13px;font-weight:800;padding:9px 0}
+a{color:#3478ca}main>a{display:inline-flex;align-items:center;text-decoration:none;font-size:13px;font-weight:800;padding:9px 0}
 .tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:13px 0}
-.tabs button{min-width:0;min-height:47px;padding:11px 8px;border:1px solid #d8d0c7;border-radius:11px;background:#fff;color:#574a40;font-size:13px;font-weight:800;cursor:pointer;transition:background .15s}
-.tabs button.active{background:#201b18;color:#fff;border-color:#201b18;box-shadow:0 3px 10px #201b181a}
-#shops{margin-top:18px;margin-bottom:19px}#shops button.active{background:#8b643c;border-color:#8b643c;color:#fff}
-.item{display:block;text-decoration:none;color:#201b18;background:#fff;border:1px solid #e4ddd5;border-radius:15px;margin:10px 0;padding:17px 16px;box-shadow:0 4px 14px #00000007}
-.item b{display:block;font-size:16px;line-height:1.5;padding-right:55px}.item small{color:#766b63;display:block;margin-top:8px;line-height:1.6;font-size:12px}
-.status{float:right;font-size:11px;font-weight:800;background:#f4f1ed;color:#8b643c;border:1px solid #e1d8ce;border-radius:20px;padding:4px 9px}
-#message{padding:15px;background:#fff;border:1px solid #e4ddd5;border-radius:12px;color:#766b63}
-input{padding:13px;width:100%;margin:7px 0;border:1px solid #d8d0c7;border-radius:11px;background:#fff;font-size:16px}
-#login{background:#fff;border:1px solid #e4ddd5;border-radius:16px;padding:17px;margin-top:14px}
-#login button{padding:13px 20px;border:0;border-radius:11px;background:#8b643c;color:#fff;font-weight:800}
-#rows>p{padding:22px 15px;text-align:center;background:#fff;border:1px solid #e4ddd5;border-radius:13px;color:#766b63}
+.tabs button{min-width:0;min-height:47px;padding:11px 8px;border:1px solid #c8def3;border-radius:11px;background:#fff;color:#23415f;font-size:13px;font-weight:800;cursor:pointer;transition:background .15s}
+.tabs button.active{background:#102235;color:#fff;border-color:#102235;box-shadow:0 3px 10px #1022351a}
+#shops{margin-top:18px;margin-bottom:19px}#shops button.active{background:#3478ca;border-color:#3478ca;color:#fff}
+.item{display:block;text-decoration:none;color:#102235;background:#fff;border:1px solid #c8def3;border-radius:15px;margin:10px 0;padding:17px 16px;box-shadow:0 4px 14px #00000007}
+.item b{display:block;font-size:16px;line-height:1.5;padding-right:55px}.item small{color:#60758d;display:block;margin-top:8px;line-height:1.6;font-size:12px}
+.status{float:right;font-size:11px;font-weight:800;background:#eaf3fd;color:#3478ca;border:1px solid #c8def3;border-radius:20px;padding:4px 9px}
+#message{padding:15px;background:#fff;border:1px solid #c8def3;border-radius:12px;color:#60758d}
+input{padding:13px;width:100%;margin:7px 0;border:1px solid #c8def3;border-radius:11px;background:#fff;font-size:16px}
+#login{background:#fff;border:1px solid #c8def3;border-radius:16px;padding:17px;margin-top:14px}
+#login button{padding:13px 20px;border:0;border-radius:11px;background:#3478ca;color:#fff;font-weight:800}
+#rows>p{padding:22px 15px;text-align:center;background:#fff;border:1px solid #c8def3;border-radius:13px;color:#60758d}
 </style></head><body><header>求人管理｜L GROUP</header><main><a href="../recruit-line/">← 求人管理へ戻る</a><h1>面接シート一覧</h1><div id="login" hidden><p>管理者ログインが必要です。</p><input id="email" type="email" placeholder="メールアドレス"><input id="password" type="password" placeholder="パスワード"><button id="signIn">ログイン</button></div><div id="content" hidden><div class="tabs" id="shops"><button id="rose" class="active">薔薇と紳士</button><button id="busty">BUSTY OSAKA</button></div><div class="tabs"><button id="hired" class="active">採用（0）</button><button id="rejected">不採用（0）</button></div><div id="rows"></div></div><p id="message">認証を確認しています…</p></main><script>
 const sb=supabase.createClient('https://vjjnkflbfsjihwzjsjpr.supabase.co','sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos',{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.sessionStorage,storageKey:'mattan-recruit-auth'}});
 let records=[],tab='採用',shop=(new URLSearchParams(location.search).get('store')==='BUSTY OSAKA'?'BUSTY OSAKA':'薔薇と紳士');const el=id=>document.getElementById(id);const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
