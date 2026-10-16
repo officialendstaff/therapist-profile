@@ -38,7 +38,11 @@ input:focus,textarea:focus,select:focus{outline:2px solid #a8cafa;outline-offset
 
 /* Keep NEWS and DIARY date pickers within mobile card */
 #newsDate,#diaryDate{display:block;width:60%;max-width:60%;min-width:0;box-sizing:border-box}
-</style><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="window.__sbCdnFailed=true"></script><script>
+</style><script>
+window.addEventListener('error',function(e){const m=document.getElementById('authMsg');if(m&&document.getElementById('gate')?.style.display!=='none')m.textContent='起動エラー: '+(e.message||'不明')+' ('+(e.filename||'').split('/').pop()+':'+(e.lineno||0)+')'});
+window.addEventListener('unhandledrejection',function(e){const m=document.getElementById('authMsg');if(m&&document.getElementById('gate')?.style.display!=='none')m.textContent='認証エラー: '+(e.reason?.message||String(e.reason))});
+window.mobileLoginNow=function(){if(window.parent!==window){window.parent.postMessage({type:'recruit-interview-auth-failed'},location.origin)}else{location.assign('../recruit-line/')}};
+</script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="window.__sbCdnFailed=true"></script><script>
 (function(){
  function setup(){
   var b=document.getElementById('mobileLoginBtn'),m=document.getElementById('authMsg'),d=document.getElementById('loginDiag');
