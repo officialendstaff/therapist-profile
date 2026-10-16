@@ -72,7 +72,7 @@ body{background:#0d0b0f;color:#fff0f7;font-family:Georgia,'Times New Roman',seri
 #price .price-fees-row .field{min-width:0}
 </style><style id="yun-pale-gold-peony">:root{--pink:#D63365;--bg:#FBE8EF;--panel:#FFF5F8;--text:#755623;--muted:#92764b}html,body{background:#FBE8EF!important;color:#755623!important}body,button,input,textarea,select{font-family:"Yu Mincho","Hiragino Mincho ProN",serif}h1,h2,h3,h4,p,small,label,li,dt,dd,span{color:inherit}main,section,article,.card,.panel{color:#755623}a{color:#D63365}button,[role="button"]{accent-color:#D63365}</style><style id="yun-formal-heading">html{lang:ja}.app .card>h2,.app section h2,.app .section-title{font-family:"Yu Mincho","Hiragino Mincho ProN",serif!important;font-style:normal!important;font-weight:600!important;letter-spacing:.12em!important;text-transform:none!important;color:#755623!important;border-bottom:1px solid #C9A45C!important;padding-bottom:12px!important}.app{background:#FBE8EF!important;color:#755623!important}</style></head><body><div class="app"><section class="hero" id="home"><div class="hero-loading" id="heroLoading" aria-hidden="true"><img src="./mattan-loading.webp" alt="" fetchpriority="high"></div><img class="hero-photo" id="heroImage" alt=""><div class="hero-inner"><div class="small" id="heroSubtitle"></div><h1 id="heroName"></h1><p id="heroCatch"></p></div></section>
 <div class="card" id="news"><h2>NEWS</h2><div class="notice" id="newsText"></div></div>
-<div class="card" id="sns"><h2>SNS</h2><div class="sns"><button data-sns="line"><img data-sns-image="line" alt="LINE"></button><button data-sns="x"><img data-sns-image="x" alt="X"></button><button data-sns="instagram"><img data-sns-image="instagram" alt="Instagram"></button><button data-sns="sub"><img data-sns-image="sub" alt="02"></button><button data-sns="relaxy"><img data-sns-image="relaxy" alt="リラクシー"></button></div></div>
+<div class="card" id="sns"><h2>SNS</h2><div class="sns"><button data-sns="line"><img data-sns-image="line" alt="LINE"></button><button data-sns="x"><img data-sns-image="x" alt="X"></button><button data-sns="instagram"><img data-sns-image="instagram" alt="Instagram"></button><button data-sns="sub"><img data-sns-image="sub" alt="02"></button><button data-sns="relaxy"><img data-sns-image="relaxy" alt="リラクシー"></button><button data-sns="other"><img data-sns-image="other" alt="その他SNS"></button></div></div>
 <div class="card" id="personal"><h2>PERSONAL</h2><img class="media-square" id="personalImage" alt="パーソナル画像"></div>
 <div class="card" id="intro"><h2>INTRODUCTION</h2><p id="introText" style="white-space:pre-wrap"></p></div>
 <div class="card" id="photo"><h2>PHOTO</h2><div class="photo" id="photoGallery"></div></div>
@@ -338,6 +338,13 @@ function go(key){
  window.open(url,'_blank','noopener,noreferrer');
 }
 document.querySelectorAll('[data-sns-image]').forEach(img=>{const key=img.dataset.snsImage;img.src=(cfg.snsImages&&cfg.snsImages[key])||'../sample/assets/icons/new-'+key+'.png'});
+const snsPrimary=['line','x','sub'];
+const snsExtras=['instagram','relaxy','other'];
+const snsSix=snsPrimary.every(k=>String(cfg.sns?.[k]||'').trim())&&snsExtras.every(k=>String(cfg.sns?.[k]||'').trim());
+document.querySelectorAll('#sns [data-sns]').forEach(button=>{
+ const key=button.dataset.sns;
+ button.hidden=!String(cfg.sns?.[key]||'').trim()||(!snsPrimary.includes(key)&&!snsSix);
+});
 document.querySelectorAll('[data-sns]').forEach(e=>e.onclick=()=>go(e.dataset.sns));
 document.querySelectorAll('[data-go]').forEach(e=>e.onclick=()=>go(e.dataset.go));
 $('bookingNav').onclick=()=>{
