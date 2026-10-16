@@ -61,7 +61,7 @@ if(currentPage==='top'){
   if(refresh.disabled)return;refresh.disabled=true;refresh.textContent='更新中…';status.textContent='公式HPから取得しています';
   try{
    const {data:{session}}=await client.auth.getSession();if(!session)throw Error('ログインが必要です');
-   const res=await fetch(REI_SAMPLE_DB.url+'/functions/v1/refresh-yun-blog',{method:'POST',headers:{'Content-Type':'application/json',apikey:REI_SAMPLE_DB.anonKey,Authorization:'Bearer '+session.access_token},body:'{}'});
+   const res=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/refresh-yun-blog',{method:'POST',headers:{'Content-Type':'application/json',apikey:'sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos',Authorization:'Bearer '+session.access_token},body:'{}'});
    const result=await res.json();if(!res.ok||!result.ok){const detail=result.detail||result.error||('HTTP '+res.status);throw Error(typeof detail==='string'?detail:JSON.stringify(detail));}
    status.textContent='最終更新：'+new Date().toLocaleString('ja-JP');
   }catch(e){status.textContent='更新失敗：'+(e.message||String(e))+'（公開中の記事は維持されます）'}
