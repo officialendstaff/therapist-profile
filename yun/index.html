@@ -237,11 +237,11 @@ cfg.sections.forEach(id=>{let e=$(id);if(e)app.insertBefore(e,foot)});
 // Official blog: render only successfully cached posts; keep the rest of the page independent.
 try{
  const blogCfg=cfg.officialBlog||{};
- const {data:blogCache,error:blogError}=await yuoriClient().from('therapist_blog_cache').select('posts,fetched_at').eq('therapist_key','rei').maybeSingle();
+ const {data:blogCache,error:blogError}=await yuoriClient().from('therapist_blog_cache').select('posts,fetched_at').eq('therapist_key','yuori').maybeSingle();
  const blogPosts=Array.isArray(blogCache?.posts)?blogCache.posts.slice(0,Math.max(1,Math.min(3,Number(blogCfg.count)||1))):[];
  const section=document.createElement('div');section.className='card';section.id='official-blog';
  const title=document.createElement('h2');title.textContent='BLOG';section.append(title);
- const listUrl='https://grandluxe-osaka.com/bloglist.php?id=1463';
+ const listUrl=blogCfg.listUrl||'https://grandluxe-osaka.com/bloglist.php?id=1465';
  if(blogPosts.length&&!blogError){
   blogPosts.forEach(post=>{
    const item=document.createElement('div');item.style.cssText='padding:12px 0;border-bottom:1px solid rgba(180,130,150,.25)';
