@@ -82,7 +82,7 @@ if(currentPage==='top'){
    const {data:{session}}=await client.auth.getSession();if(!session)throw Error('ログインが必要です');
    const res=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/refresh-yun-blog',{method:'POST',headers:{'Content-Type':'application/json',apikey:'sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos',Authorization:'Bearer '+session.access_token},body:'{}'});
    const result=await res.json();if(!res.ok||!result.ok){const detail=result.detail||result.error||('HTTP '+res.status);throw Error(typeof detail==='string'?detail:JSON.stringify(detail));}
-   status.textContent='更新しました';
+   status.textContent='更新完了';
   }catch(e){status.textContent='更新失敗：'+(e.message||String(e))+'（公開中の記事は維持されます）'}
   finally{refresh.disabled=false;refresh.textContent='ブログ更新'}
  });
