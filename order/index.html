@@ -45,8 +45,8 @@ button,.btn{border:0;border-radius:11px;background:var(--pink);color:white;paddi
 <label for="clientName">お名前・連絡先（任意）</label><input id="clientName" placeholder="お名前・LINE名など">
 <label for="currentUrl">現在掲載されているHPのURL</label><input id="currentUrl" type="url" placeholder="https://..."><p class="sub">現在在籍している店舗のセラピスト紹介ページなどをご入力ください。</p>
 <div class="notice" style="margin-top:18px"><strong>納品後のページ管理について</strong><p style="margin:6px 0 0">納品後は専用の管理ページから、ご自身でプロフィール・画像・SNS・出勤情報などを自由に登録・変更できます。これらの初期登録・更新はご自身でお願いいたします。</p></div>
-<p class="notice">「要望をコピーする」を押した後、末端興業LINEを開き、トークに貼り付けて送信してください。LINEへの自動送信ではありません。</p>
-<button class="full" id="copy">要望をコピーする</button><p id="copyMessage" class="sub" role="status"></p>
+<p class="notice">「制作依頼を送信する」を押すと管理ページへ直接届きます。送信できない場合のみ「要望をコピーする（予備）」をご利用ください。</p>
+<button class="full" id="submitRequest" type="button">制作依頼を送信する</button><p id="submitMessage" class="sub" role="status"></p><button class="full secondary" id="copy" type="button" style="margin-top:10px">要望をコピーする（予備）</button><p id="copyMessage" class="sub" role="status"></p>
 <a class="btn secondary full hidden" id="lineLink" target="_blank" rel="noopener">末端興業LINEを開く ↗</a>
 </section>
 <section class="panel" id="pricing"><div class="num">05 / ESTIMATE</div><h2>料金シミュレーション</h2><div class="summary">
@@ -99,4 +99,19 @@ $("goPricing").addEventListener("click",()=>$("pricing").scrollIntoView({behavio
 $("goContact").addEventListener("click",()=>$("clientName").scrollIntoView({behavior:"smooth",block:"center"}));
 if(CONFIG.sampleUrl){$("sampleLink").href=CONFIG.sampleUrl;$("sampleLink").classList.remove("hidden")}
 if(CONFIG.lineUrl){$("lineLink").href=CONFIG.lineUrl;$("lineLink").classList.remove("hidden")}
+
+const REQUEST_API="https://vjjnkflbfsjihwzjsjpr.supabase.co/rest/v1/personal_page_requests";
+const REQUEST_KEY="sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos";
+$("submitRequest").addEventListener("click",async()=>{
+ const btn=$("submitRequest"),msg=$("submitMessage");
+ if(btn.disabled)return;
+ const clientName=$("clientName").value.trim();
+ if(!clientName){msg.textContent="お名前・LINE名を入力してください。";$("clientName").focus();return;}
+ btn.disabled=true;btn.textContent="送信中…";msg.textContent="";
+ try{
+ const response=await fetch(REQUEST_API,{method:"POST",headers:{"apikey":REQUEST_KEY,"Content-Type":"application/json","Prefer":"return=minimal"},body:JSON.stringify({client_name:clientName,current_url:$("currentUrl").value.trim(),request_text:detailsText(),request_data:{color:selected("color"),language:selected("language"),font:selected("font"),extras:chosenExtras().map(x=>x[0]),character:selected("character")}})});
+ if(!response.ok)throw new Error("HTTP "+response.status);
+ msg.textContent="送信が完了しました。制作依頼を受け付けました。";btn.textContent="送信済み";
+ }catch(e){msg.textContent="送信できませんでした。通信状況をご確認のうえ再度お試しください。";btn.disabled=false;btn.textContent="制作依頼を送信する";}
+});
 </script></body></html>
