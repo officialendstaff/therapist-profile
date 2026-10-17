@@ -68,7 +68,8 @@ if(currentPage==='top'){
   };
   const revoke=document.createElement('button');revoke.className='secondary';revoke.textContent='本人の編集権限を解除';
   revoke.onclick=async()=>{if(!confirm('本人の編集権限を解除しますか？ 公開ページと保存データは維持されます。'))return;const {error}=await reiDbClient.rpc('yun_revoke_owner');out.textContent=error?'解除失敗：'+error.message:'編集権限を解除しました。'};
-  panel.append(invite,revoke,out);root.prepend(panel);
+  const deleteInfo=document.createElement('p');deleteInfo.className='muted';deleteInfo.textContent='アカウント完全削除は現在準備中です。編集権限の解除は上のボタンから実行できます。';
+  panel.append(invite,revoke,out,deleteInfo);root.prepend(panel);
  })().catch(console.error);
  const blogRefresh=document.createElement('button');blogRefresh.type='button';blogRefresh.className='btn secondary';blogRefresh.textContent='↻ ブログ更新';blogRefresh.style.cssText='';
  const actionRow=document.createElement('div');actionRow.className='top-action-row';originalViewLink.parentNode.insertBefore(actionRow,originalViewLink);actionRow.append(originalViewLink,blogRefresh);
