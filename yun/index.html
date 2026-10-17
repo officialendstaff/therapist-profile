@@ -70,7 +70,18 @@ body{background:#0d0b0f;color:#fff0f7;font-family:Georgia,'Times New Roman',seri
 #hime .booking-error{color:#ff9bb6;font-size:12px;font-weight:700;margin:5px 0 2px;line-height:1.5}
 #price .price-fees-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:12px;align-items:start}
 #price .price-fees-row .field{min-width:0}
-</style><style id="yun-pale-gold-peony">:root{--pink:#D63365;--bg:#FBE8EF;--panel:#FFF5F8;--text:#755623;--muted:#92764b}html,body{background:#FBE8EF!important;color:#755623!important}body,button,input,textarea,select{font-family:"Yu Mincho","Hiragino Mincho ProN",serif}h1,h2,h3,h4,p,small,label,li,dt,dd,span{color:inherit}main,section,article,.card,.panel{color:#755623}a{color:#D63365}button,[role="button"]{accent-color:#D63365}</style><style id="yun-formal-heading">html{lang:ja}.app .card>h2,.app section h2,.app .section-title{font-family:"Yu Mincho","Hiragino Mincho ProN",serif!important;font-style:normal!important;font-weight:600!important;letter-spacing:.12em!important;text-transform:none!important;color:#755623!important;border-bottom:1px solid #C9A45C!important;padding-bottom:12px!important}.app{background:#FBE8EF!important;color:#755623!important}</style></head><body><div class="app"><section class="hero" id="home"><div class="hero-loading" id="heroLoading" aria-hidden="true"></div><img class="hero-photo" id="heroImage" alt=""><div class="hero-inner"><div class="small" id="heroSubtitle"></div><h1 id="heroName"></h1><p id="heroCatch"></p></div></section>
+</style><style id="yun-pale-gold-peony">:root{--pink:#D63365;--bg:#FBE8EF;--panel:#FFF5F8;--text:#755623;--muted:#92764b}html,body{background:#FBE8EF!important;color:#755623!important}body,button,input,textarea,select{font-family:"Yu Mincho","Hiragino Mincho ProN",serif}h1,h2,h3,h4,p,small,label,li,dt,dd,span{color:inherit}main,section,article,.card,.panel{color:#755623}a{color:#D63365}button,[role="button"]{accent-color:#D63365}</style><style id="yun-formal-heading">html{lang:ja}.app .card>h2,.app section h2,.app .section-title{font-family:"Yu Mincho","Hiragino Mincho ProN",serif!important;font-style:normal!important;font-weight:600!important;letter-spacing:.12em!important;text-transform:none!important;color:#755623!important;border-bottom:1px solid #C9A45C!important;padding-bottom:12px!important}.app{background:#FBE8EF!important;color:#755623!important}</style><style id="yun-20261017-refinement">
+/* Requested readability and restrained luxury palette */
+#hime .booking-guide{color:#59424b!important;font-size:13px!important;line-height:1.85!important}
+#hime .field label{color:#755623!important;font-weight:600}
+#hime .field input:not([type=hidden]):not([type=checkbox]),#hime .field select,#hime .field textarea{background:#e8e5e7!important;color:#29232a!important;border:1px solid #b6a8af!important;box-shadow:inset 0 1px 3px #0000000d}
+#hime .field input::placeholder,#hime .field textarea::placeholder{color:#777078!important;opacity:1}
+#hime .field select option{background:#e8e5e7;color:#29232a}
+#hime .booking-footnote{color:#68525a!important}
+#hime #copyBooking{color:#9f3567!important;border-color:#d45a91!important;font-weight:700}
+#schedule-detail .schedule .r,#schedule-detail .schedule .r b,#scheduleRows .r,#scheduleRows .r b{color:#604b35!important;font-weight:650!important}
+.rei-decoration-character{display:none!important}
+</style></head><body><div class="app"><section class="hero" id="home"><div class="hero-loading" id="heroLoading" aria-hidden="true"></div><img class="hero-photo" id="heroImage" alt=""><div class="hero-inner"><div class="small" id="heroSubtitle"></div><h1 id="heroName"></h1><p id="heroCatch"></p></div></section>
 <div class="card" id="news"><h2>NEWS</h2><div class="notice" id="newsText"></div></div>
 <div class="card" id="sns"><h2>SNS</h2><div class="sns"><button data-sns="line"><img data-sns-image="line" alt="LINE"></button><button data-sns="x"><img data-sns-image="x" alt="X"></button><button data-sns="instagram"><img data-sns-image="instagram" alt="Instagram"></button><button data-sns="sub"><img data-sns-image="sub" alt="02"></button><button data-sns="relaxy"><img data-sns-image="relaxy" alt="リラクシー"></button><button data-sns="other"><img data-sns-image="other" alt="その他SNS"></button></div></div>
 <div class="card" id="personal"><h2>PERSONAL</h2><img class="media-square" id="personalImage" alt="パーソナル画像"></div>
@@ -301,7 +312,7 @@ function applyHeadingLanguage(lang){
 function applyCharacterDecorations(){
  document.querySelectorAll('.card > h2').forEach(heading=>{
   heading.querySelectorAll('.rei-decoration-character').forEach(node=>node.remove());
-  if(!cfg.decorationVisible||!cfg.decorationImage||cfg.headingDecoration==='none')return;
+  if(true)return; /* Yun: decorative cats temporarily hidden */
   const add=(side)=>{const img=document.createElement('img');img.className='rei-decoration-character';img.alt='';img.src=cfg.decorationImage;img.style.cssText='width:54px;height:54px;object-fit:contain;flex:none;';img.setAttribute('aria-hidden','true');if(side==='left')heading.prepend(img);else heading.append(img)};
   heading.style.display='flex';heading.style.alignItems='center';heading.style.justifyContent='center';heading.style.gap='10px';
   add('left');if(['both','左右','left-right'].includes(String(cfg.headingDecoration||'both')))add('right');
