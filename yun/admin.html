@@ -51,6 +51,25 @@ if(currentPage==='top'){
  const grid=document.createElement('div');grid.className='dashboard';
  ADMIN_PAGES.forEach(([id,title,icon,desc],i)=>{const a=document.createElement('a');a.className='dashboard-item';a.href='admin.html?page='+id;a.innerHTML='<span class="dash-num">'+String(i+1).padStart(2,'0')+'</span><span class="dash-icon">'+({basic:'♙',news:'✦',images:'▧',photos:'▣',shifts:'▦',links:'↗',booking:'▤',areas:'⌖',layout:'☷',ogp:'◇'}[id])+'</span><strong>'+title+'</strong><small>'+desc+'</small>';grid.append(a)});
  root.append(grid);
+ // Master-only invitation and owner revocation controls; RPC enforces privileges.
+ (async()=>{
+  const {data:{user}}=await reiDbClient.auth.getUser();if(!user)return;
+  const {data:roles}=await reiDbClient.from('therapist_admin_roles').select('role').eq('user_uid',user.id).eq('role','master');
+  if(!roles?.length)return;
+  const panel=document.createElement('section'),title=document.createElement('h2'),out=document.createElement('p');
+  title.textContent='本人アカウント管理（マスター専用）';panel.append(title);
+  const invite=document.createElement('button');invite.textContent='招待URLを発行';
+  invite.onclick=async()=>{
+   const bytes=new Uint8Array(32);crypto.getRandomValues(bytes);const token=Array.from(bytes,x=>x.toString(16).padStart(2,'0')).join('');
+   const {error}=await reiDbClient.rpc('yun_create_invite',{p_token:token});
+   if(error){out.textContent='発行失敗：'+error.message;return}
+   const url=new URL('register.html',location.href);url.searchParams.set('invite',token);
+   try{await navigator.clipboard.writeText(url.href);out.textContent='招待URLをコピーしました（7日間有効・1回限り）。本人に送信してください。'}catch{out.textContent='招待URL：'+url.href}
+  };
+  const revoke=document.createElement('button');revoke.className='secondary';revoke.textContent='本人の編集権限を解除';
+  revoke.onclick=async()=>{if(!confirm('本人の編集権限を解除しますか？ 公開ページと保存データは維持されます。'))return;const {error}=await reiDbClient.rpc('yun_revoke_owner');out.textContent=error?'解除失敗：'+error.message:'編集権限を解除しました。'};
+  panel.append(invite,revoke,out);root.prepend(panel);
+ })().catch(console.error);
  const blogRefresh=document.createElement('button');blogRefresh.type='button';blogRefresh.className='btn secondary';blogRefresh.textContent='↻ ブログ更新';blogRefresh.style.cssText='';
  const actionRow=document.createElement('div');actionRow.className='top-action-row';originalViewLink.parentNode.insertBefore(actionRow,originalViewLink);actionRow.append(originalViewLink,blogRefresh);
  const status=document.createElement('p');status.className='muted';status.style.cssText='';actionRow.append(status);
