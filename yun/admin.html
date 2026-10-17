@@ -16,7 +16,7 @@ async function initReiAdmin(){
 let d=initialData,root=document.getElementById('root'),selected=new Set(),month=new Date();
 if(!Array.isArray(d.sections))d.sections=SECTIONS.map(x=>x[0]);
 if(!d.sections.includes('official-blog')){const i=d.sections.indexOf('profile');d.sections.splice(i>=0?i+1:d.sections.length,0,'official-blog');}
-if(!Array.isArray(d.hidden))d.hidden=[];month.setDate(1);
+if(!Array.isArray(d.hidden))d.hidden=[];if(!Array.isArray(d.menuHidden))d.menuHidden=[];month.setDate(1);
 const ADMIN_PAGES=[
  ['basic','基本情報','user-round','名前・HERO・PERSONAL・INTRO・PROFILE'],
  ['news','NEWS管理','megaphone','お知らせの作成・編集'],
@@ -292,6 +292,11 @@ function drawSections(){
   const row=document.createElement('div');row.className='section-sort-item';row.dataset.index=String(i);
   const check=document.createElement('input');check.type='checkbox';check.checked=!d.hidden.includes(id);check.setAttribute('aria-label','表示：'+(SECTIONS.find(x=>x[0]===id)?.[1]||id));check.onchange=()=>{d.hidden=d.hidden.filter(x=>x!==id);if(!check.checked)d.hidden.push(id)};
   const name=document.createElement('span');name.textContent=SECTIONS.find(x=>x[0]===id)?.[1]||id;
+  const menuLabel=document.createElement('label');menuLabel.style.cssText='display:flex;align-items:center;gap:5px;font-size:11px;white-space:nowrap';
+  const menuCheck=document.createElement('input');menuCheck.type='checkbox';menuCheck.style.width='auto';menuCheck.checked=!d.menuHidden.includes(id);
+  menuCheck.setAttribute('aria-label','メニュー表示：'+name.textContent);
+  menuCheck.onchange=()=>{d.menuHidden=d.menuHidden.filter(x=>x!==id);if(!menuCheck.checked)d.menuHidden.push(id)};
+  menuLabel.append(menuCheck,document.createTextNode('メニュー表示'));
   const handle=document.createElement('button');handle.type='button';handle.className='section-drag-handle';handle.textContent='≡';handle.setAttribute('aria-label',name.textContent+'をドラッグして並び替え');handle.style.touchAction='none';
   handle.onpointerdown=e=>{if(e.button!==0)return;e.preventDefault();dragging={id,startY:e.clientY,from:i};dragged=false;row.classList.add('is-dragging');handle.setPointerCapture(e.pointerId)};
   handle.onpointermove=e=>{if(!dragging)return;e.preventDefault();if(Math.abs(e.clientY-dragging.startY)>5)dragged=true;const target=document.elementFromPoint(e.clientX,e.clientY)?.closest('.section-sort-item');host.querySelectorAll('.section-sort-item').forEach(el=>el.classList.remove('drag-over'));if(target&&target!==row)target.classList.add('drag-over')};
@@ -303,7 +308,7 @@ function drawSections(){
   const dividerCheck=document.createElement('input');dividerCheck.type='checkbox';dividerCheck.style.width='auto';dividerCheck.checked=d.dividerAfter.includes(id);
   dividerCheck.onchange=()=>{if(dividerCheck.checked){if(!d.dividerAfter.includes(id))d.dividerAfter.push(id)}else d.dividerAfter=d.dividerAfter.filter(x=>x!==id)};
   dividerLabel.append(dividerCheck,document.createTextNode('下に区切り'));
-  row.append(check,name,dividerLabel,handle);host.append(row)
+  row.append(check,name,menuLabel,dividerLabel,handle);host.append(row)
  })
 }
 drawSections();
