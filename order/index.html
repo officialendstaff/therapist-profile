@@ -41,15 +41,7 @@ button,.btn{border:0;border-radius:11px;background:var(--pink);color:white;paddi
 <label for="otherNotes">その他のご要望</label><textarea id="otherNotes" placeholder="制作についてのご要望があればご記入ください"></textarea>
 </section>
 
-<section class="panel"><div class="num">04 / CONTACT</div><h2>要望を送信</h2>
-<label for="clientName">お名前・連絡先（任意）</label><input id="clientName" placeholder="お名前・LINE名など">
-<label for="currentUrl">現在掲載されているHPのURL</label><input id="currentUrl" type="url" placeholder="https://..."><p class="sub">現在在籍している店舗のセラピスト紹介ページなどをご入力ください。</p>
-<div class="notice" style="margin-top:18px"><strong>納品後のページ管理について</strong><p style="margin:6px 0 0">納品後は専用の管理ページから、ご自身でプロフィール・画像・SNS・出勤情報などを自由に登録・変更できます。これらの初期登録・更新はご自身でお願いいたします。</p></div>
-<p class="notice">「制作依頼を送信する」を押すと管理ページへ直接届きます。送信できない場合のみ「要望をコピーする（予備）」をご利用ください。</p>
-<button class="full" id="submitRequest" type="button">制作依頼を送信する</button><p id="submitMessage" class="sub" role="status"></p><button class="full secondary" id="copy" type="button" style="margin-top:10px">要望をコピーする（予備）</button><p id="copyMessage" class="sub" role="status"></p>
-<a class="btn secondary full hidden" id="lineLink" target="_blank" rel="noopener">末端興業LINEを開く ↗</a>
-</section>
-<section class="panel" id="pricing"><div class="num">05 / ESTIMATE</div><h2>料金シミュレーション</h2><div class="summary">
+<section class="panel" id="pricing"><div class="num">04 / ESTIMATE</div><h2>料金シミュレーション</h2><div class="summary">
 <div class="line"><span>ページ作成費（税込）</span><strong>1,100円</strong></div>
 <div class="line"><span>ページ運用費（現時点）</span><strong>0円</strong></div>
 <h3 style="margin-top:18px">選択した別途制作</h3><div id="selectedExtras" class="sub">選択なし</div>
@@ -60,7 +52,15 @@ button,.btn{border:0;border-radius:11px;background:var(--pink);color:white;paddi
 <div class="line"><span>基本制作費（税込）</span><strong class="total">1,100円</strong></div></div>
 <p class="sub">別途制作は現物での対価表記です。基本制作費への金額換算・加算は行っていません。</p>
 </section>
-<div class="sticky"><button class="secondary" id="goPricing">料金を確認</button><button id="goContact">要望を送信</button></div>
+<section class="panel"><div class="num">05 / CONTACT</div><h2>要望を送信</h2>
+<label for="clientName">お名前・連絡先（任意）</label><input id="clientName" placeholder="お名前・LINE名など">
+<label for="currentUrl">現在掲載されているHPのURL</label><input id="currentUrl" type="url" placeholder="https://..."><p class="sub">現在在籍している店舗のセラピスト紹介ページなどをご入力ください。</p>
+<div class="notice" style="margin-top:18px"><strong>納品後のページ管理について</strong><p style="margin:6px 0 0">納品後は専用の管理ページから、ご自身でプロフィール・画像・SNS・出勤情報などを自由に登録・変更できます。これらの初期登録・更新はご自身でお願いいたします。</p></div>
+<p class="notice">「制作依頼を送信する」を押すと管理ページへ直接届きます。</p>
+<button class="full" id="submitRequest" type="button">制作依頼を送信する</button><p id="submitMessage" class="sub" role="status"></p><button class="full secondary" id="copy" type="button" style="margin-top:10px">要望をコピーする（予備）</button><p id="copyMessage" class="sub" role="status"></p>
+
+</section>
+
 </main><script>
 "use strict";
 const CONFIG={sampleUrl:"https://officialendstaff.github.io/therapist-profile/rei-sample/",lineUrl:"https://line.me/ti/p/uKmprFU_PS"}; // 公開前に実際のURLを設定
@@ -95,10 +95,10 @@ function detailsText(){const e=chosenExtras();return [
 "■ 現在のHP："+($("currentUrl").value||"未記入")
 ].join("\n")}
 $("copy").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(detailsText());$("copyMessage").textContent="要望をコピーしました。LINEのトークに貼り付けてください。"}catch(e){const t=document.createElement("textarea");t.value=detailsText();document.body.appendChild(t);t.select();try{document.execCommand("copy");$("copyMessage").textContent="要望をコピーしました。"}catch(e2){$("copyMessage").textContent="コピーできませんでした。HTTPSで開いてお試しください。"}t.remove()}});
-$("goPricing").addEventListener("click",()=>$("pricing").scrollIntoView({behavior:"smooth"}));
-$("goContact").addEventListener("click",()=>$("clientName").scrollIntoView({behavior:"smooth",block:"center"}));
+
+
 if(CONFIG.sampleUrl){$("sampleLink").href=CONFIG.sampleUrl;$("sampleLink").classList.remove("hidden")}
-if(CONFIG.lineUrl){$("lineLink").href=CONFIG.lineUrl;$("lineLink").classList.remove("hidden")}
+
 
 const REQUEST_API="https://vjjnkflbfsjihwzjsjpr.supabase.co/rest/v1/personal_page_requests";
 const REQUEST_KEY="sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos";
