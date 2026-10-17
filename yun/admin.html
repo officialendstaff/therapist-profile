@@ -57,7 +57,7 @@ if(currentPage==='top'){
   const {data:roles}=await reiDbClient.from('therapist_admin_roles').select('role').eq('user_uid',user.id).eq('role','master');
   if(!roles?.length)return;
   const out=document.createElement('p');
-  const invite=document.createElement('button');invite.className='btn';invite.type='button';invite.textContent='招待URLを発行';
+  const invite=document.createElement('button');invite.className='btn';invite.type='button';invite.textContent='招待を発行';
   invite.onclick=async()=>{
    const bytes=new Uint8Array(32);crypto.getRandomValues(bytes);const token=Array.from(bytes,x=>x.toString(16).padStart(2,'0')).join('');
    const {error}=await reiDbClient.rpc('yun_create_invite',{p_token:token});
@@ -65,26 +65,26 @@ if(currentPage==='top'){
    const url=new URL('register.html',location.href);url.searchParams.set('invite',token);
    try{await navigator.clipboard.writeText(url.href);out.textContent='招待URLをコピーしました（7日間有効・1回限り）。本人に送信してください。'}catch{out.textContent='招待URL：'+url.href}
   };
-  const revoke=document.createElement('button');revoke.className='btn secondary';revoke.type='button';revoke.textContent='本人の編集権限を解除';
+  const revoke=document.createElement('button');revoke.className='btn secondary';revoke.type='button';revoke.textContent='権限を解除';
   revoke.onclick=async()=>{if(!confirm('本人の編集権限を解除しますか？ 公開ページと保存データは維持されます。'))return;const {error}=await reiDbClient.rpc('yun_revoke_owner');out.textContent=error?'解除失敗：'+error.message:'編集権限を解除しました。'};
   const actionRow=document.querySelector('.top-action-row');
   if(actionRow){actionRow.insertBefore(invite,actionRow.querySelector('.muted'));actionRow.insertBefore(revoke,actionRow.querySelector('.muted'));const note=document.createElement('p');note.className='muted';note.style.cssText='font-size:11px;margin:4px 0 10px';note.append(out);actionRow.after(note)}
  })().catch(console.error);
- const blogRefresh=document.createElement('button');blogRefresh.type='button';blogRefresh.className='btn secondary';blogRefresh.textContent='↻ ブログ更新';blogRefresh.style.cssText='';
+ const blogRefresh=document.createElement('button');blogRefresh.type='button';blogRefresh.className='btn secondary';blogRefresh.textContent='ブログ更新';blogRefresh.style.cssText='';
  const actionRow=document.createElement('div');actionRow.className='top-action-row';originalViewLink.parentNode.insertBefore(actionRow,originalViewLink);actionRow.append(originalViewLink,blogRefresh);
  const status=document.createElement('p');status.className='muted';status.style.cssText='';actionRow.append(status);
  const refresh=blogRefresh;
   const client=reiDbClient;
- client.from('therapist_blog_cache').select('fetched_at,posts').eq('therapist_key','yuori').maybeSingle().then(({data,error})=>{status.textContent=error?'更新状況を取得できません':data?.fetched_at?'最終更新：'+new Date(data.fetched_at).toLocaleString('ja-JP'):'まだ記事を取得していません'});
+ 
  refresh.addEventListener('click',async()=>{
   if(refresh.disabled)return;refresh.disabled=true;refresh.textContent='更新中…';status.textContent='公式HPから取得しています';
   try{
    const {data:{session}}=await client.auth.getSession();if(!session)throw Error('ログインが必要です');
    const res=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/refresh-yun-blog',{method:'POST',headers:{'Content-Type':'application/json',apikey:'sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos',Authorization:'Bearer '+session.access_token},body:'{}'});
    const result=await res.json();if(!res.ok||!result.ok){const detail=result.detail||result.error||('HTTP '+res.status);throw Error(typeof detail==='string'?detail:JSON.stringify(detail));}
-   status.textContent='最終更新：'+new Date().toLocaleString('ja-JP');
+   status.textContent='更新しました';
   }catch(e){status.textContent='更新失敗：'+(e.message||String(e))+'（公開中の記事は維持されます）'}
-  finally{refresh.disabled=false;refresh.textContent='ブログを最新に更新'}
+  finally{refresh.disabled=false;refresh.textContent='ブログ更新'}
  });
 }else{
  if(!pageInfo){location.replace('admin.html')}
