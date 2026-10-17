@@ -1,0 +1,19 @@
+/* PC layout enhancement */
+main{max-width:none;margin:0;padding:28px clamp(22px,3vw,50px) 48px}
+.layout{grid-template-columns:270px minmax(0,1fr);gap:22px;align-items:start}
+.sidebar{background:#E8D9F5;padding:24px 18px;border-color:#ddc8eb}
+.sidebar h3{font-size:12px;color:#6a4f7d;letter-spacing:.075em;margin:24px 10px 12px}
+.filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.filters button:first-child{grid-column:span 2}
+.filters button{font-size:12px;padding:10px 6px;background:rgba(255,255,255,.7);border-color:transparent}
+.filters button.active,.navbtn.active{background:#fff;color:#513663}
+.navbtn{padding:13px;border-radius:10px;font-size:13px;color:#51405f}
+.workarea{min-height:calc(100vh - 205px);padding:clamp(24px,3vw,42px)}
+.empty-dashboard{max-width:780px;margin:7vh auto 0}
+.empty-dashboard h2{font-size:30px;margin:14px 0}
+.empty-dashboard>p{color:#7b7283;margin-bottom:28px;line-height:1.7}
+.quick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.quick-card{display:flex;flex-direction:column;gap:18px;min-height:128px;padding:22px;border:1px solid #e9e1ef;border-radius:14px;background:#fcfaff;text-decoration:none}
+.quick-card strong{color:#4d385e;font-size:15px}
+.quick-card span{color:#81718b;font-size:12px}
+@media(max-width:850px){main{padding:18px 12px}.layout{grid-template-columns:1fr}.sidebar{position:static;max-height:none}.workarea{min-height:400px;padding:22px}.quick-grid{grid-template-columns:1fr}}
