@@ -377,25 +377,22 @@ async function resolveHelp(id){
  closeInterviewSheet();await loadInterviewSheets();
 }
 async function syncSheetInterviewOutcome(x,status){
- if(!x||!x.shop||!x.submitted_at)return {synced:false,reason:'面接予定との紐付け情報が不足しています'};
- const date=new Date(x.submitted_at).toLocaleDateString('sv-SE',{timeZone:'Asia/Tokyo'});
- const submitted=new Date(x.submitted_at).getTime();
- const {data,error}=await sb.from('staff_interviews').select('id,shop,interview_date,interview_time,status').eq('shop',x.shop).eq('interview_date',date);
+ if(!x?.id)return {synced:false,reason:'面接シートIDがありません'};
+ const {data:links,error}=await sb.from('staff_interview_form_links').select('interview_id').eq('interview_applicant_id',x.id);
  if(error)return {synced:false,reason:error.message};
- const candidates=(data||[]).filter(v=>!['キャンセル','トビ（キャンセル）'].includes(v.status)).map(v=>({row:v,diff:Math.abs(new Date(v.interview_date+'T'+v.interview_time+'+09:00').getTime()-submitted)})).filter(v=>v.diff<=90*60*1000).sort((a,b)=>a.diff-b.diff);
- if(candidates.length!==1)return {synced:false,reason:'同じ日時付近の面接を一意に特定できません'};
- const target=candidates[0].row;
- if(target.status===status)return {synced:true};
- if(!['面接予定','日程変更','来店済み'].includes(target.status))return {synced:false,reason:'履歴が別の結果で確定済みです'};
- const updated=await sb.from('staff_interviews').update({status,alert:false,updated_at:new Date().toISOString()}).eq('id',target.id).eq('status',target.status).select('id');
- if(updated.error||!updated.data?.length)return {synced:false,reason:updated.error?.message||'更新の競合が発生しました'};
- await loadSchedule();
+ if(!links?.length)return {synced:false,reason:'求人管理で面接予定との紐づけが必要です'};
+ if(links.length!==1)return {synced:false,reason:'複数の面接予定と紐づいています'};
+ const {data:appointment,error:readError}=await sb.from('staff_interviews').select('id,shop,status').eq('id',links[0].interview_id).single();
+ if(readError||!appointment)return {synced:false,reason:readError?.message||'面接予定がありません'};
+ if(appointment.shop!==x.shop)return {synced:false,reason:'面接予定とシートの店舗が一致しません'};
+ // 来店・トビは面接管理でのみ判断する。採否はシートのstatusを求人管理が参照する。
  return {synced:true};
 }
 async function saveSheetOutcome(id){
  const x=(window.interviewApplicants||[]).find(v=>v.id===id);
  const status=document.getElementById('sheetOutcomeSelect')?.value;
  if(!x||!['採用','不採用','辞退'].includes(status))return alert('採否結果を選択してください。');
+ if(status==='採用')return alert('採用確定は入店情報を確認し、入店処理完了時に行ってください。');
  if(x.status===status)return alert('既に'+status+'です。');
  if(!confirm('採否結果を「'+status+'」に変更しますか？'))return;
  const {error}=await sb.from('interview_applicants').update({status}).eq('id',id);
@@ -403,7 +400,7 @@ async function saveSheetOutcome(id){
  x.status=status;
  const sync=await syncSheetInterviewOutcome(x,status);
  closeInterviewSheet();await loadInterviewSheets();
- alert('採否結果を「'+status+'」に変更しました。'+(sync.synced?' 面接履歴にも反映しました。':' 面接履歴は未変更です（'+sync.reason+'）。'));
+ alert('採否結果を「'+status+'」に変更しました。'+(sync.synced?' 求人管理は紐づいた面接シートの結果を参照します。':' 面接予定の紐づけ確認が必要です（'+sync.reason+'）。'));
 }
 async function setInterviewOutcome(id,status){
  if(!['辞退','不採用'].includes(status))return;
