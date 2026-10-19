@@ -17,3 +17,4 @@ main{max-width:none;margin:0;padding:28px clamp(22px,3vw,50px) 48px}
 .quick-card strong{color:#4d385e;font-size:15px}
 .quick-card span{color:#81718b;font-size:12px}
 @media(max-width:850px){main{padding:18px 12px}.layout{grid-template-columns:1fr}.sidebar{position:static;max-height:none}.workarea{min-height:400px;padding:22px}.quick-grid{grid-template-columns:1fr}}
+.sample-nav{display:grid;gap:5px}.sample-nav .navbtn{box-sizing:border-box;text-decoration:none;color:#24334c;padding:11px 12px;border-radius:8px;font-size:13px;font-weight:650;background:rgba(255,255,255,.5)}.sample-nav .navbtn:hover,.sample-nav .navbtn:focus-visible{background:#fff;outline-color:#8e6aaa}
