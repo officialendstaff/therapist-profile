@@ -413,8 +413,8 @@ let recruitIsMaster=false;async function refreshMasterStatus(){const {data,error
   top.append(name,state);card.append(top);
   const meta=document.createElement('div');meta.className='staffPersonMeta';
   const storeNames={rose:'薔薇・BUSTY',grand:'GL・US',luxy:'LUXY'};
-  const featureNames={recruit:'求人管理',interview:'面接管理',history:'履歴・集計',settings:'店舗設定'};
-  meta.textContent=person.role==='master'?'全店舗・全機能':person.role==='pending'?'招待から登録済み・承認待ち':person.role==='disabled'?'利用停止中':person.role==='full'?'全店舗・全機能':[(person.stores||[]).map(v=>storeNames[v]||v).join('・'),(person.features||[]).map(v=>featureNames[v]||v).join('・')].filter(Boolean).join(' ／ ')||'権限未設定';
+  
+  meta.textContent=person.role==='master'?'全店舗・全機能':person.role==='pending'?'招待から登録済み・承認待ち':person.role==='disabled'?'利用停止中':person.role==='full'?'全店舗・全機能':(person.stores||[]).map(v=>storeNames[v]||v).join('・')||'権限未設定';
   card.append(meta);
   if(person.role!=='master'){
    const actions=document.createElement('div');actions.className='staffActions';
@@ -425,16 +425,16 @@ let recruitIsMaster=false;async function refreshMasterStatus(){const {data,error
    const choices=document.createElement('div');
    const makeChecks=(label,items,selected)=>{const field=document.createElement('fieldset');const legend=document.createElement('legend');legend.textContent=label;field.append(legend);for(const [value,title] of items){const l=document.createElement('label');const input=document.createElement('input');input.type='checkbox';input.value=value;input.checked=(selected||[]).includes(value);l.append(input,document.createTextNode(' '+title));field.append(l)}choices.append(field);return field};
    const stores=makeChecks('店舗',[['rose','薔薇・BUSTY'],['grand','GL・US'],['luxy','LUXY']],person.stores);
-   const features=makeChecks('機能',[['recruit','求人管理'],['interview','面接管理'],['history','履歴・集計'],['settings','店舗設定']],person.features);
+   role.onchange=()=>{choices.classList.toggle('hide',role.value!=='custom')};choices.classList.toggle('hide',role.value!=='custom');
    const save=document.createElement('button');save.className='staffSave';save.textContent='権限を保存';
-   save.onclick=async()=>{const checked=f=>[...f.querySelectorAll('input:checked')].map(x=>x.value);save.disabled=true;const {error}=await sb.rpc('recruit_set_staff_access',{p_user_id:person.user_id,p_role:role.value,p_stores:checked(stores),p_features:checked(features)});if(error){save.disabled=false;return alert(error.message)}await loadStaffManagers()};
+   save.onclick=async()=>{const checked=f=>[...f.querySelectorAll('input:checked')].map(x=>x.value);save.disabled=true;const {error}=await sb.rpc('recruit_set_staff_access',{p_user_id:person.user_id,p_role:role.value,p_stores:checked(stores),p_features:['recruit','interview','history','settings']});if(error){save.disabled=false;return alert(error.message)}await loadStaffManagers()};
    editor.append(role,choices,save);
    const edit=document.createElement('button');edit.textContent=person.role==='pending'?'承認・権限設定':'権限編集';if(person.role==='pending')edit.className='staffPrimary';
    edit.onclick=()=>{editor.classList.toggle('hide');edit.setAttribute('aria-expanded',String(!editor.classList.contains('hide')))};
    actions.append(edit);
    if(person.role!=='pending'){
     const toggle=document.createElement('button');toggle.textContent=person.role==='disabled'?'利用再開':'利用停止';
-    toggle.onclick=async()=>{const next=person.role==='disabled'?'custom':'disabled';if(!confirm((person.display_name||'このスタッフ')+'の権限を'+(next==='disabled'?'停止':'再開')+'しますか？'))return;toggle.disabled=true;const {error}=await sb.rpc('recruit_set_staff_access',{p_user_id:person.user_id,p_role:next,p_stores:person.stores||[],p_features:person.features||[]});if(error){toggle.disabled=false;return alert(error.message)}await loadStaffManagers()};
+    toggle.onclick=async()=>{const next=person.role==='disabled'?'custom':'disabled';if(!confirm((person.display_name||'このスタッフ')+'の権限を'+(next==='disabled'?'停止':'再開')+'しますか？'))return;toggle.disabled=true;const {error}=await sb.rpc('recruit_set_staff_access',{p_user_id:person.user_id,p_role:next,p_stores:person.stores||[],p_features:['recruit','interview','history','settings']});if(error){toggle.disabled=false;return alert(error.message)}await loadStaffManagers()};
     actions.append(toggle);
    }
    card.append(actions,editor);
