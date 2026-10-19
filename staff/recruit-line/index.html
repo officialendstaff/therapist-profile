@@ -180,26 +180,44 @@ function renderHires(){
    const meta=document.createElement('div');meta.className='muted';meta.textContent=(v.appointment?v.appointment.interview_date+' '+String(v.appointment.interview_time).slice(0,5):'面接予定未紐づけ')+' ／ '+(v.form?'面接シート：'+v.form.status:'面接結果：'+v.appointment.status);
    body.append(name,meta);
    if(v.form){const href='https://officialendstaff.github.io/therapist-profile/staff/interview-management/?sheet='+encodeURIComponent(v.form.id);item.style.cursor='pointer';item.tabIndex=0;item.setAttribute('role','link');const open=()=>{openRecruitInterviewSheet(v.form.id)};item.onclick=open;item.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}};const hint=document.createElement('small');hint.textContent='面接シートを開く ›';hint.style.display='block';body.append(hint)}else{const button=document.createElement('button');button.type='button';button.className='secondary';button.style.cssText='font-size:12px;padding:8px;margin-top:8px';button.textContent='面接シートを紐づけ';button.onclick=()=>openHireFormLinkDialog(v.appointment);body.append(button)}
+   if(v.form&&!v.appointment){const b=document.createElement('button');b.type='button';b.className='secondary';b.textContent='面接予定を紐づけ';b.style.cssText='font-size:12px;padding:8px;margin-top:8px';b.onclick=e=>{e.stopPropagation();openHireAppointmentLinkDialog(v.form)};body.append(b)}
    el.append(item);
   }
  }
  const count=joined.length;
  const total=document.createElement('h3');total.textContent='面接件数　'+count+'件';total.style.marginTop='22px';el.append(total);
 }
+async function openHireAppointmentLinkDialog(form){
+ const modal=$('hireFormLinkModal'),list=$('hireFormLinkOptions');modal.classList.remove('hide');list.replaceChildren();
+ msg('hireFormLinkTitle','面接予定を紐づけ ／ '+(form.name||'氏名未入力'));
+ $('hireFormLinkClose').onclick=()=>modal.classList.add('hide');
+ const used=new Set(interviewFormLinks.filter(l=>l.interview_applicant_id!==form.id).map(l=>String(l.interview_id)));
+ const rows=interviewManagementRows.filter(x=>x.shop===form.shop&&!used.has(String(x.id))).sort((a,b)=>b.interview_date.localeCompare(a.interview_date));
+ if(!rows.length){list.textContent='この店舗に紐づけ可能な面接予定がありません。';return}
+ const note=document.createElement('p');note.className='muted';note.textContent='面接日時を確認し、該当する予定を選択してください。';list.append(note);
+ for(const appointment of rows){
+  const b=document.createElement('button');b.type='button';b.className='item';b.style.padding='12px';
+  b.textContent=appointment.interview_date+' '+String(appointment.interview_time).slice(0,5)+' ／ '+appointment.status;
+  b.onclick=async()=>{
+   if(!confirm((form.name||'氏名未入力')+'の面接シートを '+appointment.interview_date+' の面接予定に紐づけますか？'))return;
+   const {error}=await sb.from('staff_interview_form_links').upsert({interview_id:appointment.id,interview_applicant_id:form.id},{onConflict:'interview_id'});
+   if(error)return alert('紐づけできません：'+error.message);
+   modal.classList.add('hide');await loadInterviewManagement();alert('紐づけました。');
+  };list.append(b);
+ }
+}
 async function openHireFormLinkDialog(appointment){
  const modal=$('hireFormLinkModal'),list=$('hireFormLinkOptions');
  modal.classList.remove('hide');list.textContent='面接シートを検索しています…';
  msg('hireFormLinkTitle',appointment.interview_date+' '+String(appointment.interview_time).slice(0,5)+' ／ '+appointment.shop);
  $('hireFormLinkClose').onclick=()=>modal.classList.add('hide');
- const start=new Date(appointment.interview_date+'T00:00:00+09:00');start.setDate(start.getDate()-3);
- const end=new Date(appointment.interview_date+'T00:00:00+09:00');end.setDate(end.getDate()+5);
- const {data,error}=await sb.from('interview_applicants').select('id,name,shop,status,submitted_at').eq('shop',appointment.shop).gte('submitted_at',start.toISOString()).lt('submitted_at',end.toISOString()).order('submitted_at',{ascending:false}).limit(100);
+ const {data,error}=await sb.from('interview_applicants').select('id,name,shop,status,submitted_at').eq('shop',appointment.shop).order('submitted_at',{ascending:false}).limit(500);
  if(error){list.textContent='面接シートを取得できません：'+error.message;return}
  list.replaceChildren();
  const used=new Set(interviewFormLinks.filter(x=>x.interview_id!==appointment.id).map(x=>x.interview_applicant_id));
  const candidates=(data||[]).filter(x=>!used.has(x.id));
- if(!candidates.length){list.textContent='該当期間の未紐づけ面接シートがありません。';return}
- const note=document.createElement('p');note.className='muted';note.textContent='面接日の前3日〜後5日に登録されたシートです。氏名と内容を確認して選択してください。';list.append(note);
+ if(!candidates.length){list.textContent='未紐づけの面接シートがありません。';return}
+ const note=document.createElement('p');note.className='muted';note.textContent='登録日に関係なく、この店舗の未紐づけシートを表示しています。氏名と内容を確認してください。';list.append(note);
  for(const form of candidates){
   const b=document.createElement('button');b.type='button';b.className='item';b.style.padding='12px';
   const label=document.createElement('strong');label.textContent=(form.name||'氏名未入力')+' ／ '+form.status;
