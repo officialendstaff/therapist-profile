@@ -432,6 +432,7 @@ let recruitIsMaster=false;async function refreshMasterStatus(){const {data,error
    const edit=document.createElement('button');edit.textContent=person.role==='pending'?'承認・権限設定':'権限編集';if(person.role==='pending')edit.className='staffPrimary';
    edit.onclick=()=>{editor.classList.toggle('hide');edit.setAttribute('aria-expanded',String(!editor.classList.contains('hide')))};
    actions.append(edit);
+   if(savedUserId===person.user_id){const done=document.createElement('strong');done.textContent='保存完了';done.style.cssText='font-size:12px;color:#27865a';actions.append(done)}
    if(person.role==='full'||person.role==='custom'||(savedUserId===person.user_id&&role.value!=='disabled'&&role.value!=='pending')){
     const guide=document.createElement('button');guide.type='button';guide.textContent='利用案内';guide.setAttribute('aria-label',(person.display_name||'スタッフ')+'さんへの利用案内をコピー');
     guide.onclick=async()=>{
@@ -440,7 +441,6 @@ let recruitIsMaster=false;async function refreshMasterStatus(){const {data,error
     };
     actions.append(guide);
    }
-   if(savedUserId===person.user_id){const done=document.createElement('strong');done.textContent='保存完了';done.style.cssText='font-size:12px;color:#27865a';actions.append(done)}
    if(person.role!=='pending'){
     const toggle=document.createElement('button');toggle.textContent=person.role==='disabled'?'利用再開':'利用停止';
     toggle.onclick=async()=>{if(person.role==='disabled'){role.value=(person.stores||[]).length?'custom':'full';role.onchange();editor.classList.remove('hide');edit.setAttribute('aria-expanded','true');editor.scrollIntoView({block:'nearest',behavior:'smooth'});return}if(!confirm((person.display_name||'このスタッフ')+'の権限を停止しますか？'))return;toggle.disabled=true;const {error}=await sb.rpc('recruit_set_staff_access',{p_user_id:person.user_id,p_role:'disabled',p_stores:person.stores||[],p_features:['recruit','interview','history','settings']});if(error){toggle.disabled=false;return alert(error.message)}await loadStaffManagers()};
