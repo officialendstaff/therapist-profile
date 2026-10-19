@@ -215,6 +215,7 @@ function render(){const q=$('search').value.trim().toLowerCase();const linked=ne
 function renderPersonProfile(a){const el=$('personProfile');el.replaceChildren();const p=lineProfiles[a.line_user_id]||{};if(p.pictureUrl){const img=document.createElement('img');img.src=p.pictureUrl;img.alt='LINEアイコン';img.style.cssText='width:64px;height:64px;object-fit:cover;border-radius:50%';el.append(img)}const name=document.createElement('h2');name.textContent=p.displayName||'LINE応募者';el.append(name);msg('personId','ID：'+a.line_user_id);const status=lineProfileFailures[a.line_user_id];msg('profileStatus',status===401?'LINEプロフィール取得不可：アクセストークンを確認してください':status===403?'LINEプロフィール取得不可：LINE側でアクセスが拒否されました':status===404?'LINEプロフィール取得不可：該当ユーザーがこのチャネルで見つかりません':status?'LINEプロフィール取得エラー（'+status+'）':'')}
 let interviewManagementRows=[],interviewScheduleLinks=[],interviewFormLinks=[],interviewForms=[];
 async function loadInterviewManagement(){const [iv,links,forms]=await Promise.all([sb.from('staff_interviews').select('id,shop,interview_date,interview_time,status,confirmed').order('interview_date',{ascending:false}).limit(500),sb.from('staff_interview_line_links').select('interview_id,account_id,line_user_id,line_display_name,line_picture_url'),sb.from('staff_interview_form_links').select('interview_id,interview_applicant_id')]);if(iv.error||links.error||forms.error){msg('interviewUpcoming','読み込みエラー：'+(iv.error||links.error||forms.error).message);return}interviewManagementRows=iv.data||[];interviewScheduleLinks=links.data||[];interviewFormLinks=forms.data||[];const ids=interviewFormLinks.map(x=>x.interview_applicant_id);interviewForms=ids.length?(await sb.from('interview_applicants').select('id,status,submitted_at').in('id',ids)).data||[]:[];renderInterviewManagement();renderHires()}
+function resolvedInterviewStatus(x){const link=interviewFormLinks.find(l=>l.interview_id===x.id);const form=link&&interviewForms.find(f=>f.id===link.interview_applicant_id);return form&&['採用','在籍','退職','不採用','辞退'].includes(form.status)?(form.status==='在籍'?'採用':form.status==='退職'?'退職':form.status):x.status}
 function renderInterviewManagement(){
  const today=new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Tokyo'});
  const shop=activeStore?.display_name||'';
@@ -222,7 +223,7 @@ function renderInterviewManagement(){
  const upcoming=rows.filter(x=>x.interview_date>=today&&['面接予定','日程変更'].includes(x.status)).sort((a,b)=>(a.interview_date+a.interview_time).localeCompare(b.interview_date+b.interview_time));
  const past=rows.filter(x=>!upcoming.includes(x)).sort((a,b)=>(b.interview_date+b.interview_time).localeCompare(a.interview_date+a.interview_time));
  const stats=$('interviewStats');stats.replaceChildren();
- for(const [label,count] of [['今後の面接予定',upcoming.length],['面接履歴',past.length],['採用',past.filter(x=>x.status==='採用').length],['不採用',past.filter(x=>x.status==='不採用').length]]){
+ for(const [label,count] of [['今後の面接予定',upcoming.length],['面接履歴',past.length],['採用',past.filter(x=>resolvedInterviewStatus(x)==='採用').length],['不採用',past.filter(x=>resolvedInterviewStatus(x)==='不採用').length]]){
   const card=document.createElement('div'),name=document.createElement('small'),value=document.createElement('strong');
   name.textContent=label;value.textContent=count+'件';card.append(name,value);stats.append(card);
  }
@@ -241,7 +242,7 @@ function renderInterviewManagement(){
    const info=document.createElement('div');info.className='interviewInfo';
    const headline=document.createElement('div');headline.className='interviewHeadline';
    const when=document.createElement('span');when.textContent=x.interview_date+' '+String(x.interview_time).slice(0,5);
-   const status=document.createElement('span');status.className='interviewStatus '+(x.status==='採用'?'hired':x.status==='不採用'?'rejected':String(x.status).includes('キャンセル')?'cancelled':x.status==='辞退'?'withdrawn':'other');status.textContent=x.status;
+   const displayStatus=resolvedInterviewStatus(x);const status=document.createElement('span');status.className='interviewStatus '+(displayStatus==='採用'?'hired':displayStatus==='不採用'?'rejected':String(displayStatus).includes('キャンセル')?'cancelled':displayStatus==='辞退'?'withdrawn':'other');status.textContent=displayStatus;
    headline.append(when,status);
    const name=document.createElement('div');name.className='interviewName';name.textContent=linked?(profile.displayName||linked.line_display_name||linked.line_user_id):'LINE未紐づけ';
    const actions=document.createElement('div');actions.className='interviewActions';
