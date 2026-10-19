@@ -429,7 +429,7 @@ async function completeOnboarding(id){
  if(!confirm('必要事項を確認しましたか？ 入店処理を完了し、採用として確定します。'))return;
  const {error}=await sb.from('interview_applicants').update({status:'採用'}).eq('id',id);
  if(error)return alert('入店処理を完了できません：'+error.message);
- const x=(window.interviewApplicants||[]).find(v=>v.id===id);if(x)x.status='採用';
+ x.status='採用';
  closeInterviewSheet();await loadInterviewSheets();
 }
 async function createEntryDocuments(id){
