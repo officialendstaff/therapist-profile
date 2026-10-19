@@ -398,7 +398,7 @@ let recruitIsMaster=false;async function refreshMasterStatus(){const {data,error
   }
  }catch(error){if(host)host.textContent='招待URLを発行できませんでした：'+(error.message||String(error))}
  finally{if(trigger)trigger.disabled=false}
-}async function loadStaffManagers(){
+}async function loadStaffManagers(savedUserId=null){
  if(!recruitIsMaster)return;
  const {data,error}=await sb.from('recruit_staff_profiles').select('user_id,display_name,role,stores,features,created_at').order('created_at',{ascending:false});
  const host=document.getElementById('staffManagerRows');
@@ -427,11 +427,20 @@ let recruitIsMaster=false;async function refreshMasterStatus(){const {data,error
    const stores=makeChecks('店舗',[['rose','薔薇・BUSTY'],['grand','GL・US'],['luxy','LUXY']],person.stores);
    role.onchange=()=>{choices.classList.toggle('hide',role.value!=='custom')};choices.classList.toggle('hide',role.value!=='custom');
    const save=document.createElement('button');save.className='staffSave';save.textContent='権限を保存';
-   save.onclick=async()=>{const checked=f=>[...f.querySelectorAll('input:checked')].map(x=>x.value);save.disabled=true;const {error}=await sb.rpc('recruit_set_staff_access',{p_user_id:person.user_id,p_role:role.value,p_stores:checked(stores),p_features:['recruit','interview','history','settings']});if(error){save.disabled=false;return alert(error.message)}await loadStaffManagers()};
+   save.onclick=async()=>{const checked=f=>[...f.querySelectorAll('input:checked')].map(x=>x.value);save.disabled=true;const {error}=await sb.rpc('recruit_set_staff_access',{p_user_id:person.user_id,p_role:role.value,p_stores:checked(stores),p_features:['recruit','interview','history','settings']});if(error){save.disabled=false;return alert(error.message)}await loadStaffManagers(person.user_id)};
    editor.append(role,choices,save);
    const edit=document.createElement('button');edit.textContent=person.role==='pending'?'承認・権限設定':'権限編集';if(person.role==='pending')edit.className='staffPrimary';
    edit.onclick=()=>{editor.classList.toggle('hide');edit.setAttribute('aria-expanded',String(!editor.classList.contains('hide')))};
    actions.append(edit);
+   if(person.role==='full'||person.role==='custom'||(savedUserId===person.user_id&&role.value!=='disabled'&&role.value!=='pending')){
+    const guide=document.createElement('button');guide.type='button';guide.textContent='利用案内';guide.setAttribute('aria-label',(person.display_name||'スタッフ')+'さんへの利用案内をコピー');
+    guide.onclick=async()=>{
+     const message=(person.display_name||'スタッフ')+'さん\\n管理アカウントの登録が完了しました。\\n下記URLからログインしてご利用ください。\\nhttps://officialendstaff.github.io/therapist-profile/staff/recruit-line/\\n\\nログインには、登録時のメールアドレスとパスワードをご使用ください。'.replaceAll('\\n','\n');
+     try{await navigator.clipboard.writeText(message);guide.textContent='コピー完了'}catch(e){const area=document.createElement('textarea');area.value=message;area.readOnly=true;area.style.cssText='width:100%;min-height:120px;margin-top:8px';card.append(area);area.focus();area.select();guide.textContent='文章を選択しました（コピーしてください）'}
+    };
+    actions.append(guide);
+   }
+   if(savedUserId===person.user_id){const done=document.createElement('strong');done.textContent='保存完了';done.style.cssText='font-size:12px;color:#27865a';actions.append(done)}
    if(person.role!=='pending'){
     const toggle=document.createElement('button');toggle.textContent=person.role==='disabled'?'利用再開':'利用停止';
     toggle.onclick=async()=>{if(person.role==='disabled'){role.value=(person.stores||[]).length?'custom':'full';role.onchange();editor.classList.remove('hide');edit.setAttribute('aria-expanded','true');editor.scrollIntoView({block:'nearest',behavior:'smooth'});return}if(!confirm((person.display_name||'このスタッフ')+'の権限を停止しますか？'))return;toggle.disabled=true;const {error}=await sb.rpc('recruit_set_staff_access',{p_user_id:person.user_id,p_role:'disabled',p_stores:person.stores||[],p_features:['recruit','interview','history','settings']});if(error){toggle.disabled=false;return alert(error.message)}await loadStaffManagers()};
