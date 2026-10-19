@@ -163,7 +163,8 @@ function renderHires(){
  const outcome=v=>v.form?.status||v.appointment.status;
  const groups=[['採用',v=>['採用','入店','在籍'].includes(outcome(v))],
  ['不採用',v=>outcome(v)==='不採用'],
- ['辞退',v=>outcome(v)==='辞退']];
+ ['辞退',v=>outcome(v)==='辞退'],
+ ['未処理・来店済み',v=>!['採用','入店','在籍','不採用','辞退'].includes(outcome(v))]];
  for(const [title,test] of groups){
   const rows=joined.filter(test);
   const h=document.createElement('h3');h.textContent=title+'（'+rows.length+'件）';h.style.margin='18px 0 8px';el.append(h);
@@ -180,7 +181,7 @@ function renderHires(){
    el.append(item);
   }
  }
- const count=joined.filter(v=>groups.some(([,test])=>test(v))).length;
+ const count=joined.length;
  const total=document.createElement('h3');total.textContent='面接件数　'+count+'件';total.style.marginTop='22px';el.append(total);
 }
 async function openHireFormLinkDialog(appointment){
@@ -250,6 +251,7 @@ function renderInterviewManagement(){
    connect.onclick=()=>{if(!linked)openInterviewLinkDialog(x,null)};
    if(linked){connect.disabled=true;connect.title='LINE紐づけ済み'}
    actions.append(connect);
+   if(!interviewFormLinks.some(l=>l.interview_id===x.id)){const formButton=document.createElement('button');formButton.type='button';formButton.className='secondary';formButton.textContent='面接シートを紐づけ';formButton.onclick=()=>openHireFormLinkDialog(x);actions.append(formButton)}
    if(linked){const undo=document.createElement('button');undo.type='button';undo.className='unlink';undo.textContent='解除';undo.onclick=()=>openInterviewLinkDialog(x,linked);actions.append(undo)}
    info.append(headline,name,actions);
    const detail=document.createElement('div');detail.className='interviewInlineDetail';detail.hidden=true;detail.style.cssText='display:none;width:100%;padding:12px 4px 2px;border-top:1px solid #43566a;margin-top:10px';
