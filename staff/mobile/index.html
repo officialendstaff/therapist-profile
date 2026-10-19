@@ -418,14 +418,16 @@ async function rejectInterviewSheet(id){
  closeInterviewSheet();await loadInterviewSheets();
 }
 async function completeOnboarding(id){
- const x=(window.interviewApplicants||[]).find(v=>v.id===id);
- if(!x)return alert('面接シートを取得できません。');
+ const {data:x,error:readError}=await sb.from('interview_applicants').select('id,status,name,kana,birth_date,phone,prefecture,city,street,id_front_path,id_back_path,stage_name,shop,nationality,residence_status,work_permission').eq('id',id).single();
+ if(readError||!x)return alert('面接シートを取得できません：'+(readError?.message||''));
+ if(['採用','在籍','退職','不採用','辞退'].includes(x.status))return alert('既に処理済みの面接シートです。');
  const missing=[];
- for(const [field,label] of [['name','氏名'],['kana','フリガナ'],['birth_date','生年月日'],['id_front_path','身分証（表）'],['stage_name','源氏名'],['shop','店舗']])if(!String(x[field]||'').trim())missing.push(label);
+ for(const [field,label] of [['name','氏名'],['kana','フリガナ'],['birth_date','生年月日'],['id_front_path','身分証（表）'],['id_back_path','身分証（裏）'],['phone','電話番号'],['prefecture','都道府県'],['city','市区町村'],['street','住所'],['stage_name','源氏名'],['shop','店舗']])if(!String(x[field]||'').trim())missing.push(label);
+ if(x.nationality&&x.nationality!=='日本'&&!x.residence_status)missing.push('在留資格');
  if(missing.length)return alert('入店処理前に確認・登録してください：'+missing.join('、'));
  if(!confirm('必要事項を確認しましたか？ 入店処理を完了し、採用として確定します。'))return;
- const {error}=await sb.from('interview_applicants').update({status:'採用'}).eq('id',id);
- if(error)return alert('入店処理を完了できません：'+error.message);
+ const {data:updated,error}=await sb.from('interview_applicants').update({status:'採用',hire_date:new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Tokyo'})}).eq('id',id).eq('status',x.status).select('id');
+ if(error||!updated?.length)return alert('入店処理を完了できません：'+(error?.message||'他の操作で状態が変更されています'));
  x.status='採用';
  closeInterviewSheet();await loadInterviewSheets();
 }
@@ -461,7 +463,7 @@ async function saveOnboarding(id){
  const msg=document.getElementById('obMsg');msg.textContent='保存中...';
  try{
   const v=n=>document.getElementById(n);
-  const x=(window.interviewApplicants||[]).find(r=>r.id===id);const interviewDate=new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Tokyo'});const payload={hire_date:interviewDate,training_date:v('obTrainingDate').value||null,first_shift_date:v('obFirstShift').value||null,stage_name:v('obStageName').value.trim()||null,work_description:v('obWorkDescription').value.trim()||null,nationality:v('obNationality').value.trim()||null,residence_status:v('obResidenceStatus')?.value.trim()||null,residence_period:v('obResidencePeriod')?.value.trim()||null,work_permission:v('obWorkPermission')?.value.trim()||null};
+  const x=(window.interviewApplicants||[]).find(r=>r.id===id);const payload={training_date:v('obTrainingDate').value||null,first_shift_date:v('obFirstShift').value||null,stage_name:v('obStageName').value.trim()||null,work_description:v('obWorkDescription').value.trim()||null,nationality:v('obNationality').value.trim()||null,residence_status:v('obResidenceStatus')?.value.trim()||null,residence_period:v('obResidencePeriod')?.value.trim()||null,work_permission:v('obWorkPermission')?.value.trim()||null};
   const {error}=await sb.from('interview_applicants').update(payload).eq('id',id);
   if(error)throw error;
   const current=(window.interviewApplicants||[]).find(x=>x.id===id);
