@@ -273,7 +273,7 @@ async function openInterviewSheet(id){
  '<div class="sheetLines"><strong>'+escInterview(x.birth_date||'未入力')+'　'+(x.birth_date?interviewAge(x.birth_date):'')+'</strong><br>'+(x.phone?'<a href="tel:'+escInterview(x.phone)+'" style="color:inherit">'+escInterview(x.phone)+'</a>':'未入力')+'<br>'+(postal+escInterview(addr)||'住所未入力')+'<br><span style="color:#777">'+escInterview(x.recruit_source||'未入力')+'</span></div>'+
  '<div class="sheetFacts"><div class="sheetFact">喫煙<b>'+escInterview(x.smoking||'—')+'</b></div><div class="sheetFact">タトゥー<b>'+escInterview(x.tattoo||'—')+'</b></div><div class="sheetFact">経験<b>'+escInterview(x.experience||'—')+'</b></div></div>'+
  (x.tattoo_detail?'<div class="sheetHistory">'+escInterview(x.tattoo_detail)+'</div>':'')+
- '<div class="sheetId"><b>'+escInterview(x.id_type||'身分証')+'</b><div class="sheetIdImgs" id="sheetIdImgs"><span class="note">身分証を読み込み中...</span></div></div>'+
+ '<div class="sheetId"><b>'+escInterview(x.id_type||'身分証')+'</b><div class="sheetIdImgs" id="sheetIdImgs"><span class="note">身分証を読み込み中...</span></div><div style="margin-top:10px"><label>身分証（表）を登録・変更<input type="file" id="sheetIdFrontUpload" accept="image/jpeg,image/png,image/webp" style="width:100%"></label><label>身分証（裏）を登録・変更<input type="file" id="sheetIdBackUpload" accept="image/jpeg,image/png,image/webp" style="width:100%"></label><button type="button" class="onboardBtn" onclick="saveSheetIdImages(\''+x.id+'\')">身分証画像を保存</button><div id="sheetIdUploadStatus" role="status" style="font-size:12px;margin-top:6px"></div></div></div>'+
  (hist.length?hist.map((h,i)=>{let q=[h.prefecture||'',h.shop||'',h.stage_name||'','メンズエステ'].filter(Boolean).join(' ');return '<div class="sheetHistory"><b>'+escInterview([h.prefecture||'',h.shop||'',h.stage_name||''].filter(Boolean).join('　')||'勤務歴 '+(i+1))+'</b><br>'+escInterview(h.period||'')+(h.reason?' ／ '+escInterview(h.reason):'')+'<br><a class="webSearch" href="https://www.google.com/search?q='+encodeURIComponent(q)+'" target="_blank" rel="noopener">WEB検索</a></div>'}).join(''):'')+
  (x.remarks==='HELP'?'<button class="onboardBtn" style="background:#b4232c" onclick="resolveHelp(\''+x.id+'\')">HELP解除</button><div style="color:#b4232c;font-weight:800;margin-top:7px">HELP｜スタッフを呼び出しています</div>':'')+'<button class="onboardBtn" onclick="openHelpEdit(\''+x.id+'\')">入力・修正</button><div class="spDecision"><label>採用・不採用の選択</label><select id="sheetDecisionSelect" onchange="previewSheetDecision(this.value)"><option value="">選択してください</option><option value="採用"'+(x.status==='採用'?' selected':'')+'>採用</option><option value="不採用"'+(x.status==='不採用'?' selected':'')+'>不採用</option></select><div id="sheetDecisionActions"></div></div>'+'<div id="onboardingArea"></div><div class="sheetMeta">'+fmtInterviewDate(x.submitted_at)+'</div>';
  previewSheetDecision(document.getElementById('sheetDecisionSelect')?.value||'');
@@ -285,6 +285,33 @@ async function openInterviewSheet(id){
  }catch(err){box.innerHTML='<span class="note">身分証画像を表示できません。</span>'}
 }
 
+async function saveSheetIdImages(id){
+ const front=document.getElementById('sheetIdFrontUpload')?.files?.[0],back=document.getElementById('sheetIdBackUpload')?.files?.[0];
+ const status=document.getElementById('sheetIdUploadStatus');
+ if(!front&&!back){status.textContent='表または裏の画像を選択してください。';return}
+ const x=(window.interviewApplicants||[]).find(v=>v.id===id);if(!x)return;
+ const btn=status.previousElementSibling;btn.disabled=true;status.textContent='保存中...';
+ const updates={},uploaded=[];
+ try{
+  for(const [file,col] of [[front,'id_front_path'],[back,'id_back_path']]){
+   if(!file)continue;
+   if(!['image/jpeg','image/png','image/webp'].includes(file.type))throw Error('JPEG・PNG・WebP画像のみ登録できます。');
+   if(file.size>10*1024*1024)throw Error('画像は1枚10MB以下にしてください。');
+   const ext=file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg';
+   const path=id+'/'+col+'-'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+'.'+ext;
+   const {error}=await sb.storage.from('interview-id-documents').upload(path,file,{contentType:file.type,upsert:false});
+   if(error)throw error;updates[col]=path;uploaded.push(path);
+  }
+  const {error}=await sb.from('interview_applicants').update(updates).eq('id',id);
+  if(error)throw error;
+  Object.assign(x,updates);
+  status.textContent='保存完了';
+  await openInterviewSheet(id);
+ }catch(err){
+  if(uploaded.length)await sb.storage.from('interview-id-documents').remove(uploaded);
+  status.textContent='保存失敗：'+(err.message||String(err));
+ }finally{btn.disabled=false}
+}
 async function showLineLinkCandidates(id){
  const out=document.getElementById('sheetLineLinkContent');if(!out)return;
  out.textContent='LINE応募者を読み込み中...';
