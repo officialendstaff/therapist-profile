@@ -187,6 +187,19 @@ function renderHires(){
  const count=joined.length;
  const total=document.createElement('h3');total.textContent='面接件数　'+count+'件';total.style.marginTop='22px';el.append(total);
 }
+async function safelyLinkInterviewForm(appointment,form){
+ const [a,f,existing]=await Promise.all([
+  sb.from('staff_interview_form_links').select('interview_id,interview_applicant_id').eq('interview_id',appointment.id),
+  sb.from('staff_interview_form_links').select('interview_id,interview_applicant_id').eq('interview_applicant_id',form.id),
+  sb.from('interview_applicants').select('id,shop').eq('id',form.id).single()
+ ]);
+ if(a.error||f.error||existing.error)throw Error((a.error||f.error||existing.error).message);
+ if(existing.data.shop!==appointment.shop)throw Error('店舗が一致しません。');
+ if(a.data.some(x=>x.interview_applicant_id!==form.id)||f.data.some(x=>String(x.interview_id)!==String(appointment.id)))throw Error('すでに別の面接予定またはシートと紐づいています。上書きしません。');
+ if(a.data.length&&f.data.length)return;
+ const {error}=await sb.from('staff_interview_form_links').insert({interview_id:appointment.id,interview_applicant_id:form.id});
+ if(error)throw Error(error.message);
+}
 async function openHireAppointmentLinkDialog(form){
  const modal=$('hireFormLinkModal'),list=$('hireFormLinkOptions');modal.classList.remove('hide');list.replaceChildren();
  msg('hireFormLinkTitle','面接予定を紐づけ ／ '+(form.name||'氏名未入力'));
@@ -200,8 +213,7 @@ async function openHireAppointmentLinkDialog(form){
   b.textContent=appointment.interview_date+' '+String(appointment.interview_time).slice(0,5)+' ／ '+appointment.status;
   b.onclick=async()=>{
    if(!confirm((form.name||'氏名未入力')+'の面接シートを '+appointment.interview_date+' の面接予定に紐づけますか？'))return;
-   const {error}=await sb.from('staff_interview_form_links').upsert({interview_id:appointment.id,interview_applicant_id:form.id},{onConflict:'interview_id'});
-   if(error)return alert('紐づけできません：'+error.message);
+   try{await safelyLinkInterviewForm(appointment,form)}catch(error){return alert('紐づけできません：'+error.message)}
    modal.classList.add('hide');await loadInterviewManagement();alert('紐づけました。');
   };list.append(b);
  }
@@ -224,8 +236,7 @@ async function openHireFormLinkDialog(appointment){
   const detail=document.createElement('small');detail.textContent='登録：'+date(form.submitted_at);b.append(label,detail);
   b.onclick=async()=>{
    if(!confirm('「'+(form.name||'氏名未入力')+'」の面接シートを '+appointment.interview_date+' の面接に紐づけますか？'))return;
-   const {error:saveError}=await sb.from('staff_interview_form_links').upsert({interview_id:appointment.id,interview_applicant_id:form.id},{onConflict:'interview_id'});
-   if(saveError)return alert('紐づけできません：'+saveError.message);
+   try{await safelyLinkInterviewForm(appointment,form)}catch(error){return alert('紐づけできません：'+error.message)}
    modal.classList.add('hide');await loadInterviewManagement();alert('面接シートを紐づけました。');
   };
   list.append(b);
