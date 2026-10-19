@@ -233,7 +233,7 @@ function renderHires(){
    body.append(name,meta);
    if(v.form){const href='https://officialendstaff.github.io/therapist-profile/staff/interview-management/?sheet='+encodeURIComponent(v.form.id);item.style.cursor='pointer';item.tabIndex=0;item.setAttribute('role','link');const open=()=>{openRecruitInterviewSheet(v.form.id)};item.onclick=open;item.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}};const hint=document.createElement('small');hint.textContent='面接シートを開く ›';hint.style.display='block';body.append(hint)}else{const button=document.createElement('button');button.type='button';button.className='secondary';button.style.cssText='font-size:12px;padding:8px;margin-top:8px';button.textContent='面接シートを紐づけ';button.onclick=()=>openHireFormLinkDialog(v.appointment);body.append(button)}
 
-   if(v.form&&!v.appointment){const b=document.createElement('button');b.type='button';b.className='secondary';b.textContent='面接予定を紐づけ';b.style.cssText='font-size:12px;padding:8px;margin-top:8px';b.onclick=e=>{e.stopPropagation();openHireAppointmentLinkDialog(v.form)};body.append(b)}
+   if(v.form&&!v.appointment){const b=document.createElement('button');b.type='button';b.className='secondary';b.textContent='面接シート一覧を開く';b.style.cssText='font-size:12px;padding:8px;margin-top:8px';b.onclick=e=>{e.stopPropagation();const theme=storeTheme(activeStore||{});const allowed=['grand-luxe','luxy','rose','un-secret','busty'];const path=allowed.includes(theme)?theme+'/':'';window.location.href='/therapist-profile/staff/sheet-list/'+path};body.append(b)}
    el.append(item);
   }
  }
