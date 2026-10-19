@@ -6,5 +6,17 @@ const sb=supabase.createClient('https://vjjnkflbfsjihwzjsjpr.supabase.co','sb_pu
 const params=new URLSearchParams(location.search),token=params.get('token');const errorEl=document.getElementById('formError');function show(message,ok=false){errorEl.textContent=message;errorEl.classList.remove('hide');errorEl.style.background=ok?'#1b392f':'#42262a'}
 document.getElementById('inviteForm').addEventListener('submit',async e=>{e.preventDefault();const displayName=document.getElementById('displayName').value.trim(),email=document.getElementById('email').value.trim(),password=document.getElementById('password').value,confirm=document.getElementById('confirm').value,button=e.target.querySelector('button');if(!displayName)return show('表示名を入力してください。');if(!document.getElementById('email').validity.valid)return show('正しいメールアドレスを入力してください。');if(password.length<8)return show('パスワードは8文字以上で入力してください。');if(password!==confirm)return show('パスワードが一致していません。');if(!token||!/^[0-9a-f-]{36}$/i.test(token))return show('有効な招待URLから開いてください。');sessionStorage.setItem('recruit-pending-name-'+token,displayName);button.disabled=true;try{const {data,error}=await sb.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname+'?token='+encodeURIComponent(token),data:{recruit_display_name:displayName,recruit_invite_token:token}}});if(error)throw error;if(data.session){const claimed=await sb.rpc('recruit_claim_invite',{p_token:token,p_display_name:displayName});if(claimed.error)throw claimed.error;sessionStorage.removeItem('recruit-pending-name-'+token);show('登録申請を受け付けました。管理者の承認をお待ちください。',true)}else{show('確認メールを送信しました。メールのリンクを開くと登録申請が完了します。',true)}}catch(err){show('登録できませんでした：'+(err.message||String(err)))}finally{button.disabled=false}});
 document.getElementById('finishRegistration').addEventListener('click',async()=>{const displayName=document.getElementById('displayName').value.trim(),email=document.getElementById('email').value.trim(),password=document.getElementById('password').value;if(!displayName||!email||!password)return show('表示名・メールアドレス・パスワードを入力してください。');if(!token)return show('招待URLから開いてください。');const {error:loginError}=await sb.auth.signInWithPassword({email,password});if(loginError)return show('ログインできません：'+loginError.message);const {error}=await sb.rpc('recruit_claim_invite',{p_token:token,p_display_name:displayName});if(error)return show('登録申請を完了できません：'+error.message);sessionStorage.removeItem('recruit-pending-name-'+token);show('登録申請が完了しました。管理者の承認をお待ちください。',true)});
-(async()=>{if(!token)return;const {data:{session}}=await sb.auth.getSession();const pendingName=sessionStorage.getItem('recruit-pending-name-'+token)||session?.user?.user_metadata?.recruit_display_name;if(session&&pendingName){const {error}=await sb.rpc('recruit_claim_invite',{p_token:token,p_display_name:pendingName});if(!error){sessionStorage.removeItem('recruit-pending-name-'+token);show('登録申請を受け付けました。管理者の承認をお待ちください。',true)}}})();
+async function completeConfirmedInvite(){
+ if(!token)return;
+ const {data:{session},error:sessionError}=await sb.auth.getSession();
+ if(sessionError||!session)return;
+ const name=session.user.user_metadata?.recruit_display_name||sessionStorage.getItem('recruit-pending-name-'+token)||'スタッフ';
+ const {error}=await sb.rpc('recruit_claim_invite',{p_token:token,p_display_name:name});
+ if(error){show('メール認証は完了しましたが、登録申請を完了できませんでした：'+error.message);return}
+ sessionStorage.removeItem('recruit-pending-name-'+token);
+ document.getElementById('inviteForm').classList.add('hide');
+ show('登録申請が完了しました。管理者の承認をお待ちください。',true);
+}
+(async()=>{if(!token)return;await completeConfirmedInvite()})();
+sb.auth.onAuthStateChange((event)=>{if(event==='SIGNED_IN'){setTimeout(()=>{completeConfirmedInvite()},0)}});
 </script></body></html>
