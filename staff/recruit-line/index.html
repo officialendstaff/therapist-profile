@@ -174,7 +174,7 @@ async function check(){await recruitCheckIdle();if(recruitIdleLoggingOut)return;
     tile.classList.add('storeAccessDenied');
     tile.setAttribute('aria-label',store.display_name+'（権限なし）');
     const existing=tile.querySelector('.storeUnconfiguredLabel');if(existing)existing.remove();
-    const overlay=document.createElement('span');overlay.className='storeUnconfiguredLabel';overlay.textContent='権限なし';tile.append(overlay);
+    
    }
   }
   $('storeEditSelect').replaceChildren();
