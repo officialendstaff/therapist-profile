@@ -434,7 +434,7 @@ let recruitIsMaster=false;async function refreshMasterStatus(){const {data,error
    actions.append(edit);
    if(person.role!=='pending'){
     const toggle=document.createElement('button');toggle.textContent=person.role==='disabled'?'利用再開':'利用停止';
-    toggle.onclick=async()=>{const next=person.role==='disabled'?'custom':'disabled';if(!confirm((person.display_name||'このスタッフ')+'の権限を'+(next==='disabled'?'停止':'再開')+'しますか？'))return;toggle.disabled=true;const {error}=await sb.rpc('recruit_set_staff_access',{p_user_id:person.user_id,p_role:next,p_stores:person.stores||[],p_features:['recruit','interview','history','settings']});if(error){toggle.disabled=false;return alert(error.message)}await loadStaffManagers()};
+    toggle.onclick=async()=>{if(person.role==='disabled'){role.value=(person.stores||[]).length?'custom':'full';role.onchange();editor.classList.remove('hide');edit.setAttribute('aria-expanded','true');editor.scrollIntoView({block:'nearest',behavior:'smooth'});return}if(!confirm((person.display_name||'このスタッフ')+'の権限を停止しますか？'))return;toggle.disabled=true;const {error}=await sb.rpc('recruit_set_staff_access',{p_user_id:person.user_id,p_role:'disabled',p_stores:person.stores||[],p_features:['recruit','interview','history','settings']});if(error){toggle.disabled=false;return alert(error.message)}await loadStaffManagers()};
     actions.append(toggle);
    }
    card.append(actions,editor);
