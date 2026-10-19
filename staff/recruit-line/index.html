@@ -377,7 +377,28 @@ function line(container,head,body,time){const d=document.createElement('div');d.
 async function detailLoad(){if(!selected)return;const {data,error}=await sb.from('recruit_line_events').select('message_type,message_text,received_at').match({account_id:selected.account_id,line_user_id:selected.line_user_id}).order('received_at',{ascending:false}).limit(100);$('messages').replaceChildren();if(error)msg('messages','読み込みエラー: '+error.message);else if(!data.length)msg('messages','受信履歴はありません。');else for(const x of data)line($('messages'),x.message_type==='text'?'':x.message_type||'',x.message_text||'本文なし',x.received_at)}
 Promise.race([check(),new Promise((_,reject)=>setTimeout(()=>reject(new Error('ログイン確認がタイムアウトしました')),12000))]).catch(e=>{console.error('ログイン初期化エラー',e);$('authLoading').classList.remove('hide');$('authLoading').textContent='ログイン状態を確認できませんでした：'+(e?.message||String(e))+'。ページを再読み込みしてください。';});
 </script><script>function syncRecruitHeaderActions(){const selected=!!activeStore;const settings=document.getElementById('storeSettingsToggle'),interview=document.getElementById('interviewManageSwitch'),panel=document.getElementById('recruitHeaderSettings'),frameView=document.getElementById('embeddedInterviewView');const showingInterview=frameView&&!frameView.classList.contains('hide');document.body.dataset.recruitView=!selected?'selection':showingInterview?'interview':'store';if(settings)settings.style.display=selected?'none':'';if(interview){interview.style.display=selected?'':'none';interview.textContent=showingInterview?'求人管理':'面接管理'}if(selected&&panel)panel.classList.add('hide');}
-let recruitIsMaster=false;async function refreshMasterStatus(){const {data,error}=await sb.rpc('recruit_is_master');recruitIsMaster=!error&&data===true;document.getElementById('masterEntry')?.classList.toggle('hide',!recruitIsMaster)}function closeStaffManagers(){document.getElementById('staffManagers').classList.add('hide');document.getElementById('storeView').classList.remove('hide')}async function openStaffManagers(){if(!recruitIsMaster)return;document.getElementById('storeView').classList.add('hide');document.getElementById('staffManagers').classList.remove('hide');await loadStaffManagers()}async function createStaffInvite(){if(!recruitIsMaster)return;const {data,error}=await sb.rpc('recruit_create_invite');if(error)return alert(error.message);const link=new URL('./invite/?token='+encodeURIComponent(data),location.href).href;const host=document.getElementById('inviteLinkArea');host.textContent=link;const button=document.createElement('button');button.type='button';button.textContent='URLをコピー';button.onclick=()=>navigator.clipboard.writeText(link).then(()=>alert('コピーしました')).catch(()=>prompt('URLをコピーしてください',link));host.append(document.createElement('br'),button)}async function loadStaffManagers(){
+let recruitIsMaster=false;async function refreshMasterStatus(){const {data,error}=await sb.rpc('recruit_is_master');recruitIsMaster=!error&&data===true;document.getElementById('masterEntry')?.classList.toggle('hide',!recruitIsMaster)}function closeStaffManagers(){document.getElementById('staffManagers').classList.add('hide');document.getElementById('storeView').classList.remove('hide')}async function openStaffManagers(){if(!recruitIsMaster)return;document.getElementById('storeView').classList.add('hide');document.getElementById('staffManagers').classList.remove('hide');await loadStaffManagers()}async function createStaffInvite(){
+ if(!recruitIsMaster)return;
+ const trigger=document.querySelector('#staffManagers .staffInviteButton');
+ const host=document.getElementById('inviteLinkArea');
+ if(trigger?.disabled)return;
+ if(trigger)trigger.disabled=true;
+ if(host)host.textContent='招待URLを発行中...';
+ try{
+  const {data,error}=await sb.rpc('recruit_create_invite');
+  if(error)throw error;
+  const link=new URL('./invite/?token='+encodeURIComponent(data),location.href).href;
+  try{
+   await navigator.clipboard.writeText(link);
+   if(host)host.textContent='招待URLを発行してコピーしました。スタッフに貼り付けて送信してください。';
+  }catch(copyError){
+   if(host)host.textContent='招待URLを発行しました。下のURLをコピーしてください。';
+   const field=document.createElement('textarea');field.readOnly=true;field.value=link;field.rows=3;field.setAttribute('aria-label','発行済み招待URL');field.style.cssText='width:100%;background:#fff;color:#171717;border:1px solid #ddd;margin-top:8px;font-size:12px';
+   host?.append(field);field.focus();field.select();
+  }
+ }catch(error){if(host)host.textContent='招待URLを発行できませんでした：'+(error.message||String(error))}
+ finally{if(trigger)trigger.disabled=false}
+}async function loadStaffManagers(){
  if(!recruitIsMaster)return;
  const {data,error}=await sb.from('recruit_staff_profiles').select('user_id,display_name,role,stores,features,created_at').order('created_at',{ascending:false});
  const host=document.getElementById('staffManagerRows');
