@@ -173,19 +173,46 @@ function renderHires(){
   if(!rows.length){const empty=document.createElement('p');empty.className='muted';empty.textContent='該当者なし';el.append(empty);continue}
   for(const v of rows){
    const item=document.createElement('div');item.className='item';item.style.cssText='padding:12px;display:flex;align-items:center;gap:12px';
-   const avatarUrl=v.link&&(lineProfiles[v.link.line_user_id]?.pictureUrl||v.link.line_picture_url);
+   const finalLink=v.form&&interviewLinks.find(x=>x.interview_applicant_id===v.form.id);const lineId=v.link?.line_user_id||finalLink?.line_user_id;const avatarUrl=lineId&&(lineProfiles[lineId]?.pictureUrl||v.link?.line_picture_url);
    if(avatarUrl){const avatar=document.createElement('img');avatar.src=avatarUrl;avatar.alt='LINEアイコン';avatar.referrerPolicy='no-referrer';avatar.style.cssText='width:46px;height:46px;flex:none;object-fit:cover;border-radius:50%';item.append(avatar)}else{const placeholder=document.createElement('span');placeholder.textContent='LINE';placeholder.style.cssText='width:46px;height:46px;flex:none;border-radius:50%;background:#34475a;color:#cbd5e1;display:grid;place-items:center;font-size:10px';item.append(placeholder)}
    const body=document.createElement('div');body.style.cssText='flex:1;min-width:0';item.append(body);
-   const name=document.createElement('strong');name.textContent=v.link?.line_display_name||lineProfiles[v.link?.line_user_id]?.displayName||v.form?.name||'面接応募者';
+   const name=document.createElement('strong');name.textContent=v.form?.name||v.link?.line_display_name||lineProfiles[lineId]?.displayName||'面接応募者';
    const meta=document.createElement('div');meta.className='muted';meta.textContent=(v.appointment?v.appointment.interview_date+' '+String(v.appointment.interview_time).slice(0,5):'面接予定未紐づけ')+' ／ '+(v.form?'面接シート：'+v.form.status:'面接結果：'+v.appointment.status);
    body.append(name,meta);
    if(v.form){const href='https://officialendstaff.github.io/therapist-profile/staff/interview-management/?sheet='+encodeURIComponent(v.form.id);item.style.cursor='pointer';item.tabIndex=0;item.setAttribute('role','link');const open=()=>{openRecruitInterviewSheet(v.form.id)};item.onclick=open;item.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open()}};const hint=document.createElement('small');hint.textContent='面接シートを開く ›';hint.style.display='block';body.append(hint)}else{const button=document.createElement('button');button.type='button';button.className='secondary';button.style.cssText='font-size:12px;padding:8px;margin-top:8px';button.textContent='面接シートを紐づけ';button.onclick=()=>openHireFormLinkDialog(v.appointment);body.append(button)}
+   if(v.form&&['採用','在籍','不採用','辞退'].includes(v.form.status)){const b=document.createElement('button');b.type='button';b.className='secondary';b.textContent=finalLink?'LINE紐づけ済み':'LINEアカウントを紐づけ';b.style.cssText='font-size:12px;padding:8px;margin-top:8px';b.onclick=e=>{e.stopPropagation();openHireLineLinkDialog(v.form)};body.append(b)}
    if(v.form&&!v.appointment){const b=document.createElement('button');b.type='button';b.className='secondary';b.textContent='面接予定を紐づけ';b.style.cssText='font-size:12px;padding:8px;margin-top:8px';b.onclick=e=>{e.stopPropagation();openHireAppointmentLinkDialog(v.form)};body.append(b)}
    el.append(item);
   }
  }
  const count=joined.length;
  const total=document.createElement('h3');total.textContent='面接件数　'+count+'件';total.style.marginTop='22px';el.append(total);
+}
+async function openHireLineLinkDialog(form){
+ const modal=$('hireFormLinkModal'),list=$('hireFormLinkOptions');modal.classList.remove('hide');list.replaceChildren();
+ msg('hireFormLinkTitle','LINEアカウントを紐づけ ／ '+(form.name||'氏名未入力'));
+ $('hireFormLinkClose').onclick=()=>modal.classList.add('hide');
+ const account=activeStore?.account_id;
+ if(!account){list.textContent='店舗のLINEアカウントが設定されていません。';return}
+ const {data:existing,error:readError}=await sb.from('recruit_line_interview_links').select('interview_applicant_id,account_id,line_user_id').eq('interview_applicant_id',form.id);
+ if(readError){list.textContent='紐づけ情報を取得できません：'+readError.message;return}
+ if(existing?.length){list.textContent='この面接シートは既にLINEアカウントと紐づいています。上書きはできません。';return}
+ const candidates=applicants.filter(a=>!interviewLinks.some(l=>l.line_user_id===a.line_user_id));
+ if(!candidates.length){list.textContent='紐づけ可能なLINE応募者がいません。';return}
+ const note=document.createElement('p');note.className='muted';note.textContent='LINE表示名と面接シートの本人情報を確認して選択してください。';list.append(note);
+ for(const person of candidates){
+  const b=document.createElement('button');b.type='button';b.className='item';b.style.padding='12px';
+  b.textContent=(lineProfiles[person.line_user_id]?.displayName||'LINE応募者')+' ／ '+person.line_user_id;
+  b.onclick=async()=>{
+   if(!confirm('「'+(form.name||'氏名未入力')+'」と「'+(lineProfiles[person.line_user_id]?.displayName||person.line_user_id)+'」を紐づけますか？'))return;
+   const {data:again,error:checkError}=await sb.from('recruit_line_interview_links').select('interview_applicant_id,line_user_id').eq('account_id',account);
+   if(checkError)return alert('確認できません：'+checkError.message);
+   if((again||[]).some(x=>x.interview_applicant_id===form.id||x.line_user_id===person.line_user_id))return alert('既に紐づいているため上書きしません。');
+   const {error}=await sb.from('recruit_line_interview_links').insert({interview_applicant_id:form.id,account_id:account,line_user_id:person.line_user_id});
+   if(error)return alert('紐づけできません：'+error.message);
+   modal.classList.add('hide');await loadInterviewLinks();renderHires();alert('LINEアカウントを紐づけました。');
+  };list.append(b);
+ }
 }
 async function safelyLinkInterviewForm(appointment,form){
  const [a,f,existing]=await Promise.all([
