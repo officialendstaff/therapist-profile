@@ -492,11 +492,13 @@ async function saveOnboarding(id){
   if(error)throw error;
   Object.assign(x,payload);
   if(msg)msg.textContent='入店情報を保存しました。';
- }catch(e){console.error(e);if(msg)msg.textContent='保存できません：'+(e?.message||String(e));}
+  return true;
+ }catch(e){console.error(e);if(msg)msg.textContent='保存できません：'+(e?.message||String(e));return false;}
 }
-function printOnboarding(id){
+async function printOnboarding(id){
  const x=(window.interviewApplicants||[]).find(v=>v.id===id);
  if(!x||x.status!=='採用')return alert('採用確定後に印刷してください。');
+ const saved=await saveOnboarding(id);if(!saved)return;
  const payload=onboardingPayload();
  const fields=[['氏名',x.full_name||x.name||''],['店舗',x.shop||''],['研修日',payload.training_date],['初回出勤日',payload.first_shift_date],['源氏名',payload.stage_name],['従事する業務内容',payload.work_description],['国籍',payload.nationality],['在留資格',payload.residence_status],['在留期間',payload.residence_period],['資格外活動許可',payload.work_permission]];
  const escape=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
