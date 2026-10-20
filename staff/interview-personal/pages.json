@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "master": {
+    "path": "/therapist-profile/staff/mobile/",
+    "scope": "all"
+  },
+  "pages": [
+    {
+      "key": "owner",
+      "label": "俺",
+      "path": "/therapist-profile/staff/interview-personal/owner/",
+      "stores": [
+        "薔薇と紳士",
+        "BUSTY OSAKA"
+      ],
+      "highlightOwn": false
+    },
+    {
+      "key": "president",
+      "label": "社長",
+      "path": "/therapist-profile/staff/interview-personal/president/",
+      "stores": [
+        "Grand Luxe",
+        "Un Secret",
+        "LUXY"
+      ],
+      "highlightOwn": true
+    },
+    {
+      "key": "ota",
+      "label": "太田君",
+      "path": "/therapist-profile/staff/interview-personal/ota/",
+      "stores": [
+        "Grand Luxe",
+        "Un Secret",
+        "LUXY"
+      ],
+      "highlightOwn": true
+    }
+  ]
+}
