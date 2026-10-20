@@ -43,3 +43,6 @@ loadAppointments=async function(){
   };
  }
 };
+
+const priorLoadBlocks=load;
+load=async function(){await priorLoadBlocks();if(user&&profile)await loadAppointments()};
