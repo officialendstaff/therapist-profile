@@ -111,6 +111,18 @@ body[data-recruit-view="selection"] #embeddedInterviewView{display:none!importan
 #staffManagers #inviteLinkArea{overflow-wrap:anywhere;font-size:12px}
 #staffManagers #inviteLinkArea button{background:#f2f3f5;color:#171717;border:1px solid #ddd;margin-top:8px}
 @media(max-width:600px){#staffManagers{padding:15px 14px}#staffManagerRows .staffActions button{padding:9px 12px}}
+</style><style id="mobileHorizontalOverflowFix">
+@media(max-width:600px){
+html,body{width:100%!important;max-width:100%!important;overflow-x:clip!important}
+body{min-width:0!important}
+header{max-width:100%;min-width:0;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+header h1{min-width:0;max-width:100%;overflow-wrap:anywhere}
+.recruitHeaderActions{min-width:0;max-width:100%;flex-wrap:wrap}
+#gate,#authLoading,#storeView,#app,.wrap,.panel,#storeGrid,.storeGrid{min-width:0!important;max-width:100%!important}
+#gate input,#gate button,#storeView input,#storeView button{max-width:100%;min-width:0}
+#storeView .row,#storeView .storeGrid{min-width:0;max-width:100%}
+#storeView .storeTile{min-width:0}
+}
 </style></head><body>
 <header><h1>求人管理 <small>｜L GROUP</small></h1><div class="recruitHeaderActions"><button type="button" class="secondary hide" id="storeBack">← 店舗選択に戻る</button><button type="button" class="secondary" id="interviewManageSwitch" onclick="openSelectedInterviewManagement()" style="display:none">面接管理</button><button type="button" class="secondary" id="storeSettingsToggle" aria-expanded="false" onclick="toggleRecruitStoreSettings()">店舗設定</button></div></header><div id="recruitHeaderSettings" class="hide"><div class="wrap"><div class="panel"><details class="storeSettings"><summary>店舗名・リンク先の設定</summary><p class="muted" style="font-size:12px">新店舗が決まったら、店名とリンク先URLを設定できます。</p><label>店舗<select id="storeEditSelect"></select></label><label>表示名<input id="storeEditName"></label><label>リンク先URL<input id="storeEditUrl" placeholder="https://..."></label><label>店舗ロゴ<input id="storeEditLogo" type="file" accept="image/png,image/jpeg,image/webp"></label><div id="storeLogoPreview" style="margin:4px 0 12px"></div><button id="storeSave">設定を保存</button><p id="storeEditResult" class="muted"></p></details><div class="recruitSettingsFooter"><button class="secondary" id="logout" type="button">ログアウト</button></div></div></div></div>
 <main class="wrap">
