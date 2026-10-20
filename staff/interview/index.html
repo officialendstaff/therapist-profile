@@ -225,23 +225,17 @@ nav.classList.toggle('noticeBlink',unread>0);
 const escape=s=>String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 async function refresh(){try{const {data:{session}}=await client.auth.getSession();if(!session){if(visible){status.textContent='新着通知は受信しています。本文の表示は面接予約管理の認証連携後に有効になります。';messages.innerHTML=''}auth.hidden=true;return}
 auth.hidden=true;
-const [{data,error},{data:states},{data:links},{data:formLinks}]=await Promise.all([
+const [{data,error},{data:links}]=await Promise.all([
 client.from('recruit_line_events').select('id,account_id,line_user_id,event_type,received_at,message_type,message_text').eq('account_id',account).order('id',{ascending:false}).limit(100),
-client.from('recruit_line_notice_state').select('last_seen_event_id').eq('account_id',account).maybeSingle(),
-client.from('staff_interview_line_links').select('line_user_id,line_display_name,line_picture_url,interview_id').eq('account_id',account),
-client.from('recruit_line_interview_links').select('line_user_id,interview_applicant_id').eq('account_id',account)]);
-if(error){if(visible)status.textContent='LINE受信データの取得に失敗しました。';return}
-const rows=data.filter(x=>x.event_type==='message');
+client.from('staff_interview_line_links').select('line_user_id,line_display_name,line_picture_url,interview_id').eq('account_id',account)]);
+if(error){status.textContent='LINE受信データを取得できません。閲覧権限を確認してください。';return}
 if(!visible)return;
-const linkMap=new Map((links||[]).map(x=>[x.line_user_id,x]));const formMap=new Map((formLinks||[]).map(x=>[x.line_user_id,x]));
-const formIds=[...new Set((formLinks||[]).map(x=>x.interview_applicant_id).filter(Boolean))];
-const interviewIds=[...new Set((links||[]).map(x=>x.interview_id).filter(Boolean))];
-const [{data:forms},{data:interviews}]=await Promise.all([formIds.length?client.from('interview_applicants').select('id,name,stage_name,shop,status').in('id',formIds):Promise.resolve({data:[]}),interviewIds.length?client.from('staff_interviews').select('id,shop,interview_date,interview_time,status').in('id',interviewIds):Promise.resolve({data:[]})]);
-const formById=new Map((forms||[]).map(x=>[String(x.id),x])),interviewById=new Map((interviews||[]).map(x=>[String(x.id),x]));
+const rows=(data||[]).filter(x=>x.event_type==='message');
+const linkMap=new Map((links||[]).map(x=>[x.line_user_id,x]));
 const ids=[...new Set(rows.map(x=>x.line_user_id).filter(Boolean))].slice(0,30);
-let profiles={};if(ids.length){const {data:pd}=await client.functions.invoke('recruit-line-profiles',{body:{account_id:account,user_ids:ids}});profiles=pd?.profiles||{}}
+let profiles={};if(ids.length){try{const {data:pd}=await client.functions.invoke('recruit-line-profiles',{body:{account_id:account,user_ids:ids}});profiles=pd?.profiles||{}}catch(e){}}
 status.textContent='薔薇と紳士｜受信履歴（最新100件）';
-messages.innerHTML=rows.map(x=>{const l=linkMap.get(x.line_user_id),f=formById.get(String(formMap.get(x.line_user_id)?.interview_applicant_id)),iv=interviewById.get(String(l?.interview_id)),p=profiles[x.line_user_id];const name=p?.displayName||l?.line_display_name||'LINE利用者';const picture=p?.pictureUrl||l?.line_picture_url;const details=f?'応募者：'+escape(f.name||f.stage_name||'')+' ／ '+escape(f.shop||'')+' ／ '+escape(f.status||''):iv?'面接予定：'+escape(iv.shop||'')+' '+escape(iv.interview_date||'')+' '+escape(iv.interview_time||'')+' ／ '+escape(iv.status||''):'';return '<div class="lineMessage"><div class="lineSender">'+(picture?'<img class="lineAvatar" src="'+escape(picture)+'" alt="">':'<span class="lineAvatar empty">LINE</span>')+'<div><strong>'+escape(name)+'</strong><small>薔薇と紳士 ／ '+escape(new Date(x.received_at).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'}))+'</small>'+(details?'<small>'+details+'</small>':'')+'</div></div><p>'+escape(x.message_text??('['+(x.message_type||'メッセージ')+']'))+'</p></div>'}).join('')||'<p class="note">受信メッセージはありません。</p>';
+messages.innerHTML=rows.map(x=>{const l=linkMap.get(x.line_user_id),p=profiles[x.line_user_id]||{};const name=p.displayName||l?.line_display_name||'LINE利用者';const picture=p.pictureUrl||l?.line_picture_url;return '<div class="lineMessage"><div class="lineSender">'+(picture?'<img class="lineAvatar" src="'+escape(picture)+'" alt="">':'<span class="lineAvatar empty">LINE</span>')+'<div><strong>'+escape(name)+'</strong><small>薔薇と紳士 ／ '+escape(new Date(x.received_at).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'}))+'</small>'+(l?.interview_id?'<small>面接予定に紐付け済み</small>':'')+'</div></div><p>'+escape(x.message_text??('['+(x.message_type||'メッセージ')+']'))+'</p></div>'}).join('')||'<p class="note">受信メッセージはありません。</p>';
 }catch(e){if(visible)status.textContent='LINE受信情報を更新できませんでした。'}}
 nav.addEventListener('click',async()=>{visible=true;pane.hidden=false;document.querySelector('.workLeft').style.display='none';document.getElementById('scheduleView').hidden=true;await refresh();if(latest){localStorage.setItem('line_rose_seen',String(latest));count.textContent='0件';nav.classList.remove('noticeBlink');const {data:{session}}=await client.auth.getSession();if(session)await client.rpc('ack_recruit_line_notice',{p_account_id:account,p_event_id:latest});await checkLineNotice()}});
 document.getElementById('lineInboxBack').onclick=()=>{visible=false;pane.hidden=true;document.querySelector('.workLeft').style.display='';document.getElementById('allStoresChoice').click();document.getElementById('registrationStep').hidden=true;document.getElementById('calendarCard').classList.remove('compact');checkLineNotice()};
