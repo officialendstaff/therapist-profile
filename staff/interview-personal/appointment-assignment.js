@@ -44,5 +44,8 @@ loadAppointments=async function(){
  }
 };
 
-const priorLoadBlocks=load;
-load=async function(){await priorLoadBlocks();if(user&&profile)await loadAppointments()};
+// Availability edits should refresh candidate lists once, after the block mutation.
+// Do not wrap load(): init() already loads blocks and appointments in parallel.
+const refreshAfterAvailabilityEdit=async()=>{await load();if(user&&profile)await loadAppointments()};
+const originalSaveAvailability=$('save').onclick;
+$('save').onclick=async function(){await originalSaveAvailability();if(user&&profile)await loadAppointments()};
