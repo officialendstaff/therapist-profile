@@ -5,7 +5,7 @@ const defaults={headingLanguage:'ja',headingStyle:'formal',heroTextMode:'image',
 function clone(x){return JSON.parse(JSON.stringify(x))}
 function getData(){let x={};try{x=JSON.parse(localStorage.getItem(KEY)||'{}')}catch{}let d=clone(defaults);if(x.snsWarning==='外部のSNSアプリ・サイトへ移動します。リンク先をご確認のうえ、お進みください。')x.snsWarning=d.snsWarning;return {...d,...x,images:{...d.images,...(x.images||{})},sns:{...d.sns,...(x.sns||{})},snsImages:{...d.snsImages,...(x.snsImages||{})},ogp:{...d.ogp,...(x.ogp||{})}}}
 // Single source of truth for all links used by the viewer.
-function linkValue(d,key){if(['line','x','instagram','sub','relaxy'].includes(key))return (d.sns||{})[key]||'';return d[key]||''}
+function linkValue(d,key){if(['line','x','instagram','sub','relaxy','other'].includes(key))return (d.sns||{})[key]||'';return d[key]||''}
 function externalUrl(value){try{const u=new URL(value);return ['https:','http:'].includes(u.protocol)?u.href:null}catch{return null}}
 function saveData(d){localStorage.setItem(KEY,JSON.stringify(d))}
 function esc(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
