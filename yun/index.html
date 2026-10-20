@@ -345,7 +345,7 @@ function applyHeadingLanguage(lang){
 function applyCharacterDecorations(){
  document.querySelectorAll('.card > h2').forEach(heading=>{
   heading.querySelectorAll('.rei-decoration-character').forEach(node=>node.remove());
-  if(true)return; /* Yun: decorative cats temporarily hidden */
+  if(!cfg.decorationVisible||!cfg.decorationImage||String(cfg.headingDecoration||'both')==='none'){heading.style.removeProperty('display');heading.style.removeProperty('align-items');heading.style.removeProperty('justify-content');heading.style.removeProperty('gap');return;}
   const add=(side)=>{const img=document.createElement('img');img.className='rei-decoration-character';img.alt='';img.src=cfg.decorationImage;img.style.cssText='width:54px;height:54px;object-fit:contain;flex:none;';img.setAttribute('aria-hidden','true');if(side==='left')heading.prepend(img);else heading.append(img)};
   heading.style.display='flex';heading.style.alignItems='center';heading.style.justifyContent='center';heading.style.gap='10px';
   add('left');if(['both','左右','left-right'].includes(String(cfg.headingDecoration||'both')))add('right');
