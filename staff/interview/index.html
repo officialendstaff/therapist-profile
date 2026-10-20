@@ -203,6 +203,11 @@ save.onclick=async()=>{if(!date||!time||!shop||!staff)return msg.textContent='�
 const client=supabase.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storage:window.sessionStorage,storageKey:'mattan-recruit-auth'}});
 const pane=document.getElementById('lineInbox'),status=document.getElementById('lineInboxStatus'),messages=document.getElementById('lineInboxMessages'),auth=document.getElementById('lineInboxAuth'),nav=document.getElementById('lineNoticeNav'),count=document.getElementById('lineNoticeCount');
 let visible=false,latest=0,unread=0;const account='rose';
+let lineSoundReady=false,lineSoundContext=null,lineInitialCheck=true,lineLastAlertId=0;
+function activateLineSound(){try{const AudioContextType=window.AudioContext||window.webkitAudioContext;if(!AudioContextType)return;lineSoundContext=lineSoundContext||new AudioContextType();lineSoundContext.resume().then(()=>{lineSoundReady=lineSoundContext.state==='running'}).catch(()=>{})}catch(e){}}
+document.addEventListener('pointerdown',activateLineSound,{once:true});
+document.addEventListener('keydown',activateLineSound,{once:true});
+function playLineAlert(){if(!lineSoundReady||!lineSoundContext)return;try{const ctx=lineSoundContext,t=ctx.currentTime;for(let i=0;i<2;i++){const oscillator=ctx.createOscillator(),gain=ctx.createGain(),start=t+i*.24;oscillator.type='sine';oscillator.frequency.setValueAtTime(i?880:660,start);gain.gain.setValueAtTime(.0001,start);gain.gain.exponentialRampToValueAtTime(.13,start+.02);gain.gain.exponentialRampToValueAtTime(.0001,start+.18);oscillator.connect(gain);gain.connect(ctx.destination);oscillator.start(start);oscillator.stop(start+.19)}}catch(e){}}
 async function checkLineNotice(){
 try{
 const response=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/recruit-line-notice-status',{cache:'no-store'});
@@ -211,6 +216,7 @@ const data=await response.json();
 latest=Number(data.latest_event_id)||0;
 const seen=Math.max(Number(data.last_seen_event_id)||0,Number(localStorage.getItem('line_rose_seen')||0));
 unread=latest>seen?1:0;
+if(!lineInitialCheck&&unread&&latest>lineLastAlertId){playLineAlert();if('Notification' in window&&Notification.permission==='granted'){try{new Notification('求人LINEに新着メッセージ',{body:'薔薇と紳士から新しい問い合わせが届きました。',tag:'rose-line-'+latest})}catch(e){}}}lineInitialCheck=false;lineLastAlertId=Math.max(lineLastAlertId,latest);
 count.textContent=unread+'件';
 nav.classList.toggle('noticeBlink',unread>0);
 }catch(e){console.warn('LINE notice check failed',e)}
