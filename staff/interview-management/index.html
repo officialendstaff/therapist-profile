@@ -451,7 +451,8 @@ async function completeOnboarding(id){
  closeInterviewSheet();await loadInterviewSheets();
 }
 async function createEntryDocuments(id){
- const x=(window.interviewApplicants||[]).find(v=>v.id===id);if(!x)return;
+ const {data:x,error:fetchError}=await sb.from('interview_applicants').select('*').eq('id',id).maybeSingle();
+ if(fetchError||!x){alert('従業者名簿を読み込めません：'+(fetchError?.message||'対象データがありません'));return;}
  const [front,back]=await Promise.all([interviewSignedUrl(x.id_front_path),interviewSignedUrl(x.id_back_path)]);
  const addr=(x.prefecture||'')+(x.city||'')+(x.street||'');
  const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
@@ -475,7 +476,7 @@ function openOnboarding(id,scroll=true){
  '<label>国籍</label><input id="obNationality" value="'+escInterview(String(x.nationality??'日本'))+'">'+
  '<div id="obForeign"><label>在留資格</label><input id="obResidenceStatus" value="'+val('residence_status')+'"><label>在留期間</label><input id="obResidencePeriod" value="'+val('residence_period')+'"><label>資格外活動許可</label><input id="obWorkPermission" value="'+val('work_permission')+'"></div>'+
  '<button type="button" class="onboardBtn" onclick="saveOnboarding(\''+id+'\')">入店情報を保存</button>'+
- '<button type="button" class="onboardBtn" style="margin-top:8px;background:#263f5e" onclick="printOnboarding(\''+id+'\')">入店処理項目をA4印刷</button><div id="obMsg" class="msg"></div></div>';
+ '<button type="button" class="onboardBtn" style="margin-top:8px;background:#263f5e" onclick="printOnboarding(\''+id+'\')">従業者名簿・身分証（A4・2ページ）を印刷</button><div id="obMsg" class="msg"></div></div>';
  const toggle=()=>{document.getElementById('obForeign').style.display=document.getElementById('obNationality').value.trim()==='日本'?'none':'block'};
  document.getElementById('obNationality').addEventListener('input',toggle);toggle();
  if(scroll)a.scrollIntoView({behavior:'smooth',block:'start'});
@@ -502,14 +503,9 @@ async function saveOnboarding(id){
  }catch(e){console.error(e);if(msg)msg.textContent='保存できません：'+(e?.message||String(e));return false;}
 }
 async function printOnboarding(id){
- const saved=await saveOnboarding(id);if(!saved)return;
- const x=(window.interviewApplicants||[]).find(v=>v.id===id);
- const payload=onboardingPayload();
- const fields=[['氏名',x.full_name||x.name||''],['店舗',x.shop||''],['研修日',payload.training_date],['初回出勤日',payload.first_shift_date],['源氏名',payload.stage_name],['従事する業務内容',payload.work_description],['国籍',payload.nationality],['在留資格',payload.residence_status],['在留期間',payload.residence_period],['資格外活動許可',payload.work_permission]];
- const escape=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
- const html='<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>入店処理項目</title><style>@page{size:A4;margin:12mm 15mm}*{box-sizing:border-box}html,body{margin:0;padding:0}body{font-family:"Noto Sans JP",sans-serif;color:#111;font-size:12pt}h1{font-size:19pt;text-align:center;border-bottom:2px solid #111;padding:10mm 0 6mm;margin:0 0 10mm}table{width:100%;border-collapse:collapse;table-layout:fixed}tr{break-inside:avoid}th,td{border:1px solid #555;padding:6mm 4mm;text-align:left;font-size:12pt;line-height:1.5;overflow-wrap:anywhere;height:18mm}th{width:34%;background:#f2f2f2;font-weight:700}td{white-space:pre-wrap}</style></head><body><h1>入店処理項目</h1><table>'+fields.map(([k,v])=>'<tr><th>'+escape(k)+'</th><td>'+escape(v)+'</td></tr>').join('')+'</table></body></html>';
- const win=window.open('','_blank');if(!win)return alert('印刷画面が開けません。ポップアップを許可してください。');
- win.document.open();win.document.write(html);win.document.close();win.focus();setTimeout(()=>win.print(),300);
+ const saved=await saveOnboarding(id);
+ if(!saved)return;
+ await createEntryDocuments(id);
 }
 async function deleteInterviewSheet(id){
  let x=(window.interviewApplicants||[]).find(v=>v.id===id);if(!x||!confirm('この面接シートを削除しますか？\n身分証画像も削除され、元に戻せません。'))return;
