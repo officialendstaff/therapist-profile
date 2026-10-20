@@ -23,7 +23,9 @@
       "highlightOwn": false,
       "readOnly": false,
       "userId": "72ad8e71-100a-4cb4-8a63-813154b62f99",
-      "recruitDisplayName": "マスター"
+      "recruitDisplayName": "マスター",
+      "recruitFullAccess": true,
+      "availabilityScope": "own-interviewer-across-assigned-stores"
     },
     {
       "key": "president",
@@ -37,7 +39,9 @@
       "highlightOwn": true,
       "readOnly": false,
       "userId": "9bcf0e46-f443-4c8b-8f43-2d99f0cabbc6",
-      "recruitDisplayName": "福原"
+      "recruitDisplayName": "福原",
+      "recruitFullAccess": true,
+      "availabilityScope": "own-interviewer-across-assigned-stores"
     },
     {
       "key": "ota",
@@ -51,7 +55,16 @@
       "highlightOwn": true,
       "readOnly": false,
       "userId": "745f4373-dc35-4cf3-ab06-577d54d6694e",
-      "recruitDisplayName": "おおた"
+      "recruitDisplayName": "おおた",
+      "recruitFullAccess": true,
+      "availabilityScope": "own-interviewer-across-assigned-stores"
     }
-  ]
+  ],
+  "accessModel": {
+    "recruitManagement": "all-stores-full-access-for-owner-president-ota",
+    "interviewManagement": "scoped-by-identity-not-recruit-role",
+    "availability": "per-interviewer-and-only-within-their-assigned-stores",
+    "allStoreOverview": "read-only-for-all-three",
+    "assignment": "one-interviewer-unavailable-does-not-block-other-available-interviewers"
+  }
 }
