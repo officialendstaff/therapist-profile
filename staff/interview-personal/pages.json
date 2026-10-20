@@ -21,7 +21,9 @@
         "BUSTY OSAKA"
       ],
       "highlightOwn": false,
-      "readOnly": false
+      "readOnly": false,
+      "userId": "72ad8e71-100a-4cb4-8a63-813154b62f99",
+      "recruitDisplayName": "マスター"
     },
     {
       "key": "president",
@@ -33,11 +35,13 @@
         "LUXY"
       ],
       "highlightOwn": true,
-      "readOnly": false
+      "readOnly": false,
+      "userId": "9bcf0e46-f443-4c8b-8f43-2d99f0cabbc6",
+      "recruitDisplayName": "福原"
     },
     {
       "key": "ota",
-      "label": "太田君",
+      "label": "おおた",
       "path": "/therapist-profile/staff/interview-personal/ota/",
       "stores": [
         "Grand Luxe",
@@ -45,7 +49,9 @@
         "LUXY"
       ],
       "highlightOwn": true,
-      "readOnly": false
+      "readOnly": false,
+      "userId": "745f4373-dc35-4cf3-ab06-577d54d6694e",
+      "recruitDisplayName": "おおた"
     }
   ]
 }
