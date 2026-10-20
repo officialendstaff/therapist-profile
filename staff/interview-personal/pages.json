@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "master": {
+    "path": "/therapist-profile/staff/mobile/",
+    "scope": "all",
+    "label": "全店面接管理",
+    "readOnly": true,
+    "allowedRecruitRoles": [
+      "master",
+      "full"
+    ],
+    "description": "全5店舗・全担当者の予定、シート、対応不可設定の閲覧のみ。変更操作は個人ページで行う。"
+  },
+  "pages": [
+    {
+      "key": "owner",
+      "label": "俺",
+      "path": "/therapist-profile/staff/interview-personal/owner/",
+      "stores": [
+        "薔薇と紳士",
+        "BUSTY OSAKA"
+      ],
+      "highlightOwn": false,
+      "readOnly": false,
+      "userId": "72ad8e71-100a-4cb4-8a63-813154b62f99",
+      "recruitDisplayName": "マスター",
+      "recruitFullAccess": true,
+      "availabilityScope": "own-interviewer-across-assigned-stores"
+    },
+    {
+      "key": "president",
+      "label": "社長",
+      "path": "/therapist-profile/staff/interview-personal/president/",
+      "stores": [
+        "Grand Luxe",
+        "Un Secret",
+        "LUXY"
+      ],
+      "highlightOwn": true,
+      "readOnly": false,
+      "userId": "9bcf0e46-f443-4c8b-8f43-2d99f0cabbc6",
+      "recruitDisplayName": "福原",
+      "recruitFullAccess": true,
+      "availabilityScope": "own-interviewer-across-assigned-stores"
+    },
+    {
+      "key": "ota",
+      "label": "おおた",
+      "path": "/therapist-profile/staff/interview-personal/ota/",
+      "stores": [
+        "Grand Luxe",
+        "Un Secret",
+        "LUXY"
+      ],
+      "highlightOwn": true,
+      "readOnly": false,
+      "userId": "745f4373-dc35-4cf3-ab06-577d54d6694e",
+      "recruitDisplayName": "おおた",
+      "recruitFullAccess": true,
+      "availabilityScope": "own-interviewer-across-assigned-stores"
+    }
+  ],
+  "accessModel": {
+    "recruitManagement": "all-stores-full-access-for-owner-president-ota",
+    "interviewManagement": "scoped-by-identity-not-recruit-role",
+    "availability": "per-interviewer-and-only-within-their-assigned-stores",
+    "allStoreOverview": "read-only-for-all-three",
+    "assignment": "one-interviewer-unavailable-does-not-block-other-available-interviewers"
+  }
+}
