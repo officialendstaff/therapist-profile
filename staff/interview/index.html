@@ -118,6 +118,11 @@ body,body[data-active-shop]{background:#f3f5f8!important;color:#1d2d40!important
 #lineNoticeNav.noticeBlink #lineNoticeCount{background:#fff!important;color:#b80000!important;border-radius:14px;padding:4px 10px;font-size:15px;font-weight:900}
 #lineNoticeNav.noticeBlink::before{content:"● 新着 ";font-weight:900}
 @keyframes lineAlertFlash{0%,49%{background:#e02020;filter:brightness(1.1);outline:3px solid #ffd94d}50%,100%{background:#243c59;filter:brightness(1);outline:0}}
+</style><style id="lineNoticeClearAlert">
+#lineNoticeNav.noticeBlink{animation:lineNoticeBright 1s steps(1,end) infinite!important;font-size:15px!important;font-weight:900!important;border:3px solid #ffe15a!important;box-shadow:0 0 0 3px rgba(255,50,50,.5),0 0 18px rgba(255,45,45,.7)!important}
+#lineNoticeNav.noticeBlink::before{content:"● 新着 ";font-weight:900}
+#lineNoticeNav.noticeBlink #lineNoticeCount{display:inline-block;background:#fff!important;color:#b90000!important;border-radius:14px;padding:3px 8px}
+@keyframes lineNoticeBright{0%,49%{background:#ec1717!important;color:white!important;filter:brightness(1.2)}50%,100%{background:#701212!important;color:#fff!important;filter:brightness(.85)}}
 </style></head><body><div id="staffLock"><div class="lockbox"><div class="lockmark">MATTAN KOUGYOU</div><h2>STAFF LOGIN</h2><input id="staffPin" type="password" inputmode="numeric" maxlength="4" placeholder="暗証番号" autocomplete="off"><button id="staffUnlock" type="button">ログイン</button><div id="staffLockErr" class="lockerr"></div></div></div><header class="appHeader"><div class="brand"><span>MATTAN KOUGYOU</span><strong>面接予約管理</strong></div><div class="headerRight"><button type="button" id="enablePcAlerts" class="notifyButton">PC通知を許可</button><span id="reminderCount" class="reminderCount" hidden>0</span><span>INTERVIEW MANAGEMENT</span><span class="headerSymbol" aria-hidden="true">◈</span></div></header><main class="wrap"><div class="workspace">
 <aside class="side card"><div class="sideTitle">面接予定</div><div class="navSection"><button class="navBtn" id="lineNoticeNav" type="button">LINE通知 <span id="lineNoticeCount">0件</span></button></div><div class="navSection"><h2>今日の面接予定 <span id="todayInterviewCount">0件</span></h2><div id="todayList">読み込み中...</div></div><div class="navSection"><button class="navBtn" id="futureNav" type="button" aria-expanded="true">明日以降の面接予定 <span id="futureInterviewCount">0件</span> ▸</button><div class="navPanel" id="futurePanel"><div id="list">読み込み中...</div></div><button class="navBtn" id="historyNav" type="button" aria-expanded="false">過去の面接予定 ▸ <span id="pastInterviewCount"></span></button><div class="navPanel" id="historyPanel" hidden><div id="pastInterviewList">読み込み中...</div></div></div></aside>
 <div class="workMain"><section class="card lineInbox" id="lineInbox" hidden><div class="scheduleHeader"><h2>求人LINE受信｜薔薇と紳士</h2><button type="button" class="action" id="lineInboxBack">カレンダーに戻る</button></div><p class="note" id="lineInboxStatus">受信データを確認しています。</p><div id="lineInboxAuth" hidden><p class="note">求人管理の管理者アカウントでログインしてください。</p><input type="email" id="lineInboxEmail" autocomplete="username" placeholder="メールアドレス"><input type="password" id="lineInboxPassword" autocomplete="current-password" placeholder="パスワード"><button type="button" class="action" id="lineInboxLogin">ログイン</button></div><div id="lineInboxMessages"></div></section><section class="card reminderPanel" id="reminderPanel" hidden><h2>確認LINEの送信時間です</h2><p class="note">面接開始2時間前になりました。応募者への確認LINEを送信してください。</p><div id="reminderItems"></div></section><section class="card scheduleView" id="scheduleView" hidden><div class="scheduleHeader"><h2 id="scheduleTitle">面接予定一覧</h2><button type="button" id="backToCalendar" class="action">カレンダーに戻る</button></div><div id="scheduleViewContent"></div></section>
@@ -204,7 +209,7 @@ const response=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v
 if(!response.ok)return;
 const data=await response.json();
 latest=Number(data.latest_event_id)||0;
-const seen=Math.max(Number(data.last_seen_event_id)||0,Number(localStorage.getItem('line_rose_seen')||0));
+const seen=Number(data.last_seen_event_id)||0;
 unread=latest>seen?1:0;
 count.textContent=unread+'件';
 nav.classList.toggle('noticeBlink',unread>0);
@@ -212,7 +217,7 @@ nav.classList.toggle('noticeBlink',unread>0);
 }
 
 const escape=s=>String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-async function refresh(){try{const {data:{session}}=await client.auth.getSession();if(!session){if(visible)status.textContent='LINE受信本文は現在表示できません。面接予約管理の認証連携が未完了です。';auth.hidden=true;return}
+async function refresh(){try{const {data:{session}}=await client.auth.getSession();if(!session){if(visible){status.textContent='新着通知は受信しています。本文の表示は面接予約管理の認証連携後に有効になります。';messages.innerHTML=''}auth.hidden=true;return}
 auth.hidden=true;
 const [{data,error},{data:states},{data:links},{data:formLinks}]=await Promise.all([
 client.from('recruit_line_events').select('id,account_id,line_user_id,event_type,received_at,message_type,message_text').eq('account_id',account).order('id',{ascending:false}).limit(100),
@@ -220,7 +225,7 @@ client.from('recruit_line_notice_state').select('last_seen_event_id').eq('accoun
 client.from('staff_interview_line_links').select('line_user_id,line_display_name,line_picture_url,interview_id').eq('account_id',account),
 client.from('recruit_line_interview_links').select('line_user_id,interview_applicant_id').eq('account_id',account)]);
 if(error){if(visible)status.textContent='LINE受信データの取得に失敗しました。';return}
-const rows=data.filter(x=>x.event_type==='message');latest=Math.max(0,...rows.map(x=>Number(x.id)||0));const seen=Number(states?.last_seen_event_id||0);unread=rows.filter(x=>Number(x.id)>seen).length;count.textContent=unread+'件';nav.classList.toggle('noticeBlink',unread>0);
+const rows=data.filter(x=>x.event_type==='message');
 if(!visible)return;
 const linkMap=new Map((links||[]).map(x=>[x.line_user_id,x]));const formMap=new Map((formLinks||[]).map(x=>[x.line_user_id,x]));
 const formIds=[...new Set((formLinks||[]).map(x=>x.interview_applicant_id).filter(Boolean))];
@@ -232,9 +237,9 @@ let profiles={};if(ids.length){const {data:pd}=await client.functions.invoke('re
 status.textContent='薔薇と紳士｜受信履歴（最新100件）';
 messages.innerHTML=rows.map(x=>{const l=linkMap.get(x.line_user_id),f=formById.get(String(formMap.get(x.line_user_id)?.interview_applicant_id)),iv=interviewById.get(String(l?.interview_id)),p=profiles[x.line_user_id];const name=p?.displayName||l?.line_display_name||'LINE利用者';const picture=p?.pictureUrl||l?.line_picture_url;const details=f?'応募者：'+escape(f.name||f.stage_name||'')+' ／ '+escape(f.shop||'')+' ／ '+escape(f.status||''):iv?'面接予定：'+escape(iv.shop||'')+' '+escape(iv.interview_date||'')+' '+escape(iv.interview_time||'')+' ／ '+escape(iv.status||''):'';return '<div class="lineMessage"><div class="lineSender">'+(picture?'<img class="lineAvatar" src="'+escape(picture)+'" alt="">':'<span class="lineAvatar empty">LINE</span>')+'<div><strong>'+escape(name)+'</strong><small>薔薇と紳士 ／ '+escape(new Date(x.received_at).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'}))+'</small>'+(details?'<small>'+details+'</small>':'')+'</div></div><p>'+escape(x.message_text??('['+(x.message_type||'メッセージ')+']'))+'</p></div>'}).join('')||'<p class="note">受信メッセージはありません。</p>';
 }catch(e){if(visible)status.textContent='LINE受信情報を更新できませんでした。'}}
-nav.addEventListener('click',async()=>{visible=true;pane.hidden=false;document.querySelector('.workLeft').style.display='none';document.getElementById('scheduleView').hidden=true;await refresh();if(latest){const {error}=await client.rpc('ack_recruit_line_notice',{p_account_id:account,p_event_id:latest});if(!error){count.textContent='0件';nav.classList.remove('noticeBlink')}}});
-document.getElementById('lineInboxBack').onclick=()=>{visible=false;pane.hidden=true;document.querySelector('.workLeft').style.display=''};
+nav.addEventListener('click',async()=>{visible=true;pane.hidden=false;document.querySelector('.workLeft').style.display='none';document.getElementById('scheduleView').hidden=true;await refresh();if(latest){const {data:{session}}=await client.auth.getSession();if(session){const {error}=await client.rpc('ack_recruit_line_notice',{p_account_id:account,p_event_id:latest});if(!error)await checkLineNotice()}}});
+document.getElementById('lineInboxBack').onclick=()=>{visible=false;pane.hidden=true;document.querySelector('.workLeft').style.display='';checkLineNotice()};
 document.getElementById('lineInboxLogin').onclick=()=>{};
-setInterval(()=>{if(document.visibilityState==='visible')checkLineNotice()},30000);checkLineNotice();
+setInterval(()=>{if(document.visibilityState==='visible'){checkLineNotice();if(visible)refresh()}},30000);checkLineNotice();
 })();
 </script></body></html>
