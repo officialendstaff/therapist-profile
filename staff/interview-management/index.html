@@ -243,7 +243,9 @@ async function loadInterviewSheets(){
  let {data,error}=await sb.from('interview_applicants').select('id,name,kana,birth_date,status,submitted_at,phone,postal_code,prefecture,city,street,recruit_source,id_type,id_front_path,id_back_path,smoking,tattoo,tattoo_detail,experience,work_history,hire_date,training_date,first_shift_date,stage_name,work_description,nationality,residence_status,residence_period,work_permission,remarks,shop,rejection_reason,rejection_note').not('status','in','("採用","在籍","退職","不採用","辞退")').order('submitted_at',{ascending:false});
  if(error&&String(error.message||'').includes('shop'))({data,error}=await sb.from('interview_applicants').select('id,name,kana,birth_date,status,submitted_at,phone,postal_code,prefecture,city,street,recruit_source,id_type,id_front_path,id_back_path,smoking,tattoo,tattoo_detail,experience,work_history,hire_date,training_date,first_shift_date,stage_name,work_description,nationality,residence_status,residence_period,work_permission,remarks,rejection_reason,rejection_note').not('status','in','("採用","在籍","退職","不採用","辞退")').order('submitted_at',{ascending:false}));
  if(error){interviewSheetList.innerHTML='<span class="msg">読み込みできません：'+escInterview(error.message)+'</span>';interviewSheetLoading=false;return}
+ const openSheet=(window.interviewApplicants||[]).find(v=>v.id===window.spOpenSheetId);
  window.interviewApplicants=data||[];
+ if(openSheet&&!window.interviewApplicants.some(v=>v.id===openSheet.id))window.interviewApplicants.push(openSheet);
  updateInterviewSheetAlert();
  const rowHtml=x=>'<button type="button" onclick="openInterviewSheet(\''+x.id+'\')" style="width:100%;text-align:left;border:0;border-bottom:1px solid #eee;background:#fff;padding:10px 8px"><b style="font-size:15px">'+escInterview(x.name||'氏名未入力')+'</b><span style="float:right;font-size:11px;'+(x.remarks==='HELP'?'color:#d00;font-weight:900':'')+'">'+escInterview(x.remarks==='HELP'?'HELP':x.status||'面接前')+'</span><br><small>'+escInterview(x.kana||'—')+' ｜ '+(x.birth_date?interviewAge(x.birth_date):'—')+' ｜ '+fmtInterviewDate(x.submitted_at)+'</small></button>';
  const pending=window.interviewApplicants.filter(x=>!['在籍','退職'].includes(x.status)),active=window.interviewApplicants.filter(x=>x.status==='在籍'),retired=window.interviewApplicants.filter(x=>x.status==='退職');
@@ -485,8 +487,8 @@ function onboardingPayload(){
 async function saveOnboarding(id){
  const msg=document.getElementById('obMsg');if(msg)msg.textContent='保存中...';
  try{
-  const x=(window.interviewApplicants||[]).find(r=>r.id===id);
-  if(!x)throw Error('面接シートが見つかりません。');
+  let x=(window.interviewApplicants||[]).find(r=>r.id===id);
+  if(!x){const {data:found,error:lookupError}=await sb.from('interview_applicants').select('id,name,shop,status').eq('id',id).maybeSingle();if(lookupError)throw lookupError;if(!found)throw Error('面接シートが見つかりません。');x=found;window.interviewApplicants=window.interviewApplicants||[];window.interviewApplicants.push(x);}
   const decision=document.getElementById('sheetDecisionSelect')?.value;
   if(decision!=='採用'&&x.status!=='採用')throw Error('採用を選択してから保存してください。');
   const payload=onboardingPayload();
@@ -500,9 +502,8 @@ async function saveOnboarding(id){
  }catch(e){console.error(e);if(msg)msg.textContent='保存できません：'+(e?.message||String(e));return false;}
 }
 async function printOnboarding(id){
- const x=(window.interviewApplicants||[]).find(v=>v.id===id);
- if(!x)return alert('面接シートが見つかりません。');
  const saved=await saveOnboarding(id);if(!saved)return;
+ const x=(window.interviewApplicants||[]).find(v=>v.id===id);
  const payload=onboardingPayload();
  const fields=[['氏名',x.full_name||x.name||''],['店舗',x.shop||''],['研修日',payload.training_date],['初回出勤日',payload.first_shift_date],['源氏名',payload.stage_name],['従事する業務内容',payload.work_description],['国籍',payload.nationality],['在留資格',payload.residence_status],['在留期間',payload.residence_period],['資格外活動許可',payload.work_permission]];
  const escape=v=>String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
