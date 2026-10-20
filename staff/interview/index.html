@@ -214,7 +214,29 @@ function activateLineSound(){try{const AudioContextType=window.AudioContext||win
 document.addEventListener('pointerdown',activateLineSound,{once:true});
 document.addEventListener('keydown',activateLineSound,{once:true});
 document.getElementById('lineSoundTest').addEventListener('click',async()=>{activateLineSound();if(lineSoundContext){try{await lineSoundContext.resume();lineSoundReady=lineSoundContext.state==='running';playLineAlert();if(!lineSoundReady)alert('通知音を再生できません。Chromeのサイト音声設定をご確認ください。')}catch(e){alert('通知音を再生できません。Chromeのサイト音声設定をご確認ください。')}}else alert('このブラウザでは通知音を再生できません。')});
-function playLineAlert(){if(!lineSoundReady||!lineSoundContext)return;try{const ctx=lineSoundContext,t=ctx.currentTime;for(let i=0;i<2;i++){const oscillator=ctx.createOscillator(),gain=ctx.createGain(),start=t+i*.24;oscillator.type='sine';oscillator.frequency.setValueAtTime(i?880:660,start);gain.gain.setValueAtTime(.0001,start);gain.gain.exponentialRampToValueAtTime(.13,start+.02);gain.gain.exponentialRampToValueAtTime(.0001,start+.18);oscillator.connect(gain);gain.connect(ctx.destination);oscillator.start(start);oscillator.stop(start+.19)}}catch(e){}}
+function playLineAlert(){
+if(!lineSoundReady||!lineSoundContext)return;
+try{
+const ctx=lineSoundContext,now=ctx.currentTime;
+const notes=[
+{at:0,duration:.85,frequencies:[659.25,830.61,987.77]},
+{at:.92,duration:1.35,frequencies:[523.25,659.25,783.99,1046.50]}
+];
+for(const note of notes){
+const start=now+note.at;
+for(const frequency of note.frequencies){
+const oscillator=ctx.createOscillator(),gain=ctx.createGain();
+oscillator.type='sine';oscillator.frequency.setValueAtTime(frequency,start);
+gain.gain.setValueAtTime(.0001,start);
+gain.gain.exponentialRampToValueAtTime(.028,start+.035);
+gain.gain.setValueAtTime(.028,start+note.duration*.48);
+gain.gain.exponentialRampToValueAtTime(.0001,start+note.duration);
+oscillator.connect(gain);gain.connect(ctx.destination);
+oscillator.start(start);oscillator.stop(start+note.duration+.02)
+}
+}
+}catch(e){console.warn('LINE chime playback failed',e)}
+}
 async function checkLineNotice(){
 try{
 const response=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/recruit-line-notice-status',{cache:'no-store'});
