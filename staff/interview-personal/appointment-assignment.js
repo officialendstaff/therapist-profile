@@ -37,10 +37,8 @@ loadAppointments=async function(){
    if(check.error||!(check.data||[]).some(p=>p.interviewer_user_id===selected)){
     note.textContent='対応状況が変更されました。再読み込みしてください';return;
    }
-   const save=await sb.from('staff_interviews').update({interviewer_user_id:selected})
-    .eq('id',x.id).eq('shop',x.shop).eq('interview_date',x.interview_date)
-    .eq('interview_time',x.interview_time).select('id');
-   if(save.error||!save.data?.length){note.textContent='保存失敗：'+(save.error?.message||'更新できません');return}
+   const save=await sb.rpc('assign_interview_interviewer',{p_interview_id:x.id,p_interviewer_user_id:selected});
+   if(save.error){note.textContent='保存失敗：'+save.error.message;return}
    message('担当者を保存しました');await loadAppointments();
   };
  }
