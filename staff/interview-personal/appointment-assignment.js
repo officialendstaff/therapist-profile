@@ -3,7 +3,7 @@
 const originalLoadAppointments=loadAppointments;
 loadAppointments=async function(){
  await originalLoadAppointments();
- if(!user||!profile)return;
+ if(!user||!profile||previewMode)return;
  const {data,error}=await sb.from('staff_interviews')
   .select('id,shop,interview_date,interview_time,interviewer_user_id,status')
   .in('shop',profile.stores).order('interview_date').order('interview_time');
