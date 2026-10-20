@@ -1,4 +1,4 @@
-import { createClient } from "npm:@supabase/supabase-js@2";
+import { createClient } from "npm:@supabase/supabase-js@2.57.0";
 const url = Deno.env.get("SUPABASE_URL")!;
 const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const admin = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
@@ -7,6 +7,7 @@ const headers = { "Content-Type": "application/json", "Access-Control-Allow-Orig
 const response = (status: number, message: string) => new Response(JSON.stringify({ message }), { status, headers });
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers });
+  // Origin checks are not authentication. Invite validation and server-side authorization remain mandatory.
   if (req.method !== "POST" || req.headers.get("origin") !== origin) return response(403, "Forbidden");
   try {
     const input = await req.json();
@@ -40,7 +41,8 @@ Deno.serve(async (req) => {
     if (profileError) {
       await admin.from("recruit_staff_invites").update({ claimed_by: null, claimed_at: null })
         .eq("token", token).eq("claimed_by", userId);
-      await admin.auth.admin.deleteUser(userId);
+      const { error: deleteError } = await admin.auth.admin.deleteUser(userId);
+      if (deleteError) console.error("Registration cleanup failed", { userId, error: deleteError.message });
       return response(500, "承認待ち登録に失敗しました。");
     }
     return response(200, "登録申請が完了しました。マスターの承認をお待ちください。");
