@@ -2,7 +2,14 @@
   "version": 1,
   "master": {
     "path": "/therapist-profile/staff/mobile/",
-    "scope": "all"
+    "scope": "all",
+    "label": "全店面接管理",
+    "readOnly": true,
+    "allowedRecruitRoles": [
+      "master",
+      "full"
+    ],
+    "description": "全5店舗・全担当者の予定、シート、対応不可設定の閲覧のみ。変更操作は個人ページで行う。"
   },
   "pages": [
     {
@@ -13,7 +20,8 @@
         "薔薇と紳士",
         "BUSTY OSAKA"
       ],
-      "highlightOwn": false
+      "highlightOwn": false,
+      "readOnly": false
     },
     {
       "key": "president",
@@ -24,7 +32,8 @@
         "Un Secret",
         "LUXY"
       ],
-      "highlightOwn": true
+      "highlightOwn": true,
+      "readOnly": false
     },
     {
       "key": "ota",
@@ -35,7 +44,8 @@
         "Un Secret",
         "LUXY"
       ],
-      "highlightOwn": true
+      "highlightOwn": true,
+      "readOnly": false
     }
   ]
 }
