@@ -389,7 +389,14 @@ document.querySelectorAll('#sns [data-sns]').forEach(button=>{
  const key=button.dataset.sns;
  button.hidden=!String(cfg.sns?.[key]||'').trim()||(!snsPrimary.includes(key)&&!snsSix);
 });
-document.querySelectorAll('[data-sns]').forEach(e=>e.onclick=()=>go(e.dataset.sns));
+document.querySelectorAll('#sns [data-sns]').forEach(e=>e.onclick=()=>go(e.dataset.sns));
+const bottomScrollTargets={line:'today',x:'photo',sub:'sns'};
+document.querySelectorAll('.bottom [data-sns]').forEach(button=>{
+ button.onclick=()=>{
+  const target=document.getElementById(bottomScrollTargets[button.dataset.sns]);
+  if(target){target.scrollIntoView({behavior:'smooth',block:'start'});}
+ };
+});
 document.querySelectorAll('[data-go]').forEach(e=>e.onclick=()=>go(e.dataset.go));
 $('bookingNav').onclick=()=>{
  modal('ご予約','');
