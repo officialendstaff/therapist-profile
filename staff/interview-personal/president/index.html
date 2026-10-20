@@ -41,7 +41,17 @@ input:focus,textarea:focus,select:focus{outline:2px solid #a8cafa;outline-offset
 </style><script>
 window.addEventListener('error',function(e){const m=document.getElementById('authMsg');if(m&&document.getElementById('gate')?.style.display!=='none')m.textContent='起動エラー: '+(e.message||'不明')+' ('+(e.filename||'').split('/').pop()+':'+(e.lineno||0)+')'});
 window.addEventListener('unhandledrejection',function(e){const m=document.getElementById('authMsg');if(m&&document.getElementById('gate')?.style.display!=='none')m.textContent='認証エラー: '+(e.reason?.message||String(e.reason))});
-window.mobileLoginNow=function(){return login()};
+window.mobileLoginNow=async function(){
+ const m=document.getElementById('authMsg'),email=document.getElementById('email')?.value.trim(),password=document.getElementById('password')?.value;
+ if(!email||!password){m.textContent='メールアドレスとパスワードを入力してください';return}
+ if(!window.supabase){m.textContent='認証ライブラリの読み込みに失敗しました';return}
+ try{
+ const client=window.supabase.createClient('https://vjjnkflbfsjihwzjsjpr.supabase.co','sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos',{auth:{persistSession:true,autoRefreshToken:true,storage:window.sessionStorage,storageKey:'mattan-recruit-auth'}});
+ const {error}=await client.auth.signInWithPassword({email,password});
+ if(error)throw error;
+ location.reload();
+ }catch(e){m.textContent='ログインエラー：'+(e.message||String(e))}
+};
 </script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="window.__sbCdnFailed=true"></script><script>
 (function(){
  function setup(){
