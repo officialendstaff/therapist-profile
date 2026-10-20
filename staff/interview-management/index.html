@@ -486,18 +486,22 @@ async function saveOnboarding(id){
  const msg=document.getElementById('obMsg');if(msg)msg.textContent='保存中...';
  try{
   const x=(window.interviewApplicants||[]).find(r=>r.id===id);
-  if(!x||x.status!=='採用')throw Error('採用確定後に保存してください。');
+  if(!x)throw Error('面接シートが見つかりません。');
+  const decision=document.getElementById('sheetDecisionSelect')?.value;
+  if(decision!=='採用'&&x.status!=='採用')throw Error('採用を選択してから保存してください。');
   const payload=onboardingPayload();
-  const {error}=await sb.from('interview_applicants').update(payload).eq('id',id);
+  const update={...payload,status:'採用'};
+  const {data,error}=await sb.from('interview_applicants').update(update).eq('id',id).select('id,status').single();
   if(error)throw error;
-  Object.assign(x,payload);
+  if(!data||data.status!=='採用')throw Error('採用状態を保存できませんでした。');
+  Object.assign(x,update);
   if(msg)msg.textContent='入店情報を保存しました。';
   return true;
  }catch(e){console.error(e);if(msg)msg.textContent='保存できません：'+(e?.message||String(e));return false;}
 }
 async function printOnboarding(id){
  const x=(window.interviewApplicants||[]).find(v=>v.id===id);
- if(!x||x.status!=='採用')return alert('採用確定後に印刷してください。');
+ if(!x)return alert('面接シートが見つかりません。');
  const saved=await saveOnboarding(id);if(!saved)return;
  const payload=onboardingPayload();
  const fields=[['氏名',x.full_name||x.name||''],['店舗',x.shop||''],['研修日',payload.training_date],['初回出勤日',payload.first_shift_date],['源氏名',payload.stage_name],['従事する業務内容',payload.work_description],['国籍',payload.nationality],['在留資格',payload.residence_status],['在留期間',payload.residence_period],['資格外活動許可',payload.work_permission]];
