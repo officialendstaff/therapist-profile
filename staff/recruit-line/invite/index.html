@@ -4,7 +4,17 @@
 <body><main class="wrap"><div class="brand">L GROUP<small>STAFF ACCOUNT INVITATION</small></div><section class="card"><div class="eyebrow">STAFF REGISTRATION</div><h1 class="title">管理アカウント登録</h1><form id="inviteForm"><label for="displayName">表示名（あだ名でも可）</label><input id="displayName" maxlength="50" autocomplete="nickname" placeholder="例：山ちゃん" required><label for="email">メールアドレス</label><input id="email" type="email" autocomplete="email" placeholder="name@example.com" required><label for="password">パスワード</label><input id="password" type="password" autocomplete="new-password" placeholder="8文字以上" minlength="8" required><label for="confirm">パスワード（確認）</label><input id="confirm" type="password" autocomplete="new-password" placeholder="もう一度入力" minlength="8" required><p id="formError" class="error hide" role="alert"></p><button type="submit">登録する</button><button type="button" id="forgotPassword" style="margin-top:12px;background:transparent;color:#c6a46c;border:1px solid #526276">パスワードを忘れた場合</button></form></section><div class="footer">L GROUP ｜ RECRUIT MANAGEMENT</div></main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
 const sb=supabase.createClient('https://vjjnkflbfsjihwzjsjpr.supabase.co','sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos',{auth:{persistSession:true,storage:sessionStorage,storageKey:'mattan-recruit-auth'}});
 const params=new URLSearchParams(location.search),token=params.get('token');const errorEl=document.getElementById('formError');function show(message,ok=false){errorEl.textContent=message;errorEl.classList.remove('hide');errorEl.style.background=ok?'#1b392f':'#42262a'}
-document.getElementById('inviteForm').addEventListener('submit',async e=>{e.preventDefault();const displayName=document.getElementById('displayName').value.trim(),email=document.getElementById('email').value.trim(),password=document.getElementById('password').value,confirm=document.getElementById('confirm').value,button=e.target.querySelector('button');if(!displayName)return show('表示名を入力してください。');if(!document.getElementById('email').validity.valid)return show('正しいメールアドレスを入力してください。');if(password.length<8)return show('パスワードは8文字以上で入力してください。');if(password!==confirm)return show('パスワードが一致していません。');if(!token||!/^[0-9a-f-]{36}$/i.test(token))return show('有効な招待URLから開いてください。');sessionStorage.setItem('recruit-pending-name-'+token,displayName);button.disabled=true;try{const {data,error}=await sb.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname+'?token='+encodeURIComponent(token),data:{recruit_display_name:displayName,recruit_invite_token:token}}});if(error)throw error;if(data.session){const claimed=await sb.rpc('recruit_claim_invite',{p_token:token,p_display_name:displayName});if(claimed.error)throw claimed.error;sessionStorage.removeItem('recruit-pending-name-'+token);document.getElementById('inviteForm').classList.add('hide');show('登録申請が完了しました。管理者の承認をお待ちください。',true)}else{document.getElementById('inviteForm').classList.add('hide');show('確認メールを送信しました。メール内のリンクを開くと登録申請が完了します。再入力は不要です。',true)}}catch(err){show('登録できませんでした：'+(err.message||String(err)))}finally{button.disabled=false}});
+document.getElementById('inviteForm').addEventListener('submit',async e=>{e.preventDefault();const displayName=document.getElementById('displayName').value.trim(),email=document.getElementById('email').value.trim(),password=document.getElementById('password').value,confirm=document.getElementById('confirm').value,button=e.target.querySelector('button');if(!displayName)return show('表示名を入力してください。');if(!document.getElementById('email').validity.valid)return show('正しいメールアドレスを入力してください。');if(password.length<8)return show('パスワードは8文字以上で入力してください。');if(password!==confirm)return show('パスワードが一致していません。');if(!token||!/^[0-9a-f-]{36}$/i.test(token))return show('有効な招待URLから開いてください。');button.disabled=true;try{
+ const response=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/recruit-staff-register',{
+  method:'POST',headers:{'Content-Type':'application/json','apikey':'sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos'},
+  body:JSON.stringify({token,displayName,email,password})
+ });
+ const result=await response.json().catch(()=>({}));
+ if(!response.ok)throw new Error(result.message||'登録申請に失敗しました。');
+ document.getElementById('inviteForm').classList.add('hide');
+ show('登録申請が完了しました。マスターの承認をお待ちください。',true);
+}catch(err){show('登録できませんでした：'+(err.message||String(err)))}finally{button.disabled=false}});
+
 document.getElementById('forgotPassword').addEventListener('click',async()=>{
  const email=document.getElementById('email').value.trim();
  if(!email||!document.getElementById('email').validity.valid)return show('メールアドレスを入力してから押してください。');
@@ -12,7 +22,7 @@ document.getElementById('forgotPassword').addEventListener('click',async()=>{
  try{const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname+'?token='+encodeURIComponent(token||'')+'&reset=1'});if(error)throw error;show('パスワード再設定メールを送信しました。メールをご確認ください。',true)}
  catch(error){show('再設定メールを送信できませんでした：'+(error.message||String(error)))}finally{button.disabled=false}
 });
-sb.auth.onAuthStateChange((event)=>{if(event==='PASSWORD_RECOVERY')setTimeout(()=>{showResetPasswordForm()},0);else if(event==='SIGNED_IN')setTimeout(()=>{completeConfirmedInvite()},0)});
+sb.auth.onAuthStateChange((event)=>{if(event==='PASSWORD_RECOVERY')setTimeout(()=>{showResetPasswordForm()},0);});
 function showResetPasswordForm(){
  if(document.getElementById('resetPasswordForm'))return;
  document.getElementById('inviteForm').classList.add('hide');
@@ -21,17 +31,5 @@ function showResetPasswordForm(){
  document.getElementById('inviteForm').after(form);
  form.addEventListener('submit',async e=>{e.preventDefault();const password=document.getElementById('newPassword').value;if(password!==document.getElementById('newPasswordConfirm').value)return show('パスワードが一致していません。');const {error}=await sb.auth.updateUser({password});if(error)return show('パスワードを変更できませんでした：'+error.message);form.classList.add('hide');show('パスワードを再設定しました。',true)});
 }
-async function completeConfirmedInvite(){
- if(!token||new URLSearchParams(location.search).has('reset'))return;
- const {data:{session},error:sessionError}=await sb.auth.getSession();
- if(sessionError||!session)return;
- const name=session.user.user_metadata?.recruit_display_name||sessionStorage.getItem('recruit-pending-name-'+token)||'スタッフ';
- const {error}=await sb.rpc('recruit_claim_invite',{p_token:token,p_display_name:name});
- if(error){show('メール認証は完了しましたが、登録申請を完了できませんでした：'+error.message);return}
- sessionStorage.removeItem('recruit-pending-name-'+token);
- document.getElementById('inviteForm').classList.add('hide');
- show('登録申請が完了しました。管理者の承認をお待ちください。',true);
-}
-(async()=>{if(new URLSearchParams(location.search).has('reset'))return;if(!token)return;await completeConfirmedInvite()})();
-sb.auth.onAuthStateChange((event)=>{if(event==='SIGNED_IN'){setTimeout(()=>{completeConfirmedInvite()},0)}});
+
 </script></body></html>
