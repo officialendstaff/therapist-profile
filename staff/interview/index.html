@@ -209,7 +209,7 @@ const response=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v
 if(!response.ok)return;
 const data=await response.json();
 latest=Number(data.latest_event_id)||0;
-const seen=Number(data.last_seen_event_id)||0;
+const seen=Math.max(Number(data.last_seen_event_id)||0,Number(localStorage.getItem('line_rose_seen')||0));
 unread=latest>seen?1:0;
 count.textContent=unread+'件';
 nav.classList.toggle('noticeBlink',unread>0);
@@ -237,7 +237,7 @@ let profiles={};if(ids.length){const {data:pd}=await client.functions.invoke('re
 status.textContent='薔薇と紳士｜受信履歴（最新100件）';
 messages.innerHTML=rows.map(x=>{const l=linkMap.get(x.line_user_id),f=formById.get(String(formMap.get(x.line_user_id)?.interview_applicant_id)),iv=interviewById.get(String(l?.interview_id)),p=profiles[x.line_user_id];const name=p?.displayName||l?.line_display_name||'LINE利用者';const picture=p?.pictureUrl||l?.line_picture_url;const details=f?'応募者：'+escape(f.name||f.stage_name||'')+' ／ '+escape(f.shop||'')+' ／ '+escape(f.status||''):iv?'面接予定：'+escape(iv.shop||'')+' '+escape(iv.interview_date||'')+' '+escape(iv.interview_time||'')+' ／ '+escape(iv.status||''):'';return '<div class="lineMessage"><div class="lineSender">'+(picture?'<img class="lineAvatar" src="'+escape(picture)+'" alt="">':'<span class="lineAvatar empty">LINE</span>')+'<div><strong>'+escape(name)+'</strong><small>薔薇と紳士 ／ '+escape(new Date(x.received_at).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'}))+'</small>'+(details?'<small>'+details+'</small>':'')+'</div></div><p>'+escape(x.message_text??('['+(x.message_type||'メッセージ')+']'))+'</p></div>'}).join('')||'<p class="note">受信メッセージはありません。</p>';
 }catch(e){if(visible)status.textContent='LINE受信情報を更新できませんでした。'}}
-nav.addEventListener('click',async()=>{visible=true;pane.hidden=false;document.querySelector('.workLeft').style.display='none';document.getElementById('scheduleView').hidden=true;await refresh();if(latest){const {data:{session}}=await client.auth.getSession();if(session){const {error}=await client.rpc('ack_recruit_line_notice',{p_account_id:account,p_event_id:latest});if(!error)await checkLineNotice()}}});
+nav.addEventListener('click',async()=>{visible=true;pane.hidden=false;document.querySelector('.workLeft').style.display='none';document.getElementById('scheduleView').hidden=true;await refresh();if(latest){localStorage.setItem('line_rose_seen',String(latest));count.textContent='0件';nav.classList.remove('noticeBlink');const {data:{session}}=await client.auth.getSession();if(session)await client.rpc('ack_recruit_line_notice',{p_account_id:account,p_event_id:latest});await checkLineNotice()}});
 document.getElementById('lineInboxBack').onclick=()=>{visible=false;pane.hidden=true;document.querySelector('.workLeft').style.display='';document.getElementById('allStoresChoice').click();document.getElementById('registrationStep').hidden=true;document.getElementById('calendarCard').classList.remove('compact');checkLineNotice()};
 document.getElementById('lineInboxLogin').onclick=()=>{};
 setInterval(()=>{if(document.visibilityState==='visible'){checkLineNotice();if(visible)refresh()}},30000);checkLineNotice();
