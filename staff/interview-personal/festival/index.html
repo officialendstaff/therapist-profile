@@ -1,0 +1,14 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>お祭り｜面接管理</title></head><body><p>面接管理を読み込み中です…</p><script>
+(async function(){
+try{
+ const response=await fetch('../president/index.html',{cache:'no-store'});
+ if(!response.ok)throw new Error('画面取得エラー '+response.status);
+ let html=await response.text();
+ html=html.replace('<title>社長｜面接管理</title>','<title>お祭り｜面接管理</title>')
+ .replace("PERSONAL_PROFILE_KEY='president'","PERSONAL_PROFILE_KEY='festival'")
+ .replace('"profile":"president"','"profile":"festival"');
+ if(!html.includes("PERSONAL_PROFILE_KEY='festival'"))throw new Error('担当者設定の変更に失敗');
+ document.open();document.write(html);document.close();
+}catch(e){document.body.textContent='画面を開けませんでした：'+e.message;}
+})();
+</script></body></html>
