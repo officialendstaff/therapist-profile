@@ -556,7 +556,7 @@ async function openSelectedInterviewManagement(){if(!activeStore)return;
  }catch(e){alert('担当者の確認に失敗しました。再ログインしてください。\n'+(e.message||e));return}
  const personalPaths={president:'../interview-personal/president/?embedded=1',ota:'../interview-personal/ota/?embedded=1',festival:'../interview-personal/festival/?embedded=1'};
  if(personalPaths[profileKey]){
-  frame.src=personalPaths[profileKey]+'&v=20261020-26';
+  frame.src=personalPaths[profileKey]+'&v=20261021-07';
   list.classList.add('hide');document.getElementById('storeView').classList.add('hide');frameView.classList.remove('hide');
   syncRecruitHeaderActions();savePageState();window.scrollTo(0,0);return;
  }
