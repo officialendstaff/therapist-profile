@@ -147,13 +147,25 @@ async function sendInterviewPushTest(){
   out.textContent='送信成功：'+result.sent+'件 ／ 失敗：'+result.failed+'件'+(result.failures?.length?'\\nエラー：'+result.failures.map(x=>x.status+' '+x.message).join('; '):'')+'\\n※送信成功はiPhoneでの表示を保証しません。';
  }catch(error){out.textContent='テスト失敗：'+(error?.message||String(error))}
 }
+async function getInterviewPushRegistration(){
+ if(!('serviceWorker' in navigator))throw Error('Service Workerに対応していません');
+ const registration=await Promise.race([
+  navigator.serviceWorker.register('/therapist-profile/staff/recruit-line/sw.js',{scope:'/therapist-profile/staff/recruit-line/'}),
+  new Promise((_,reject)=>setTimeout(()=>reject(Error('通知の準備がタイムアウトしました')),10000))
+ ]);
+ await Promise.race([
+  (async()=>{if(!registration.active){await new Promise((resolve,reject)=>{const worker=registration.installing||registration.waiting;if(!worker)return reject(Error('通知の準備が完了していません'));if(worker.state==='activated')return resolve();worker.addEventListener('statechange',()=>{if(worker.state==='activated')resolve()})})}})(),
+  new Promise((_,reject)=>setTimeout(()=>reject(Error('通知の有効化がタイムアウトしました')),10000))
+ ]);
+ return registration;
+}
 async function registerInterviewPushDevice(){
  const status=document.getElementById('pushSetupStatus');
  if(!INTERVIEW_PUSH_VAPID_PUBLIC_KEY){status.textContent='通知配信サーバーの設定待ちです。';return}
  try{
   const {data:{user},error:authError}=await sb.auth.getUser();
   if(authError||!user)throw Error('ログインが必要です。');
-  const registration=await navigator.serviceWorker.ready;
+  const registration=await getInterviewPushRegistration();
   let subscription=await registration.pushManager.getSubscription();
   if(!subscription)subscription=await registration.pushManager.subscribe({
    userVisibleOnly:true,
@@ -173,7 +185,7 @@ function refreshInterviewPushStatus(){
  panel.style.display='';button.style.display='none';register.style.display='none';
  if(!('Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window)){status.textContent='この環境ではWeb Pushを利用できません。';return}
  if(!(window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true)){status.textContent='iPhoneで通知を受け取るには、Safariの共有メニューからこのページを「ホーム画面に追加」し、ホーム画面のアイコンから開いてください。';return}
- if(Notification.permission==='granted'){status.textContent='通知先を確認しています...';navigator.serviceWorker.ready.then(async reg=>{const sub=await reg.pushManager.getSubscription();if(sub){status.textContent='この端末は通知先登録済みです。';return}status.textContent='この端末を通知先に登録してください。';register.style.display='inline-block'}).catch(()=>{status.textContent='通知先を確認できません。再登録してください。';register.style.display='inline-block'});return}
+ if(Notification.permission==='granted'){status.textContent='通知先を確認しています...';getInterviewPushRegistration().then(async reg=>{const sub=await reg.pushManager.getSubscription();if(sub){status.textContent='通知情報を確認しました。端末登録を更新してください。';register.style.display='inline-block';return}status.textContent='この端末を通知先に登録してください。';register.style.display='inline-block'}).catch(()=>{status.textContent='通知先を確認できません。再登録してください。';register.style.display='inline-block'});return}
  if(Notification.permission==='denied'){status.textContent='通知が拒否されています。iPhoneの設定で通知を許可してください。';return}
  status.textContent='通知の許可が必要です。';button.style.display='inline-block';
 }
@@ -566,7 +578,7 @@ async function deleteInterviewSheet(id){
 let mobileDiaryRows=[],editingDiaryId=null;async function loadMobileDiary(){let {data}=await sb.from('staff_diary').select('*').order('diary_date',{ascending:false});mobileDiaryRows=data||[];mobileDiaryList.innerHTML=mobileDiaryRows.map(x=>'<div style="padding:10px 0;border-bottom:1px solid #eee"><b>'+x.title+'</b><br><small>'+x.diary_date+'</small><button style="float:right" onclick="editMobileDiary('+x.id+')">編集</button></div>').join('')||'<small>掲載なし</small>'}function editMobileDiary(id){let x=mobileDiaryRows.find(v=>Number(v.id)===Number(id));if(!x)return;editingDiaryId=x.id;diaryDate.value=x.diary_date||'';diaryTitle.value=x.title||'';diaryBody.value=x.body||'';diarySaveBtn.textContent='DIARYを更新';scrollTo({top:0,behavior:'smooth'})}
 async function saveDiary(){if(!diaryTitle.value.trim())return alert('タイトルを入力してください');try{let u=await upload(diaryImage.files[0],'diary'),row={diary_date:diaryDate.value,title:diaryTitle.value.trim(),body:diaryBody.value,is_public:true};if(u){row.image_url=u.url;row.storage_path=u.path}let q=editingDiaryId?sb.from('staff_diary').update(row).eq('id',editingDiaryId):sb.from('staff_diary').insert(row);let {error}=await q;if(error)throw error;editingDiaryId=null;diarySaveBtn.textContent='DIARYを投稿';diaryTitle.value='';diaryBody.value='';diaryImage.value='';await loadMobileDiary();alert('DIARYを保存しました')}catch(e){alert(e.message)}}
 try{timeOpts().forEach(t=>{document.getElementById('blockStart')?.add(new Option(t,t));document.getElementById('blockEnd')?.add(new Option(t,t))});if(document.getElementById('blockStart'))document.getElementById('blockStart').value='19:00';if(document.getElementById('blockEnd'))document.getElementById('blockEnd').value='14:00'}catch(e){console.error('Interview time controls:',e)}init().catch(e=>{console.error('Interview init:',e);const msg=document.getElementById('authMsg');if(msg)msg.textContent='面接管理の起動エラー: '+e.message});
-</script><script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('../mobile/sw.js').catch(()=>{}))}setInterval(()=>{const modal=document.getElementById('interviewSheetModal');if(document.visibilityState==='visible' && document.getElementById('schedule')?.classList.contains('active') && !document.getElementById('gate')?.offsetParent && !(modal&&modal.classList.contains('on')))loadInterviewSheets()},10000);
+</script><script>if('serviceWorker' in navigator){window.addEventListener('load',()=>getInterviewPushRegistration().catch(e=>console.warn('Push SW:',e)))}setInterval(()=>{const modal=document.getElementById('interviewSheetModal');if(document.visibilityState==='visible' && document.getElementById('schedule')?.classList.contains('active') && !document.getElementById('gate')?.offsetParent && !(modal&&modal.classList.contains('on')))loadInterviewSheets()},10000);
 
 /* SP mobile: pull-to-refresh and foreground sync */
 (function(){
