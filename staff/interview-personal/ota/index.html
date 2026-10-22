@@ -389,8 +389,9 @@ async function openInterviewSheet(id){
  (x.tattoo_detail?'<div class="sheetHistory">'+escInterview(x.tattoo_detail)+'</div>':'')+
  '<div class="sheetId"><b>'+escInterview(x.id_type||'身分証')+'</b><div class="sheetIdImgs" id="sheetIdImgs"><span class="note">身分証を読み込み中...</span></div></div>'+
  (hist.length?hist.map((h,i)=>{let q=[h.prefecture||'',h.shop||'',h.stage_name||'','メンズエステ'].filter(Boolean).join(' ');return '<div class="sheetHistory"><b>'+escInterview([h.prefecture||'',h.shop||'',h.stage_name||''].filter(Boolean).join('　')||'勤務歴 '+(i+1))+'</b><br>'+escInterview(h.period||'')+(h.reason?' ／ '+escInterview(h.reason):'')+'<br><a class="webSearch" href="https://www.google.com/search?q='+encodeURIComponent(q)+'" target="_blank" rel="noopener noreferrer" onclick="rememberInterviewResearch()">WEB検索</a></div>'}).join(''):'')+
- (x.remarks==='HELP'?'<button class="onboardBtn" style="background:#b4232c" onclick="resolveHelp(\''+x.id+'\')">HELP解除</button><div style="color:#b4232c;font-weight:800;margin-top:7px">HELP｜スタッフを呼び出しています</div>':'')+'<button class="onboardBtn" onclick="openHelpEdit(\''+x.id+'\')">入力・修正</button><div class="spDecision"><label>採用・不採用の選択</label><select id="sheetDecisionSelect" onchange="previewSheetDecision(this.value)"><option value="">選択してください</option><option value="採用"'+(x.status==='採用'?' selected':'')+'>採用</option><option value="不採用"'+(x.status==='不採用'?' selected':'')+'>不採用</option></select><div id="sheetDecisionActions"></div></div>'+'<div id="onboardingArea"></div><div class="sheetMeta">'+fmtInterviewDate(x.submitted_at)+'</div>';
+ (x.remarks==='HELP'?'<button class="onboardBtn" style="background:#b4232c" onclick="resolveHelp(\''+x.id+'\')">HELP解除</button><div style="color:#b4232c;font-weight:800;margin-top:7px">HELP｜スタッフを呼び出しています</div>':'')+'<button class="onboardBtn" onclick="openHelpEdit(\''+x.id+'\')">入力・修正</button><div class="spDecision"><label>採用・不採用の選択</label><select id="sheetDecisionSelect" onchange="previewSheetDecision(this.value)"><option value="">選択してください</option><option value="採用"'+(x.status==='採用'?' selected':'')+'>採用</option><option value="不採用"'+(x.status==='不採用'?' selected':'')+'>不採用</option></select><div id="sheetDecisionActions"></div></div>'+'<div class="spDecision" style="margin-top:12px"><label>対応する面接予約</label><select id="sheetLinkedInterviewSelect" style="width:100%"><option value="">読み込み中...</option></select><button type="button" class="onboardBtn" style="margin-top:8px" onclick="saveSheetInterviewLink(window.spOpenSheetId)">面接予約を紐付けて保存</button><div id="sheetLinkStatus" class="note"></div></div>'+''+'<div id="onboardingArea"></div><div class="sheetMeta">'+fmtInterviewDate(x.submitted_at)+'</div>';
  previewSheetDecision(document.getElementById('sheetDecisionSelect')?.value||'');
+ loadSheetInterviewLink(x);
  const box=document.getElementById('sheetIdImgs');
  try{
    const urls=await Promise.all([interviewSignedUrl(x.id_front_path),interviewSignedUrl(x.id_back_path)]);
@@ -468,6 +469,39 @@ async function resolveHelp(id){
  const x=(window.interviewApplicants||[]).find(v=>v.id===id);if(x)x.remarks=null;
  closeInterviewSheet();await loadInterviewSheets();
 }
+async function loadSheetInterviewLink(x){
+ const select=document.getElementById('sheetLinkedInterviewSelect'),msg=document.getElementById('sheetLinkStatus');if(!select)return;
+ const [bookings,links,used]=await Promise.all([
+  sb.from('staff_interviews').select('id,shop,interview_date,interview_time,status').eq('shop',x.shop).order('interview_date',{ascending:false}).limit(100),
+  sb.from('staff_interview_form_links').select('interview_id').eq('interview_applicant_id',x.id),
+  sb.from('staff_interview_form_links').select('interview_id,interview_applicant_id')
+ ]);
+ if(window.spOpenSheetId!==x.id)return;
+ if(bookings.error||links.error||used.error){msg.textContent='面接予約の取得に失敗しました。';return}
+ const current=links.data?.[0]?.interview_id;
+ const taken=new Set((used.data||[]).filter(v=>v.interview_applicant_id!==x.id).map(v=>String(v.interview_id)));
+ const choices=(bookings.data||[]).filter(v=>!taken.has(String(v.id))&&!['キャンセル','トビ（キャンセル）'].includes(v.status));
+ select.innerHTML='<option value="">面接予約を選択してください</option>'+choices.map(v=>'<option value="'+v.id+'"'+(String(v.id)===String(current)?' selected':'')+'>'+escInterview(v.interview_date+' '+String(v.interview_time).slice(0,5)+'｜'+v.shop+'｜'+v.status)+'</option>').join('');
+ if(current&&!choices.some(v=>String(v.id)===String(current)))msg.textContent='既存の紐付け先を一覧から取得できません。';
+ else msg.textContent=current?'現在の紐付けを表示しています。':'面接日時を確認して該当する予約を選択してください。';
+}
+async function saveSheetInterviewLink(id){
+ const x=(window.interviewApplicants||[]).find(v=>v.id===id),sel=document.getElementById('sheetLinkedInterviewSelect'),msg=document.getElementById('sheetLinkStatus');
+ if(!x||!sel?.value)return alert('面接予約を選択してください。');
+ const interviewId=Number(sel.value);
+ if(!Number.isSafeInteger(interviewId))return alert('面接予約IDが不正です。');
+ const {data:existing,error:readError}=await sb.from('staff_interview_form_links').select('interview_id').eq('interview_applicant_id',id);
+ if(readError)return alert('紐付けの確認に失敗しました：'+readError.message);
+ if(existing?.length>1)return alert('紐付けが複数存在します。管理者に確認してください。');
+ if(existing?.length&&Number(existing[0].interview_id)===interviewId){msg.textContent='既に紐付け済みです。';return}
+ if(!confirm('選択した面接予約をこの面接シートに紐付けますか？'))return;
+ const {data:occupied,error:checkError}=await sb.from('staff_interview_form_links').select('interview_applicant_id').eq('interview_id',interviewId);
+ if(checkError||occupied?.some(v=>v.interview_applicant_id!==id))return alert('別の面接シートに紐付いているか、確認に失敗しました。');
+ const write=existing?.length?await sb.from('staff_interview_form_links').update({interview_id:interviewId}).eq('interview_applicant_id',id):await sb.from('staff_interview_form_links').insert({interview_id:interviewId,interview_applicant_id:id});
+ if(write.error)return alert('紐付け保存に失敗しました：'+write.error.message);
+ const result=await syncSheetInterviewOutcome(x,x.status);
+ msg.textContent='紐付けを保存しました。'+(result.synced?' 面接予約にも採否を反映しました。':' 採否は未反映：'+result.reason);
+}
 async function syncSheetInterviewOutcome(x,status){
  if(!x?.id)return {synced:false,reason:'面接シートが見つかりません'};
  const {data:linked,error:linkError}=await sb.from('staff_interview_form_links').select('interview_id').eq('interview_applicant_id',x.id);
@@ -479,17 +513,7 @@ async function syncSheetInterviewOutcome(x,status){
   if(error||!data)return {synced:false,reason:error?.message||'紐付け先が見つかりません'};
   target=data;
  }else{
-  if(!x.shop||!x.submitted_at)return {synced:false,reason:'面接日時・店舗が不足しています'};
-  const date=new Date(x.submitted_at).toLocaleDateString('sv-SE',{timeZone:'Asia/Tokyo'});
-  const submitted=new Date(x.submitted_at).getTime();
-  const {data,error}=await sb.from('staff_interviews').select('id,shop,interview_date,interview_time,status').eq('shop',x.shop).eq('interview_date',date);
-  if(error)return {synced:false,reason:error.message};
-  const candidates=(data||[]).filter(v=>!['キャンセル','トビ（キャンセル）'].includes(v.status)).map(v=>({row:v,diff:Math.abs(new Date(v.interview_date+'T'+v.interview_time+'+09:00').getTime()-submitted)})).filter(v=>v.diff<=90*60*1000);
-  if(candidates.length!==1)return {synced:false,reason:'該当する面接予定を一意に特定できません'};
-  const {data:otherLinks,error:otherError}=await sb.from('staff_interview_form_links').select('interview_applicant_id').eq('interview_id',candidates[0].row.id);
-  if(otherError)return {synced:false,reason:otherError.message};
-  if((otherLinks||[]).some(v=>v.interview_applicant_id!==x.id))return {synced:false,reason:'別の面接シートと紐付いています'};
-  target=candidates[0].row;
+  return {synced:false,reason:'面接予約との紐付けがありません。面接シートで該当予約を選択してください'};
  }
  if(target.status!==status){
   if(!['面接予定','日程変更','来店済み'].includes(target.status))return {synced:false,reason:'履歴が別の結果で確定済みです'};
