@@ -346,7 +346,7 @@ async function loadInterviewSheets(){
  if(openSheet&&!window.interviewApplicants.some(v=>v.id===openSheet.id))window.interviewApplicants.push(openSheet);
  updateInterviewSheetAlert();
  const rowHtml=x=>'<button type="button" onclick="openInterviewSheet(\''+x.id+'\')" style="width:100%;text-align:left;border:0;border-bottom:1px solid #eee;background:#fff;padding:10px 8px"><b style="font-size:15px">'+escInterview(x.name||'氏名未入力')+'</b><span style="float:right;font-size:11px;'+(x.remarks==='HELP'?'color:#d00;font-weight:900':'')+'">'+escInterview(x.remarks==='HELP'?'HELP':x.status||'面接前')+'</span><br><small>'+escInterview(x.kana||'—')+' ｜ '+(x.birth_date?interviewAge(x.birth_date):'—')+' ｜ '+fmtInterviewDate(x.submitted_at)+'</small></button>';
- const pending=window.interviewApplicants.filter(x=>!['在籍','退職'].includes(x.status)),active=window.interviewApplicants.filter(x=>x.status==='在籍'),retired=window.interviewApplicants.filter(x=>x.status==='退職');
+ const pending=window.interviewApplicants.filter(x=>!['採用','在籍','退職','不採用','辞退'].includes(x.status)),active=window.interviewApplicants.filter(x=>x.status==='在籍'),retired=window.interviewApplicants.filter(x=>x.status==='退職');
  const nextHtml=pending.length?pending.map(rowHtml).join(''):'<span class="note">面接シートはありません。</span>';if(interviewSheetList.innerHTML!==nextHtml)interviewSheetList.innerHTML=nextHtml;
  interviewSheetLoading=false;
 
