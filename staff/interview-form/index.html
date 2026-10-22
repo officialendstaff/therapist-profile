@@ -51,7 +51,7 @@
 <script>
 const SUPABASE_URL='https://vjjnkflbfsjihwzjsjpr.supabase.co';
 const SUPABASE_KEY='sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos';
-const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.sessionStorage,storageKey:'mattan-recruit-auth'}});
 const staffMode=new URLSearchParams(location.search).get('staff')==='1';
 if(staffMode){
  document.getElementById('staffEntrySection').classList.remove('hidden');
