@@ -430,7 +430,7 @@ function requireSheetShop(id){const x=(window.interviewApplicants||[]).find(v=>v
 async function saveSheetOutcome(id){
  if(!requireSheetShop(id))return;
  const x=(window.interviewApplicants||[]).find(v=>v.id===id);
- const status=document.getElementById('sheetDecisionSelect')?.value;
+ const status=document.getElementById('sheetDecisionSelect')?.value||'辞退';
  if(!x||!['採用','不採用','辞退'].includes(status))return alert('採否結果を選択してください。');
  if(x.status===status)return alert('既に'+status+'です。');
  if(!confirm('採否結果を「'+status+'」に変更しますか？'))return;
