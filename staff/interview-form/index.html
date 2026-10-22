@@ -30,9 +30,11 @@
 <section class="card"><h2>求人媒体</h2><div class="field"><label>応募のきっかけ<span class="req">必須</span></label><select name="recruit_source" required><option value="">選択してください</option><option>オフィシャルHP</option><option>エステ魂</option><option>メンズエステワーク</option><option>エステラブワーク</option><option>リラクジョブ</option><option>エステクイーン</option><option>Richセラピ</option><option>エステアイ</option><option>メンエスリクルート</option><option>バニラ</option><option>その他</option></select></div></section>
 <section class="card"><h2>身分証</h2>
 <div class="field"><label>身分証の種類<span class="req">必須</span></label><select name="id_type" id="idType" required><option value="">選択してください</option><option>運転免許証</option><option>パスポート</option><option>マイナンバーカード</option><option>在留カード</option><option>本籍地記載住民票</option><option>その他</option></select></div>
+<div id="idPhotoFields">
 <div class="field"><label>表面・本人確認面<span class="req">必須</span></label><input type="file" id="idFront" accept="image/*" capture="environment" required><img id="frontPreview" class="preview hidden"></div>
 <div class="field"><label>裏面（ある場合）</label><input type="file" id="idBack" accept="image/*" capture="environment"><img id="backPreview" class="preview hidden"></div>
 <p class="privacy">年齢確認のため身分証を撮影して添付してください。</p>
+</div><p id="idCopiedNotice" class="privacy hidden">身分証原本のコピーを保管するため、画像登録は不要です。身分証の種類を選択してください。</p>
 </section>
 <section class="card"><h2>喫煙・タトゥー</h2>
 <div class="field"><label>喫煙<span class="req">必須</span></label><select name="smoking" required><option value="">選択してください</option><option>喫煙する</option><option>喫煙しない</option></select></div>
@@ -56,9 +58,11 @@ if(staffMode){
  document.getElementById('helpBox').classList.add('hidden');
  document.querySelector('.head h1').textContent='面接シート転記';
  document.getElementById('submitBtn').textContent='面接シートを登録';
+ document.getElementById('idPhotoFields').classList.add('hidden');
+ document.getElementById('idCopiedNotice').classList.remove('hidden');
  document.getElementById('idFront').required=false;
  document.getElementById('idBack').required=false;
- document.querySelectorAll('#form [required]').forEach(el=>{if(el.id!=='staffShop')el.required=false});
+ document.querySelectorAll('#form [required]').forEach(el=>{if(el.id!=='staffShop'&&el.id!=='idType')el.required=false});
  const group=new URLSearchParams(location.search).get('group');
  if(group==='grand')document.getElementById('staffShop').value='Grand Luxe';
  if(group==='luxy')document.getElementById('staffShop').value='LUXY';
@@ -105,8 +109,8 @@ form.onsubmit=async e=>{
   submitBtn.disabled=true;
   msg.textContent='登録処理中です…';
   const applicantId=uuid();
-  const front=await upload(idFront.files[0],applicantId,'front');
-  const back=await upload(idBack.files[0],applicantId,'back');
+  const front=staffMode?null:await upload(idFront.files[0],applicantId,'front');
+  const back=staffMode?null:await upload(idBack.files[0],applicantId,'back');
   const payload=currentPayload(applicantId,'面接前');
   payload.id_front_path=front;payload.id_back_path=back;
   if(staffMode){payload.shop=staffShop.value;payload.remarks=staffRemarks.value.trim()||null}
