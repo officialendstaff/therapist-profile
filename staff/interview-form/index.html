@@ -92,5 +92,36 @@ helpBtn.onclick=async()=>{
   helpBtn.textContent='スタッフを呼び出し中…';helpMsg.innerHTML='<span class="helpDone">スタッフを呼びました。そのままお待ちください。</span>';
  }catch(err){console.error(err);helpMsg.textContent='呼び出しを送信できませんでした。エラー：'+(err?.message||String(err));helpBtn.disabled=false}
 };
-form.onsubmit=async e=>{e.preventDefault();submitBtn.disabled=true;msg.textContent='送信中です…';try{let applicantId=uuid(),front=await upload(idFront.files[0],applicantId,'front'),back=await upload(idBack.files[0],applicantId,'back');let payload=currentPayload(applicantId,'面接前');payload.id_front_path=front;payload.id_back_path=back;if(staffMode){payload.shop=staffShop.value;payload.remarks=staffRemarks.value.trim()||null;if(!payload.shop||!payload.name)throw new Error('面接店舗と氏名は必須です');const {data:auth}=await sb.auth.getUser();if(!auth?.user)throw new Error('スタッフとしてログインしてください')}let {error}=await sb.from('interview_applicants').insert(payload);if(error)throw error;if(staffMode&&new URLSearchParams(location.search).get('embedded')==='1'&&window.parent!==window){window.parent.postMessage({type:'interview-sheet-transcribed'},location.origin);return;}form.innerHTML=staffMode?'<section class="card" style="text-align:center"><h2>登録完了</h2><p>共通面接シートに保存しました。</p><a href="../interview-management/">面接管理に戻る</a></section>':'<section class="card" style="text-align:center"><h2>送信完了</h2><p class="note">ご入力ありがとうございました。スタッフへ送信しました。</p></section>'}catch(err){console.error(err);msg.textContent=staffMode?'登録できません：'+(err?.message||String(err)):'送信できませんでした。スタッフへお声がけください。';submitBtn.disabled=false}};
+form.onsubmit=async e=>{
+ e.preventDefault();
+ if(submitBtn.disabled)return;
+ msg.textContent='';
+ try{
+  if(staffMode){
+   if(!staffShop.value||!String(new FormData(form).get('name')||'').trim())throw new Error('面接店舗と氏名は必須です');
+   const {data:auth,error:authError}=await sb.auth.getUser();
+   if(authError||!auth?.user)throw new Error('ログイン状態を確認できません。求人管理に戻ってログインし直してください。');
+  }
+  submitBtn.disabled=true;
+  msg.textContent='登録処理中です…';
+  const applicantId=uuid();
+  const front=await upload(idFront.files[0],applicantId,'front');
+  const back=await upload(idBack.files[0],applicantId,'back');
+  const payload=currentPayload(applicantId,'面接前');
+  payload.id_front_path=front;payload.id_back_path=back;
+  if(staffMode){payload.shop=staffShop.value;payload.remarks=staffRemarks.value.trim()||null}
+  const {error}=await sb.from('interview_applicants').insert(payload);
+  if(error)throw error;
+  if(staffMode&&new URLSearchParams(location.search).get('embedded')==='1'&&window.parent!==window){
+   msg.textContent='登録完了。面接シート一覧に反映します。';
+   window.parent.postMessage({type:'interview-sheet-transcribed'},location.origin);
+   return;
+  }
+  form.innerHTML=staffMode?'<section class="card" style="text-align:center"><h2>登録完了</h2><p>共通面接シートに保存しました。</p><a href="../interview-management/">面接管理に戻る</a></section>':'<section class="card" style="text-align:center"><h2>送信完了</h2><p class="note">ご入力ありがとうございました。スタッフへ送信しました。</p></section>';
+ }catch(err){
+  console.error(err);
+  msg.textContent=staffMode?'登録できません：'+(err?.message||String(err)):'送信できませんでした。スタッフへお声がけください。';
+  submitBtn.disabled=false;
+ }
+};
 </script></body></html>
