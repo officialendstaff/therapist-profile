@@ -369,8 +369,8 @@ async function loadInterviewSheets(){
 
 }
 function updateInterviewSheetAlert(){
- updateMobileSheetAlert();const rows=window.interviewApplicants||[],help=rows.some(x=>x.remarks==='HELP');
- const latest=rows.reduce((v,x)=>Math.max(v,new Date(x.submitted_at||0).getTime()||0),0),seen=Number(localStorage.getItem('interviewSheetSeenAt')||0),unread=rows.some(x=>x.remarks!=='HELP'&&x.submitted_at&&new Date(x.submitted_at).getTime()>seen);
+ updateMobileSheetAlert();const rows=window.interviewApplicants||[],read=new Set(interviewSheetReadIds()),help=rows.some(x=>x.remarks==='HELP'&&!read.has(String(x.id)));
+ const latest=rows.reduce((v,x)=>Math.max(v,new Date(x.submitted_at||0).getTime()||0),0),seen=Number(localStorage.getItem('interviewSheetSeenAt')||0),unread=rows.some(x=>x.remarks!=='HELP'&&x.submitted_at&&!read.has(String(x.id))&&new Date(x.submitted_at).getTime()>seen);
  const nav=document.getElementById('scheduleNavLamp'),lamp=document.getElementById('scheduleLamp'),hl=document.getElementById('sheetHelpLamp');
  if(help){nav.textContent='●';nav.style.color='#d00';nav.classList.add('scheduleBlink');lamp.style.display='inline';lamp.style.color='#d00';lamp.classList.add('scheduleBlink');if(hl){hl.style.display='inline';hl.classList.add('scheduleBlink')}}
  else if(unread){nav.textContent='●';nav.style.color='#198754';nav.classList.add('scheduleBlink');lamp.style.display='inline';lamp.style.color='#198754';lamp.classList.add('scheduleBlink');if(hl){hl.style.display='none';hl.classList.remove('scheduleBlink')}}
