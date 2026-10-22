@@ -266,7 +266,7 @@ async function deleteBlock(id){
  const {error}=await sb.from('interview_staff_unavailability').delete().eq('id',id).eq('interviewer_user_id',personalViewer.userId);
  if(error)return alert(error.message);await loadSchedule();
 }
-const interviewerNames={"46536af1-b940-47ec-9199-82646072a82f":"お祭り","745f4373-dc35-4cf3-ab06-577d54d6694e":"太田君","72ad8e71-100a-4cb4-8a63-813154b62f99":"俺","9bcf0e46-f443-4c8b-8f43-2d99f0cabbc6":"社長"};function interviewAssignee(x){return escInterview(interviewerNames[x.interviewer_user_id]||'担当未設定')}
+const interviewerNames={"46536af1-b940-47ec-9199-82646072a82f":"お祭り","745f4373-dc35-4cf3-ab06-577d54d6694e":"オオタ","72ad8e71-100a-4cb4-8a63-813154b62f99":"俺","9bcf0e46-f443-4c8b-8f43-2d99f0cabbc6":"社長"};function interviewAssignee(x){return escInterview(interviewerNames[x.interviewer_user_id]||'担当未設定')}
 let mobileInterviewLineLinks=[];
 async function loadMobileInterviewLineLinks(){const {data,error}=await sb.from('staff_interview_line_links').select('interview_id,account_id,line_user_id,line_display_name,line_picture_url');if(error){console.warn('LINE紐づけの取得に失敗',error.message);return}mobileInterviewLineLinks=data||[]}
 function mobileLineLinkedLabel(x){const link=mobileInterviewLineLinks.find(v=>v.interview_id===x.id);return link?'<div style="margin-top:6px;display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:#135b48">'+(link.line_picture_url?'<img src="'+escInterview(link.line_picture_url)+'" alt="LINE" style="width:28px;height:28px;border-radius:50%;object-fit:cover">':'')+'✓ LINE：'+escInterview(link.line_display_name||'紐づけ済み')+'</div>':'<div style="margin-top:6px;font-size:12px;color:#64748b">LINE未紐づけ</div>'}
