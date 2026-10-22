@@ -254,10 +254,11 @@ function spNoticeItems(rows){
 function renderSpNoticeList(rows){const box=document.getElementById('spScheduleNoticeDetails');if(!box)return;const items=spNoticeItems(rows);window.spNoticeItemsCurrent=items;box.innerHTML=items.map((n,i)=>{const x=n.row;const d=n.type==='日程変更'&&x.previous_interview_date?x.previous_interview_date:x.interview_date;const t=String(n.type==='日程変更'&&x.previous_interview_time?x.previous_interview_time:x.interview_time||'').slice(0,5);const title=n.type==='確認済み'?'面接予約の確認':n.type==='新規面接'?'新規面接予約':n.type==='日程変更'?'面接日時の変更':n.type==='キャンセル'?'面接キャンセル':n.type;return '<button type="button" class="spNoticeItem" onclick="ackSpNotice('+i+')"><span class="spNoticeBody"><strong>'+escInterview(title)+'</strong><span>'+escInterview(x.shop)+'</span><span>'+escInterview(d)+' '+escInterview(t)+'</span></span><span class="spNoticeBadge">'+(n.type==='確認済み'?'確認済み':'確認する')+'</span></button>'}).join('');const legacy=document.getElementById('mobileScheduleAlert');if(legacy)legacy.style.display='none';const conf=document.getElementById('mobileConfirmedAlert');if(conf)conf.style.display='none';updateMobileAlertSummary();updateSpDashboard();spNoticeDiagnostics()}
 async function ackSpNotice(index){const n=(window.spNoticeItemsCurrent||[])[index];if(!n)return;const seen=spNoticeSeen();localStorage.setItem(spNoticeStorageKey(),JSON.stringify([...new Set([...seen,n.key])].slice(-500)));if(n.type!=='確認済み'&&n.row.alert){await sb.from('staff_interviews').update({alert:false}).eq('id',n.row.id);}if(window.scheduleInterviewRows){const row=window.scheduleInterviewRows.find(x=>x.id===n.row.id);if(row&&n.type!=='確認済み')row.alert=false;renderSpNoticeList(window.scheduleInterviewRows)}updateMobileAlertSummary();}
 function updateMobileScheduleAlert(rows){window.scheduleInterviewRows=rows;renderSpNoticeList(rows);updateMobileAlertSummary()}
+function interviewSheetReadIds(){try{const a=JSON.parse(localStorage.getItem('interviewSheetReadIds')||'[]');return Array.isArray(a)?a:[]}catch(e){return []}}
 function updateMobileSheetAlert(){
- const rows=window.interviewApplicants||[],seen=Number(localStorage.getItem('interviewSheetSeenAt')||0);
- const help=rows.filter(x=>x.remarks==='HELP').sort((a,b)=>String(b.submitted_at||'').localeCompare(String(a.submitted_at||'')));
- const unread=rows.filter(x=>x.remarks!=='HELP'&&x.submitted_at&&new Date(x.submitted_at).getTime()>seen).sort((a,b)=>String(b.submitted_at||'').localeCompare(String(a.submitted_at||'')));
+ const rows=window.interviewApplicants||[],seen=new Set(interviewSheetReadIds()),legacy=Number(localStorage.getItem('interviewSheetSeenAt')||0);
+ const help=rows.filter(x=>x.remarks==='HELP'&&!seen.has(String(x.id))).sort((a,b)=>String(b.submitted_at||'').localeCompare(String(a.submitted_at||'')));
+ const unread=rows.filter(x=>x.remarks!=='HELP'&&x.submitted_at&&!seen.has(String(x.id))&&new Date(x.submitted_at).getTime()>legacy).sort((a,b)=>String(b.submitted_at||'').localeCompare(String(a.submitted_at||'')));
  const h=document.getElementById('mobileHelpAlert'),sh=document.getElementById('mobileSheetAlert');
  if(h)h.style.display=help.length?'block':'none';
  if(sh)sh.style.display=unread.length?'block':'none';
@@ -308,15 +309,11 @@ function updateInterviewSheetAlert(){
  else{if(hl){hl.style.display='none';hl.classList.remove('scheduleBlink')}}
 }
 function markInterviewSheetSeen(x){
- const t=new Date(x.submitted_at||Date.now()).getTime()||Date.now();
- const prev=Number(localStorage.getItem('interviewSheetSeenAt')||0);
- if(t>prev)localStorage.setItem('interviewSheetSeenAt',String(t));updateMobileSheetAlert();
- const latest=(window.interviewApplicants||[]).filter(v=>v.remarks!=='HELP').reduce((m,v)=>Math.max(m,new Date(v.submitted_at||0).getTime()||0),0);
- if(Number(localStorage.getItem('interviewSheetSeenAt')||0)>=latest && !(window.interviewApplicants||[]).some(v=>v.remarks==='HELP')){
-  const nav=document.getElementById('scheduleNavLamp'),lamp=document.getElementById('scheduleLamp');
-  nav.classList.remove('scheduleBlink');lamp.classList.remove('scheduleBlink');
-  nav.textContent='□';nav.style.color='';lamp.style.display='none';
- }
+ if(!x?.id)return;
+ const ids=interviewSheetReadIds(),id=String(x.id);
+ if(!ids.includes(id))localStorage.setItem('interviewSheetReadIds',JSON.stringify([...ids,id].slice(-2000)));
+ updateMobileSheetAlert();
+ updateInterviewSheetAlert();
 }
 async function interviewSignedUrl(path){if(!path)return null;let {data,error}=await sb.storage.from('interview-id-documents').createSignedUrl(path,300);return error?null:data.signedUrl}
 async function openSheetFromUrl(){const id=new URLSearchParams(location.search).get('sheet');if(!id||!/^[0-9a-f-]{36}$/i.test(id))return;if(window.__sheetUrlOpened===id)return;const current=(window.interviewApplicants||[]).find(x=>x.id===id);if(current){window.__sheetUrlOpened=id;openInterviewSheet(id);return}const {data,error}=await sb.from('interview_applicants').select('*').eq('id',id).maybeSingle();if(error||!data){console.warn('指定面接シートを取得できません',error?.message);return}window.interviewApplicants=window.interviewApplicants||[];window.interviewApplicants.push(data);window.__sheetUrlOpened=id;openInterviewSheet(id)}
