@@ -421,7 +421,7 @@ function renderInterviewManagement(){
    const info=document.createElement('div');info.className='interviewInfo';
    const headline=document.createElement('div');headline.className='interviewHeadline';
    const when=document.createElement('span');when.textContent=x.interview_date+' '+String(x.interview_time).slice(0,5);
-   const displayStatus=resolvedInterviewStatus(x);const rawStatus=String(displayStatus||'');const isTobi=/トビ|無断.*(欠席|キャンセル)/.test(rawStatus);const statusLabel=isTobi?'トビ':displayStatus;const statusKind=isTobi?'tobi':displayStatus==='採用'?'hired':displayStatus==='不採用'?'rejected':String(displayStatus).includes('キャンセル')?'cancelled':displayStatus==='辞退'?'withdrawn':'other';const status=document.createElement('span');status.className='interviewStatus '+statusKind;status.textContent=statusLabel;box.classList.add('interviewEntry--'+statusKind);
+   const displayStatus=resolvedInterviewStatus(x);const rawStatus=String(displayStatus||'');const isTobi=/トビ|無断.*(欠席|キャンセル)/.test(rawStatus);const statusLabel=isTobi?'無断トビ':displayStatus;const statusKind=isTobi?'tobi':displayStatus==='採用'?'hired':displayStatus==='不採用'?'rejected':String(displayStatus).includes('キャンセル')?'cancelled':displayStatus==='辞退'?'withdrawn':'other';const status=document.createElement('span');status.className='interviewStatus '+statusKind;status.textContent=statusLabel;box.classList.add('interviewEntry--'+statusKind);
    headline.append(when,status);
    const name=document.createElement('div');name.className='interviewName';name.textContent=linked?(profile.displayName||linked.line_display_name||linked.line_user_id):'LINE未紐づけ';
    const actions=document.createElement('div');actions.className='interviewActions';
@@ -637,8 +637,8 @@ const recruitChangeLog=[
     "items": [
      "個人ページ埋め込み画面に「求人管理へ戻る」ボタンを追加。",
      "個人ページへの移動処理のJavaScript構文エラーを修正し、ログイン不能となる問題に対応。",
-     "面接履歴カードの配色を状態別に変更：トビは赤、キャンセルはグレー。",
-     "面接履歴の「トビ（キャンセル）」を表示上「トビ」に変更（保存データは変更なし）。",
+     "面接履歴カードの配色を状態別に変更：無断トビは赤、キャンセルはグレー。",
+     "面接履歴の「トビ（キャンセル）」を表示上「無断トビ」に変更（保存データは変更なし）。",
      "Un SecretのLINE Webhook接続・受信テストを確認し、LINEプロフィールの表示名・アイコン取得に対応。",
      "Un Secretの応募者一覧・月別LINE集計・面接管理の表示を確認（採用管理画面と60分枠は最終動作未確認）。",
      "ヘッダー固定・ボタン配置、スマートフォン表示、お知らせ画面の構成を調整。"
