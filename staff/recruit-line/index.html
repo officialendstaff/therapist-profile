@@ -307,8 +307,7 @@ function renderHires(){
    el.append(item);
   }
  }
- const count=joined.length;
- const total=document.createElement('h3');total.textContent='面接件数　'+count+'件';total.style.marginTop='22px';el.append(total);
+
 }
 async function openHireLineLinkDialog(form){
  const modal=$('hireFormLinkModal'),list=$('hireFormLinkOptions');modal.classList.remove('hide');list.replaceChildren();
