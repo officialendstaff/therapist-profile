@@ -193,7 +193,18 @@ $('storeBack').onclick=()=>{ $('storeBack').classList.add('hide');activeStore=nu
 const date=s=>s?new Date(s).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'}):'―';
 const msg=(id,s)=>$(id).textContent=s;
 let currentRecruitStaffRole=null;let currentRecruitAllowedStores=new Set();
-async function check(){await recruitCheckIdle();if(recruitIdleLoggingOut)return;const {data:{session}}=await sb.auth.getSession();const user=session?.user||null;const error=null;if(error||!user){$('authLoading').classList.add('hide');$('gate').classList.remove('hide');$('app').classList.add('hide');return}const {data:staffAccess,error:staffError}=await sb.from('recruit_staff_profiles').select('role,stores').eq('user_id',user.id).maybeSingle();const {data:legacyAdmin,error:legacyError}=await sb.from('recruit_line_admins').select('user_id').eq('user_id',user.id).maybeSingle();currentRecruitStaffRole=staffAccess?.role||null;currentRecruitAllowedStores=new Set((staffAccess?.stores||[]).flatMap(g=>g==='rose'?['rose','busty-osaka']:g==='grand'?['grand-luxe','un-secret']:g==='luxy'?['luxy']:[]));const allowed=staffAccess&&['master','full','custom'].includes(staffAccess.role)||(!staffAccess&&legacyAdmin);if((staffError&&!legacyAdmin)||(!allowed&&(!legacyAdmin||legacyError))){$('authLoading').classList.add('hide');$('gate').classList.remove('hide');$('app').classList.add('hide');msg('error','このアカウントには求人管理権限がありません。');return}$('gate').classList.add('hide');$('app').classList.add('hide');$('storeView').classList.remove('hide');$('listView').classList.add('hide');$('detail').classList.add('hide');await loadStoreDirectory();await refreshMasterStatus();
+async function check(){await recruitCheckIdle();if(recruitIdleLoggingOut)return;const {data:{session}}=await sb.auth.getSession();const user=session?.user||null;const error=null;
+ if(user){
+  try{
+   const {data:staffProfile,error:staffProfileError}=await sb.rpc('interview_my_profile');
+   if(staffProfileError)throw staffProfileError;
+   const ownProfile=Array.isArray(staffProfile)?staffProfile[0]:staffProfile;
+   const profileKey=ownProfile?.profile_key;
+   window.recruitPersonalButtonLabel=({owner:'俺',president:'社長',ota:'オオタ',festival:'お祭り'})[profileKey]||'個人ページ';
+  }catch(e){window.recruitPersonalButtonLabel='個人ページ';}
+  syncRecruitPersonalButtonLabel();
+ }else{window.recruitPersonalButtonLabel='個人ページ';syncRecruitPersonalButtonLabel();}
+if(error||!user){$('authLoading').classList.add('hide');$('gate').classList.remove('hide');$('app').classList.add('hide');return}const {data:staffAccess,error:staffError}=await sb.from('recruit_staff_profiles').select('role,stores').eq('user_id',user.id).maybeSingle();const {data:legacyAdmin,error:legacyError}=await sb.from('recruit_line_admins').select('user_id').eq('user_id',user.id).maybeSingle();currentRecruitStaffRole=staffAccess?.role||null;currentRecruitAllowedStores=new Set((staffAccess?.stores||[]).flatMap(g=>g==='rose'?['rose','busty-osaka']:g==='grand'?['grand-luxe','un-secret']:g==='luxy'?['luxy']:[]));const allowed=staffAccess&&['master','full','custom'].includes(staffAccess.role)||(!staffAccess&&legacyAdmin);if((staffError&&!legacyAdmin)||(!allowed&&(!legacyAdmin||legacyError))){$('authLoading').classList.add('hide');$('gate').classList.remove('hide');$('app').classList.add('hide');msg('error','このアカウントには求人管理権限がありません。');return}$('gate').classList.add('hide');$('app').classList.add('hide');$('storeView').classList.remove('hide');$('listView').classList.add('hide');$('detail').classList.add('hide');await loadStoreDirectory();await refreshMasterStatus();
  if(staffAccess?.role==='custom'){
   const allowedStores=currentRecruitAllowedStores;
   const tiles=[...$('storeGrid').querySelectorAll('.storeTile')];
@@ -554,7 +565,7 @@ async function openSelectedInterviewManagement(){if(!activeStore)return;
   if(profileError)throw profileError;
   const own=Array.isArray(mine)?mine[0]:mine;
   profileKey=own?.profile_key||'';
-  window.recruitPersonalButtonLabel=({president:'社長ページ',ota:'オオタページ',festival:'お祭りページ',owner:'末端ページ'})[profileKey]||'個人ページ';syncRecruitHeaderActions();
+  window.recruitPersonalButtonLabel=({president:'社長ページ',ota:'オオタページ',festival:'お祭りページ',owner:'俺'})[profileKey]||'個人ページ';syncRecruitHeaderActions();
  }catch(e){alert('担当者の確認に失敗しました。再ログインしてください。\n'+(e.message||e));return}
  const personalPaths={president:'../interview-personal/president/?embedded=1',ota:'../interview-personal/ota/?embedded=1',festival:'../interview-personal/festival/?embedded=1'};
  if(personalPaths[profileKey]){
