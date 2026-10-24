@@ -254,30 +254,23 @@ document.getElementById('lineSoundTest').addEventListener('click',async()=>{acti
 function playLineAlert(){
 stopLineAlert();
 if(!lineSoundReady||!lineSoundContext)return;
-function playOneChime(){
 try{
-const ctx=lineSoundContext,now=ctx.currentTime;
-const notes=[
-{at:0,duration:.85,frequencies:[659.25,830.61,987.77]},
-{at:.92,duration:1.35,frequencies:[523.25,659.25,783.99,1046.50]}
-];
-for(const note of notes){
-const start=now+note.at;
-for(const frequency of note.frequencies){
-const oscillator=ctx.createOscillator(),gain=ctx.createGain();
-oscillator.type='sine';oscillator.frequency.setValueAtTime(frequency,start);
-gain.gain.setValueAtTime(.0001,start);
-gain.gain.exponentialRampToValueAtTime(.028,start+.035);
-gain.gain.setValueAtTime(.028,start+note.duration*.48);
-gain.gain.exponentialRampToValueAtTime(.0001,start+note.duration);
-oscillator.connect(gain);gain.connect(ctx.destination);
-oscillator.start(start);oscillator.stop(start+note.duration+.02);lineSoundVoices.push(oscillator);oscillator.onended=()=>{lineSoundVoices=lineSoundVoices.filter(v=>v!==oscillator)}
+const ctx=lineSoundContext,sr=ctx.sampleRate;
+const burst=.85,shortGap=.18,longGap=.9,cycle=2*burst+shortGap+longGap;
+const buffer=ctx.createBuffer(1,Math.ceil(cycle*sr),sr),samples=buffer.getChannelData(0);
+for(let i=0;i<samples.length;i++){
+const t=i/sr;
+const local=t<burst?t:(t>=burst+shortGap&&t<2*burst+shortGap?t-burst-shortGap:-1);
+if(local<0)continue;
+const fade=Math.max(0,Math.min(1,local/.012,(burst-local)/.025));
+const trem=.62+.38*Math.pow(Math.sin(2*Math.PI*22*local),2);
+samples[i]=.68*fade*trem*(.42*Math.sin(2*Math.PI*740*local)+.38*Math.sin(2*Math.PI*790*local)+.12*Math.sin(2*Math.PI*1480*local)+.08*Math.sin(2*Math.PI*1580*local));
 }
-}
-}catch(e){console.warn('LINE chime playback failed',e)}
-}
-playOneChime();
-lineSoundRepeatTimer=setInterval(playOneChime,2200);
+const source=ctx.createBufferSource();
+source.buffer=buffer;source.loop=true;source.connect(ctx.destination);
+source.onended=()=>{lineSoundVoices=lineSoundVoices.filter(v=>v!==source)};
+lineSoundVoices.push(source);source.start();
+}catch(e){console.warn('LINE telephone bell playback failed',e)}
 }
 async function checkLineNotice(){
 try{
