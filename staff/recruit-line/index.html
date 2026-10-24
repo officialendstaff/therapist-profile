@@ -613,38 +613,60 @@ function closeRecruitStoreSettings(){const e=document.getElementById("recruitHea
 })();
 </script>
 <script id="recruitNoticesScript">
-const recruitChangeLog=[{date:'2026-10-24',sections:[
-{area:'面接登録',items:[
-'LINE通知音：新着LINE通知時に通知音を1回鳴らす処理。',
-'LINE通知音：未確認の場合、約30秒間隔で通知音を繰り返す処理。',
-'LINE通知：LINE通知ボタンを押すと通知音を停止する仕様。',
-'バックグラウンド通知：PCで別タブを表示している場合も通知を確認する処理（ブラウザによる時間制限あり）。',
-'対応不可時間：面接終了時刻ではなく、開始時刻を基準に判定。',
-'対応不可時間：21:00から対応不可の場合、21:00以降の開始を制限。',
-'古い設定の削除：10月26日に残っていた19:00開始の旧設定を削除。',
-'全店舗カレンダー：全店舗選択時、カレンダーを横幅いっぱいに表示。',
-'日程変更：明日以降の面接予定から、新しい日付・時間を選択できるよう修正。',
-'予定一覧：「明日以降」「過去」のフォントサイズ・色・太さを「今日」と統一。'
-]},
-{area:'求人管理',items:[
-'ヘッダー：二重表示を防止する処理を修正。',
-'ヘッダー固定：スクロール時も画面上部に表示。',
-'お知らせボタン：個人ページボタンの左側に新設。',
-'個人ページボタン：ヘッダー内の配置とサイズを調整。',
-'スマートフォン表示：ページ名・お知らせ・個人ページを横一列に配置。',
-'ボタンサイズ：お知らせ・個人ページの幅と高さを統一。',
-'お知らせ画面：改修履歴を確認できる画面を追加。',
-'改修履歴：改修日ごとに変更内容を記録。',
-'改修履歴の分類：面接登録・求人管理・面接管理の3分類に変更。'
-]},
-{area:'面接管理',items:[
-'対応不可カレンダー：当日を黄色で表示。',
-'対応不可カレンダー：選択日を濃紺で表示。',
-'日付表示：「今日」「選択中」の文字を追加。',
-'共通仕様：俺・社長・オオタ・お祭りの4名の個人ページに配色変更を反映。',
-'対応不可設定：同一担当者・同一日付の古い設定を整理し、最新の登録を保持するよう変更。'
-]}
-]}];
+const recruitChangeLog=[
+ {
+  "date": "2026-10-24",
+  "sections": [
+   {
+    "area": "面接登録",
+    "items": [
+     "PCサイドバー幅を235pxから310pxに拡張し、今日の面接予定の「確認OK・日程変更・キャンセル」ボタンを横一列のまま拡大。",
+     "操作ボタンの高さを43px以上とし、ボタン間隔を拡大して押し間違いを防止。",
+     "点滅中と通常時の面接カードの余白・ボタン位置を統一。",
+     "確認LINE送信時刻の通知をPCでは横一列に整理し、重複説明文を削除。",
+     "LINE新着通知音を1回鳴らし、未確認時に約30秒間隔で繰り返す処理。LINE通知ボタンの操作で停止。",
+     "バックグラウンドでの通知処理（ブラウザ側の制限により厳密な間隔は保証不可）。",
+     "対応不可時間の判定を面接開始時刻基準に調整。21:00以降の開始制限と旧設定の整理。",
+     "全店舗カレンダーの表示調整、日程変更の操作修正、明日以降・過去の見出しデザイン統一。"
+    ]
+   },
+   {
+    "area": "求人管理",
+    "items": [
+     "個人ページ埋め込み画面に「求人管理へ戻る」ボタンを追加。",
+     "個人ページへの移動処理のJavaScript構文エラーを修正し、ログイン不能となる問題に対応。",
+     "面接履歴カードの配色を状態別に変更：トビは赤、無断トビは濃赤、キャンセルはグレー。",
+     "面接履歴の「トビ（キャンセル）」を表示上「トビ」に変更（保存データは変更なし）。",
+     "Un SecretのLINE Webhook接続・受信テストを確認し、LINEプロフィールの表示名・アイコン取得に対応。",
+     "Un Secretの応募者一覧・月別LINE集計・面接管理の表示を確認（採用管理画面と60分枠は最終動作未確認）。",
+     "ヘッダー固定・ボタン配置、スマートフォン表示、お知らせ画面の構成を調整。"
+    ]
+   },
+   {
+    "area": "面接管理（個人ページ・共通）",
+    "items": [
+     "対応不可カレンダーの当日・選択日を色分けし、表示文言を追加。",
+     "俺・社長・オオタ・お祭りの4名の個人ページで対応不可カレンダーの共通表示仕様を調整。",
+     "面接開始時刻を過ぎても未処理の予定は表示し、トビなど処理済みの記録は「本日対応済み」に分類する現行動作を確認。"
+    ]
+   },
+   {
+    "area": "面接データ",
+    "items": [
+     "薔薇と紳士・2026年10月24日14:30のテスト用キャンセル記録（面接ID43）を削除。実記録（面接ID44）は保持。"
+    ]
+   },
+   {
+    "area": "未実装・検討中",
+    "items": [
+     "面接履歴のステータス別絞り込みは見送り。",
+     "「返信なし」ボタンの追加は見送り。",
+     "グループ店舗間のトビ・キャンセル履歴の自動照合と警告表示は未実装。"
+    ]
+   }
+  ]
+ }
+];
 function openRecruitNotices(){const root=document.getElementById('recruitNoticesContent');root.replaceChildren();for(const day of recruitChangeLog){const daySection=document.createElement('section');daySection.className='recruitNoticesDay';const h=document.createElement('h3');h.textContent=day.date;daySection.append(h);for(const section of day.sections){const group=document.createElement('section');group.className='recruitNoticesArea';const title=document.createElement('h4');title.textContent='改修場所：'+section.area;group.append(title);const ul=document.createElement('ul');for(const entry of section.items){const li=document.createElement('li');li.textContent=entry;ul.append(li)}group.append(ul);daySection.append(group)}root.append(daySection)}document.getElementById('recruitNoticesDialog').classList.remove('hide');document.body.style.overflow='hidden'}
 function closeRecruitNotices(){document.getElementById('recruitNoticesDialog').classList.add('hide');document.body.style.overflow=''}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!document.getElementById('recruitNoticesDialog').classList.contains('hide'))closeRecruitNotices()});
