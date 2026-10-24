@@ -147,16 +147,17 @@ main.wrap{display:block;width:100%;max-width:860px;min-width:0;margin-left:auto;
 <script id="recruitHeaderDedup">
 (function(){
 function normalizeRecruitHeader(){
- const headers=[...document.body.children].filter(el=>el.tagName==='HEADER');
+ const headers=[...document.querySelectorAll('body header')].filter(el=>el.querySelector('h1')?.textContent?.includes('求人管理'));
  if(headers.length<2)return;
  const primary=headers[0];
  for(const duplicate of headers.slice(1)){
   const sameTitle=duplicate.querySelector('h1')?.textContent?.replace(/\s+/g,' ').trim()===primary.querySelector('h1')?.textContent?.replace(/\s+/g,' ').trim();
-  if(sameTitle&&duplicate.querySelector('#personalPageLink'))duplicate.remove();
+  if(sameTitle)duplicate.remove();
  }
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',normalizeRecruitHeader,{once:true});
 else normalizeRecruitHeader();
+new MutationObserver(normalizeRecruitHeader).observe(document.documentElement,{childList:true,subtree:true});
 })();
 </script>
 <main class="wrap">
