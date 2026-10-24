@@ -609,21 +609,34 @@ function closeRecruitStoreSettings(){const e=document.getElementById("recruitHea
 <script id="recruitNoticesScript">
 const recruitChangeLog=[{date:'2026-10-24',sections:[
 {area:'面接登録',items:[
-'全店舗を選択した場合、カレンダーを横幅いっぱいに表示し、店舗・日付選択前の入力欄を非表示に変更。',
-'明日以降の面接予定から「日程変更」を押すと、対象店舗のカレンダーに戻って新しい日付・担当者・時間を選択できるよう修正。',
-'対応不可の開始時刻を面接開始時刻と比較する判定に変更（21:00から対応不可なら21:00以降の開始を制限）。',
-'古い共通の対応不可時間による誤判定を解消。10月26日の旧19:00開始データを削除。',
-'左側メニューの「明日以降の面接予定」「過去の面接予定」の文字サイズ・文字色・太さを「今日の面接予定」と統一。'
+'LINE通知音：新着LINE通知時に通知音を1回鳴らす処理。',
+'LINE通知音：未確認の場合、約30秒間隔で通知音を繰り返す処理。',
+'LINE通知：LINE通知ボタンを押すと通知音を停止する仕様。',
+'バックグラウンド通知：PCで別タブを表示している場合も通知を確認する処理（ブラウザによる時間制限あり）。',
+'対応不可時間：面接終了時刻ではなく、開始時刻を基準に判定。',
+'対応不可時間：21:00から対応不可の場合、21:00以降の開始を制限。',
+'古い設定の削除：10月26日に残っていた19:00開始の旧設定を削除。',
+'全店舗カレンダー：全店舗選択時、カレンダーを横幅いっぱいに表示。',
+'日程変更：明日以降の面接予定から、新しい日付・時間を選択できるよう修正。',
+'予定一覧：「明日以降」「過去」のフォントサイズ・色・太さを「今日」と統一。'
 ]},
 {area:'求人管理',items:[
-'ヘッダーの二重表示を防止する処理を修正（公開画面での最終確認は未完了）。',
-'ヘッダーをスクロール中も画面上部に固定。',
-'スマートフォンで「求人管理｜L GROUP」「お知らせ」「個人ページ」を横一列に配置し、ボタン寸法を調整。',
-'「お知らせ」ボタンを追加し、改修日・改修場所別に内容を確認できる履歴画面を設置。'
+'ヘッダー：二重表示を防止する処理を修正。',
+'ヘッダー固定：スクロール時も画面上部に表示。',
+'お知らせボタン：個人ページボタンの左側に新設。',
+'個人ページボタン：ヘッダー内の配置とサイズを調整。',
+'スマートフォン表示：ページ名・お知らせ・個人ページを横一列に配置。',
+'ボタンサイズ：お知らせ・個人ページの幅と高さを統一。',
+'お知らせ画面：改修履歴を確認できる画面を追加。',
+'改修履歴：改修日ごとに変更内容を記録。',
+'改修履歴の分類：面接登録・求人管理・面接管理の3分類に変更。'
 ]},
 {area:'面接管理',items:[
-'4名の個人ページの対応不可設定カレンダーで、当日は黄色・選択日は濃紺に変更し、「今日」「選択中」を表示。',
-'担当者ごとの対応不可設定を面接登録側の空き時間判定に使用するよう連携を修正。'
+'対応不可カレンダー：当日を黄色で表示。',
+'対応不可カレンダー：選択日を濃紺で表示。',
+'日付表示：「今日」「選択中」の文字を追加。',
+'共通仕様：俺・社長・オオタ・お祭りの4名の個人ページに配色変更を反映。',
+'対応不可設定：同一担当者・同一日付の古い設定を整理し、最新の登録を保持するよう変更。'
 ]}
 ]}];
 function openRecruitNotices(){const root=document.getElementById('recruitNoticesContent');root.replaceChildren();for(const day of recruitChangeLog){const daySection=document.createElement('section');daySection.className='recruitNoticesDay';const h=document.createElement('h3');h.textContent=day.date;daySection.append(h);for(const section of day.sections){const group=document.createElement('section');group.className='recruitNoticesArea';const title=document.createElement('h4');title.textContent='改修場所：'+section.area;group.append(title);const ul=document.createElement('ul');for(const entry of section.items){const li=document.createElement('li');li.textContent=entry;ul.append(li)}group.append(ul);daySection.append(group)}root.append(daySection)}document.getElementById('recruitNoticesDialog').classList.remove('hide');document.body.style.overflow='hidden'}
