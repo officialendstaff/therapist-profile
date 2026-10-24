@@ -11,12 +11,40 @@ function reiSampleClient(){
   if(!window.supabase?.createClient)throw new Error('Supabase JS is not loaded');
   return window.supabase.createClient(REI_SAMPLE_DB.url,REI_SAMPLE_DB.anonKey);
 }
+async function nishinoReadLegacy(client){
+  const [page,photos,sns,schedule,news]=await Promise.all([
+    client.from('nishino_page').select('*').eq('id',1).maybeSingle(),
+    client.from('nishino_photos').select('image_url,image_data,sort_order').order('sort_order',{ascending:true}),
+    client.from('nishino_sns').select('*').eq('id',1).maybeSingle(),
+    client.from('nishino_schedule').select('*').gte('schedule_date',new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Tokyo'})).order('schedule_date',{ascending:true}).limit(120),
+    client.from('nishino_news').select('title,body,published_at').eq('is_public',true).lte('published_at',new Date().toISOString()).order('published_at',{ascending:false}).limit(3)
+  ]);
+  if(page.error||!page.data)throw new Error('西野さんの既存データを読み込めません');
+  const p=page.data,n=sns.data||{},shifts={};
+  for(const row of schedule.data||[]){
+    const start=row.base_start||row.today_start,end=row.base_end||row.today_end;
+    if(row.base_status==='work'&&start&&end)shifts[row.schedule_date]=start.slice(0,5)+'–'+end.slice(0,5);
+  }
+  return {
+    name:'西野',catch:'薔薇と紳士 · NISHINO',intro:p.intro||'',images:{
+      hero:p.hero_image_url||'../main.png.png',personal:p.personal_image_url||'',
+      profile:p.profile_image_url||'',calendar:p.calendar_image_url||'',
+      working:p.work_image_url||'',off:p.off_image_url||'',soldout:p.full_image_url||''
+    },
+    photos:(photos.data||[]).map(x=>x.image_url||x.image_data).filter(Boolean),
+    sns:{line:n.line_enabled===false?'':n.line_url||'',x:n.x_enabled===false?'':n.x_url||'',sub:n.sns02_enabled===false?'':n.sns02_url||''},
+    shifts,newsItems:(news.data||[]).map(x=>({title:x.title,body:x.body,date:x.published_at})),
+    phone:'0662145047',shopLine:'https://line.me/R/ti/p/@639kkifl?oat_content=url',
+    official:'https://rose-gentleman.com/profile.php?id=146',
+    ogp:{title:'西野 | 薔薇と紳士',description:'薔薇と紳士 西野 セラピスト OFFICIAL PAGE',image:p.hero_image_url||''}
+  };
+}
 async function reiSampleReadPublished(client){
   const {data,error}=await client.from(REI_SAMPLE_DB.table)
     .select('config').eq('therapist_key',REI_SAMPLE_DB.therapistKey)
     .maybeSingle();
   if(error)throw error;
-  return data?.config??null;
+  return data?.config??await nishinoReadLegacy(client);
 }
 let reiSampleLoadedRevision=null;
 function reiCanonical(value){if(Array.isArray(value))return value.map(reiCanonical);if(value&&typeof value==='object')return Object.fromEntries(Object.keys(value).sort().map(key=>[key,reiCanonical(value[key])]));return value}
