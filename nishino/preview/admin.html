@@ -279,6 +279,9 @@ const applyButton=document.createElement('button');applyButton.type='button';app
 const paidList=document.createElement('div');s.append(paidList);
 function renderPaid(){paidList.replaceChildren();d.travelAreas.filter(x=>Number(x.price)>=1000).forEach(x=>{const row=document.createElement('div');row.className='item';textfield(row,'エリア名',x,'name');textfield(row,'交通費（円）',x,'price','number');check(row,'表示',x,'visible');const del=document.createElement('button');del.type='button';del.className='secondary';del.textContent='削除';del.onclick=()=>{const i=d.travelAreas.indexOf(x);if(i>=0)d.travelAreas.splice(i,1);renderPaid()};row.append(del);paidList.append(row)})}
 renderPaid();
+const askHead=document.createElement('h3');askHead.textContent='要問い合わせ（ASK）エリア';s.append(askHead);
+if(!Array.isArray(d.travelAskAreas))d.travelAskAreas=[];
+items(s,d.travelAskAreas,[['エリア名','name'],['表示','visible','checkbox']],()=>({name:'新しいASKエリア',visible:true}));
 compactBookingSection(s);
 s=section('LOCATION GUIDE');textfield(s,'セクション見出し',d,'locationTitle');items(s,d.areas,[['エリア名','name'],['形式','type','select',[['image','画像'],['map','Google Maps埋め込み']]],['画像URL','image'],['Google Maps埋め込みURL','map'],['表示','visible','checkbox']],()=>({name:'NEW AREA',type:'image',image:'',map:'',visible:true}),{autoSave:true});
 s=section('セクションの表示・並び順');{
