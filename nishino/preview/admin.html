@@ -208,7 +208,7 @@ if(currentPage==='basic'){
  if(!d.officialBlog||typeof d.officialBlog!=='object')d.officialBlog={};
  const blog=d.officialBlog;
  const lab=document.createElement('label');lab.textContent='公式ブログ一覧URL';blogSection.append(lab);
- const url=document.createElement('input');url.type='url';url.placeholder='https://grandluxe-osaka.com/bloglist.php?id=1463';url.value=blog.listUrl||'https://grandluxe-osaka.com/bloglist.php?id=1463';blog.listUrl=url.value;url.addEventListener('input',()=>blog.listUrl=url.value.trim());blogSection.append(url);
+ const url=document.createElement('input');url.type='url';url.placeholder='https://rose-gentleman.com/bloglist.php?id=146';url.value=blog.listUrl||'https://rose-gentleman.com/bloglist.php?id=146';blog.listUrl=url.value;url.addEventListener('input',()=>blog.listUrl=url.value.trim());blogSection.append(url);
  const countLabel=document.createElement('label');countLabel.textContent='表示件数';blogSection.append(countLabel);
  const count=document.createElement('select');[1,2,3].forEach(n=>{const opt=document.createElement('option');opt.value=n;opt.textContent=n+'件';count.append(opt)});count.value=String([1,2,3].includes(Number(blog.count))?blog.count:1);blog.count=Number(count.value);count.addEventListener('change',()=>blog.count=Number(count.value));blogSection.append(count);
  
