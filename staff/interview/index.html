@@ -315,10 +315,10 @@ const linkedApplicant=window.getSelectedLineApplicant?.();if(linkedApplicant&&li
 </script><script>
 (()=>{const lock=document.getElementById('staffLock'),pin=document.getElementById('staffPin'),btn=document.getElementById('staffUnlock'),err=document.getElementById('staffLockErr');const KEY='interview_staff_session_v2',endpoint='https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access';
 async function api(action,extra={}){const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,...extra}),cache:'no-store'});const data=await response.json().catch(()=>({}));if(!response.ok)throw Error(data.error||'request_failed');return data}
-window.interviewStaffAuth={token:()=>localStorage.getItem(KEY)||sessionStorage.getItem(KEY),api:async(action,extra={})=>api(action,{token:sessionStorage.getItem(KEY),...extra})};
+window.interviewStaffAuth={token:()=>localStorage.getItem(KEY)||sessionStorage.getItem(KEY),api:async(action,extra={})=>api(action,{token:localStorage.getItem(KEY)||sessionStorage.getItem(KEY),...extra})};
 async function unlock(){const password=pin.value;if(!password)return;btn.disabled=true;err.textContent='確認中...';try{const data=await api('login',{password});localStorage.setItem(KEY,data.token);sessionStorage.removeItem(KEY);pin.value='';lock.style.display='none';err.textContent='';window.dispatchEvent(new Event('interview-auth-ready'))}catch(e){err.textContent=e.message==='incorrect_password'?'パスワードが違います。':e.message==='too_many_attempts'?'試行回数が多すぎます。15分後に再度お試しください。':'ログインできません。時間をおいて再度お試しください。';pin.value='';pin.focus()}finally{btn.disabled=false}}
 btn.addEventListener('click',unlock);pin.addEventListener('keydown',e=>{if(e.key==='Enter')unlock()});
-(async()=>{const token=sessionStorage.getItem(KEY);if(!token){lock.style.display='';return}try{await api('verify',{token});lock.style.display='none';window.dispatchEvent(new Event('interview-auth-ready'))}catch(e){localStorage.removeItem(KEY);sessionStorage.removeItem(KEY);lock.style.display='';}})();
+(async()=>{const token=localStorage.getItem(KEY)||sessionStorage.getItem(KEY);if(!token){lock.style.display='';return}try{await api('verify',{token});lock.style.display='none';window.dispatchEvent(new Event('interview-auth-ready'))}catch(e){localStorage.removeItem(KEY);sessionStorage.removeItem(KEY);lock.style.display='';}})();
 })();
 </script><script>
 (()=>{const url='https://vjjnkflbfsjihwzjsjpr.supabase.co',key='sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos';
