@@ -445,6 +445,6 @@ document.addEventListener('click',function(e){
  const b=e.target.closest('button.action-confirm,button.action-change,button.action-cancel');
  if(!b)return;
  b.classList.add('action-tapped');
- if(b.classList.contains('action-cancel'))setTimeout(()=>b.classList.remove('action-tapped'),1600);
+ setTimeout(()=>b.classList.remove('action-tapped'),350);
 });
 </script></body></html>
