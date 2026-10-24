@@ -517,6 +517,7 @@ let recruitIsMaster=false;async function refreshMasterStatus(){const {data,error
 function closeActionHistory(){document.getElementById('actionHistory').classList.add('hide');document.getElementById('storeView').classList.remove('hide')}
 async function openActionHistory(){
  if(!recruitIsMaster)return;
+ auditSelectedCategory=null;
  document.getElementById('storeView').classList.add('hide');
  document.getElementById('actionHistory').classList.remove('hide');
  const host=document.getElementById('actionHistoryRows');host.textContent='読み込み中...';
@@ -530,20 +531,53 @@ async function openActionHistory(){
  }
  renderActionHistory();
 }
+const auditCategories=[
+ {group:'求人管理',name:'応募者管理',match:/応募|問い合わせ|問合せ|除外|復元|LINE/i},
+ {group:'求人管理',name:'採用管理',match:/採用|不採用|辞退|入店|在籍/},
+ {group:'求人管理',name:'権限管理',match:/権限|承認|招待|スタッフ登録|アカウント|停止/},
+ {group:'求人管理',name:'店舗設定',match:/店舗設定|店舗情報|店舗変更/},
+ {group:'個人管理',name:'対応不可設定',match:/対応不可|不可時間|不可設定/},
+ {group:'個人管理',name:'面接予定・確認',match:/面接予定|面接確認|確認OK|日程変更|面接キャンセル|到着|無断|トビ/},
+ {group:'個人管理',name:'面接シート',match:/面接シート|転記|面接情報|入店処理|印刷/}
+];
+let auditSelectedCategory=null;
+function auditCategoryFor(item){
+ const content=[item.action||'',item.detail||''].join(' ');
+ return auditCategories.find(c=>c.match.test(content))?.name||'その他の操作';
+}
 function renderActionHistory(){
  const host=document.getElementById('actionHistoryRows');host.replaceChildren();
  const store=document.getElementById('auditStoreFilter').value,actor=document.getElementById('auditActorFilter').value;
  const rows=actionAuditRows.filter(v=>(!store||v.store_name===store)&&(!actor||v.actor_name===actor));
- if(!rows.length){host.textContent='該当する操作履歴はありません。記録開始前の操作は表示されません。';return}
- for(const item of rows){
-  const entry=document.createElement('div');entry.style.cssText='padding:12px 2px;border-bottom:1px solid #e5e7eb;line-height:1.7';
-  const top=document.createElement('div');top.style.cssText='display:flex;justify-content:space-between;gap:8px';
-  const name=document.createElement('strong');name.textContent=item.actor_name||'スタッフ';
-  const time=document.createElement('small');time.style.color='#777';time.textContent=new Date(item.occurred_at).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'});
-  top.append(name,time);
-  const action=document.createElement('div');action.textContent=(item.store_name||'全店舗')+' ｜ '+item.action;
-  const detail=document.createElement('div');detail.style.color='#777';detail.textContent=item.detail||'';
-  entry.append(top,action,detail);host.append(entry);
+ if(auditSelectedCategory){
+  const back=document.createElement('button');back.type='button';back.textContent='← 操作項目一覧へ';back.style.cssText='background:#f1f3f5;color:#20242a;padding:10px 14px;border:1px solid #dce0e5;border-radius:9px;margin:8px 0 14px';back.onclick=()=>{auditSelectedCategory=null;renderActionHistory()};host.append(back);
+  const title=document.createElement('h3');title.textContent=auditSelectedCategory;title.style.cssText='font-size:17px;margin:0 0 10px';host.append(title);
+  const matching=rows.filter(v=>auditCategoryFor(v)===auditSelectedCategory);
+  if(!matching.length){const empty=document.createElement('p');empty.textContent='該当する操作履歴はありません。';host.append(empty);return}
+  for(const item of matching){
+   const entry=document.createElement('div');entry.style.cssText='padding:12px 3px;border-bottom:1px solid #e5e7eb;line-height:1.65';
+   const top=document.createElement('div');top.style.cssText='display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px';
+   const name=document.createElement('strong');name.textContent=item.actor_name||'操作者不明';
+   const time=document.createElement('small');time.style.color='#666';time.textContent=new Date(item.occurred_at).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'});
+   top.append(name,time);
+   const action=document.createElement('div');action.style.fontWeight='600';action.textContent=item.action||'操作';
+   const detail=document.createElement('div');detail.style.color='#555';detail.textContent=(item.store_name||'全店舗')+(item.detail?' ｜ '+item.detail:'');
+   entry.append(top,action,detail);host.append(entry);
+  }
+  return;
+ }
+ const hint=document.createElement('p');hint.textContent='操作項目を選ぶと、誰が・いつ・何をしたか確認できます。';hint.style.cssText='font-size:12px;color:#666;margin:6px 0 14px';host.append(hint);
+ for(const group of ['求人管理','個人管理']){
+  const heading=document.createElement('h3');heading.textContent=group;heading.style.cssText='font-size:16px;margin:17px 0 9px';host.append(heading);
+  const cats=auditCategories.filter(c=>c.group===group);
+  if(group==='個人管理')cats.push({name:'その他の操作'});
+  for(const category of cats){
+   const count=rows.filter(v=>auditCategoryFor(v)===category.name).length;
+   const button=document.createElement('button');button.type='button';button.style.cssText='display:flex;align-items:center;justify-content:space-between;width:100%;padding:13px 14px;margin:7px 0;background:#f5f6f8;color:#171b22;border:1px solid #e1e4e8;border-radius:10px;text-align:left;font-size:14px';
+   const label=document.createElement('span');label.textContent=category.name;
+   const countLabel=document.createElement('span');countLabel.textContent=count+'件 ›';countLabel.style.cssText='color:#667085;font-size:12px';
+   button.append(label,countLabel);button.onclick=()=>{auditSelectedCategory=category.name;renderActionHistory()};host.append(button);
+  }
  }
 }
 async function loadStaffManagers(savedUserId=null){
