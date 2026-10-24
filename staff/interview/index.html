@@ -246,7 +246,7 @@ btn.addEventListener('click',unlock);pin.addEventListener('keydown',e=>{if(e.key
 const client=supabase.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storage:window.sessionStorage,storageKey:'mattan-recruit-auth'}});
 const pane=document.getElementById('lineInbox'),status=document.getElementById('lineInboxStatus'),messages=document.getElementById('lineInboxMessages'),auth=document.getElementById('lineInboxAuth'),nav=document.getElementById('lineNoticeNav'),count=document.getElementById('lineNoticeCount');
 let visible=false,latest=0,unread=0;const account='all';
-let lineSoundReady=false,lineSoundContext=null,lineInitialCheck=true,lineLastAlertId=0;let lineSoundVoices=[];function stopLineAlert(){for(const voice of lineSoundVoices){try{voice.stop(0)}catch(e){}}lineSoundVoices=[];lineLastAlertId=Math.max(lineLastAlertId,latest);document.getElementById('lineSoundStop').textContent='音を停止';}document.getElementById('lineSoundStop').addEventListener('click',stopLineAlert);
+let lineSoundReady=false,lineSoundContext=null,lineInitialCheck=true,lineLastAlertId=0;let lineSoundVoices=[],lineSoundRepeatTimer=null;function stopLineAlert(){if(lineSoundRepeatTimer!==null){clearInterval(lineSoundRepeatTimer);lineSoundRepeatTimer=null;}for(const voice of lineSoundVoices){try{voice.stop(0)}catch(e){}}lineSoundVoices=[];lineLastAlertId=Math.max(lineLastAlertId,latest);document.getElementById('lineSoundStop').textContent='音を停止';}document.getElementById('lineSoundStop').addEventListener('click',stopLineAlert);
 function activateLineSound(){try{const AudioContextType=window.AudioContext||window.webkitAudioContext;if(!AudioContextType)return;lineSoundContext=lineSoundContext||new AudioContextType();lineSoundContext.resume().then(()=>{lineSoundReady=lineSoundContext.state==='running'}).catch(()=>{})}catch(e){}}
 document.addEventListener('pointerdown',activateLineSound,{once:true});
 document.addEventListener('keydown',activateLineSound,{once:true});
@@ -254,6 +254,7 @@ document.getElementById('lineSoundTest').addEventListener('click',async()=>{acti
 function playLineAlert(){
 stopLineAlert();
 if(!lineSoundReady||!lineSoundContext)return;
+function playOneChime(){
 try{
 const ctx=lineSoundContext,now=ctx.currentTime;
 const notes=[
@@ -274,6 +275,9 @@ oscillator.start(start);oscillator.stop(start+note.duration+.02);lineSoundVoices
 }
 }
 }catch(e){console.warn('LINE chime playback failed',e)}
+}
+playOneChime();
+lineSoundRepeatTimer=setInterval(playOneChime,2700);
 }
 async function checkLineNotice(){
 try{
