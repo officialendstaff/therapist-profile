@@ -202,8 +202,8 @@ async function check(){await recruitCheckIdle();if(recruitIdleLoggingOut)return;
    const profileKey=ownProfile?.profile_key;
    window.recruitPersonalButtonLabel=({owner:'俺',president:'社長',ota:'オオタ',festival:'お祭り'})[profileKey]||'個人ページ';
   }catch(e){window.recruitPersonalButtonLabel='個人ページ';}
-  syncRecruitPersonalButtonLabel();
- }else{window.recruitPersonalButtonLabel='個人ページ';syncRecruitPersonalButtonLabel();}
+  (function(){const button=document.getElementById('personalPageLink');if(button)button.textContent=window.recruitPersonalButtonLabel||'個人ページ';})();
+ }else{window.recruitPersonalButtonLabel='個人ページ';(function(){const button=document.getElementById('personalPageLink');if(button)button.textContent=window.recruitPersonalButtonLabel||'個人ページ';})();}
 if(error||!user){$('authLoading').classList.add('hide');$('gate').classList.remove('hide');$('app').classList.add('hide');return}const {data:staffAccess,error:staffError}=await sb.from('recruit_staff_profiles').select('role,stores').eq('user_id',user.id).maybeSingle();const {data:legacyAdmin,error:legacyError}=await sb.from('recruit_line_admins').select('user_id').eq('user_id',user.id).maybeSingle();currentRecruitStaffRole=staffAccess?.role||null;currentRecruitAllowedStores=new Set((staffAccess?.stores||[]).flatMap(g=>g==='rose'?['rose','busty-osaka']:g==='grand'?['grand-luxe','un-secret']:g==='luxy'?['luxy']:[]));const allowed=staffAccess&&['master','full','custom'].includes(staffAccess.role)||(!staffAccess&&legacyAdmin);if((staffError&&!legacyAdmin)||(!allowed&&(!legacyAdmin||legacyError))){$('authLoading').classList.add('hide');$('gate').classList.remove('hide');$('app').classList.add('hide');msg('error','このアカウントには求人管理権限がありません。');return}$('gate').classList.add('hide');$('app').classList.add('hide');$('storeView').classList.remove('hide');$('listView').classList.add('hide');$('detail').classList.add('hide');await loadStoreDirectory();await refreshMasterStatus();
  if(staffAccess?.role==='custom'){
   const allowedStores=currentRecruitAllowedStores;
