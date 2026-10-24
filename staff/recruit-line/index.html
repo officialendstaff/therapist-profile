@@ -55,6 +55,11 @@ body[data-recruit-view="interview"] #storeView{display:none!important}
 .interviewInfo{min-width:0;flex:1}
 .interviewHeadline{display:flex;flex-wrap:wrap;gap:7px;align-items:center;font-weight:700;font-size:14px}
 .interviewStatus{border-radius:6px;padding:3px 8px;font-size:12px;font-weight:800}
+/* Keep interview status aligned to the right regardless of label length */
+.interviewHeadline{width:100%;flex-wrap:nowrap;justify-content:space-between;gap:12px}
+.interviewHeadline>span:first-child{min-width:0;flex:1 1 auto}
+.interviewHeadline>.interviewStatus{margin-left:auto;flex:0 0 auto;white-space:nowrap;text-align:center}
+
 .interviewStatus.hired{background:#d4f3dd;color:#13552b}.interviewStatus.rejected{background:#f7d7db;color:#80212d}.interviewStatus.cancelled{background:#e2e6ed;color:#4b5563}.interviewStatus.withdrawn{background:#ffebc5;color:#754d0a}.interviewStatus.other{background:#dbeafe;color:#1e40af}
 .interviewName{font-size:14px;margin:6px 0 8px;overflow-wrap:anywhere}
 .interviewActions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
