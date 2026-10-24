@@ -55,7 +55,7 @@ body[data-recruit-view="interview"] #storeView{display:none!important}
 .interviewInfo{min-width:0;flex:1}
 .interviewHeadline{display:flex;flex-wrap:wrap;gap:7px;align-items:center;font-weight:700;font-size:14px}
 .interviewStatus{border-radius:6px;padding:3px 8px;font-size:12px;font-weight:800}
-.pastRiskHistory{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}.pastRiskItem{font-size:11px;font-weight:700;padding:5px 7px;border-radius:6px;border:1px solid}.pastRiskItem.tobi{color:#ffb9c0;background:#51242d;border-color:#a44b59}.pastRiskItem.cancelled{color:#e0e4e9;background:#414955;border-color:#747d8b}
+.pastRiskHistory{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-top:7px}.pastRiskExtra{display:flex;flex-wrap:wrap;gap:5px;width:100%}.pastRiskExtra[hidden]{display:none!important}.pastRiskToggle{font-size:11px!important;padding:5px 7px!important;background:transparent!important;color:#dbeafe!important;border:1px solid #70849a!important;border-radius:6px!important;cursor:pointer}.pastRiskItem{font-size:11px;font-weight:700;padding:5px 7px;border-radius:6px;border:1px solid}.pastRiskItem.tobi{color:#ffb9c0;background:#51242d;border-color:#a44b59}.pastRiskItem.cancelled{color:#e0e4e9;background:#414955;border-color:#747d8b}
 
 /* Keep interview status aligned to the right regardless of label length */
 .interviewHeadline{width:100%;flex-wrap:nowrap;justify-content:space-between;gap:12px}
@@ -409,7 +409,15 @@ function makeRiskHistory(lineId,excludeInterviewId){
  const items=riskHistoryForLineId(lineId,excludeInterviewId);
  if(!items.length)return null;
  const wrap=document.createElement('div');wrap.className='pastRiskHistory';
- for(const item of items){const badge=document.createElement('span');badge.className='pastRiskItem '+item.kind;badge.textContent='過去の面接履歴あり｜'+item.shop+'｜'+item.date+' '+item.time+'｜'+item.label;wrap.append(badge)}
+ const badgeFor=item=>{const badge=document.createElement('span');badge.className='pastRiskItem '+item.kind;badge.textContent=item.shop+'｜'+item.date+' '+item.time+'｜'+item.label;return badge};
+ wrap.append(badgeFor(items[0]));
+ if(items.length>1){
+  const extra=document.createElement('div');extra.className='pastRiskExtra';extra.hidden=true;
+  for(const item of items.slice(1))extra.append(badgeFor(item));
+  const toggle=document.createElement('button');toggle.type='button';toggle.className='pastRiskToggle';toggle.textContent='ほか'+(items.length-1)+'件 ▼';toggle.setAttribute('aria-expanded','false');
+  toggle.onclick=e=>{e.stopPropagation();extra.hidden=!extra.hidden;toggle.setAttribute('aria-expanded',String(!extra.hidden));toggle.textContent=extra.hidden?'ほか'+(items.length-1)+'件 ▼':'閉じる ▲'};
+  wrap.append(toggle,extra);
+ }
  return wrap;
 }
 
