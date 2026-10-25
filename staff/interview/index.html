@@ -737,10 +737,10 @@ window.pickInterviewGanttSlot=function(p){
  const categories={future:'明日以降の面接予定',pending:'日程調整中',misconduct:'不届き者達',past:'過去の面接予定'};
  const bad=['キャンセル','無断トビ','トビ（キャンセル）','返信なし'];
  const closed=['キャンセル','面接済','採用','不採用','無断トビ','トビ（キャンセル）','日程調整中','返信なし'];
- let category='future',store='',month='';
+ let category='future',store='',month='';let sidebarRows=null;let sidebarError='';let sidebarFetching=false;
  const today=()=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
  const currentMonth=()=>today().slice(0,7);
- const all=()=>typeof interviews!=='undefined'&&Array.isArray(interviews)?interviews:[];
+ const all=()=>sidebarRows!==null?sidebarRows:(typeof interviews!=='undefined'&&Array.isArray(interviews)?interviews:[]);
  const match=(i,type)=>{const d=i.interview_date||'',status=i.status||'',now=today();
   if(type==='future')return d>now&&!closed.includes(status);
   if(type==='pending')return status==='日程調整中'&&!(typeof pendingExpired==='function'&&pendingExpired(i));
@@ -749,7 +749,19 @@ window.pickInterviewGanttSlot=function(p){
  };
  function updateCounts(){
   const m=currentMonth();const count=t=>all().filter(i=>match(i,t)&&String(i.interview_date||'').slice(0,7)===m).length;
-  for(const [id,t] of [['futureInterviewCount','future'],['pendingInterviewCount','pending'],['misconductCount','misconduct'],['pastInterviewCount','past']]){const el=document.getElementById(id);if(el){const value=count(t)+'件';if(el.textContent!==value)el.textContent=value}}
+  for(const [id,t] of [['futureInterviewCount','future'],['pendingInterviewCount','pending'],['misconductCount','misconduct'],['pastInterviewCount','past']]){const el=document.getElementById(id);if(el){const value=sidebarRows===null?(sidebarError?'取得失敗':'読込中'):count(t)+'件';if(el.textContent!==value)el.textContent=value}}
+ }
+ async function fetchSidebarRows(){
+  if(sidebarFetching)return;sidebarFetching=true;
+  try{
+   const client=typeof sb!=='undefined'?sb:null;
+   if(!client)throw new Error('Supabase接続が初期化されていません');
+   const result=await Promise.race([client.from('staff_interviews').select('*').order('interview_date').order('interview_time'),new Promise((_,reject)=>setTimeout(()=>reject(new Error('通信タイムアウト')),15000))]);
+   if(result.error)throw result.error;
+   sidebarRows=result.data||[];sidebarError='';
+   if(typeof interviews!=='undefined')interviews=sidebarRows;
+  }catch(e){sidebarError=e?.message||String(e);console.error('Sidebar interview fetch failed',e)}
+  finally{sidebarFetching=false;updateCounts();if(!document.getElementById('scheduleView').hidden&&document.getElementById('interviewListFilters'))render()}
  }
  function render(){
   const root=document.getElementById('scheduleViewContent'),heading=document.getElementById('scheduleTitle');
@@ -757,6 +769,7 @@ window.pickInterviewGanttSlot=function(p){
   heading.textContent=categories[category];
   const items=all().filter(i=>match(i,category)&&(!store||i.shop===store)&&String(i.interview_date||'').slice(0,7)===month).sort((a,b)=>category==='past'||category==='misconduct'?String(b.interview_date).localeCompare(String(a.interview_date)):String(a.interview_date).localeCompare(String(b.interview_date)));
   root.replaceChildren();
+  if(sidebarRows===null){const notice=document.createElement('p');notice.className='note';notice.textContent=sidebarError?'面接データ取得失敗：'+sidebarError:'面接データを読み込み中です。';root.append(notice);if(sidebarError){const retry=document.createElement('button');retry.type='button';retry.className='action';retry.textContent='再取得';retry.onclick=fetchSidebarRows;root.append(retry)}return}
   const tools=document.createElement('div');tools.id='interviewListFilters';
   const shops=document.createElement('select');shops.setAttribute('aria-label','店舗切替');
   for(const name of ['全店舗','Grand Luxe','Un Secret','LUXY','薔薇と紳士','BUSTY OSAKA']){const o=document.createElement('option');o.value=name==='全店舗'?'':name;o.textContent=name;shops.append(o)}shops.value=store;
@@ -788,7 +801,7 @@ window.pickInterviewGanttSlot=function(p){
   for(const id of ['dailyDashboard','lineInbox']){const e=document.getElementById(id);if(e)e.hidden=true}
   const box=document.getElementById('scheduleView');box.hidden=false;
   document.querySelector('.workLeft').style.display='none';
-  render();updateCounts();
+  render();updateCounts();void fetchSidebarRows();
  }
  function init(){
   for(const [id,type] of [['futureNav','future'],['pendingNav','pending'],['misconductNav','misconduct'],['historyNav','past']]){
@@ -799,7 +812,7 @@ window.pickInterviewGanttSlot=function(p){
   });
   const count=()=>{updateCounts();if(!document.getElementById('scheduleView').hidden&&document.getElementById('interviewListFilters'))render()};
   const watcher=new MutationObserver(count);const el=document.getElementById('futureInterviewCount');if(el)watcher.observe(el,{childList:true,characterData:true,subtree:true});
-  updateCounts();
+  updateCounts();void fetchSidebarRows();setInterval(fetchSidebarRows,60000);
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
