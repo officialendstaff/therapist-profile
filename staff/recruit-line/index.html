@@ -246,6 +246,19 @@ body.recruitModalOpen{overflow:hidden!important;touch-action:none}
 #recruitModalBackdrop{position:fixed!important;inset:0!important;z-index:2147483645!important;background:rgba(0,0,0,.5)!important;touch-action:none!important}
 #recruitModalBackdrop.hide{display:none!important}
 body>#interviewLinkModal:not(.hide),body>#hireFormLinkModal:not(.hide){z-index:2147483646!important;touch-action:auto!important}
+</style><style id="recruitLinkDialogDesign">
+body>#interviewLinkModal:not(.hide),body>#hireFormLinkModal:not(.hide){background:#152130!important;border:1px solid #47586b!important;border-radius:16px!important;box-shadow:0 18px 65px #000b!important;color:#f2f5fa!important;padding:20px!important}
+#interviewLinkModal h3,#hireFormLinkModal h3{font-size:17px!important;color:#f2f5fa!important;line-height:1.4!important;margin:0 0 12px!important}
+#interviewLinkTitle,#hireFormLinkTitle{font-size:14px!important;color:#c7d4e2!important;line-height:1.6!important;padding-bottom:12px!important;border-bottom:1px solid #36485c!important}
+.recruitLinkCurrent{background:#202e40;border-radius:10px;padding:12px;display:flex;align-items:center;gap:12px;margin:12px 0}
+.recruitLinkAvatar{width:48px;height:48px;flex:none;border-radius:50%;object-fit:cover;background:#34475a}
+.recruitLinkFallback{display:grid;place-items:center;font-size:11px;font-weight:700;color:#dfe8f4}
+.recruitLinkCurrent strong{color:#fff;font-size:16px}
+.recruitLinkCurrent small{display:block;color:#aebed0;margin-bottom:5px}
+.recruitLinkFooter{display:flex;gap:10px;margin-top:14px}
+.recruitLinkFooter button{flex:1;min-width:0;min-height:44px!important;margin:0!important;border-radius:9px!important;font-size:14px!important;font-weight:700!important}
+.recruitLinkFooter .recruitUnlinkButton{background:#714550!important;color:#ffe4e8!important;border:1px solid #8b5864!important}
+.recruitLinkFooter .recruitCloseButton{background:#2a394b!important;color:#e7eef6!important;border:1px solid #43566c!important}
 </style><style id="singleRecruitModalPolicy">
 /* Do not draw a full-screen pseudo-element: it obscured the linking controls on some views. */
 body:has(#interviewLinkModal:not(.hide),#hireFormLinkModal:not(.hide))::before{content:none!important;display:none!important}
@@ -501,8 +514,39 @@ async function openHireAppointmentLinkDialog(form){
   };list.append(b);
  }
 }
+function recruitLinkFooter(modalId,actionLabel,onAction){
+ const modal=$(modalId),options=$(modalId==='interviewLinkModal'?'interviewLinkOptions':'hireFormLinkOptions');
+ const footer=document.createElement('div');footer.className='recruitLinkFooter';
+ const close=document.createElement('button');close.type='button';close.className='recruitCloseButton';close.textContent='✕ 閉じる';close.onclick=()=>closeRecruitModal(modalId);
+ const action=document.createElement('button');action.type='button';action.className='recruitUnlinkButton';action.textContent='⊘ '+actionLabel;action.onclick=onAction;
+ footer.append(close,action);options.append(footer);
+}
+function recruitCurrentCard(name,picture,kind){
+ const card=document.createElement('div');card.className='recruitLinkCurrent';
+ const avatar=picture?document.createElement('img'):document.createElement('span');
+ avatar.className='recruitLinkAvatar'+(picture?'':' recruitLinkFallback');
+ if(picture){avatar.src=picture;avatar.alt='LINEプロフィール画像';avatar.referrerPolicy='no-referrer'}
+ else{avatar.textContent=kind==='LINE'?'LINE':'▤'}
+ const detail=document.createElement('div');const label=document.createElement('small');label.textContent='現在の'+kind+'紐づけ ／ 紐づけ済み';const strong=document.createElement('strong');strong.textContent=name;detail.append(label,strong);card.append(avatar,detail);return card;
+}
+function openSheetUnlinkDialog(appointment,formLink){
+ const modal=$('hireFormLinkModal'),list=$('hireFormLinkOptions');openExclusiveRecruitModal(modal.id);
+ modal.querySelector('h3').textContent='▤ 面接シート紐づけ管理';
+ msg('hireFormLinkTitle',appointment.interview_date+' '+String(appointment.interview_time).slice(0,5)+' ／ '+appointment.shop);
+ list.replaceChildren();
+ const form=interviewForms.find(f=>String(f.id)===String(formLink.interview_applicant_id));
+ list.append(recruitCurrentCard(form?.name||'面接シート（氏名未取得）',null,'面接シート'));
+ recruitLinkFooter(modal.id,'シート紐づけ解除',async()=>{
+  if(!confirm('面接シートの紐づけを解除しますか？\\n面接シート本体は削除されません。'))return;
+  const {error}=await sb.from('staff_interview_form_links').delete().eq('interview_id',appointment.id).eq('interview_applicant_id',formLink.interview_applicant_id);
+  if(error)return alert('シート解除に失敗しました：'+error.message);
+  closeRecruitModal(modal.id);await loadInterviewManagement();
+ });
+ $('hireFormLinkClose').onclick=()=>closeRecruitModal(modal.id);
+}
 async function openHireFormLinkDialog(appointment){
  const modal=$('hireFormLinkModal'),list=$('hireFormLinkOptions');
+ modal.querySelector('h3').textContent='▤ 面接シート紐づけ管理';
  openExclusiveRecruitModal(modal.id);list.textContent='面接シートを検索しています…';
  msg('hireFormLinkTitle',appointment.interview_date+' '+String(appointment.interview_time).slice(0,5)+' ／ '+appointment.shop);
  $('hireFormLinkClose').onclick=()=>closeRecruitModal(modal.id);
@@ -617,12 +661,7 @@ function renderInterviewManagement(){
    makeAction(linked?'LINE済':'LINE未',linked?'linked':'unlinked',linked?null:()=>openInterviewLinkDialog(x,null),!!linked);
    makeAction(formLink?'シート済':'シート未',formLink?'linked':'unlinked',formLink?null:()=>openHireFormLinkDialog(x),!!formLink);
    makeAction('LINE解除','unlink',linked?()=>openInterviewLinkDialog(x,linked):null,!linked);
-   makeAction('シート解除','unlink',formLink?async()=>{
-    if(!confirm('この面接予定と面接シートの紐づけを解除しますか？\\n面接シート本体は削除されません。'))return;
-    const {error}=await sb.from('staff_interview_form_links').delete().eq('interview_id',x.id).eq('interview_applicant_id',formLink.interview_applicant_id);
-    if(error){alert('シート解除に失敗しました：'+error.message);return}
-    await loadInterviewManagement();
-   }:null,!formLink);
+   makeAction('シート解除','unlink',formLink?()=>openSheetUnlinkDialog(x,formLink):null,!formLink);
    info.append(headline,name,actions);
    const riskSlot=document.createElement('div');riskSlot.className='recruitRiskSlot';if(linked){const risk=makeRiskHistory(linked.line_user_id,x.id);if(risk)riskSlot.append(risk)}info.append(riskSlot);
    const detail=document.createElement('div');detail.className='interviewInlineDetail';detail.hidden=true;detail.style.cssText='display:none;width:100%;padding:12px 4px 2px;border-top:1px solid #43566a;margin-top:10px';
@@ -674,7 +713,7 @@ function closeRecruitModal(id){
   document.body.classList.remove('recruitModalOpen');
  }
 }
-function openInterviewLinkDialog(x,linked){const modal=$('interviewLinkModal');openExclusiveRecruitModal(modal.id);msg('interviewLinkTitle',x.interview_date+' '+String(x.interview_time).slice(0,5)+' ／ '+x.shop);const list=$('interviewLinkOptions');list.replaceChildren();const close=()=>closeRecruitModal(modal.id);$('interviewLinkClose').onclick=close;if(linked){const p=document.createElement('p');p.textContent='紐づけ済み：'+(lineProfiles[linked.line_user_id]?.displayName||linked.line_user_id);list.append(p);const undo=document.createElement('button');undo.textContent='紐づけ解除';undo.onclick=async()=>{if(!confirm('この面接予定とのLINE紐づけを解除しますか？'))return;const {error}=await sb.from('staff_interview_line_links').delete().eq('interview_id',x.id);if(error)return alert(error.message);close();await loadInterviewManagement();render()};list.append(undo);return}const available=applicants.filter(a=>!interviewScheduleLinks.some(l=>String(l.interview_id)===String(x.id)&&l.account_id===$('account').value&&l.line_user_id===a.line_user_id));if(!available.length){list.textContent='紐づけ可能なLINE応募者はいません。';return}for(const a of available){const b=document.createElement('button');b.className='item';const p=lineProfiles[a.line_user_id]||{};b.style.display='flex';b.style.alignItems='center';b.style.gap='12px';if(p.pictureUrl){const avatar=document.createElement('img');avatar.src=p.pictureUrl;avatar.alt='LINEアイコン';avatar.referrerPolicy='no-referrer';avatar.style.cssText='width:46px;height:46px;flex:none;object-fit:cover;border-radius:50%;background:#e8edf4';b.append(avatar)}else{const avatar=document.createElement('span');avatar.textContent='LINE';avatar.style.cssText='width:46px;height:46px;flex:none;border-radius:50%;background:#dfe7f1;color:#35465a;display:grid;place-items:center;font-size:11px;font-weight:bold';b.append(avatar)}const info=document.createElement('span');info.style.cssText='display:block;min-width:0';const name=document.createElement('strong');name.textContent=p.displayName||'LINE応募者';const last=document.createElement('small');last.style.cssText='display:block;margin-top:4px';last.textContent='最終受信 '+date(a.last_contact_at);info.append(name,last);b.append(info);b.onclick=async()=>{if(!confirm('このLINE応募者と面接予定を紐づけますか？'))return;const {error}=await sb.from('staff_interview_line_links').insert({interview_id:x.id,account_id:$('account').value,line_user_id:a.line_user_id,line_display_name:lineProfiles[a.line_user_id]?.displayName||null,line_picture_url:lineProfiles[a.line_user_id]?.pictureUrl||null});if(error)return alert('紐づけできません：'+error.message);close();await loadInterviewManagement();render()};list.append(b)}}
+function openInterviewLinkDialog(x,linked){const modal=$('interviewLinkModal');modal.querySelector('h3').textContent='♧ LINE紐づけ管理';openExclusiveRecruitModal(modal.id);msg('interviewLinkTitle',x.interview_date+' '+String(x.interview_time).slice(0,5)+' ／ '+x.shop);const list=$('interviewLinkOptions');list.replaceChildren();const close=()=>closeRecruitModal(modal.id);$('interviewLinkClose').onclick=close;if(linked){list.append(recruitCurrentCard(lineProfiles[linked.line_user_id]?.displayName||linked.line_display_name||'LINE応募者',lineProfiles[linked.line_user_id]?.pictureUrl||linked.line_picture_url,'LINE'));recruitLinkFooter(modal.id,'LINE紐づけ解除',async()=>{if(!confirm('この面接予定とのLINE紐づけを解除しますか？'))return;const {error}=await sb.from('staff_interview_line_links').delete().eq('interview_id',x.id);if(error)return alert(error.message);close();await loadInterviewManagement();render()});return}const available=applicants.filter(a=>!interviewScheduleLinks.some(l=>String(l.interview_id)===String(x.id)&&l.account_id===$('account').value&&l.line_user_id===a.line_user_id));if(!available.length){list.textContent='紐づけ可能なLINE応募者はいません。';return}for(const a of available){const b=document.createElement('button');b.className='item';const p=lineProfiles[a.line_user_id]||{};b.style.display='flex';b.style.alignItems='center';b.style.gap='12px';if(p.pictureUrl){const avatar=document.createElement('img');avatar.src=p.pictureUrl;avatar.alt='LINEアイコン';avatar.referrerPolicy='no-referrer';avatar.style.cssText='width:46px;height:46px;flex:none;object-fit:cover;border-radius:50%;background:#e8edf4';b.append(avatar)}else{const avatar=document.createElement('span');avatar.textContent='LINE';avatar.style.cssText='width:46px;height:46px;flex:none;border-radius:50%;background:#dfe7f1;color:#35465a;display:grid;place-items:center;font-size:11px;font-weight:bold';b.append(avatar)}const info=document.createElement('span');info.style.cssText='display:block;min-width:0';const name=document.createElement('strong');name.textContent=p.displayName||'LINE応募者';const last=document.createElement('small');last.style.cssText='display:block;margin-top:4px';last.textContent='最終受信 '+date(a.last_contact_at);info.append(name,last);b.append(info);b.onclick=async()=>{if(!confirm('このLINE応募者と面接予定を紐づけますか？'))return;const {error}=await sb.from('staff_interview_line_links').insert({interview_id:x.id,account_id:$('account').value,line_user_id:a.line_user_id,line_display_name:lineProfiles[a.line_user_id]?.displayName||null,line_picture_url:lineProfiles[a.line_user_id]?.pictureUrl||null});if(error)return alert('紐づけできません：'+error.message);close();await loadInterviewManagement();render()};list.append(b)}}
 async function openPerson(a){selected=a;$('listView').classList.add('hide');$('detail').classList.remove('hide');renderPersonProfile(a);msg('dates','初回：'+date(a.first_contact_at)+'\n最終：'+date(a.last_contact_at));$('dates').style.whiteSpace='pre-line';const riskHost=$('personRiskHistory');riskHost.replaceChildren();const risk=makeRiskHistory(a.line_user_id);if(risk){riskHost.append(risk);const extra=risk.querySelector('.pastRiskExtra');const toggle=risk.querySelector('.pastRiskToggle');if(extra){extra.hidden=false;if(toggle)toggle.remove()}}await detailLoad();await loadSummary();render()}
 $('back').onclick=()=>{$('detail').classList.add('hide');$('listView').classList.remove('hide');selected=null};
 const kinds={inquiry:'問い合わせ',application_details:'応募情報の回答',interview_scheduled:'面接予約',interview_rescheduled:'面接日程変更',interview_reconfirmed:'面接再確認',confirmation_sent:'確認連絡送信',confirmation_replied:'確認連絡返信',arrival_reported:'到着連絡',interview_attended:'面接実施',no_show:'無断欠席',cancelled:'キャンセル',hired:'採用',rejected:'不採用',note:'メモ'};
