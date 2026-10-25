@@ -593,4 +593,20 @@ document.addEventListener('click',function(e){
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
+</script><script id="interviewLoadDiagnostic20261025">
+(function(){
+ const boot=()=>{
+  const list=document.getElementById('list'),counter=document.getElementById('futureInterviewCount');
+  if(!list)return;
+  let resolved=false;
+  const note=(message)=>{if(!resolved&&list.textContent.includes('読み込み中'))list.textContent=message};
+  note('面接データに接続しています…');
+  const timeout=setTimeout(()=>note('面接データの取得が開始されていません。再読み込みしてください。'),8000);
+  const check=()=>{if(!list.textContent.includes('読み込み中')&&!list.textContent.includes('接続しています')&&!list.textContent.includes('開始されていません')){resolved=true;clearTimeout(timeout)}};
+  const observer=new MutationObserver(check);observer.observe(list,{childList:true,subtree:true,characterData:true});check();
+  window.addEventListener('error',e=>{if(!resolved)note('画面の初期化エラー：'+String(e.message||'不明なエラー'))});
+  window.addEventListener('unhandledrejection',e=>{if(!resolved)note('通信・初期化エラー：'+String(e.reason?.message||e.reason||'不明なエラー'))});
+ };
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+})();
 </script></body></html>
