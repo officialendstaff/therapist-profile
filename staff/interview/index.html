@@ -728,7 +728,7 @@ window.pickInterviewGanttSlot=function(p){
  };
  function updateCounts(){
   const m=currentMonth();const count=t=>all().filter(i=>match(i,t)&&String(i.interview_date||'').slice(0,7)===m).length;
-  for(const [id,t] of [['futureInterviewCount','future'],['pendingInterviewCount','pending'],['misconductCount','misconduct'],['pastInterviewCount','past']]){const el=document.getElementById(id);if(el)el.textContent=count(t)+'件'}
+  for(const [id,t] of [['futureInterviewCount','future'],['pendingInterviewCount','pending'],['misconductCount','misconduct'],['pastInterviewCount','past']]){const el=document.getElementById(id);if(el){const value=count(t)+'件';if(el.textContent!==value)el.textContent=value}}
  }
  function render(){
   const root=document.getElementById('scheduleViewContent'),heading=document.getElementById('scheduleTitle');
