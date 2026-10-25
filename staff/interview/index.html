@@ -660,7 +660,7 @@ document.addEventListener('click',function(e){
    document.getElementById('lineInbox').hidden=true;
    document.getElementById('scheduleView').hidden=true;
    document.querySelector('.workLeft').style.removeProperty('display');
-   document.getElementById('calendarCard')?.scrollIntoView({block:'start',behavior:'smooth'});
+   try{if(typeof render==='function')render();if(typeof renderStaff==='function')renderStaff();if(typeof refreshStaffAvailability==='function')void refreshStaffAvailability();}catch(err){console.error('面接登録画面の再描画に失敗',err);const hint=document.getElementById('interviewerCalendarHint');if(hint)hint.textContent='面接登録画面を表示できませんでした。再読み込みしてください。';}document.getElementById('calendarCard')?.scrollIntoView({block:'start',behavior:'smooth'});
   });
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
