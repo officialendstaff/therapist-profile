@@ -963,7 +963,7 @@ async function openRecruitPersonalPage(){
   document.getElementById('listView')?.classList.add('hide');
   frameView.classList.remove('hide');
   document.body.classList.add('recruitPersonalFullscreen');
-  frame.src=new URL(target+'?embedded=1',location.href).href;
+  frame.src=new URL(target+'?embedded=1&v=20261025-layout2',location.href).href;
   syncRecruitHeaderActions();
   window.scrollTo(0,0);
  }catch(e){alert('個人ページを開けません：'+(e.message||String(e)))}
