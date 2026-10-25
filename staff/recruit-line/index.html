@@ -298,6 +298,10 @@ body>#interviewLinkModal.hide,body>#hireFormLinkModal.hide{display:none!importan
 #hirePage .applicantCompactMonths>button{display:flex;align-items:center;justify-content:center;flex:0 0 36px;width:36px;height:36px;min-height:36px;padding:0;font-size:21px!important;font-weight:400!important;line-height:1!important;border-radius:9px;background:#34475d;color:#fff}
 #hirePage #hireMonthLabel{font-size:13px!important;font-weight:700!important;line-height:1.4!important;white-space:nowrap;min-width:92px;text-align:center}
 @media(max-width:380px){#hirePage>.panel{padding:11px}#hirePage .applicantCompactMonths{gap:3px}#hirePage .applicantCompactMonths>button{flex-basis:32px;width:32px;height:34px}#hirePage #hireMonthLabel{min-width:78px;font-size:12px!important}}
+</style><style id="recruitPersonalFullscreenStyles">
+body.recruitPersonalFullscreen>header,body.recruitPersonalFullscreen #app>header,body.recruitPersonalFullscreen #recruitHeaderSettings{display:none!important}
+body.recruitPersonalFullscreen #app,body.recruitPersonalFullscreen main.wrap,body.recruitPersonalFullscreen #embeddedInterviewView{width:100%!important;max-width:none!important;margin:0!important;padding:0!important}
+body.recruitPersonalFullscreen #embeddedInterviewFrame{width:100%!important;height:100dvh!important;min-height:100dvh!important;border:0!important}
 </style></head><body>
 <header><h1>求人管理 <small>｜L GROUP</small></h1><div class="recruitHeaderActions"><button type="button" class="secondary hide" id="storeBack">← 店舗管理</button><button type="button" class="secondary" id="interviewManageSwitch" onclick="openSelectedInterviewManagement()" style="display:none">面接管理</button><button type="button" class="secondary" id="recruitNoticeButton" onclick="openRecruitNotices()" aria-haspopup="dialog">お知らせ</button><button type="button" class="secondary" id="personalPageLink" onclick="openRecruitPersonalPage()">個人ページへ</button></div></header><div id="recruitNoticesDialog" class="hide" role="dialog" aria-modal="true" aria-labelledby="recruitNoticesTitle"><div class="recruitNoticesCard"><div class="recruitNoticesTop"><h2 id="recruitNoticesTitle">お知らせ・改修履歴</h2><button type="button" class="secondary" onclick="closeRecruitNotices()">閉じる ×</button></div><p class="recruitNoticesIntro">改修を実施した日ごとの変更内容です。公開画面で未検証の項目はその旨を記載しています。</p><div id="recruitNoticesContent"></div></div></div><div id="recruitHeaderSettings" class="hide"><div class="wrap"><div class="panel"><div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button type="button" class="secondary" onclick="closeRecruitStoreSettings()" aria-label="店舗設定を閉じる">✕ 閉じる</button></div><details class="storeSettings"><summary>店舗名・リンク先の設定</summary><p class="muted" style="font-size:12px">新店舗が決まったら、店名とリンク先URLを設定できます。</p><label>店舗<select id="storeEditSelect"></select></label><label>表示名<input id="storeEditName"></label><label>リンク先URL<input id="storeEditUrl" placeholder="https://..."></label><label>店舗ロゴ<input id="storeEditLogo" type="file" accept="image/png,image/jpeg,image/webp"></label><div id="storeLogoPreview" style="margin:4px 0 12px"></div><button id="storeSave">設定を保存</button><p id="storeEditResult" class="muted"></p></details><div class="recruitSettingsFooter"><button class="secondary" id="logout" type="button">ログアウト</button></div></div></div></div>
 <script id="recruitHeaderDedup">
@@ -902,8 +906,29 @@ async function openSelectedInterviewManagement(){
  // 店舗画面からもTOPと同じ個人ページを直接開く。iframeは使わない。
  await openRecruitPersonalPage();
 }
-async function returnFromPersonalToRecruit(){document.getElementById('embeddedInterviewView').classList.add('hide');document.getElementById('embeddedInterviewFrame').src='about:blank';if(activeStore){document.getElementById('listView').classList.remove('hide');document.getElementById('storeView').classList.add('hide')}else{document.getElementById('storeView').classList.remove('hide');document.getElementById('listView').classList.add('hide')}syncRecruitHeaderActions();window.scrollTo(0,0)}
-async function openRecruitPersonalPage(){try{const {data:auth,error:authError}=await sb.auth.getUser();if(authError||!auth?.user)throw Error('ログイン情報を確認できません');const {data,error}=await sb.rpc('interview_my_profile');if(error)throw error;const profile=Array.isArray(data)?data[0]:data;const key=profile?.profile_key;const paths={president:'../interview-personal/president/',ota:'../interview-personal/ota/',festival:'../interview-personal/festival/',owner:'../interview-personal/owner/'};if(!paths[key])throw Error('このアカウントに個人ページが登録されていません');window.location.assign(new URL(paths[key],location.href).href)}catch(e){alert('個人ページを開けません：'+(e.message||String(e)))}}
+async function returnFromPersonalToRecruit(){document.body.classList.remove('recruitPersonalFullscreen');document.getElementById('embeddedInterviewView').classList.add('hide');document.getElementById('embeddedInterviewFrame').src='about:blank';if(activeStore){document.getElementById('listView').classList.remove('hide');document.getElementById('storeView').classList.add('hide')}else{document.getElementById('storeView').classList.remove('hide');document.getElementById('listView').classList.add('hide')}syncRecruitHeaderActions();window.scrollTo(0,0)}
+async function openRecruitPersonalPage(){
+ try{
+  const {data:auth,error:authError}=await sb.auth.getUser();
+  if(authError||!auth?.user)throw Error('ログイン情報を確認できません');
+  const {data,error}=await sb.rpc('interview_my_profile');
+  if(error)throw error;
+  const profile=Array.isArray(data)?data[0]:data;
+  const paths={president:'../interview-personal/president/',ota:'../interview-personal/ota/',festival:'../interview-personal/festival/',owner:'../interview-personal/owner/'};
+  const target=paths[profile?.profile_key];
+  if(!target)throw Error('このアカウントに個人ページが登録されていません');
+  const frameView=document.getElementById('embeddedInterviewView');
+  const frame=document.getElementById('embeddedInterviewFrame');
+  if(!frameView||!frame)throw Error('個人ページの表示領域がありません');
+  document.getElementById('storeView')?.classList.add('hide');
+  document.getElementById('listView')?.classList.add('hide');
+  frameView.classList.remove('hide');
+  document.body.classList.add('recruitPersonalFullscreen');
+  frame.src=new URL(target+'?embedded=1',location.href).href;
+  syncRecruitHeaderActions();
+  window.scrollTo(0,0);
+ }catch(e){alert('個人ページを開けません：'+(e.message||String(e)))}
+}
 function closeRecruitStoreSettings(){const e=document.getElementById("recruitHeaderSettings"),b=document.getElementById("storeSettingsToggle");if(e)e.classList.add("hide");if(b)b.setAttribute("aria-expanded","false");}function toggleRecruitStoreSettings(){if(activeStore||!recruitIsMaster)return;const e=document.getElementById("recruitHeaderSettings");if(!e)return;if(!e.classList.contains("hide")){closeRecruitStoreSettings();return;}e.classList.remove("hide");document.getElementById("storeSettingsToggle")?.setAttribute("aria-expanded","true");const d=e.querySelector("details");if(d)d.open=true;}</script><script>
 /* Refresh the home-screen management view after resuming from the background.
    Preserve active edits instead of discarding unsaved input. */
