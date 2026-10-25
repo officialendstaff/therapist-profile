@@ -346,13 +346,15 @@ async function load(){
  try{
   const a=await Promise.race([sb.from('staff_interviews').select('*').order('interview_date').order('interview_time'),timeout(12000)]);
   if(a.error)throw a.error;
-  const b=await Promise.race([sb.from('staff_schedule_blocks').select('*'),timeout(12000)]).catch(e=>({error:e,data:[]}));
-  if(b.error)console.warn('対応不可データの取得に失敗。面接予定の表示は続行します。',b.error);
   interviews=a.data||[];
-  const raw=b.data||[];
-  blocks=raw;
   msg.textContent='';
-  render();renderStaff();renderTimes();renderList();window.refreshDailyDashboard?.();if(!document.getElementById('scheduleView').hidden&&document.getElementById('scheduleTitle').textContent.includes('明日以降'))showSchedule('future');checkReminders();void loadInterviewLineProfiles();
+  renderList();
+  if(!document.getElementById('scheduleView').hidden&&document.getElementById('scheduleTitle').textContent.includes('明日以降'))showSchedule('future');
+  try{render();renderStaff();renderTimes()}catch(uiError){console.error('面接登録カレンダーの描画失敗',uiError)}
+  try{window.refreshDailyDashboard?.()}catch(dashboardError){console.error('TOPスケジュールの描画失敗',dashboardError)}
+  try{checkReminders()}catch(reminderError){console.error('通知描画失敗',reminderError)}
+  void loadInterviewLineProfiles();
+  void sb.from('staff_schedule_blocks').select('*').then(({data,error})=>{if(error){console.warn('対応不可データの取得失敗',error);return}blocks=data||[];try{render();renderStaff();renderTimes()}catch(e){console.warn('対応不可データ描画失敗',e)}}).catch(e=>console.warn('対応不可データ通信失敗',e));
  }catch(e){
   console.error('interview load failed',e);
   msg.textContent='読み込みエラー：'+(e.message||String(e));
