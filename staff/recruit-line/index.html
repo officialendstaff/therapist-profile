@@ -421,7 +421,15 @@ function drawVerticalChart(id,values,labels,color,legend){const el=$(id);el.repl
 function drawRecruitComparisonChart(id,inquiries,bookings,labels){
  const el=$(id);el.replaceChildren();
  const legend=document.createElement('div');legend.className='chartLegend recruitCompareLegend';
- for(const [color,label] of [['#f4a9c6','問い合わせ件数'],['#6db9db','面接予約件数']]){
+ const palettes={
+  'grand-luxe':['#d8bb78','#b8a0d4'],
+  'luxy':['#d5b5e9','#e5a8c1'],
+  'rose':['#d4a0ac','#d6b77d'],
+  'un-secret':['#d3c1a0','#a9b8a0'],
+  'busty':['#e5a8c1','#c3a4dc']
+ };
+ const [inquiryColor,bookingColor]=palettes[document.body.dataset.storeTheme]||['#d8bb78','#b8a0d4'];
+ for(const [color,label] of [[inquiryColor,'問い合わせ件数'],[bookingColor,'面接予約件数']]){
   const item=document.createElement('span');const swatch=document.createElement('i');swatch.style.background=color;item.append(swatch,document.createTextNode(label));legend.append(item);
  }
  el.append(legend);
@@ -430,7 +438,7 @@ function drawRecruitComparisonChart(id,inquiries,bookings,labels){
  labels.forEach((label,i)=>{
   const col=document.createElement('div');col.className='chartColumn recruitCompareColumn';
   const pair=document.createElement('div');pair.className='recruitComparePair';
-  for(const [value,color,type] of [[inquiries[i],'#f4a9c6','問い合わせ'],[bookings[i],'#6db9db','面接予約']]){
+  for(const [value,color,type] of [[inquiries[i],inquiryColor,'問い合わせ'],[bookings[i],bookingColor,'面接予約']]){
    const bar=document.createElement('div');bar.className='recruitCompareBar';bar.style.height=(value/max*100)+'%';bar.style.background=color;
    bar.title=label+' '+type+'：'+value+'件';
    const number=document.createElement('span');number.className='recruitCompareValue';number.textContent=String(value);
