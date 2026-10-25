@@ -220,6 +220,20 @@ body > header h1{flex:0 1 auto!important;min-width:0!important;white-space:nowra
 #applicantSection .applicantCompactMonths>strong,#interviewPage .applicantCompactMonths>strong{font-size:13px!important;font-weight:700!important;line-height:1.4!important}
 #applicantSection .applicantCompactMonths>button,#interviewPage .applicantCompactMonths>button{font-size:21px!important;font-weight:400!important;line-height:1!important}
 @media(max-width:380px){#applicantSection .applicantCompactMonths>strong,#interviewPage .applicantCompactMonths>strong{font-size:12px!important}}
+</style><style id="applicantInterviewCountExactParity">
+/* 件数の表示は両ページのIDを同一セレクタで制御し、個別指定より優先する */
+#applicantSection .applicantCompactTitle #count,
+#interviewPage .applicantCompactTitle #interviewCount{
+ font-family:inherit!important;
+ font-size:13px!important;
+ font-weight:400!important;
+ line-height:1.4!important;
+ letter-spacing:normal!important;
+ transform:none!important;
+ zoom:1!important;
+ margin:0!important;
+ padding:0!important;
+}
 </style></head><body>
 <header><h1>求人管理 <small>｜L GROUP</small></h1><div class="recruitHeaderActions"><button type="button" class="secondary hide" id="storeBack">← 店舗管理</button><button type="button" class="secondary" id="interviewManageSwitch" onclick="openSelectedInterviewManagement()" style="display:none">面接管理</button><button type="button" class="secondary" id="recruitNoticeButton" onclick="openRecruitNotices()" aria-haspopup="dialog">お知らせ</button><button type="button" class="secondary" id="personalPageLink" onclick="openRecruitPersonalPage()">個人ページへ</button></div></header><div id="recruitNoticesDialog" class="hide" role="dialog" aria-modal="true" aria-labelledby="recruitNoticesTitle"><div class="recruitNoticesCard"><div class="recruitNoticesTop"><h2 id="recruitNoticesTitle">お知らせ・改修履歴</h2><button type="button" class="secondary" onclick="closeRecruitNotices()">閉じる ×</button></div><p class="recruitNoticesIntro">改修を実施した日ごとの変更内容です。公開画面で未検証の項目はその旨を記載しています。</p><div id="recruitNoticesContent"></div></div></div><div id="recruitHeaderSettings" class="hide"><div class="wrap"><div class="panel"><div style="display:flex;justify-content:flex-end;margin-bottom:8px"><button type="button" class="secondary" onclick="closeRecruitStoreSettings()" aria-label="店舗設定を閉じる">✕ 閉じる</button></div><details class="storeSettings"><summary>店舗名・リンク先の設定</summary><p class="muted" style="font-size:12px">新店舗が決まったら、店名とリンク先URLを設定できます。</p><label>店舗<select id="storeEditSelect"></select></label><label>表示名<input id="storeEditName"></label><label>リンク先URL<input id="storeEditUrl" placeholder="https://..."></label><label>店舗ロゴ<input id="storeEditLogo" type="file" accept="image/png,image/jpeg,image/webp"></label><div id="storeLogoPreview" style="margin:4px 0 12px"></div><button id="storeSave">設定を保存</button><p id="storeEditResult" class="muted"></p></details><div class="recruitSettingsFooter"><button class="secondary" id="logout" type="button">ログアウト</button></div></div></div></div>
 <script id="recruitHeaderDedup">
