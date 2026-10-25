@@ -293,7 +293,8 @@ function renderHires(){
  for(const form of interviewForms.filter(f=>f.shop===store&&['採用','在籍','不採用','辞退'].includes(f.status)&&!linkedFormIds.has(f.id)&&f.submitted_at?.slice(0,7)===hireMonth))joined.push({appointment:null,link:null,form});
  const outcome=v=>v.form?.status||v.appointment?.status;
  const groups=[['採用',v=>['採用','入店','在籍'].includes(outcome(v))],
- ['不採用',v=>outcome(v)==='不採用']];
+ ['不採用',v=>outcome(v)==='不採用'],
+ ['辞退',v=>outcome(v)==='辞退']];
  for(const [title,test] of groups){
   const rows=joined.filter(test);
   const h=document.createElement('h3');h.textContent=title+'（'+rows.length+'件）';h.style.margin='18px 0 8px';el.append(h);
