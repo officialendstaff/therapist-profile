@@ -1084,7 +1084,7 @@ function interviewSharedHistoryText(item){
 function interviewSharedHistoryHTML(items){
  const types=['日程変更','キャンセル','無断キャン','無断トビ'];
  const distinct=[...new Map((items||[]).map(e=>[String(e.id||e.event_key),e])).values()];
- return '<div class="sharedInterviewRisk">'+types.map(t=>{
+ return '<div class="sharedInterviewRisk">'+types.filter(t=>distinct.some(e=>e.event_type===t)).map(t=>{
   const rows=distinct.filter(e=>e.event_type===t);
   return '<details class="sharedHistoryDetail"><summary>'+interviewSharedEscape(t)+'　'+rows.length+'件</summary><div class="sharedHistoryDetailItems">'+rows.map(e=>'<div>'+interviewSharedEscape(interviewSharedHistoryText(e))+'</div>').join('')+'</div></details>';
  }).join('')+'</div>';
@@ -1931,7 +1931,7 @@ window.pickInterviewGanttSlot=function(p){
   put('applicantDetailSchedule',records[0]?(String(records[0].interview_date||'')+' '+String(records[0].interview_time||'').slice(0,5)):'面接登録なし');
   put('applicantDetailStaff',records[0]?('担当：'+(typeof interviewAssigneeName==='function'?interviewAssigneeName(records[0]):'未設定')):'');
   put('applicantDetailStatus',records[0]?('現在：'+String(records[0].status||'面接予定')):'');
-  put('applicantDetailRisk',['日程変更','キャンセル','無断キャン','無断トビ'].map(t=>t+' '+audits.filter(e=>e.event_type===t).length+'件').join(' ／ '));
+  put('applicantDetailRisk',['日程変更','キャンセル','無断キャン','無断トビ'].filter(t=>audits.some(e=>e.event_type===t)).map(t=>t+' '+audits.filter(e=>e.event_type===t).length+'件').join(' ／ '));
   const target=byId('applicantDetailHistory');target.replaceChildren();
   const info=[...audits.map(e=>({date:e.recorded_at,title:e.event_type,detail:String(e.original_date||'')+' '+String(e.original_time||'').slice(0,5)+'　'+String(e.original_shop||'')})),...records.map(i=>({date:i.interview_date,title:'面接：'+(i.status||'予定'),detail:String(i.interview_date||'')+' '+String(i.interview_time||'').slice(0,5)+'　'+String(i.shop||'')}))].sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
   if(!info.length){const p=document.createElement('p');p.className='applicantDetailEmpty';p.textContent='紐付いた面接履歴はありません。';target.append(p)}
