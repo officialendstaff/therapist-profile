@@ -2940,7 +2940,7 @@ window.afterlifeReload=load;
  const storeFilter=document.getElementById('commonPreviewStore');
  if(!button||!panel||!list||!selector)return;
  const sections=['LINE通知','明日以降の面接予定','日程調整中','不届き者達','面接実施済み','来世に期待'];
- const totals=[19,12,6,9,14,3]; // Sample counts only; no live data touched.
+ const totals=[0,0,0,0,0,0]; // No fabricated records or counts.
  const PAGE_SIZE=10;
  let category=0,page=1;
  const make=(tag,cls,content)=>{
@@ -3003,7 +3003,7 @@ window.afterlifeReload=load;
    return !selected||map[i.shop]===selected;
   }).sort((a,b)=>(a.interview_date+' '+a.interview_time).localeCompare(b.interview_date+' '+b.interview_time)):[];
   const hasActualLineCards=isLine&&originals.length>0;
-  const total=isLine?originals.length:isFuture?futureRows.length:totals[category];
+  const total=isLine?originals.length:isFuture?futureRows.length:category===4?(typeof interviews!=='undefined'?interviews.filter(i=>['採用','不採用','来店済み','面接済'].includes(i.status)).length:0):0;
   const pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
   page=Math.max(1,Math.min(page,pages));
   selector.value=String(category);
@@ -3050,8 +3050,14 @@ window.afterlifeReload=load;
     if(actions[2])actions[2].textContent='登録済み';
     fragment.append(item);
    });
-  }else if(!isLine){
-   for(let i=(page-1)*PAGE_SIZE;i<Math.min(total,page*PAGE_SIZE);i++)fragment.append(card(i));
+  }else if(category===4){
+   const done=typeof interviews!=='undefined'?interviews.filter(i=>['採用','不採用','来店済み','面接済'].includes(i.status)):[];
+   done.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE).forEach((record,index)=>{
+    const item=card(index);item.querySelector('.lineNoticeIdentity strong').textContent=record.line_name||record.applicant_name||record.name||'応募者';
+    item.querySelector('.lineStoreBadge').textContent=record.shop||'店舗未設定';
+    item.querySelector('.sharedInterviewAppointment').textContent=(record.interview_date||'')+' '+(record.interview_time||'')+' '+record.status;
+    item.querySelector('.sharedInterviewRisk')?.remove();item.querySelectorAll('button').forEach(b=>b.remove());fragment.append(item);
+   });
   }
   list.replaceChildren(fragment);
 
