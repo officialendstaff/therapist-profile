@@ -1317,6 +1317,9 @@ body:not(.dashboardHome):not(.lineInboxOpen):not(.lineBookingActive):not(.applic
 }
 </style><style id="nativeCommonListPreview20261026">
 /* Preview is a single native view in workMain, with no iframe or overlay. */
+/* Legacy desktop shell disables root scrolling; release it ONLY for this view. */
+html:has(body.commonPreviewOpen){height:auto!important;min-height:100%!important;overflow-x:hidden!important;overflow-y:auto!important}
+body.commonPreviewOpen{height:auto!important;min-height:100dvh!important;overflow:visible!important}
 #commonPreviewPanel[hidden]{display:none!important}
 body.commonPreviewOpen main.wrap{
  height:auto!important;max-height:none!important;min-height:calc(100dvh - 76px)!important;
@@ -1365,7 +1368,7 @@ body.commonPreviewOpen #commonPreviewNav{box-shadow:0 0 0 2px #78addc!important;
 #commonPreviewMessages{
  box-sizing:border-box!important;display:flex!important;flex-direction:column!important;
  width:100%!important;height:620px!important;min-height:620px!important;max-height:none!important;
- gap:6px!important;margin:0!important;padding:0!important;overflow:visible!important;
+ gap:6px!important;margin:0!important;padding:3px 0!important;overflow:visible!important;
  background:#fff!important
 }
 #commonPreviewMessages>.lineMessage{
