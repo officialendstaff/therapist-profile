@@ -2953,31 +2953,28 @@ window.afterlifeReload=load;
   return node;
  };
  const storeCodes={'薔薇と紳士':'rose','Grand Luxe':'grandluxe','LUXY':'luxy','Un Secret':'unsecret','BUSTY OSAKA':'busty'};
- function card(record){
-  const item=make('div','lineMessage interviewCommonCard');
-  const primary=make('div','lineNoticePrimary');
-  const person=make('div','lineNoticePerson');
-  const avatar=make('span','lineAvatar empty','LINE');
-  const identity=make('div','lineNoticeIdentity');
-  identity.append(make('strong','',record.line_name||record.applicant_name||record.name||'応募者'));
-  const store=make('span','lineStoreBadge',record.shop||'店舗未設定');
-  store.dataset.store=storeCodes[record.shop]||'';
-  identity.append(store);person.append(avatar,identity);
-  const summary=make('div','lineNoticeSummary');
-  const appointment=make('div','sharedInterviewAppointment');
-  appointment.append(make('strong','',record.interview_date?(record.interview_date+' '+(record.interview_time||'').slice(0,5)):'未定'));
-  if(record.interviewer||record.staff_name)appointment.append(make('span','','担当：'+(record.staff_name||record.interviewer)));
-  summary.append(appointment);
-  const actions=make('div','lineBookActions sharedInterviewButtons');
-  ['日程変更','キャンセル','面接登録','来世に期待'].forEach((name,index)=>{
-   const action=make('button','action '+['action-change','action-cancel','lineBookButton','afterlifeAction'][index],name);
-   action.type='button';
-   action.disabled=!(category===1&&index<2);
-   if(!action.disabled&&index===0)action.addEventListener('click',()=>chooseReschedule(record.id));
-   if(!action.disabled&&index===1)action.addEventListener('click',()=>cancelIt(record.id));
-   actions.append(action);
+ const sharedTemplate=document.querySelector('#lineInboxMessages > .lineMessage');
+ function makeSharedCard(source){
+  // Every category uses the exact same LINE message card DOM as the shared page.
+  const original=source.node||document.querySelector('#lineInboxMessages > .lineMessage')||sharedTemplate;
+  if(!original)return null;
+  const item=original.cloneNode(true);
+  item.hidden=false;item.removeAttribute('id');
+  item.querySelectorAll('[id]').forEach(node=>node.removeAttribute('id'));
+  if(source.record){
+   const record=source.record;
+   const name=item.querySelector('.lineNoticeIdentity strong');
+   if(name)name.textContent=record.line_name||record.applicant_name||record.name||'応募者';
+   const badge=item.querySelector('.lineStoreBadge');
+   if(badge){badge.textContent=record.shop||'店舗未設定';badge.dataset.store=storeCodes[record.shop]||'';}
+   const appointment=item.querySelector('.sharedInterviewAppointment,.lineNoticeSummary');
+   if(appointment)appointment.textContent=(record.interview_date||'未定')+' '+(record.interview_time||'').slice(0,5)+(record.staff_name?' 担当：'+record.staff_name:'');
+  }
+  item.querySelectorAll('button,input,select,a').forEach(node=>{
+   node.setAttribute('aria-disabled','true');node.setAttribute('tabindex','-1');
+   if(node.matches('button,input,select'))node.disabled=true;
+   if(node.matches('a'))node.removeAttribute('href');
   });
-  primary.append(person,summary,actions);item.append(primary);
   return item;
  }
  function render(){
@@ -2992,14 +2989,10 @@ window.afterlifeReload=load;
    if(category===4)return ['採用','不採用','来店済み','面接済'].includes(record.status);
    return false;
   });
-  const lineCards=[...document.querySelectorAll('#lineInboxMessages > .lineMessage')].filter(el=>{
-   const badge=el.querySelector('.lineStoreBadge');
-   return (!selected||badge?.dataset.store===selected);
-  });
-  const total=category===0?lineCards.length:records.length;
-  const pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
-  page=Math.max(1,Math.min(page,pages));
-  selector.value=String(category);
+  const lineCards=[...document.querySelectorAll('#lineInboxMessages > .lineMessage')].filter(el=>!selected||el.querySelector('.lineStoreBadge')?.dataset.store===selected);
+  const sources=category===0?lineCards.map(node=>({node})):records.map(record=>({record}));
+  const total=sources.length,pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
+  page=Math.max(1,Math.min(page,pages));selector.value=String(category);
   document.body.classList.remove('commonFutureOpen');
   document.getElementById('commonPreviewTitle').textContent=category===0?'求人LINE受信｜全店舗':sections[category];
   document.getElementById('commonPreviewCount').textContent=total+'件';
@@ -3007,20 +3000,10 @@ window.afterlifeReload=load;
   document.getElementById('commonPreviewPrev').disabled=page===1;
   document.getElementById('commonPreviewNext').disabled=page===pages;
   const fragment=document.createDocumentFragment();
-  if(category===0){
-   lineCards.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE).forEach(original=>{
-    const copy=original.cloneNode(true);copy.hidden=false;copy.removeAttribute('id');
-    copy.querySelectorAll('[id]').forEach(node=>node.removeAttribute('id'));
-    copy.querySelectorAll('button,input,select,a').forEach(node=>{
-     node.setAttribute('aria-disabled','true');node.setAttribute('tabindex','-1');
-     if(node.matches('button,input,select'))node.disabled=true;
-     if(node.matches('a'))node.removeAttribute('href');
-    });
-    fragment.append(copy);
-   });
-  }else{
-   records.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE).forEach(record=>fragment.append(card(record)));
-  }
+  sources.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE).forEach(source=>{
+   const item=makeSharedCard(source);
+   if(item)fragment.append(item);
+  });
   list.replaceChildren(fragment);
  }
  // Preserve the original panes so the preview can be removed without losing
