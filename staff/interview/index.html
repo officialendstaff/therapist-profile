@@ -2994,13 +2994,16 @@ window.afterlifeReload=load;
   const isLine=category===0;
   const isFuture=category===1;
   document.body.classList.toggle('commonFutureOpen',isFuture);
-  const futureRows=isFuture?(typeof interviews!=='undefined'?interviews:[]).filter(i=>i.interview_date>nowJst().date&&!['キャンセル','面接済','採用','不採用','無断トビ','トビ（キャンセル）','日程調整中'].includes(i.status)).filter(i=>{
+  const today=new Date(Date.now()+9*60*60*1000).toISOString().slice(0,10);
+  const futureRows=isFuture?(typeof interviews!=='undefined'?interviews:[]).filter(i=>
+   i.interview_date>=today&&!['キャンセル','面接済','採用','不採用','無断トビ','トビ（キャンセル）','日程調整中'].includes(i.status)
+  ).filter(i=>{
    const selected=storeFilter?.value||'';
    const map={'薔薇と紳士':'rose','Grand Luxe':'grandluxe','LUXY':'luxy','Un Secret':'unsecret','BUSTY OSAKA':'busty'};
    return !selected||map[i.shop]===selected;
   }).sort((a,b)=>(a.interview_date+' '+a.interview_time).localeCompare(b.interview_date+' '+b.interview_time)):[];
   const hasActualLineCards=isLine&&originals.length>0;
-  const total=isLine?originals.length:isFuture?0:totals[category];
+  const total=isLine?originals.length:isFuture?futureRows.length:totals[category];
   const pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
   page=Math.max(1,Math.min(page,pages));
   selector.value=String(category);
@@ -3026,8 +3029,27 @@ window.afterlifeReload=load;
     fragment.append(copy);
    });
   }else if(isFuture){
-   // Clean common-page foundation. The old future-list renderer is retired.
-   // Existing database records are deliberately untouched.
+   futureRows.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE).forEach((record,index)=>{
+    // Same card factory, DOM and CSS classes as the common page.
+    const item=card((page-1)*PAGE_SIZE+index);
+    const name=item.querySelector('.lineNoticeIdentity strong');
+    if(name)name.textContent=record.line_name||record.applicant_name||record.name||'応募者';
+    const badge=item.querySelector('.lineStoreBadge');
+    if(badge){badge.textContent=record.shop||'店舗未設定';badge.dataset.store=({'薔薇と紳士':'rose','Grand Luxe':'grandluxe','LUXY':'luxy','Un Secret':'unsecret','BUSTY OSAKA':'busty'})[record.shop]||'';}
+    const appointment=item.querySelector('.sharedInterviewAppointment');
+    if(appointment){
+     appointment.replaceChildren();
+     appointment.append(make('strong','',(record.interview_date||'日付未設定')+' '+(record.interview_time||'')));
+     appointment.append(make('span','','担当：'+(record.staff_name||record.interviewer||record.person||'未設定')));
+    }
+    item.querySelector('.sharedInterviewRisk')?.remove();
+    const actions=item.querySelectorAll('.sharedInterviewButtons button');
+    actions.forEach(button=>{button.disabled=true;button.title='';});
+    if(actions[0]){actions[0].disabled=false;actions[0].addEventListener('click',()=>chooseReschedule(record.id));}
+    if(actions[1]){actions[1].disabled=false;actions[1].addEventListener('click',()=>cancelIt(record.id));}
+    if(actions[2])actions[2].textContent='登録済み';
+    fragment.append(item);
+   });
   }else if(!isLine){
    for(let i=(page-1)*PAGE_SIZE;i<Math.min(total,page*PAGE_SIZE);i++)fragment.append(card(i));
   }
