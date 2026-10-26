@@ -1833,6 +1833,29 @@ function currentTemplate(){return shop==='BUSTY OSAKA'?bustyText():shop==='薔�
 function renderTemplate(){let show=!!shop&&!!date&&!!time;messageTemplateCard.style.display=show?'block':'none';if(show){templateTitle.textContent=shop+'｜送信用テンプレート';messageTemplate.textContent=currentTemplate()}}
 copyTemplate.onclick=async()=>{let txt=currentTemplate();try{await navigator.clipboard.writeText(txt);copyMsg.textContent='コピーしました。'}catch(e){let ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();copyMsg.textContent='コピーしました。'}}
 
+// Interview sheet decisions live in interview_applicants, not necessarily staff_interviews.
+async function applyInterviewSheetOutcomes(rows){
+ if(!Array.isArray(rows)||!rows.length)return rows;
+ try{
+  const ids=rows.map(row=>row.id).filter(id=>id!=null);
+  const {data:links,error:linkError}=await sb.from('staff_interview_form_links')
+   .select('interview_id,interview_applicant_id').in('interview_id',ids);
+  if(linkError)throw linkError;
+  const formIds=[...new Set((links||[]).map(link=>link.interview_applicant_id).filter(Boolean))];
+  if(!formIds.length)return rows;
+  const {data:forms,error:formError}=await sb.from('interview_applicants')
+   .select('id,status').in('id',formIds);
+  if(formError)throw formError;
+  const statuses=new Map((forms||[]).map(form=>[String(form.id),form.status]));
+  const decisions=new Map();
+  for(const link of links||[]){
+   const status=statuses.get(String(link.interview_applicant_id));
+   if(['採用','在籍','退職','不採用','辞退'].includes(status))
+    decisions.set(String(link.interview_id),status==='在籍'?'採用':status);
+  }
+  return rows.map(row=>decisions.has(String(row.id))?{...row,status:decisions.get(String(row.id))}:row);
+ }catch(error){console.warn('面接シート結果との照合に失敗',error);return rows}
+}
 let interviewLoading=false;
 async function load(){
  if(interviewLoading)return;
@@ -1842,7 +1865,7 @@ async function load(){
  try{
   const a=await Promise.race([sb.from('staff_interviews').select('*').order('interview_date').order('interview_time'),timeout(12000)]);
   if(a.error)throw a.error;
-  interviews=a.data||[];
+  interviews=await applyInterviewSheetOutcomes(a.data||[]);
   window.interviewDashboardRows=interviews;
   window.dispatchEvent(new Event('interview-dashboard-rows-updated'));
   void window.interviewSharedLoadHistory?.();
@@ -2396,7 +2419,7 @@ window.pickInterviewGanttSlot=function(p){
    if(!client)throw new Error('Supabase接続が初期化されていません');
    const result=await Promise.race([client.from('staff_interviews').select('*').order('interview_date').order('interview_time'),new Promise((_,reject)=>setTimeout(()=>reject(new Error('通信タイムアウト')),15000))]);
    if(result.error)throw result.error;
-   sidebarRows=result.data||[];sidebarError='';
+   sidebarRows=await applyInterviewSheetOutcomes(result.data||[]);sidebarError='';
    void window.interviewSharedLoadHistory?.();
    window.interviewDashboardRows=sidebarRows;
    // Status changes must replace stale cached rows even when the row count is unchanged.
