@@ -2954,11 +2954,27 @@ window.afterlifeReload=load;
  };
  const storeCodes={'薔薇と紳士':'rose','Grand Luxe':'grandluxe','LUXY':'luxy','Un Secret':'unsecret','BUSTY OSAKA':'busty'};
  const sharedTemplate=document.querySelector('#lineInboxMessages > .lineMessage');
+ function sharedEmptyTemplate(){
+  const item=make('div','lineMessage');
+  const primary=make('div','lineNoticePrimary');
+  const person=make('div','lineNoticePerson');
+  person.append(make('span','lineAvatar empty','LINE'));
+  const identity=make('div','lineNoticeIdentity');
+  identity.append(make('strong','', ''));
+  identity.append(make('span','lineStoreBadge',''));
+  person.append(identity);
+  const summary=make('div','lineNoticeSummary');
+  const actions=make('div','lineBookActions');
+  ['日程変更','キャンセル','面接登録','来世に期待'].forEach(label=>{
+   const action=make('button','action',label);action.type='button';actions.append(action);
+  });
+  primary.append(person,summary,actions);item.append(primary);
+  return item;
+ }
  function makeSharedCard(source){
   // Every category uses the exact same LINE message card DOM as the shared page.
   const original=source.node||document.querySelector('#lineInboxMessages > .lineMessage')||sharedTemplate;
-  if(!original)return null;
-  const item=original.cloneNode(true);
+  const item=original?original.cloneNode(true):sharedEmptyTemplate();
   item.hidden=false;item.removeAttribute('id');
   item.querySelectorAll('[id]').forEach(node=>node.removeAttribute('id'));
   if(source.record){
