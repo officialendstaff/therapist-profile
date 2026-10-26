@@ -3129,7 +3129,7 @@ window.afterlifeReload=load;
   if(!target)return;
   event.preventDefault();
   event.stopImmediatePropagation();
-  category=1;page=1;
+  category=1;page=1;selector.value='1';
   if(storeFilter)storeFilter.value='';
   const old=document.getElementById('scheduleView');
   if(old)old.hidden=true;
@@ -3138,10 +3138,23 @@ window.afterlifeReload=load;
   if(typeof interviews!=='undefined'&&!interviews.length&&typeof load==='function')void load().then(()=>render()).catch(console.error);
  },true);
  window.openFutureInterviewCommonView=()=>{category=1;page=1;if(storeFilter)storeFilter.value='';const legacy=document.getElementById('scheduleView');if(legacy)legacy.hidden=true;open();document.getElementById('futureNav')?.setAttribute('aria-expanded','true');if(typeof interviews!=='undefined'&&!interviews.length&&typeof load==='function')void load().then(()=>render())};
+ // All sidebar lists use the same shared panel, renderer and pagination.
+ const sidebarCategories={futureNav:1,pendingNav:2,misconductNav:3,historyNav:4,afterlifeNav:5};
+ document.addEventListener('click',event=>{
+  const nav=event.target.closest?.('#pendingNav,#misconductNav,#historyNav,#afterlifeNav');
+  if(!nav)return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  category=sidebarCategories[nav.id];
+  page=1;
+  selector.value=String(category);
+  if(storeFilter)storeFilter.value='';
+  open();
+ },true);
  // The future sidebar opens the shared layout with actual interview records.
  const futureButton=document.getElementById('futureNav');
  if(futureButton)futureButton.onclick=()=>{
-  category=1;page=1;storeFilter.value='';open();
+  category=1;page=1;selector.value='1';storeFilter.value='';open();
   futureButton.setAttribute('aria-expanded','true');
   if(typeof interviews!=='undefined'&&!interviews.length&&typeof load==='function')void load().then(()=>render());
  };
