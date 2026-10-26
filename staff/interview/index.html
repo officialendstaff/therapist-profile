@@ -688,9 +688,58 @@ body:not(.dashboardHome):not(.lineInboxOpen):not(.lineBookingActive) #scheduleVi
  #lineInbox>.scheduleHeader .interviewPager,#scheduleView>.scheduleHeader .interviewPager{margin-left:auto!important}
  body.lineInboxOpen,body:not(.dashboardHome):not(.lineInboxOpen):not(.lineBookingActive){overflow-y:auto!important}
 }
+</style><style id="applicantDetailViewStyle20261026">
+#applicantDetailView[hidden]{display:none!important}
+body.applicantDetailOpen .workMain > :not(#applicantDetailView){display:none!important}
+body.applicantDetailOpen .workspace{display:grid!important;grid-template-columns:300px minmax(0,1fr)!important;grid-template-rows:300px auto!important;gap:12px 14px!important;align-items:start!important}
+body.applicantDetailOpen .workspace>.side.card{display:contents!important}
+body.applicantDetailOpen #dailySidebarCalendar{grid-column:1!important;grid-row:1!important}
+body.applicantDetailOpen .workspace>.side.card>.navSection{grid-column:1!important;grid-row:2!important;display:flex!important}
+body.applicantDetailOpen .workspace>.workMain{display:block!important;grid-column:2!important;grid-row:1 / span 2!important;min-width:0!important;width:100%!important}
+body.applicantDetailOpen #applicantDetailView{display:flex!important;flex-direction:column!important;gap:13px!important;padding:17px!important;margin:0!important;max-height:calc(100dvh - 155px)!important;min-height:0!important;overflow:hidden!important}
+body.applicantDetailOpen{overflow:hidden!important}
+.applicantDetailHeader{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #e0e7f0;padding-bottom:12px}
+.applicantDetailHeader h2{font-size:19px;margin:0 0 4px;color:#192e49}
+.applicantDetailHeader p{margin:0;font-size:11px;color:#66809c}
+.applicantDetailIdentity{display:flex;align-items:center;gap:14px}
+.applicantDetailIdentity .lineAvatar{width:55px;height:55px;min-width:55px;border-radius:50%;object-fit:cover}
+.applicantDetailIdentity strong{display:block;font-size:19px;color:#182f4a}
+.applicantDetailMeta{display:flex;gap:12px;align-items:center;margin-top:5px;font-size:12px;color:#64738a}
+.applicantDetailSummary{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.applicantDetailSummary>div{padding:12px 14px;border:1px solid #d6e1ed;background:#f1f5fa;border-radius:9px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.applicantDetailSummary small{font-size:11px;color:#667b95}
+.applicantDetailSummary strong{font-size:15px;color:#1b3a5a}
+.applicantDetailSummary span{font-size:12px;color:#435b77}
+.applicantDetailColumns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;flex:1;min-height:0}
+.applicantDetailPanel{border:1px solid #dae4ee;border-radius:10px;display:flex;flex-direction:column;min-width:0;min-height:0;padding:12px;background:#fff}
+.applicantDetailPanelHead{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e1e7ee;padding-bottom:10px;margin-bottom:9px}
+.applicantDetailPanel h3{font-size:15px;margin:0;color:#1e3753}
+.applicantDetailPanelHead span{font-size:11px;color:#6c7d92}
+.applicantDetailScroll{overflow-y:auto!important;overscroll-behavior:contain;min-height:0;flex:1}
+.applicantDetailEntry{border:1px solid #e0e6ee;background:#f4f7fb;border-radius:8px;padding:10px 12px;margin-bottom:9px;white-space:pre-wrap;overflow-wrap:anywhere}
+.applicantDetailEntry small{display:block;color:#70829a;font-size:11px;margin-bottom:6px}
+.applicantDetailEntry p{margin:0;font-size:13px;line-height:1.6;color:#22354e}
+#applicantDetailMore{margin-top:10px;width:100%}
+#applicantDetailMore[hidden]{display:none!important}
+.applicantDetailEmpty{padding:17px;color:#70829a;font-size:13px}
+body.applicantDetailOpen #lineInbox,body.applicantDetailOpen #scheduleView,body.applicantDetailOpen #dailyDashboard{display:none!important}
+#lineInboxMessages .lineNoticePerson[data-user],#scheduleViewContent .lineNoticePerson[data-user],#scheduleViewContent .unifiedSidebarPerson[data-user]{cursor:pointer}
+#lineInboxMessages .lineNoticePerson[data-user]:hover strong,#scheduleViewContent [data-user]:hover strong{text-decoration:underline}
+#lineInboxMessages .lineNoticePerson[data-user]:focus-visible,#scheduleViewContent [data-user]:focus-visible{outline:2px solid #2e6599;outline-offset:4px;border-radius:5px}
+@media(max-width:900px){
+ body.applicantDetailOpen{overflow:auto!important}
+ body.applicantDetailOpen .workspace{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto auto!important}
+ body.applicantDetailOpen .workspace>.side.card{display:block!important;grid-column:1!important;grid-row:1!important}
+ body.applicantDetailOpen .workspace>.workMain{grid-column:1!important;grid-row:2!important}
+ body.applicantDetailOpen #applicantDetailView{max-height:none!important;overflow:visible!important}
+ .applicantDetailColumns{grid-template-columns:1fr}
+ .applicantDetailScroll{max-height:45vh!important}
+ .applicantDetailSummary{grid-template-columns:1fr}
+}
 </style></head><body><div id="staffLock" style="display:none"><div class="lockbox"><div class="lockmark">MATTAN KOUGYOU</div><h2>STAFF LOGIN</h2><input id="staffPin" type="password" placeholder="パスワード" autocomplete="off"><button id="staffUnlock" type="button">ログイン</button><div id="staffLockErr" class="lockerr"></div></div></div><header class="appHeader"><div class="brand"><span>MATTAN KOUGYOU</span><strong>面接予約管理</strong></div><div class="headerRight"><button type="button" id="headerTopNav" class="headerNavButton">TOP</button><button type="button" id="headerBookingNav" class="headerNavButton">面接登録</button><div id="headerLineNavSlot"></div><button type="button" id="headerSettingsNav" class="headerNavButton" aria-expanded="false">設定</button><div id="headerSettingsPanel" hidden><button type="button" id="enablePcAlerts" class="notifyButton">PC通知を許可</button><button type="button" id="lineSoundTest" class="notifyButton" title="LINE通知音を確認">通知音テスト</button></div><span id="reminderCount" class="reminderCount" hidden>0</span><span>INTERVIEW MANAGEMENT</span><span class="headerSymbol" aria-hidden="true">◈</span></div></header><main class="wrap"><div class="workspace">
 <aside class="side card"><section id="dailySidebarCalendar"><h2>日付選択</h2><div class="dailyMonthNav"><button type="button" id="dailyPrevMonth" aria-label="前月">‹</button><strong id="dailyMonthLabel"></strong><button type="button" id="dailyNextMonth" aria-label="翌月">›</button></div><div class="dailyCalendar" id="dailyCalendarDays"></div></section><div class="navSection"><button type="button" class="navBtn" id="sidebarLineNav"><span class="sidebarNavTitle">LINE通知</span><span class="sidebarNavRight"><span id="sidebarLineCount">—件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><button class="navBtn" id="futureNav" type="button" aria-expanded="true"><span class="sidebarNavTitle">明日以降の面接予定</span><span class="sidebarNavRight"><span id="futureInterviewCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><div class="navPanel" id="futurePanel" hidden><div id="list">読み込み中...</div></div><button class="navBtn" id="pendingNav" type="button" aria-expanded="false"><span class="sidebarNavTitle">日程調整中</span><span class="sidebarNavRight"><span id="pendingInterviewCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><div class="navPanel" id="pendingPanel" hidden><div id="pendingInterviewList"></div></div><button class="navBtn" id="misconductNav" type="button"><span class="sidebarNavTitle">不届き者達</span><span class="sidebarNavRight"><span id="misconductCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><button class="navBtn" id="historyNav" type="button" aria-expanded="false"><span class="sidebarNavTitle">面接実施済み</span><span class="sidebarNavRight"><span id="pastInterviewCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><div class="navPanel" id="historyPanel" hidden><div id="pastInterviewList">読み込み中...</div></div></div></aside>
 <div class="workMain"><section class="card" id="dailyDashboard" hidden><div class="dailySection dailyAppointmentSection"><div class="dailyDateTitle"><h2 id="dailyAppointmentTitle">本日の面接予定</h2><span id="dailyAppointmentCount"></span></div><div class="dailyAppointments" id="dailyAppointmentItems"></div></div><div class="dailySection dailyScheduleSection"><div class="dailyDateTitle"><h2 id="dailyScheduleTitle">担当者スケジュール</h2><span id="dailyAvailabilityStatus" class="note"></span></div><div class="dailyLegend"><span>🟩 対応可能</span><span>⬜ 対応不可（グレー）</span><span>🟪 面接予約済み</span></div><div class="dailyTableWrap"><div class="dailyGrid" id="dailyScheduleGrid"></div></div><p class="dailyNotice">10:00〜23:30・30分単位。空き枠をタップして日時を選択できます。</p></div></section><section class="card lineInbox" id="lineInbox" hidden><div class="scheduleHeader"><h2>求人LINE受信｜全店舗</h2><button type="button" class="action" id="lineInboxBack" hidden style="display:none!important" aria-hidden="true" tabindex="-1">TOPに戻る</button></div><p class="note" id="lineInboxStatus">受信データを確認しています。</p><div id="lineInboxAuth" hidden><p class="note">求人管理の管理者アカウントでログインしてください。</p><input type="email" id="lineInboxEmail" autocomplete="username" placeholder="メールアドレス"><input type="password" id="lineInboxPassword" autocomplete="current-password" placeholder="パスワード"><button type="button" class="action" id="lineInboxLogin">ログイン</button></div><div class="lineInboxTools"><label for="lineInboxStore">店舗</label><select id="lineInboxStore"><option value="">全店舗</option><option value="rose">薔薇と紳士</option><option value="grandluxe">Grand Luxe</option><option value="luxy">LUXY</option><option value="unsecret">Un Secret</option><option value="us">Un Secret（旧ID）</option></select><span id="lineInboxResultCount" aria-live="polite"></span></div><div id="lineInboxMessages"></div></section><section class="card reminderPanel" id="reminderPanel" hidden><div class="reminderSingleRow"><h2>確認LINEの送信時間です</h2><span class="reminderMessage">応募者へ確認LINEを送信してください。</span><div id="reminderItems"></div></div></section><section class="card scheduleView" id="scheduleView" hidden><div class="scheduleHeader"><h2 id="scheduleTitle">面接予定一覧</h2><button type="button" id="backToCalendar" class="action" hidden style="display:none!important" aria-hidden="true" tabindex="-1">TOPに戻る</button></div><div id="scheduleViewContent"></div></section>
+<section class="card applicantDetailView" id="applicantDetailView" hidden aria-labelledby="applicantDetailTitle"><div class="applicantDetailHeader"><div><h2 id="applicantDetailTitle">応募者詳細</h2><p id="applicantDetailOrigin" class="note">求人LINE受信 ＞ 応募者詳細</p></div><button type="button" class="action" id="applicantDetailBack">一覧へ戻る</button></div><div class="applicantDetailIdentity"><span id="applicantDetailAvatar" class="lineAvatar empty">LINE</span><div><strong id="applicantDetailName">読み込み中</strong><div class="applicantDetailMeta"><span id="applicantDetailShop" class="lineStoreBadge">店舗</span><span id="applicantDetailLatest"></span></div></div></div><div class="applicantDetailSummary"><div><small>現在の面接状況</small><strong id="applicantDetailSchedule">確認中</strong><span id="applicantDetailStaff"></span></div><div><small>面接・対応履歴</small><strong id="applicantDetailRisk">確認中</strong><span id="applicantDetailStatus"></span></div></div><div class="applicantDetailColumns"><section class="applicantDetailPanel"><div class="applicantDetailPanelHead"><h3>LINE受信履歴</h3><span id="applicantDetailMessageCount"></span></div><div id="applicantDetailMessages" class="applicantDetailScroll" aria-live="polite"></div><button type="button" id="applicantDetailMore" class="action" hidden>さらに表示</button></section><section class="applicantDetailPanel"><div class="applicantDetailPanelHead"><h3>面接・対応履歴</h3></div><div id="applicantDetailHistory" class="applicantDetailScroll"></div></section></div></section>
 <div class="workLeft">
 <div class="storeTop card" hidden style="display:none!important"><nav class="storeNav" aria-label="店舗選択"><button type="button" class="choice" data-shop="" id="allStoresChoice">全店舗</button>
 <button type="button" class="choice" data-shop="Grand Luxe">Grand Luxe</button>
@@ -863,6 +912,7 @@ async function loadInterviewLineProfiles(){
    const data=await auth.api('inbox');
    const links=(data.links||[]).filter(l=>l.interview_id!=null);
    window.interviewSharedHistoryLinks=links;
+   window.interviewLineDetailData=data;
    window.interviewSharedRefreshInboxData?.(data);
    const profiles=data.profiles||{};
    const apply=(link,profile)=>{
@@ -999,6 +1049,7 @@ const data=await Promise.race([access.api('inbox'),new Promise((_,reject)=>setTi
 const rows=data.events||[];
 const allLinks=data.links||[];
 window.interviewSharedHistoryLinks=allLinks;
+window.interviewLineDetailData=data;
 window.interviewSharedRefreshInboxData?.(data);
 const linkMap=new Map(allLinks.map(x=>[x.account_id+':'+x.line_user_id,x]));
 const historyByLine=new Map();
@@ -1034,7 +1085,7 @@ const cancellationHistory='';
 const sharedSummary=interviewSharedInfoHTML(linkedInterview,interviewSharedHistoryForLine(x.account_id,x.line_user_id));
 const body=event=>'<div class="lineGroupedEntry"><small>'+escape(new Date(event.received_at).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'}))+'</small><p>'+escape(event.message_text??('['+(event.message_type||'メッセージ')+']'))+'</p></div>';
 return '<div class="lineMessage"><div class="lineNoticePrimary">'+
- '<div class="lineNoticePerson">'+(picture?'<img class="lineAvatar" src="'+escape(picture)+'" alt="LINEアイコン">':'<span class="lineAvatar empty">LINE</span>')+'<div class="lineNoticeIdentity"><strong>'+escape(name)+'</strong><span class="lineStoreBadge" data-store="'+escape(x.account_id)+'">'+escape(storeNames[x.account_id]||x.account_id)+'</span></div></div>'+
+ '<div class="lineNoticePerson" role="button" tabindex="0" title="応募者詳細を開く" data-account="'+escape(x.account_id)+'" data-user="'+escape(x.line_user_id)+'">'+(picture?'<img class="lineAvatar" src="'+escape(picture)+'" alt="LINEアイコン">':'<span class="lineAvatar empty">LINE</span>')+'<div class="lineNoticeIdentity"><strong>'+escape(name)+'</strong><span class="lineStoreBadge" data-store="'+escape(x.account_id)+'">'+escape(storeNames[x.account_id]||x.account_id)+'</span></div></div>'+
  '<div class="lineNoticeSummary">'+sharedSummary+'</div>'+
  
  '<div class="lineBookActions sharedInterviewButtons"><button type="button" class="action action-change" disabled>日程変更</button><button type="button" class="action action-cancel" disabled>キャンセル</button>'+(registered?'<button type="button" class="action lineBookStatus" disabled>登録済み</button>':'<button type="button" class="action lineBookButton" data-account="'+escape(x.account_id)+'" data-user="'+escape(x.line_user_id)+'" data-name="'+escape(name)+'" data-shop="'+escape(storeNames[x.account_id]||x.account_id)+'">面接登録</button>')+'</div></div>'+
@@ -1356,7 +1407,15 @@ window.pickInterviewGanttSlot=function(p){
     const identity=document.createElement('div');identity.className='lineNoticeIdentity';
     const name=document.createElement('strong');name.textContent=profile.name&&profile.name!=='未取得'?profile.name:'LINE名未取得';
     const shopBadge=document.createElement('span');shopBadge.className='lineStoreBadge interviewStoreBadge';shopBadge.dataset.shop=String(i.shop||'');shopBadge.textContent=i.shop||'店舗未設定';
-    identity.append(name,shopBadge);person.append(identity);top.append(person);
+    identity.append(name,shopBadge);
+    const matchedLink=(window.interviewSharedHistoryLinks||[]).find(l=>String(l.interview_id)===String(i.id));
+    if(matchedLink?.line_user_id){
+      person.dataset.account=matchedLink.account_id;
+      person.dataset.user=matchedLink.line_user_id;
+      person.setAttribute('role','button');person.tabIndex=0;
+      person.title='応募者詳細を開く';
+    }
+    person.append(identity);top.append(person);
     const summary=document.createElement('div');summary.className=common?'lineNoticeSummary':'sharedInterviewSummary';
     const history=interviewSharedRelatedHistory(i,all());
     summary.innerHTML=interviewSharedInfoHTML(i,history);
@@ -1524,5 +1583,80 @@ window.pickInterviewGanttSlot=function(p){
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',moveLineStore);
  else moveLineStore();
  new MutationObserver(moveLineStore).observe(document.getElementById('lineInbox')||document.documentElement,{childList:true,subtree:true});
+})();
+</script><script id="applicantDetailViewLogic20261026">
+(function(){
+ const root=document.getElementById('applicantDetailView');
+ const back=document.getElementById('applicantDetailBack');
+ if(!root||!back)return;
+ const labels={rose:'薔薇と紳士',grandluxe:'Grand Luxe',luxy:'LUXY',unsecret:'Un Secret',us:'Un Secret'};
+ const byId=id=>document.getElementById(id);
+ let opened=false,selection=null,page=20,entries=[],origin='';
+ const format=v=>{if(!v)return '';const date=new Date(v);return Number.isNaN(date.getTime())?String(v):date.toLocaleString('ja-JP',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})};
+ function put(id,value){byId(id).textContent=String(value??'')}
+ function fillMessages(){
+  const target=byId('applicantDetailMessages');target.replaceChildren();
+  const visible=entries.slice(0,page);
+  if(!visible.length){const note=document.createElement('p');note.className='applicantDetailEmpty';note.textContent='取得済みのLINE受信履歴はありません。';target.append(note)}
+  for(const e of visible){
+   const item=document.createElement('div');item.className='applicantDetailEntry';
+   const date=document.createElement('small');date.textContent=format(e.received_at);
+   const text=document.createElement('p');text.textContent=e.message_text??('['+(e.message_type||'メッセージ')+']');
+   item.append(date,text);target.append(item);
+  }
+  put('applicantDetailMessageCount',entries.length+'件取得済み');
+  byId('applicantDetailMore').hidden=entries.length<=page;
+ }
+ function fillHistory(links){
+  const related=links.filter(l=>String(l.account_id)===selection.account&&String(l.line_user_id)===selection.user);
+  const ids=new Set(related.map(l=>String(l.interview_id)));
+  const interviews=Array.isArray(window.interviewDashboardRows)?window.interviewDashboardRows:[];
+  const records=interviews.filter(i=>ids.has(String(i.id))).sort((a,b)=>String(b.interview_date||'').localeCompare(String(a.interview_date||'')));
+  const audits=(window.interviewSharedHistoryRows||[]).filter(e=>ids.has(String(e.interview_id))).sort((a,b)=>String(b.recorded_at||'').localeCompare(String(a.recorded_at||'')));
+  put('applicantDetailSchedule',records[0]?(String(records[0].interview_date||'')+' '+String(records[0].interview_time||'').slice(0,5)):'面接登録なし');
+  put('applicantDetailStaff',records[0]?('担当：'+(typeof interviewAssigneeName==='function'?interviewAssigneeName(records[0]):'未設定')):'');
+  put('applicantDetailStatus',records[0]?('現在：'+String(records[0].status||'面接予定')):'');
+  put('applicantDetailRisk',['日程変更','無断トビ','キャンセル'].map(t=>t+' '+audits.filter(e=>e.event_type===t).length+'件').join(' ／ '));
+  const target=byId('applicantDetailHistory');target.replaceChildren();
+  const info=[...audits.map(e=>({date:e.recorded_at,title:e.event_type,detail:String(e.original_date||'')+' '+String(e.original_time||'').slice(0,5)+'　'+String(e.original_shop||'')})),...records.map(i=>({date:i.interview_date,title:'面接：'+(i.status||'予定'),detail:String(i.interview_date||'')+' '+String(i.interview_time||'').slice(0,5)+'　'+String(i.shop||'')}))].sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
+  if(!info.length){const p=document.createElement('p');p.className='applicantDetailEmpty';p.textContent='紐付いた面接履歴はありません。';target.append(p)}
+  for(const e of info){const box=document.createElement('div');box.className='applicantDetailEntry';const title=document.createElement('strong');title.textContent=e.title;const detail=document.createElement('p');detail.textContent=e.detail;box.append(title,detail);target.append(box)}
+ }
+ async function open(target){
+  const account=target.dataset.account,user=target.dataset.user;
+  if(!account||!user)return;
+  selection={account,user};page=20;entries=[];
+  origin=byId('scheduleView')&&!byId('scheduleView').hidden?'面接予定一覧':'求人LINE受信一覧';
+  put('applicantDetailOrigin',origin+' ＞ 応募者詳細');
+  put('applicantDetailName',target.querySelector('.lineNoticeIdentity strong')?.textContent||'LINE利用者');
+  put('applicantDetailShop',labels[account]||account);
+  put('applicantDetailLatest','取得中');
+  const avatar=target.querySelector('.lineAvatar');const avatarHolder=byId('applicantDetailAvatar');
+  const clone=avatar?.cloneNode(true)||document.createElement('span');clone.id='applicantDetailAvatar';clone.classList.add('lineAvatar');avatarHolder.replaceWith(clone);
+  document.body.classList.add('applicantDetailOpen');
+  root.hidden=false;opened=true;fillMessages();
+  put('applicantDetailSchedule','確認中');put('applicantDetailRisk','確認中');
+  put('applicantDetailStaff','');put('applicantDetailStatus','');
+  try{
+   const auth=window.interviewStaffAuth;if(!auth?.token())throw new Error('面接管理へのログインが必要です。');
+   const data=await auth.api('inbox');
+   if(!opened||selection.account!==account||selection.user!==user)return;
+   window.interviewLineDetailData=data;
+   const profile=data.profiles?.[account+':'+user];
+   if(profile?.displayName)put('applicantDetailName',profile.displayName);
+   if(profile?.pictureUrl){const img=document.createElement('img');img.className='lineAvatar';img.id='applicantDetailAvatar';img.alt='LINEアイコン';img.referrerPolicy='no-referrer';img.src=profile.pictureUrl;byId('applicantDetailAvatar').replaceWith(img)}
+   entries=(data.events||[]).filter(e=>String(e.account_id)===account&&String(e.line_user_id)===user).sort((a,b)=>String(a.received_at).localeCompare(String(b.received_at)));
+   put('applicantDetailLatest',entries.length?'最終受信：'+format(entries[entries.length-1].received_at):'受信履歴なし');
+   fillMessages();
+   await window.interviewSharedLoadHistory?.();
+   if(opened&&selection.account===account&&selection.user===user)fillHistory(data.links||[]);
+  }catch(error){if(opened){put('applicantDetailLatest','取得失敗');const p=document.createElement('p');p.className='applicantDetailEmpty';p.textContent='データを取得できませんでした：'+(error?.message||String(error));byId('applicantDetailMessages').replaceChildren(p)}}
+ }
+ function close(){opened=false;selection=null;root.hidden=true;document.body.classList.remove('applicantDetailOpen')}
+ back.addEventListener('click',close);
+ byId('applicantDetailMore').addEventListener('click',()=>{page+=20;fillMessages()});
+ document.addEventListener('click',e=>{const target=e.target.closest('#lineInboxMessages .lineNoticePerson[data-user],#scheduleViewContent .lineNoticePerson[data-user],#scheduleViewContent .unifiedSidebarPerson[data-user]');if(target&&!e.target.closest('button')){e.preventDefault();open(target)}},true);
+ document.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const target=e.target.closest('#lineInboxMessages .lineNoticePerson[data-user],#scheduleViewContent .lineNoticePerson[data-user],#scheduleViewContent .unifiedSidebarPerson[data-user]');if(target){e.preventDefault();open(target)}});
+ document.querySelectorAll('#sidebarLineNav,#futureNav,#pendingNav,#misconductNav,#historyNav').forEach(button=>button.addEventListener('click',close,true));
 })();
 </script></body></html>
