@@ -3010,27 +3010,48 @@ window.afterlifeReload=load;
     fragment.append(copy);
    });
   }else if(isFuture){
-   futureRows.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE).forEach(i=>{
-    const row=make('div','lineMessage interviewCommonCard');
+   futureRows.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE).forEach((i,index)=>{
+    // Use the exact common-preview card markup/classes, replacing only the record data and actions.
+    const row=card(index);
     row.dataset.interviewId=String(i.id);
-    const primary=make('div','lineNoticePrimary');
-    const person=make('div','lineNoticePerson');
     const profile=typeof interviewLineProfiles!=='undefined'?interviewLineProfiles.get(Number(i.id)):null;
-    const avatar=make('span','lineAvatar empty','LINE');
-    if(profile?.picture){avatar.textContent='';const img=make('img');img.src=profile.picture;img.alt='LINEアイコン';img.referrerPolicy='no-referrer';img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%';img.onerror=()=>{avatar.textContent='LINE'};avatar.append(img)}
-    const identity=make('div','lineNoticeIdentity');
-    identity.append(make('strong','',profile?.name||'未取得'));
-    const shop=make('span','lineStoreBadge',i.shop||'');identity.append(shop);person.append(avatar,identity);
-    const summary=make('div','lineNoticeSummary');
-    const appointment=make('div','sharedInterviewAppointment');
-    appointment.append(make('strong','',i.interview_date+' '+String(i.interview_time||'').slice(0,5)));
-    appointment.append(make('span','', '担当：'+interviewAssigneeName(i)));
-    summary.append(appointment,make('span','interviewStatus',i.confirmed?'確認OK':i.status||'面接予定'));
-    const actions=make('div','lineBookActions sharedInterviewButtons');
-    const change=make('button','action action-change','日程変更');change.type='button';change.onclick=()=>chooseReschedule(i.id);
-    const cancel=make('button','action action-cancel','キャンセル');cancel.type='button';cancel.onclick=()=>cancelIt(i.id);
-    actions.append(change,cancel);
-    primary.append(person,summary,actions);row.append(primary);fragment.append(row);
+    const identity=row.querySelector('.lineNoticeIdentity');
+    const name=identity?.querySelector('strong');
+    if(name)name.textContent=profile?.name||'未取得';
+    const badge=identity?.querySelector('.lineStoreBadge');
+    if(badge){
+     badge.textContent=i.shop||'';
+     const shops={'薔薇と紳士':'rose','Grand Luxe':'grandluxe','LUXY':'luxy','Un Secret':'unsecret','BUSTY OSAKA':'busty'};
+     badge.dataset.store=shops[i.shop]||'';
+    }
+    const avatar=row.querySelector('.lineAvatar');
+    if(avatar&&profile?.picture){
+     avatar.replaceChildren();
+     const img=make('img');img.src=profile.picture;img.alt='LINEアイコン';img.referrerPolicy='no-referrer';
+     img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%';
+     img.onerror=()=>{avatar.textContent='LINE'};
+     avatar.append(img);
+    }
+    const appointment=row.querySelector('.sharedInterviewAppointment');
+    if(appointment){
+     appointment.replaceChildren(
+      make('strong','',i.interview_date+' '+String(i.interview_time||'').slice(0,5)),
+      make('span','','担当：'+interviewAssigneeName(i))
+     );
+    }
+    const summary=row.querySelector('.lineNoticeSummary');
+    summary?.querySelector('.sharedInterviewRisk')?.remove();
+    if(summary)summary.append(make('span','interviewStatus',i.confirmed?'確認OK':i.status||'面接予定'));
+    const actions=row.querySelector('.sharedInterviewButtons');
+    if(actions){
+     const buttons=actions.querySelectorAll('button');
+     buttons.forEach(b=>{b.disabled=true;b.title=''});
+     if(buttons[0]){buttons[0].disabled=false;buttons[0].onclick=()=>chooseReschedule(i.id)}
+     if(buttons[1]){buttons[1].disabled=false;buttons[1].onclick=()=>cancelIt(i.id)}
+     if(buttons[2]){buttons[2].textContent='登録済み';buttons[2].disabled=true}
+     if(buttons[3]){buttons[3].disabled=true;buttons[3].title='この一覧からは操作できません'}
+    }
+    fragment.append(row);
    });
   }else if(!isLine){
    for(let i=(page-1)*PAGE_SIZE;i<Math.min(total,page*PAGE_SIZE);i++)fragment.append(card(i));
