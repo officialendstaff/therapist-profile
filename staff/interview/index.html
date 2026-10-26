@@ -2974,8 +2974,27 @@ window.afterlifeReload=load;
  function makeSharedCard(source){
   // Clone the actual LINE card structure, never hand-build a lookalike.
   const original=document.querySelector('#lineInboxMessages > .lineMessage');
-  if(!original)return null;
-  const item=original.cloneNode(true);
+  // LINE inbox can legitimately be empty; never let that hide all interview rows.
+  const item=original?original.cloneNode(true):(()=>{
+   const card=make('div','lineMessage');
+   const primary=make('div','lineNoticePrimary');
+   const person=make('div','lineNoticePerson');
+   person.append(make('span','lineAvatar empty','LINE'));
+   const identity=make('div','lineNoticeIdentity');
+   identity.append(make('strong','', ''),make('span','lineStoreBadge',''));
+   person.append(identity);
+   const summary=make('div','lineNoticeSummary');
+   const appointment=make('div','lineNoticeAppointment');
+   appointment.append(make('strong','', ''),make('span','', ''));
+   summary.append(appointment);
+   const actions=make('div','lineBookActions');
+   ['日程変更','キャンセル','面接登録','来世に期待'].forEach((label,i)=>{
+    const button=make('button','lineBookButton '+['action-change','action-cancel','action-register','action-afterlife'][i],label);
+    button.type='button';actions.append(button);
+   });
+   primary.append(person,summary,actions);card.append(primary);
+   return card;
+  })();
   item.hidden=false;item.removeAttribute('id');
   item.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));
   const record=source.record;
