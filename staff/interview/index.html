@@ -1135,7 +1135,13 @@ async function refresh(){
 async function refreshOnce(){try{if(!visible)return;status.textContent='LINE受信データを読み込み中です。';
 const access=window.interviewStaffAuth;
 if(!access?.token()){status.textContent='面接予約管理にログインすると受信内容を表示できます。';messages.innerHTML='';return}
-const data=await Promise.race([access.api('inbox'),new Promise((_,reject)=>setTimeout(()=>reject(new Error('受信データの取得がタイムアウトしました。再試行してください。')),12000))]);
+const getInbox=()=>Promise.race([access.api('inbox'),new Promise((_,reject)=>setTimeout(()=>reject(new Error('受信データの取得がタイムアウトしました。再試行してください。')),12000))]);
+let data;
+try{data=await getInbox()}catch(firstError){
+ status.textContent='受信データの取得を再試行しています…';
+ await new Promise(resolve=>setTimeout(resolve,900));
+ data=await getInbox();
+}
 window.interviewInboxStage='fetch-complete';
 status.textContent='受信データ取得完了・一覧を構築中…';
 const rows=data.events||[];
@@ -1189,13 +1195,17 @@ return '<div class="lineMessage"><div class="lineNoticePrimary">'+
 }).join('')||'<p class="note">受信メッセージはありません。</p>';
 messages.querySelectorAll('.lineLatestPreview,.lineAllHistory').forEach(el=>el.remove());
 applyLineInboxFilters();
-}catch(e){console.error('LINE受信データ取得エラー',e);window.interviewInboxLastError=String(e?.stack||e);if(visible){status.textContent='LINE受信情報を取得できませんでした：'+(e?.message||String(e));messages.innerHTML='<button type="button" class="action" id="lineInboxRetry">再読み込み</button>';document.getElementById('lineInboxRetry').onclick=()=>refresh();}}}
+ }catch(e){console.error('LINE受信データ取得エラー',e);window.interviewInboxLastError=String(e?.stack||e);if(visible){status.textContent='LINE受信情報を取得できませんでした：'+(e?.message||String(e));if(!messages.querySelector('.lineMessage')){messages.innerHTML='<button type="button" class="action" id="lineInboxRetry">再読み込み</button>';document.getElementById('lineInboxRetry').onclick=()=>refresh()}}}}
 let lineInboxPage=1;
 function applyLineInboxFilters(reset=false){
  if(reset)lineInboxPage=1;
  const store=document.getElementById('lineInboxStore')?.value||'';
  const cards=[...messages.querySelectorAll('.lineMessage')];
- const eligible=cards.filter(el=>!store||el.querySelector('.lineNoticePerson .lineStoreBadge')?.dataset.store===store);
+ const eligible=cards.filter(el=>{
+ const person=el.querySelector('.lineNoticePerson[data-account][data-user]');
+ if(person&&window.afterlifeIsRejected?.(person.dataset.account,person.dataset.user))return false;
+ return !store||el.querySelector('.lineNoticePerson .lineStoreBadge')?.dataset.store===store;
+});
  const pageSize=window.interviewListVisibleCount?.()||5;const pages=Math.max(1,Math.ceil(eligible.length/pageSize));lineInboxPage=Math.min(pages,Math.max(1,lineInboxPage));
  cards.forEach(el=>el.hidden=true);
  eligible.slice((lineInboxPage-1)*pageSize,lineInboxPage*pageSize).forEach(el=>el.hidden=false);
@@ -1267,7 +1277,11 @@ document.addEventListener('click',function(e){
  const box=document.getElementById('dailyAppointmentItems'),title=document.getElementById('dailyAppointmentTitle'),count=document.getElementById('dailyAppointmentCount');
  if(!box||!title||!count)return;
  const excluded=new Set(['キャンセル','面接済','採用','不採用','無断トビ','トビ（キャンセル）','日程調整中','返信なし']);
- const data=(Array.isArray(window.interviewDashboardRows)&&window.interviewDashboardRows.length?window.interviewDashboardRows:(Array.isArray(interviews)?interviews:[])).filter(i=>String(i.interview_date||'').slice(0,10)===selected&&!excluded.has(i.status)).sort((a,b)=>String(a.interview_time||'').localeCompare(String(b.interview_time||'')));
+ const data=(Array.isArray(window.interviewDashboardRows)&&window.interviewDashboardRows.length?window.interviewDashboardRows:(Array.isArray(interviews)?interviews:[])).filter(i=>{
+ if(String(i.interview_date||'').slice(0,10)!==selected||excluded.has(i.status))return false;
+ const linked=(window.interviewSharedHistoryLinks||[]).find(l=>String(l.interview_id)===String(i.id));
+ return !linked||!window.afterlifeIsRejected?.(linked.account_id,linked.line_user_id);
+}).sort((a,b)=>String(a.interview_time||'').localeCompare(String(b.interview_time||'')));
  title.textContent=selected===jstToday()?'本日の面接予定':selected+' の面接予定';count.textContent=data.length+'件';box.replaceChildren();
  if(!data.length){const p=document.createElement('p');p.className='note';p.textContent='この日の面接予定はありません。';box.append(p);return;}
  for(const i of data){try{
@@ -1477,7 +1491,11 @@ window.pickInterviewGanttSlot=function(p){
   const root=document.getElementById('scheduleViewContent'),heading=document.getElementById('scheduleTitle');
   if(!root||!heading)return;
   heading.textContent=categories[category];
-  const items=all().filter(i=>match(i,category)&&(!store||i.shop===store)&&String(i.interview_date||'').slice(0,7)===month).sort((a,b)=>category==='past'||category==='misconduct'?String(b.interview_date).localeCompare(String(a.interview_date)):String(a.interview_date).localeCompare(String(b.interview_date)));
+  const items=all().filter(i=>{
+ if(!match(i,category)||store&&i.shop!==store||String(i.interview_date||'').slice(0,7)!==month)return false;
+ const linked=(window.interviewSharedHistoryLinks||[]).find(l=>String(l.interview_id)===String(i.id));
+ return !linked||!window.afterlifeIsRejected?.(linked.account_id,linked.line_user_id);
+}).sort((a,b)=>category==='past'||category==='misconduct'?String(b.interview_date).localeCompare(String(a.interview_date)):String(a.interview_date).localeCompare(String(b.interview_date)));
   root.replaceChildren();document.getElementById('scheduleHeaderPager')?.remove();document.getElementById('scheduleHeaderStore')?.remove();
   if(sidebarRows===null){const notice=document.createElement('p');notice.className='note';notice.textContent=sidebarError?'面接データ取得失敗：'+sidebarError:'面接データを読み込み中です。';root.append(notice);if(sidebarError){const retry=document.createElement('button');retry.type='button';retry.className='action';retry.textContent='再取得';retry.onclick=fetchSidebarRows;root.append(retry)}return}
   const tools=document.createElement('div');tools.id='interviewListFilters';
@@ -1841,7 +1859,7 @@ async function load(){
  const data=await api('afterlife_list');
  entries=Array.isArray(data.items)?data.items:[];
  rejected=new Set(entries.map(e=>key(e.account_id,e.line_user_id)));
- loaded=true;refreshCount();prune();render();
+ loaded=true;refreshCount();prune();render();if(!document.getElementById('scheduleView')?.hidden)window.refreshInterviewSidebarCards?.();
 }
 const main=document.createElement('div');main.className='afterlifeToolbar';
 const select=document.createElement('select');select.setAttribute('aria-label','店舗切替');
