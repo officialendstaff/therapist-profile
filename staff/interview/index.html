@@ -2962,28 +2962,50 @@ window.afterlifeReload=load;
   time:String(10+i).padStart(2,'0')+':00',staff:'テスト担当',
   avatar:'LINE'
  }));
+ // Mirror the original LINE inbox CSS selectors without reimplementing its styles.
+ // Inline source styles remain the single source of truth for both containers.
+ const mirrored=document.createElement('style');
+ mirrored.id='sharedLineInboxExactStyle20261026';
+ mirrored.textContent=[...document.querySelectorAll('style')].filter(el=>el!==mirrored)
+  .map(el=>el.textContent||'').filter(css=>css.includes('#lineInboxMessages'))
+  .map(css=>css.replaceAll('#lineInboxMessages','#commonPreviewMessages')).join('\n');
+ document.head.append(mirrored);
  function makeSharedCard(source){
-  // Single identical card DOM for every category; content alone changes.
-  const item=make('div','lineMessage');
-  const primary=make('div','lineNoticePrimary');
-  const person=make('div','lineNoticePerson');
-  const avatar=make('span','lineAvatar empty',source.record?.avatar||'LINE');
-  const identity=make('div','lineNoticeIdentity');
-  identity.append(make('strong','',source.record?.name||'テスト応募者'));
-  const store=make('span','lineStoreBadge',source.record?.shop||'薔薇と紳士');
-  store.dataset.store=storeCodes[source.record?.shop]||'rose';
-  identity.append(store);person.append(avatar,identity);
-  const summary=make('div','lineNoticeSummary');
-  const appointment=make('div','lineRegisteredInterview');
-  appointment.append(make('strong','',(source.record?.date||'2026-10-27')+' '+(source.record?.time||'10:00')));
-  appointment.append(make('span','', '担当：'+(source.record?.staff||'テスト担当')));
-  summary.append(appointment);
-  const actions=make('div','lineBookActions');
-  ['日程変更','キャンセル','面接登録','来世に期待'].forEach((label,i)=>{
-   const action=make('button','action '+['action-change','action-cancel','lineBookButton','afterlifeAction'][i],label);
-   action.type='button';action.disabled=true;actions.append(action);
+  // Clone the actual LINE card structure, never hand-build a lookalike.
+  const original=document.querySelector('#lineInboxMessages > .lineMessage');
+  if(!original)return null;
+  const item=original.cloneNode(true);
+  item.hidden=false;item.removeAttribute('id');
+  item.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));
+  const record=source.record;
+  const name=item.querySelector('.lineNoticeIdentity strong');
+  if(name)name.textContent=record.name;
+  const badge=item.querySelector('.lineStoreBadge');
+  if(badge){badge.textContent=record.shop;badge.dataset.store=storeCodes[record.shop]||'';}
+  const person=item.querySelector('.lineNoticePerson');
+  const oldAvatar=person?.querySelector('.lineAvatar');
+  if(oldAvatar){
+   const avatar=make('span','lineAvatar empty','LINE');
+   oldAvatar.replaceWith(avatar);
+  }
+  const appointment=item.querySelector('.lineNoticeAppointment');
+  if(appointment){
+   appointment.replaceChildren(make('strong','',record.date+' '+record.time),make('span','', '担当：'+record.staff));
+  }
+  const summary=item.querySelector('.lineNoticeSummary');
+  if(summary && !appointment){
+   summary.replaceChildren();
+   const box=make('div','lineNoticeAppointment');
+   box.append(make('strong','',record.date+' '+record.time),make('span','', '担当：'+record.staff));
+   summary.append(box);
+  }
+  // Remove real person's private/history content from the cloned fixture.
+  item.querySelectorAll('.lineLatestPreview,.lineInterviewHistory,.lineAllHistory,.lineRiskHistory,.lineNoticeRisk').forEach(el=>el.remove());
+  item.querySelectorAll('button,input,select,a').forEach(el=>{
+   el.setAttribute('aria-disabled','true');el.setAttribute('tabindex','-1');
+   if(el.matches('button,input,select'))el.disabled=true;
+   if(el.matches('a'))el.removeAttribute('href');
   });
-  primary.append(person,summary,actions);item.append(primary);
   return item;
  }
  function render(){
@@ -3009,7 +3031,7 @@ window.afterlifeReload=load;
      if(node.matches('a'))node.removeAttribute('href');
     });
     fragment.append(copy);
-   }else fragment.append(makeSharedCard(source));
+   }else {const item=makeSharedCard(source);if(item)fragment.append(item);}
   });
   list.replaceChildren(fragment);
  }
