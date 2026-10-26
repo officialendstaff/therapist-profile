@@ -3104,6 +3104,21 @@ window.afterlifeReload=load;
   button.setAttribute('aria-expanded','true');
   render();
  }
+ // Capture the sidebar action before legacy handlers can open scheduleView.
+ // Keep a single entrypoint for the future list regardless of registration order.
+ document.addEventListener('click',event=>{
+  const target=event.target.closest?.('#futureNav');
+  if(!target)return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  category=1;page=1;
+  if(storeFilter)storeFilter.value='';
+  const old=document.getElementById('scheduleView');
+  if(old)old.hidden=true;
+  open();
+  target.setAttribute('aria-expanded','true');
+  if(typeof interviews!=='undefined'&&!interviews.length&&typeof load==='function')void load().then(()=>render()).catch(console.error);
+ },true);
  // The future sidebar opens the shared layout with actual interview records.
  const futureButton=document.getElementById('futureNav');
  if(futureButton)futureButton.onclick=()=>{
