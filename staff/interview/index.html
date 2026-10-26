@@ -432,7 +432,7 @@ async function load(){
   interviews=a.data||[];
   msg.textContent='';
   renderList();
-  if(!document.getElementById('scheduleView').hidden&&document.getElementById('scheduleTitle').textContent.includes('明日以降'))showSchedule('future');
+  window.refreshDailyDashboard?.();if(!document.getElementById('scheduleView').hidden&&document.getElementById('scheduleTitle').textContent.includes('明日以降'))showSchedule('future');
   try{render();renderStaff();renderTimes()}catch(uiError){console.error('面接登録カレンダーの描画失敗',uiError)}
   try{window.refreshDailyDashboard?.()}catch(dashboardError){console.error('TOPスケジュールの描画失敗',dashboardError)}
   try{checkReminders()}catch(reminderError){console.error('通知描画失敗',reminderError)}
@@ -796,7 +796,8 @@ window.pickInterviewGanttSlot=function(p){
    const result=await Promise.race([client.from('staff_interviews').select('*').order('interview_date').order('interview_time'),new Promise((_,reject)=>setTimeout(()=>reject(new Error('通信タイムアウト')),15000))]);
    if(result.error)throw result.error;
    sidebarRows=result.data||[];sidebarError='';
-   if(typeof interviews!=='undefined')interviews=sidebarRows;
+   // Keep the primary interview state owned by load(); sidebar fetch must not overwrite it.
+   if(typeof window.refreshDailyDashboard==='function')window.refreshDailyDashboard();
   }catch(e){sidebarError=e?.message||String(e);console.error('Sidebar interview fetch failed',e)}
   finally{sidebarFetching=false;updateCounts();if(!document.getElementById('scheduleView').hidden&&document.getElementById('interviewListFilters'))render()}
  }
