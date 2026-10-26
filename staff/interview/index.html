@@ -638,6 +638,10 @@ body.lineBookingActive #lineBookingApplicantPane #bookingApplicantCard .lineAllH
 #dailyAppointmentItems .interviewInlineReminderDescription{font-size:11px;color:#845b24}
 #dailyAppointmentItems .interviewInlineReminder:focus-visible{outline:3px solid #c58b30;outline-offset:2px}
 #dailyAppointmentItems .interviewInlineReminderSent{background:#edf7f0;color:#25623a;border-color:#92c7a0;border-left-color:#328451;cursor:default}
+/* Daily interview status palette: pending / LINE sent / confirmed. */
+#dailyAppointmentItems .unifiedInterviewCard.interviewStatePending{border:1px solid #D89A2B!important;border-left:4px solid #D89A2B!important;background:#FFF6E5!important}
+#dailyAppointmentItems .unifiedInterviewCard.interviewStateLineSent{border:1px solid #4F81BD!important;border-left:4px solid #4F81BD!important;background:#EEF5FF!important}
+#dailyAppointmentItems .unifiedInterviewCard.interviewStateConfirmed{border:1px solid #5E9B6B!important;border-left:4px solid #5E9B6B!important;background:#EEF8F0!important}
 /* Keep the alert in the unused area to the right of each applicant's details. */
 #dailyDashboard .unifiedInterviewHead{display:flex;align-items:center;flex-wrap:wrap}
 #dailyAppointmentItems .unifiedInterviewHead .unifiedInterviewIdentity{flex:0 1 auto}
@@ -833,6 +837,10 @@ const reminderSent=new Set();const reminderClosed=new Set();const reminderAckKey
  let banner=card.querySelector('.interviewInlineReminder');
  const reminderId=match?String(match.id)+'|'+match.interview_date+'|'+match.interview_time:'';
  const active=!!match&&pendingIds.has(reminderId);
+ const cardRecord=reminderSource.find(i=>String(i.id)===card.dataset.interviewId);
+ const sent=!!reminderId&&reminderAcknowledged().includes(reminderId);
+ card.classList.remove('interviewStatePending','interviewStateLineSent','interviewStateConfirmed');
+ card.classList.add(cardRecord?.confirmed?'interviewStateConfirmed':sent?'interviewStateLineSent':'interviewStatePending');
  if(!match){if(banner)banner.remove();return;}
  if(banner&&banner.dataset.reminderId===reminderId&&banner.dataset.sent===String(!active))return;
  if(banner)banner.remove();
@@ -1117,6 +1125,8 @@ document.addEventListener('click',function(e){
  if(!data.length){const p=document.createElement('p');p.className='note';p.textContent='この日の面接予定はありません。';box.append(p);return;}
  for(const i of data){try{
  const card=document.createElement('div');card.className='item interviewMiniCard unifiedInterviewCard';card.dataset.interviewId=String(i.id??'');
+ const reminderRecordId=String(i.id)+'|'+i.interview_date+'|'+i.interview_time;
+ card.classList.add(i.confirmed?'interviewStateConfirmed':reminderAcknowledged().includes(reminderRecordId)?'interviewStateLineSent':'interviewStatePending');
  let profile=null;try{profile=typeof interviewLineProfiles!=='undefined'&&interviewLineProfiles?.get?interviewLineProfiles.get(Number(i.id)):null}catch(e){console.warn('LINEプロフィール取得失敗',e)}
  const head=document.createElement('div');head.className='unifiedInterviewHead';
  const avatar=document.createElement('span');avatar.className='unifiedInterviewAvatar';avatar.textContent='LINE';
