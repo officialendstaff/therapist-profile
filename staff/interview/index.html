@@ -1171,7 +1171,7 @@ for(const event of rows){
  grouped.get(key).push(event);
 }
 status.textContent='求人LINE受信｜全店舗（最新100件の受信データをアカウント別に表示）';
-lineInboxPage=1;
+// Preserve the current page when an automatic inbox refresh completes.
 messages.innerHTML=[...grouped.entries()].sort((a,b)=>String(b[1].reduce((max,e)=>String(e.received_at)>max?e.received_at:max,'')).localeCompare(String(a[1].reduce((max,e)=>String(e.received_at)>max?e.received_at:max,'')))).map(([key,events])=>{
 events.sort((a,b)=>new Date(b.received_at)-new Date(a.received_at));
 const x=events[0],l=linkMap.get(key),profile=profiles[key]||{},name=profile.displayName||l?.line_display_name||'LINE利用者',picture=profile.pictureUrl||l?.line_picture_url;
@@ -1468,7 +1468,11 @@ window.pickInterviewGanttSlot=function(p){
   return completed.includes(status);
  };
  function updateCounts(){
-  const m=currentMonth();const count=t=>all().filter(i=>match(i,t)&&String(i.interview_date||'').slice(0,7)===m).length;
+  const m=currentMonth();const count=t=>all().filter(i=>{
+ if(!match(i,t)||String(i.interview_date||'').slice(0,7)!==m)return false;
+ const linked=(window.interviewSharedHistoryLinks||[]).find(l=>String(l.interview_id)===String(i.id));
+ return !linked||!window.afterlifeIsRejected?.(linked.account_id,linked.line_user_id);
+}).length;
   for(const [id,t] of [['futureInterviewCount','future'],['pendingInterviewCount','pending'],['misconductCount','misconduct'],['pastInterviewCount','past']]){const el=document.getElementById(id);if(el){const value=sidebarRows===null?(sidebarError?'取得失敗':'読込中'):count(t)+'件';if(el.textContent!==value)el.textContent=value}}
  }
  async function fetchSidebarRows(){
