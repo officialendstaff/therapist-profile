@@ -2928,7 +2928,7 @@ window.afterlifeReload=load;
   return node;
  };
  function card(i){
-  const card=make('div','lineMessage');
+  const card=make('div','lineMessage interviewCommonCard');
   const primary=make('div','lineNoticePrimary');
   const person=make('div','lineNoticePerson');
   const avatar=make('span','lineAvatar empty','LINE');
@@ -2967,7 +2967,8 @@ window.afterlifeReload=load;
    return !person||!window.afterlifeIsRejected?.(person.dataset.account,person.dataset.user);
   });
   const isLine=category===0;
-  const total=isLine?originals.length:totals[category];
+  const hasActualLineCards=isLine&&originals.length>0;
+  const total=isLine&&!hasActualLineCards?10:isLine?originals.length:totals[category];
   const pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
   page=Math.max(1,Math.min(page,pages));
   selector.value=String(category);
@@ -2977,7 +2978,7 @@ window.afterlifeReload=load;
   document.getElementById('commonPreviewPrev').disabled=page===1;
   document.getElementById('commonPreviewNext').disabled=page===pages;
   const fragment=document.createDocumentFragment();
-  if(isLine){
+  if(hasActualLineCards){
    originals.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE).forEach(original=>{
     const copy=original.cloneNode(true);
     copy.hidden=false;
@@ -2996,7 +2997,7 @@ window.afterlifeReload=load;
   }
   list.replaceChildren(fragment);
   const note=panel.querySelector('.commonPreviewNote');
-  if(note)note.textContent=isLine?'元のLINE一覧カードをそのまま複製しています（操作は無効）。':'表示確認用サンプルです。実データには未接続です。';
+  if(note)note.textContent=hasActualLineCards?'元のLINE一覧カードを複製して表示しています。操作は無効です。':'共通ページのレイアウト確認用です。実データには接続していません。';
  }
 
  // Preserve the original panes so the preview can be removed without losing
