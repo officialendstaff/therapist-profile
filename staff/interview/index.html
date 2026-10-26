@@ -1609,7 +1609,7 @@ window.pickInterviewGanttSlot=function(p){
  if(!root||!back)return;
  const labels={rose:'薔薇と紳士',grandluxe:'Grand Luxe',luxy:'LUXY',unsecret:'Un Secret',us:'Un Secret'};
  const byId=id=>document.getElementById(id);
- let opened=false,selection=null,page=20,entries=[],origin='';
+ let opened=false,selection=null,page=20,entries=[],origin='',previousView=null;
  const format=v=>{if(!v)return '';const date=new Date(v);return Number.isNaN(date.getTime())?String(v):date.toLocaleString('ja-JP',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})};
  function put(id,value){byId(id).textContent=String(value??'')}
  function fillMessages(){
@@ -1651,6 +1651,18 @@ window.pickInterviewGanttSlot=function(p){
   put('applicantDetailLatest','取得中');
   const avatar=target.querySelector('.lineAvatar');const avatarHolder=byId('applicantDetailAvatar');
   const clone=avatar?.cloneNode(true)||document.createElement('span');clone.id='applicantDetailAvatar';clone.classList.add('lineAvatar');avatarHolder.replaceWith(clone);
+  // Hide the source list before displaying the detail. LINE inbox has an inline display:block!important
+  // that stylesheets cannot override, so switch its inline display explicitly.
+  const inbox=byId('lineInbox');
+  if(!opened){
+   previousView={
+    lineInboxOpen:document.body.classList.contains('lineInboxOpen'),
+    inboxDisplay:inbox.style.getPropertyValue('display'),
+    inboxPriority:inbox.style.getPropertyPriority('display')
+   };
+  }
+  inbox.style.setProperty('display','none','important');
+  document.body.classList.remove('lineInboxOpen');
   document.body.classList.add('applicantDetailOpen');
   root.hidden=false;opened=true;fillMessages();
   put('applicantDetailSchedule','確認中');put('applicantDetailRisk','確認中');
@@ -1670,7 +1682,20 @@ window.pickInterviewGanttSlot=function(p){
    if(opened&&selection.account===account&&selection.user===user)fillHistory(data.links||[]);
   }catch(error){if(opened){put('applicantDetailLatest','取得失敗');const p=document.createElement('p');p.className='applicantDetailEmpty';p.textContent='データを取得できませんでした：'+(error?.message||String(error));byId('applicantDetailMessages').replaceChildren(p)}}
  }
- function close(){opened=false;selection=null;root.hidden=true;document.body.classList.remove('applicantDetailOpen')}
+ function close(){
+  if(!opened)return;
+  opened=false;selection=null;
+  root.hidden=true;
+  document.body.classList.remove('applicantDetailOpen');
+  const inbox=byId('lineInbox');
+  if(previousView?.lineInboxOpen)document.body.classList.add('lineInboxOpen');
+  if(previousView?.inboxDisplay){
+   inbox.style.setProperty('display',previousView.inboxDisplay,previousView.inboxPriority);
+  }else{
+   inbox.style.removeProperty('display');
+  }
+  previousView=null;
+ }
  back.addEventListener('click',close);
  byId('applicantDetailMore').addEventListener('click',()=>{page+=20;fillMessages()});
  document.addEventListener('click',e=>{const target=e.target.closest('#lineInboxMessages .lineNoticePerson[data-user],#scheduleViewContent .lineNoticePerson[data-user],#scheduleViewContent .unifiedSidebarPerson[data-user]');if(target&&!e.target.closest('button')){e.preventDefault();open(target)}},true);
