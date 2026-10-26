@@ -1712,25 +1712,7 @@ body.applicantDetailOpen .workMain>#applicantDetailView:not([hidden]){display:fl
  }
 }
 
-</style><style id="commonFutureInteractive20261026">body.commonFutureOpen #commonPreviewMessages>.lineMessage,body.commonFutureOpen #commonPreviewMessages>.lineMessage *{pointer-events:auto!important}body.commonFutureOpen #commonPreviewMessages>.lineMessage button{cursor:pointer!important}</style><style id="futureExactCommonCardGeometry20261026">
-/* Future interviews use the same native common-preview card geometry, without the legacy 56px card constraint. */
-@media(min-width:901px){
-body.commonPreviewOpen.commonFutureOpen #commonPreviewMessages>.lineMessage{
- display:block!important;box-sizing:border-box!important;min-height:54px!important;height:54px!important;max-height:none!important;
- padding:7px 9px!important;margin:3px 0!important;border:1px solid #dce4ee!important;border-radius:7px!important;background:#fff!important;overflow:visible!important
-}
-body.commonPreviewOpen.commonFutureOpen #commonPreviewMessages>.lineMessage>.lineNoticePrimary{
- display:grid!important;grid-template-columns:minmax(155px,210px) minmax(0,1fr) max-content!important;
- gap:12px!important;align-items:center!important;width:100%!important;min-height:38px!important;height:100%!important;overflow:visible!important
-}
-body.commonPreviewOpen.commonFutureOpen #commonPreviewMessages .lineNoticePerson{display:flex!important;align-items:center!important;gap:9px!important;min-width:0!important}
-body.commonPreviewOpen.commonFutureOpen #commonPreviewMessages .lineAvatar{width:38px!important;height:38px!important;flex:0 0 38px!important}
-body.commonPreviewOpen.commonFutureOpen #commonPreviewMessages .sharedInterviewAppointment{min-width:0!important;width:233px!important;min-height:34px!important;padding:6px 10px!important}
-body.commonPreviewOpen.commonFutureOpen #commonPreviewMessages .sharedInterviewButtons{display:flex!important;gap:5px!important;align-items:center!important;justify-content:flex-end!important;flex-wrap:nowrap!important}
-body.commonPreviewOpen.commonFutureOpen #commonPreviewMessages .sharedInterviewButtons>button{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-width:70px!important;min-height:32px!important;padding:5px 8px!important;visibility:visible!important;opacity:1!important}
-body.commonPreviewOpen.commonFutureOpen #commonPreviewMessages .interviewStatus{display:none!important}
-}
-</style></head><body><div id="staffLock" style="display:none"><div class="lockbox"><div class="lockmark">MATTAN KOUGYOU</div><h2>STAFF LOGIN</h2><input id="staffPin" type="password" placeholder="パスワード" autocomplete="off"><button id="staffUnlock" type="button">ログイン</button><div id="staffLockErr" class="lockerr"></div></div></div><header class="appHeader"><div class="brand"><span>MATTAN KOUGYOU</span><strong>面接予約管理</strong></div><div class="headerRight"><button type="button" id="headerTopNav" class="headerNavButton">TOP</button><button type="button" id="headerBookingNav" class="headerNavButton">面接登録</button><div id="headerLineNavSlot"></div><button type="button" id="headerSettingsNav" class="headerNavButton" aria-expanded="false">設定</button><div id="headerSettingsPanel" hidden><button type="button" id="enablePcAlerts" class="notifyButton">PC通知を許可</button><button type="button" id="lineSoundTest" class="notifyButton" title="LINE通知音を確認">通知音テスト</button></div><span id="reminderCount" class="reminderCount" hidden>0</span><span>INTERVIEW MANAGEMENT</span><span class="headerSymbol" aria-hidden="true">◈</span></div></header><main class="wrap"><div class="workspace">
+</style><style id="commonFutureInteractive20261026">body.commonFutureOpen #commonPreviewMessages>.lineMessage,body.commonFutureOpen #commonPreviewMessages>.lineMessage *{pointer-events:auto!important}body.commonFutureOpen #commonPreviewMessages>.lineMessage button{cursor:pointer!important}</style></head><body><div id="staffLock" style="display:none"><div class="lockbox"><div class="lockmark">MATTAN KOUGYOU</div><h2>STAFF LOGIN</h2><input id="staffPin" type="password" placeholder="パスワード" autocomplete="off"><button id="staffUnlock" type="button">ログイン</button><div id="staffLockErr" class="lockerr"></div></div></div><header class="appHeader"><div class="brand"><span>MATTAN KOUGYOU</span><strong>面接予約管理</strong></div><div class="headerRight"><button type="button" id="headerTopNav" class="headerNavButton">TOP</button><button type="button" id="headerBookingNav" class="headerNavButton">面接登録</button><div id="headerLineNavSlot"></div><button type="button" id="headerSettingsNav" class="headerNavButton" aria-expanded="false">設定</button><div id="headerSettingsPanel" hidden><button type="button" id="enablePcAlerts" class="notifyButton">PC通知を許可</button><button type="button" id="lineSoundTest" class="notifyButton" title="LINE通知音を確認">通知音テスト</button></div><span id="reminderCount" class="reminderCount" hidden>0</span><span>INTERVIEW MANAGEMENT</span><span class="headerSymbol" aria-hidden="true">◈</span></div></header><main class="wrap"><div class="workspace">
 <aside class="side card"><section id="dailySidebarCalendar"><div class="dailyMonthNav"><button type="button" id="dailyPrevMonth" aria-label="前月">‹</button><strong id="dailyMonthLabel"></strong><button type="button" id="dailyNextMonth" aria-label="翌月">›</button></div><div class="dailyCalendar" id="dailyCalendarDays"></div></section><div class="navSection"><button type="button" class="navBtn" id="sidebarLineNav"><span class="sidebarNavTitle">LINE通知</span><span class="sidebarNavRight"><span id="sidebarLineCount">—件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><button class="navBtn" id="futureNav" type="button" aria-expanded="true"><span class="sidebarNavTitle">明日以降の面接予定</span><span class="sidebarNavRight"><span id="futureInterviewCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><div class="navPanel" id="futurePanel" hidden><div id="list">読み込み中...</div></div><button class="navBtn" id="pendingNav" type="button" aria-expanded="false"><span class="sidebarNavTitle">日程調整中</span><span class="sidebarNavRight"><span id="pendingInterviewCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><div class="navPanel" id="pendingPanel" hidden><div id="pendingInterviewList"></div></div><button class="navBtn" id="misconductNav" type="button"><span class="sidebarNavTitle">不届き者達</span><span class="sidebarNavRight"><span id="misconductCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><button class="navBtn" id="historyNav" type="button" aria-expanded="false"><span class="sidebarNavTitle">面接実施済み</span><span class="sidebarNavRight"><span id="pastInterviewCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><div class="navPanel" id="historyPanel" hidden><div id="pastInterviewList">読み込み中...</div></div><button class="navBtn afterlifeNavBtn" id="afterlifeNav" type="button" aria-expanded="false"><span class="sidebarNavTitle">来世に期待</span><span class="sidebarNavRight"><span id="afterlifeCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><button type="button" id="commonPreviewNav" class="navBtn" style="margin-top:22px!important;background:#234969!important;border:1px solid #66849c!important;color:#fff!important" aria-controls="commonPreviewPanel" aria-expanded="false"><span class="sidebarNavTitle">共通ページ</span><span class="sidebarNavRight"><span style="font-size:11px">確認用</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button></div></aside>
 <div class="workMain"><section class="card lineInbox" id="commonPreviewPanel" hidden aria-label="共通ページ">
 <div class="scheduleHeader commonPreviewHeader"><h2 id="commonPreviewTitle">求人LINE受信｜全店舗</h2><div class="commonPreviewTools"><label for="commonPreviewStore" class="visuallyHidden">店舗</label><select id="commonPreviewStore"><option value="">全店舗</option><option value="rose">薔薇と紳士</option><option value="grandluxe">Grand Luxe</option><option value="luxy">LUXY</option><option value="unsecret">Un Secret</option><option value="busty">BUSTY OSAKA</option></select><span id="commonPreviewCount" aria-live="polite"></span><label for="commonPreviewCategory" class="visuallyHidden">一覧</label><select id="commonPreviewCategory"><option value="0">LINE通知</option><option value="1">明日以降の面接予定</option><option value="2">日程調整中</option><option value="3">不届き者達</option><option value="4">面接実施済み</option><option value="5">来世に期待</option></select><button type="button" id="commonPreviewPrev">前へ</button><strong id="commonPreviewPage">1 / 1ページ</strong><button type="button" id="commonPreviewNext">次へ</button></div></div>
@@ -3003,12 +2985,13 @@ window.afterlifeReload=load;
    return !selected||map[i.shop]===selected;
   }).sort((a,b)=>(a.interview_date+' '+a.interview_time).localeCompare(b.interview_date+' '+b.interview_time)):[];
   const hasActualLineCards=isLine&&originals.length>0;
-  const total=isLine?originals.length:isFuture?futureRows.length:totals[category];
+  const total=isLine?originals.length:isFuture?0:totals[category];
   const pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
   page=Math.max(1,Math.min(page,pages));
   selector.value=String(category);
   document.getElementById('commonPreviewTitle').textContent=isLine?'求人LINE受信｜全店舗':sections[category];
   document.getElementById('commonPreviewCount').textContent=total+'件';
+  if(isFuture&&total===0)list.setAttribute('aria-label','明日以降の面接予定・新規構築用の空一覧');
   document.getElementById('commonPreviewPage').textContent=page+' / '+pages+'ページ';
   document.getElementById('commonPreviewPrev').disabled=page===1;
   document.getElementById('commonPreviewNext').disabled=page===pages;
@@ -3028,21 +3011,8 @@ window.afterlifeReload=load;
     fragment.append(copy);
    });
   }else if(isFuture){
-   // New future-list foundation: copy the existing common-page card DOM exactly.
-   // No legacy scheduleView markup, styling or synthetic applicant rows are used.
-   const sourceCards=[...document.querySelectorAll('#lineInboxMessages > .lineMessage')];
-   futureRows.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE).forEach(i=>{
-    const source=sourceCards.find(el=>el.querySelector('.lineNoticePerson[data-account][data-user]')?.dataset.user===i.line_user_id);
-    if(!source)return;
-    const copy=source.cloneNode(true);
-    copy.removeAttribute('id');
-    copy.querySelectorAll('[id]').forEach(node=>node.removeAttribute('id'));
-    copy.querySelectorAll('button,input,select,a').forEach(node=>{
-     if(node.matches('button,input,select'))node.disabled=true;
-     if(node.matches('a'))node.removeAttribute('href');
-    });
-    fragment.append(copy);
-   });
+   // Clean common-page foundation. The old future-list renderer is retired.
+   // Existing database records are deliberately untouched.
   }else if(!isLine){
    for(let i=(page-1)*PAGE_SIZE;i<Math.min(total,page*PAGE_SIZE);i++)fragment.append(card(i));
   }
