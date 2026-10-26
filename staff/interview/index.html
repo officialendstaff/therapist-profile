@@ -1315,78 +1315,165 @@ body:not(.dashboardHome):not(.lineInboxOpen):not(.lineBookingActive):not(.applic
   box-sizing:border-box!important;
  }
 }
-</style><style id="commonPreviewWithinInterview20261026">
+</style><style id="nativeCommonListPreview20261026">
+/* Preview is a single native view in workMain, with no iframe or overlay. */
 #commonPreviewPanel[hidden]{display:none!important}
+body.commonPreviewOpen main.wrap{
+ height:auto!important;max-height:none!important;min-height:calc(100dvh - 76px)!important;
+ display:block!important;overflow:visible!important;padding-bottom:12px!important
+}
+body.commonPreviewOpen main.wrap>.workspace{
+ display:grid!important;grid-template-columns:300px minmax(0,1fr)!important;
+ grid-template-rows:max-content!important;align-items:start!important;align-content:start!important;
+ height:auto!important;max-height:none!important;min-height:0!important;overflow:visible!important;
+ gap:14px!important
+}
+body.commonPreviewOpen main.wrap>.workspace>.workMain{
+ display:block!important;grid-column:2!important;grid-row:1!important;align-self:start!important;
+ width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+ overflow:visible!important;position:relative!important
+}
 body.commonPreviewOpen main.wrap>.workspace>.workMain>:not(#commonPreviewPanel){display:none!important}
 body.commonPreviewOpen main.wrap>.workspace>.workMain>#commonPreviewPanel{
  display:block!important;box-sizing:border-box!important;position:relative!important;
- width:100%!important;height:100%!important;min-height:0!important;max-height:100%!important;
- padding:0!important;margin:0!important;overflow:hidden!important;background:#fff!important;
- border:1px solid #d8e0e9!important;border-radius:10px!important;
+ width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+ padding:8px 12px 8px!important;margin:0!important;overflow:visible!important;
+ background:#fff!important;border:1px solid #d8e0e9!important;border-radius:10px!important;
+ box-shadow:none!important
 }
-#commonPreviewFrame{display:block!important;width:100%!important;height:100%!important;min-height:0!important;
- padding:0!important;margin:0!important;border:0!important;background:white!important}
 body.commonPreviewOpen #commonPreviewNav{box-shadow:0 0 0 2px #78addc!important;border-color:#78addc!important}
-</style><style id="commonPreviewTenCardsUnclipped20261026">
-/* Preview only: the legacy flex/grid row sizes were clipping the embedded ten-card list. */
-@media(min-width:901px){
- body.commonPreviewOpen main.wrap{
-  display:block!important;
-  box-sizing:border-box!important;
-  height:auto!important;
-  max-height:none!important;
-  min-height:calc(100dvh - 76px)!important;
-  overflow:visible!important;
-  padding-bottom:12px!important;
- }
- body.commonPreviewOpen main.wrap>.workspace{
-  display:grid!important;
-  grid-template-columns:300px minmax(0,1fr)!important;
-  grid-template-rows:710px!important;
-  align-content:start!important;
-  align-items:start!important;
-  height:710px!important;
-  min-height:710px!important;
-  max-height:none!important;
-  overflow:visible!important;
- }
- body.commonPreviewOpen main.wrap>.workspace>.workMain{
-  display:block!important;
-  box-sizing:border-box!important;
-  grid-column:2!important;
-  grid-row:1!important;
-  align-self:start!important;
-  height:710px!important;
-  min-height:710px!important;
-  max-height:none!important;
-  overflow:visible!important;
- }
- body.commonPreviewOpen main.wrap>.workspace>.workMain>#commonPreviewPanel{
-  display:block!important;
-  box-sizing:border-box!important;
-  height:710px!important;
-  min-height:710px!important;
-  max-height:none!important;
-  overflow:hidden!important;
- }
- body.commonPreviewOpen #commonPreviewFrame{
-  display:block!important;
-  height:100%!important;
-  min-height:0!important;
-  max-height:none!important;
- }
+#commonPreviewPanel>.commonPreviewHeader{
+ display:flex!important;justify-content:space-between!important;align-items:center!important;
+ flex-wrap:wrap!important;gap:8px!important;box-sizing:border-box!important;
+ min-height:35px!important;height:auto!important;margin:0 0 8px!important;
+ padding:0 0 7px!important;border-bottom:1px solid #dce4ee!important
 }
-/* Narrow viewports may scroll vertically; never truncate the ten-card preview. */
+#commonPreviewPanel>.commonPreviewHeader h2{font-size:15px!important;margin:0!important;line-height:1.3!important}
+#commonPreviewPanel .commonPreviewTools{display:flex!important;align-items:center!important;justify-content:flex-end!important;flex-wrap:wrap!important;gap:7px!important}
+#commonPreviewPanel .commonPreviewTools select,
+#commonPreviewPanel .commonPreviewTools button{
+ box-sizing:border-box!important;min-height:29px!important;height:29px!important;min-width:0!important;
+ padding:0 9px!important;font-size:11px!important;color:#143957!important;
+ background:#fff!important;border:1px solid #bed2e8!important;border-radius:6px!important;
+ cursor:pointer!important
+}
+#commonPreviewPanel .commonPreviewTools button:disabled{cursor:default!important;opacity:.45!important}
+#commonPreviewPanel #commonPreviewCategory{width:138px!important}
+#commonPreviewPanel #commonPreviewCount,
+#commonPreviewPanel #commonPreviewPage{font-size:11px!important;white-space:nowrap!important}
+#commonPreviewPanel .visuallyHidden{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%)!important}
+#commonPreviewMessages{
+ box-sizing:border-box!important;display:flex!important;flex-direction:column!important;
+ width:100%!important;height:620px!important;min-height:620px!important;max-height:none!important;
+ gap:6px!important;margin:0!important;padding:0!important;overflow:visible!important;
+ background:#fff!important
+}
+#commonPreviewMessages>.lineMessage{
+ box-sizing:border-box!important;display:block!important;flex:0 0 56px!important;
+ width:100%!important;height:56px!important;min-height:56px!important;max-height:56px!important;
+ margin:0!important;padding:5px 8px!important;border:1px solid #dce4ee!important;
+ border-radius:7px!important;background:#fff!important;overflow:hidden!important
+}
+#commonPreviewMessages>.lineMessage>.lineNoticePrimary{
+ box-sizing:border-box!important;display:grid!important;
+ grid-template-columns:165px minmax(0,1fr) 318px!important;align-items:center!important;
+ gap:8px!important;width:100%!important;height:44px!important;min-height:44px!important;
+ max-height:44px!important;margin:0!important;padding:0!important;overflow:hidden!important
+}
+#commonPreviewMessages .lineNoticePerson{
+ display:flex!important;flex-direction:row!important;align-items:center!important;gap:8px!important;
+ min-width:0!important;width:auto!important;height:44px!important;max-height:44px!important;overflow:hidden!important
+}
+#commonPreviewMessages .lineAvatar{
+ box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;
+ flex:0 0 36px!important;width:36px!important;height:36px!important;min-width:36px!important;
+ max-height:36px!important;border-radius:50%!important;object-fit:cover!important
+}
+#commonPreviewMessages .lineNoticeIdentity{
+ display:flex!important;flex-direction:column!important;gap:2px!important;justify-content:center!important;
+ min-width:0!important;max-width:calc(100% - 44px)!important;height:42px!important;overflow:hidden!important
+}
+#commonPreviewMessages .lineNoticeIdentity strong{
+ display:block!important;margin:0!important;font-size:12px!important;line-height:16px!important;
+ font-weight:800!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important
+}
+#commonPreviewMessages .lineStoreBadge{
+ display:inline-flex!important;align-self:flex-start!important;width:auto!important;
+ font-size:10px!important;line-height:13px!important;padding:2px 6px!important;margin:0!important
+}
+#commonPreviewMessages .lineNoticeSummary{
+ box-sizing:border-box!important;display:flex!important;align-items:center!important;
+ gap:6px!important;grid-column:2!important;grid-row:1!important;min-width:0!important;
+ width:auto!important;overflow:hidden!important;white-space:nowrap!important;flex-wrap:nowrap!important
+}
+#commonPreviewMessages .sharedInterviewAppointment{
+ box-sizing:border-box!important;display:inline-flex!important;align-items:center!important;
+ gap:8px!important;flex:0 1 235px!important;width:235px!important;min-width:0!important;
+ max-width:235px!important;height:34px!important;min-height:34px!important;max-height:34px!important;
+ padding:4px 9px!important;white-space:nowrap!important
+}
+#commonPreviewMessages .sharedInterviewAppointment strong{font-size:12px!important;line-height:1.2!important}
+#commonPreviewMessages .sharedInterviewAppointment span{font-size:11px!important}
+#commonPreviewMessages .sharedInterviewRisk{display:flex!important;gap:5px!important;white-space:nowrap!important;overflow:hidden!important;min-width:0!important}
+#commonPreviewMessages .sharedHistoryCount{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ padding:5px 6px!important;white-space:nowrap!important;border-radius:5px!important;
+ background:#fff3f4!important;border:1px solid #e3b5bd!important;color:#953741!important;
+ font-size:10px!important;font-weight:700!important;line-height:1.2!important
+}
+#commonPreviewMessages .lineBookActions{
+ display:flex!important;grid-column:3!important;grid-row:1!important;
+ width:318px!important;max-width:318px!important;gap:4px!important;margin:0!important;padding:0!important;
+ flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-end!important
+}
+#commonPreviewMessages .lineBookActions>.action{
+ box-sizing:border-box!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ width:76px!important;min-width:76px!important;max-width:76px!important;
+ height:32px!important;min-height:32px!important;max-height:32px!important;
+ padding:0 3px!important;margin:0!important;border-radius:6px!important;
+ font-size:10px!important;line-height:1!important;font-weight:700!important;white-space:nowrap!important;
+ background:#edf0f4!important;color:#8c99a9!important;border:1px solid #d5dbe3!important;
+ opacity:1!important;cursor:default!important
+}
+#commonPreviewMessages .lineBookActions>.lineBookButton{
+ background:#176b9b!important;color:white!important;border-color:#10547d!important
+}
+#commonPreviewMessages .lineBookActions>.afterlifeAction{
+ background:#60445f!important;color:white!important;border-color:#60445f!important
+}
+#commonPreviewPanel .commonPreviewNote{
+ color:#65768b!important;font-size:10px!important;line-height:1.3!important;
+ margin:5px 0 0!important;padding:0!important
+}
+/* The content may extend below a short viewport; never clip rows or add nested scrollbars. */
+@media(max-width:1180px){
+ body.commonPreviewOpen main.wrap>.workspace{grid-template-columns:220px minmax(0,1fr)!important}
+ body.commonPreviewOpen main.wrap>.workspace>aside.side.card{width:220px!important;min-width:220px!important;max-width:220px!important}
+ #commonPreviewMessages{min-width:0!important;overflow-x:auto!important}
+ #commonPreviewMessages>.lineMessage{min-width:830px!important}
+}
 @media(max-width:900px){
- body.commonPreviewOpen main.wrap{height:auto!important;max-height:none!important;overflow:visible!important}
- body.commonPreviewOpen main.wrap>.workspace{height:auto!important;min-height:710px!important;max-height:none!important;overflow:visible!important}
- body.commonPreviewOpen main.wrap>.workspace>.workMain{height:710px!important;min-height:710px!important;max-height:none!important;overflow:visible!important}
- body.commonPreviewOpen main.wrap>.workspace>.workMain>#commonPreviewPanel{height:710px!important;min-height:710px!important;max-height:none!important}
+ body.commonPreviewOpen main.wrap>.workspace{grid-template-columns:minmax(0,1fr)!important}
+ body.commonPreviewOpen main.wrap>.workspace>aside.side.card{width:100%!important;max-width:none!important;min-width:0!important}
+ body.commonPreviewOpen main.wrap>.workspace>.workMain{grid-column:1!important;grid-row:2!important}
 }
 </style></head><body><div id="staffLock" style="display:none"><div class="lockbox"><div class="lockmark">MATTAN KOUGYOU</div><h2>STAFF LOGIN</h2><input id="staffPin" type="password" placeholder="パスワード" autocomplete="off"><button id="staffUnlock" type="button">ログイン</button><div id="staffLockErr" class="lockerr"></div></div></div><header class="appHeader"><div class="brand"><span>MATTAN KOUGYOU</span><strong>面接予約管理</strong></div><div class="headerRight"><button type="button" id="headerTopNav" class="headerNavButton">TOP</button><button type="button" id="headerBookingNav" class="headerNavButton">面接登録</button><div id="headerLineNavSlot"></div><button type="button" id="headerSettingsNav" class="headerNavButton" aria-expanded="false">設定</button><div id="headerSettingsPanel" hidden><button type="button" id="enablePcAlerts" class="notifyButton">PC通知を許可</button><button type="button" id="lineSoundTest" class="notifyButton" title="LINE通知音を確認">通知音テスト</button></div><span id="reminderCount" class="reminderCount" hidden>0</span><span>INTERVIEW MANAGEMENT</span><span class="headerSymbol" aria-hidden="true">◈</span></div></header><main class="wrap"><div class="workspace">
 <aside class="side card"><section id="dailySidebarCalendar"><div class="dailyMonthNav"><button type="button" id="dailyPrevMonth" aria-label="前月">‹</button><strong id="dailyMonthLabel"></strong><button type="button" id="dailyNextMonth" aria-label="翌月">›</button></div><div class="dailyCalendar" id="dailyCalendarDays"></div></section><div class="navSection"><button type="button" class="navBtn" id="sidebarLineNav"><span class="sidebarNavTitle">LINE通知</span><span class="sidebarNavRight"><span id="sidebarLineCount">—件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><button class="navBtn" id="futureNav" type="button" aria-expanded="true"><span class="sidebarNavTitle">明日以降の面接予定</span><span class="sidebarNavRight"><span id="futureInterviewCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><div class="navPanel" id="futurePanel" hidden><div id="list">読み込み中...</div></div><button class="navBtn" id="pendingNav" type="button" aria-expanded="false"><span class="sidebarNavTitle">日程調整中</span><span class="sidebarNavRight"><span id="pendingInterviewCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><div class="navPanel" id="pendingPanel" hidden><div id="pendingInterviewList"></div></div><button class="navBtn" id="misconductNav" type="button"><span class="sidebarNavTitle">不届き者達</span><span class="sidebarNavRight"><span id="misconductCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><button class="navBtn" id="historyNav" type="button" aria-expanded="false"><span class="sidebarNavTitle">面接実施済み</span><span class="sidebarNavRight"><span id="pastInterviewCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><div class="navPanel" id="historyPanel" hidden><div id="pastInterviewList">読み込み中...</div></div><button class="navBtn afterlifeNavBtn" id="afterlifeNav" type="button" aria-expanded="false"><span class="sidebarNavTitle">来世に期待</span><span class="sidebarNavRight"><span id="afterlifeCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><button type="button" id="commonPreviewNav" class="navBtn" style="margin-top:22px!important;background:#234969!important;border:1px solid #66849c!important;color:#fff!important" aria-controls="commonPreviewPanel" aria-expanded="false"><span class="sidebarNavTitle">共通ページ</span><span class="sidebarNavRight"><span style="font-size:11px">確認用</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button></div></aside>
 <div class="workMain"><section class="card" id="commonPreviewPanel" hidden aria-label="共通ページの表示確認">
-<iframe id="commonPreviewFrame" title="共通ページの一覧プレビュー" data-preview-src="./common-preview/?embedded=1"></iframe></section><section class="card" id="dailyDashboard" hidden><div class="dailySection dailyAppointmentSection"><div class="dailyDateTitle"><h2 id="dailyAppointmentTitle">本日の面接予定</h2><span id="dailyAppointmentCount"></span></div><div class="dailyAppointments" id="dailyAppointmentItems"></div></div><div class="dailySection dailyScheduleSection"><div class="dailyDateTitle"><h2 id="dailyScheduleTitle">担当者スケジュール</h2><div class="dailyLegend"><span>🟩 対応可能</span><span>⬜ 対応不可（グレー）</span><span>🟪 面接予約済み</span></div><span id="dailyAvailabilityStatus" class="note"></span></div><div class="dailyTableWrap"><div class="dailyGrid" id="dailyScheduleGrid"></div></div></div></section><section class="card lineInbox" id="lineInbox" hidden><div class="scheduleHeader"><h2>求人LINE受信｜全店舗</h2><button type="button" class="action" id="lineInboxBack" hidden style="display:none!important" aria-hidden="true" tabindex="-1">TOPに戻る</button></div><p class="note" id="lineInboxStatus">受信データを確認しています。</p><div id="lineInboxAuth" hidden><p class="note">求人管理の管理者アカウントでログインしてください。</p><input type="email" id="lineInboxEmail" autocomplete="username" placeholder="メールアドレス"><input type="password" id="lineInboxPassword" autocomplete="current-password" placeholder="パスワード"><button type="button" class="action" id="lineInboxLogin">ログイン</button></div><div class="lineInboxTools"><label for="lineInboxStore">店舗</label><select id="lineInboxStore"><option value="">全店舗</option><option value="rose">薔薇と紳士</option><option value="grandluxe">Grand Luxe</option><option value="luxy">LUXY</option><option value="unsecret">Un Secret</option><option value="us">Un Secret（旧ID）</option></select><span id="lineInboxResultCount" aria-live="polite"></span></div><div id="lineInboxMessages"></div></section><section class="card reminderPanel" id="reminderPanel" hidden><div class="reminderSingleRow"><h2>確認LINEの送信時間です</h2><span class="reminderMessage">応募者へ確認LINEを送信してください。</span><div id="reminderItems"></div></div></section><section class="card scheduleView" id="scheduleView" hidden><div class="scheduleHeader"><h2 id="scheduleTitle">面接予定一覧</h2><button type="button" id="backToCalendar" class="action" hidden style="display:none!important" aria-hidden="true" tabindex="-1">TOPに戻る</button></div><div id="scheduleViewContent"></div></section>
+ <div class="scheduleHeader commonPreviewHeader">
+  <h2 id="commonPreviewTitle">求人LINE受信｜全店舗</h2>
+  <div class="commonPreviewTools">
+   <label for="commonPreviewCategory" class="visuallyHidden">一覧を選択</label>
+   <select id="commonPreviewCategory" aria-label="一覧種別"><option value="0">LINE通知</option><option value="1">明日以降の面接予定</option><option value="2">日程調整中</option><option value="3">不届き者達</option><option value="4">面接実施済み</option><option value="5">来世に期待</option></select>
+   <span id="commonPreviewCount" aria-live="polite"></span>
+   <button type="button" id="commonPreviewPrev">前へ</button>
+   <strong id="commonPreviewPage">1 / 1ページ</strong>
+   <button type="button" id="commonPreviewNext">次へ</button>
+  </div>
+ </div>
+ <div id="commonPreviewMessages" aria-label="共通一覧・1ページ最大10件"></div>
+ <p class="commonPreviewNote">表示確認用サンプルデータです。各操作ボタンは動作しません。実際のLINE通知一覧・面接データは変更していません。</p>
+</section><section class="card" id="dailyDashboard" hidden><div class="dailySection dailyAppointmentSection"><div class="dailyDateTitle"><h2 id="dailyAppointmentTitle">本日の面接予定</h2><span id="dailyAppointmentCount"></span></div><div class="dailyAppointments" id="dailyAppointmentItems"></div></div><div class="dailySection dailyScheduleSection"><div class="dailyDateTitle"><h2 id="dailyScheduleTitle">担当者スケジュール</h2><div class="dailyLegend"><span>🟩 対応可能</span><span>⬜ 対応不可（グレー）</span><span>🟪 面接予約済み</span></div><span id="dailyAvailabilityStatus" class="note"></span></div><div class="dailyTableWrap"><div class="dailyGrid" id="dailyScheduleGrid"></div></div></div></section><section class="card lineInbox" id="lineInbox" hidden><div class="scheduleHeader"><h2>求人LINE受信｜全店舗</h2><button type="button" class="action" id="lineInboxBack" hidden style="display:none!important" aria-hidden="true" tabindex="-1">TOPに戻る</button></div><p class="note" id="lineInboxStatus">受信データを確認しています。</p><div id="lineInboxAuth" hidden><p class="note">求人管理の管理者アカウントでログインしてください。</p><input type="email" id="lineInboxEmail" autocomplete="username" placeholder="メールアドレス"><input type="password" id="lineInboxPassword" autocomplete="current-password" placeholder="パスワード"><button type="button" class="action" id="lineInboxLogin">ログイン</button></div><div class="lineInboxTools"><label for="lineInboxStore">店舗</label><select id="lineInboxStore"><option value="">全店舗</option><option value="rose">薔薇と紳士</option><option value="grandluxe">Grand Luxe</option><option value="luxy">LUXY</option><option value="unsecret">Un Secret</option><option value="us">Un Secret（旧ID）</option></select><span id="lineInboxResultCount" aria-live="polite"></span></div><div id="lineInboxMessages"></div></section><section class="card reminderPanel" id="reminderPanel" hidden><div class="reminderSingleRow"><h2>確認LINEの送信時間です</h2><span class="reminderMessage">応募者へ確認LINEを送信してください。</span><div id="reminderItems"></div></div></section><section class="card scheduleView" id="scheduleView" hidden><div class="scheduleHeader"><h2 id="scheduleTitle">面接予定一覧</h2><button type="button" id="backToCalendar" class="action" hidden style="display:none!important" aria-hidden="true" tabindex="-1">TOPに戻る</button></div><div id="scheduleViewContent"></div></section>
 <section class="card afterlifeView" id="afterlifeView" hidden><div class="scheduleHeader afterlifeHeader"><h2>来世に期待</h2><span id="afterlifeListCount">0件</span></div><div class="afterlifeEmpty">現在、登録された応募者はいません。</div></section>
 <section class="card applicantDetailView" id="applicantDetailView" hidden aria-labelledby="applicantDetailTitle"><div class="applicantDetailHeader"><div><h2 id="applicantDetailTitle">応募者詳細</h2><p id="applicantDetailOrigin" class="note">求人LINE受信 ＞ 応募者詳細</p></div><div class="applicantDetailHeaderActions"><button type="button" class="action afterlifeAction" id="applicantDetailAfterlife">来世に期待</button><button type="button" class="action" id="applicantDetailBack">一覧へ戻る</button></div></div><div class="applicantDetailIdentity"><span id="applicantDetailAvatar" class="lineAvatar empty">LINE</span><div><strong id="applicantDetailName">読み込み中</strong><div class="applicantDetailMeta"><span id="applicantDetailShop" class="lineStoreBadge">店舗</span><span id="applicantDetailLatest"></span></div></div></div><div class="applicantDetailSummary"><div><small>現在の面接状況</small><strong id="applicantDetailSchedule">確認中</strong><span id="applicantDetailStaff"></span></div><div><small>面接・対応履歴</small><strong id="applicantDetailRisk">確認中</strong><span id="applicantDetailStatus"></span></div></div><div class="applicantDetailColumns"><section class="applicantDetailPanel"><div class="applicantDetailPanelHead"><h3>LINE受信履歴</h3><span id="applicantDetailMessageCount"></span></div><div id="applicantDetailMessages" class="applicantDetailScroll" aria-live="polite"></div><button type="button" id="applicantDetailMore" class="action" hidden>さらに表示</button></section><section class="applicantDetailPanel"><div class="applicantDetailPanelHead"><h3>面接・対応履歴</h3></div><div id="applicantDetailHistory" class="applicantDetailScroll"></div></section></div></section>
 <div class="workLeft">
@@ -2584,31 +2671,98 @@ window.afterlifeReload=load;
  document.addEventListener('DOMContentLoaded',sync);
  sync();
 })();
-</script><script id="commonPreviewSamePageNavigation20261026">
+</script><script id="nativeCommonListNavigation20261026">
 (function(){
-const button=document.getElementById('commonPreviewNav');
-const panel=document.getElementById('commonPreviewPanel');
-const frame=document.getElementById('commonPreviewFrame');
-if(!button||!panel||!frame)return;
-function close(){
- document.body.classList.remove('commonPreviewOpen');
- panel.hidden=true;
- button.setAttribute('aria-expanded','false');
-}
-function open(){
- if(typeof window.restoreLineBookingLayout==='function')window.restoreLineBookingLayout();
- document.body.classList.remove('dashboardHome','lineInboxOpen','lineBookingActive','applicantDetailOpen','afterlifeOpen');
- document.body.classList.add('commonPreviewOpen');
- panel.hidden=false;
- button.setAttribute('aria-expanded','true');
- const src=frame.dataset.previewSrc;
- if(src&&!frame.getAttribute('src'))frame.setAttribute('src',src);
-}
-button.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();open()});
-document.addEventListener('click',function(e){
- if(e.target.closest('#headerTopNav,#headerBookingNav,#sidebarLineNav,#futureNav,#pendingNav,#misconductNav,#historyNav,#afterlifeNav')){
-  close();
+ 'use strict';
+ const button=document.getElementById('commonPreviewNav');
+ const panel=document.getElementById('commonPreviewPanel');
+ const list=document.getElementById('commonPreviewMessages');
+ const selector=document.getElementById('commonPreviewCategory');
+ if(!button||!panel||!list||!selector)return;
+ const sections=['LINE通知','明日以降の面接予定','日程調整中','不届き者達','面接実施済み','来世に期待'];
+ const totals=[19,12,6,9,14,3]; // Sample counts only; no live data touched.
+ const PAGE_SIZE=10;
+ let category=0,page=1;
+ const make=(tag,cls,content)=>{
+  const node=document.createElement(tag);
+  if(cls)node.className=cls;
+  if(content!==undefined)node.textContent=content;
+  return node;
+ };
+ function card(i){
+  const card=make('div','lineMessage');
+  const primary=make('div','lineNoticePrimary');
+  const person=make('div','lineNoticePerson');
+  const avatar=make('span','lineAvatar empty','LINE');
+  const identity=make('div','lineNoticeIdentity');
+  identity.append(make('strong','', '確認用応募者 '+String(i+1).padStart(2,'0')));
+  const shop=i%3===0?'薔薇と紳士':'Grand Luxe';
+  const store=make('span','lineStoreBadge',shop);
+  store.dataset.store=i%3===0?'rose':'grandluxe';
+  identity.append(store);person.append(avatar,identity);
+  const summary=make('div','lineNoticeSummary');
+  const appointment=make('div','sharedInterviewAppointment');
+  const date=category===2?'未定':'2026-10-27 15:00';
+  appointment.append(make('strong','',date));
+  if(category!==2)appointment.append(make('span','', '担当：村上'));
+  summary.append(appointment);
+  if(i%4===0){
+   const histories=make('div','sharedInterviewRisk');
+   histories.append(make('span','sharedHistoryCount',
+    category===3?'無断トビ 1件':category===5?'キャンセル 1件':i%8===0?'日程変更 2件':'キャンセル 1件'));
+   summary.append(histories);
+  }
+  const actions=make('div','lineBookActions sharedInterviewButtons');
+  const names=['日程変更','キャンセル','面接登録','来世に期待'];
+  names.forEach((name,index)=>{
+   const kind=['action-change','action-cancel','lineBookButton','afterlifeAction'][index];
+   const action=make('button','action '+kind,name);
+   action.type='button';action.disabled=true;action.title='表示確認用のため操作できません';
+   actions.append(action);
+  });
+  primary.append(person,summary,actions);card.append(primary);
+  return card;
  }
-},true);
+ function render(){
+  const total=totals[category], pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
+  page=Math.max(1,Math.min(page,pages));
+  selector.value=String(category);
+  document.getElementById('commonPreviewTitle').textContent=
+   category===0?'求人LINE受信｜全店舗':sections[category];
+  document.getElementById('commonPreviewCount').textContent=total+'件';
+  document.getElementById('commonPreviewPage').textContent=page+' / '+pages+'ページ';
+  document.getElementById('commonPreviewPrev').disabled=page===1;
+  document.getElementById('commonPreviewNext').disabled=page===pages;
+  const fragment=document.createDocumentFragment();
+  for(let i=(page-1)*PAGE_SIZE;i<Math.min(total,page*PAGE_SIZE);i++)fragment.append(card(i));
+  list.replaceChildren(fragment);
+ }
+ function close(){
+  document.body.classList.remove('commonPreviewOpen');
+  panel.hidden=true;
+  button.setAttribute('aria-expanded','false');
+ }
+ function open(){
+  // Do not mutate the original list content or application data.
+  document.body.classList.remove('dashboardHome','lineInboxOpen','lineBookingActive','applicantDetailOpen','afterlifeOpen');
+  document.body.classList.add('commonPreviewOpen');
+  panel.hidden=false;
+  button.setAttribute('aria-expanded','true');
+  render();
+ }
+ selector.addEventListener('change',()=>{
+  category=Math.max(0,Math.min(5,Number(selector.value)||0));page=1;render();
+ });
+ document.getElementById('commonPreviewPrev').addEventListener('click',()=>{if(page>1){page--;render()}});
+ document.getElementById('commonPreviewNext').addEventListener('click',()=>{if(page<Math.ceil(totals[category]/PAGE_SIZE)){page++;render()}});
+ button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();open()});
+ document.addEventListener('click',event=>{
+  const other=event.target.closest('#headerTopNav,#headerBookingNav,#sidebarLineNav,#futureNav,#pendingNav,#misconductNav,#historyNav,#afterlifeNav');
+  if(other&&document.body.classList.contains('commonPreviewOpen'))close();
+ },true);
+ window.addEventListener('pageshow',()=>{
+  if(document.body.classList.contains('commonPreviewOpen'))render();
+ });
+ render();
 })();
 </script></body></html>
