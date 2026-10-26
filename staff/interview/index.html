@@ -432,7 +432,7 @@ async function load(){
   interviews=a.data||[];
   msg.textContent='';
   renderList();
-  window.refreshDailyDashboard?.();if(!document.getElementById('scheduleView').hidden&&document.getElementById('scheduleTitle').textContent.includes('明日以降'))showSchedule('future');
+  window.refreshDailyDashboard?.();if(!document.getElementById('scheduleView').hidden&&document.getElementById('interviewListFilters'))window.refreshInterviewSidebarCards?.();
   try{render();renderStaff();renderTimes()}catch(uiError){console.error('面接登録カレンダーの描画失敗',uiError)}
   try{window.refreshDailyDashboard?.()}catch(dashboardError){console.error('TOPスケジュールの描画失敗',dashboardError)}
   try{checkReminders()}catch(reminderError){console.error('通知描画失敗',reminderError)}
@@ -504,8 +504,8 @@ let lineSoundReady=false,lineSoundContext=null,lineInitialCheck=true,lineLastAle
 function activateLineSound(){try{const AudioContextType=window.AudioContext||window.webkitAudioContext;if(!AudioContextType)return;lineSoundContext=lineSoundContext||new AudioContextType();lineSoundContext.resume().then(()=>{lineSoundReady=lineSoundContext.state==='running'}).catch(()=>{})}catch(e){}}
 document.addEventListener('pointerdown',activateLineSound,{once:true});
 document.addEventListener('keydown',activateLineSound,{once:true});
-document.getElementById('lineSoundTest').addEventListener('click',async()=>{activateLineSound();if(lineSoundContext){try{await lineSoundContext.resume();lineSoundReady=lineSoundContext.state==='running';playLineAlert();if(!lineSoundReady)alert('通知音を再生できません。Chromeのサイト音声設定をご確認ください。')}catch(e){alert('通知音を再生できません。Chromeのサイト音声設定をご確認ください。')}}else alert('このブラウザでは通知音を再生できません。')});
-function playLineAlert(){
+document.getElementById('lineSoundTest').addEventListener('click',async()=>{activateLineSound();if(lineSoundContext){try{await lineSoundContext.resume();lineSoundReady=lineSoundContext.state==='running';playLineAlert(true);if(!lineSoundReady)alert('通知音を再生できません。Chromeのサイト音声設定をご確認ください。')}catch(e){alert('通知音を再生できません。Chromeのサイト音声設定をご確認ください。')}}else alert('このブラウザでは通知音を再生できません。')});
+function playLineAlert(testOnly=false){
 stopLineAlert();
 if(!lineSoundReady||!lineSoundContext)return;
 try{
@@ -524,7 +524,7 @@ function ringOnce(){if(ctx.state!=='running')return;const source=ctx.createBuffe
 source.buffer=buffer;source.loop=false;source.connect(ctx.destination);
 source.onended=()=>{lineSoundVoices=lineSoundVoices.filter(v=>v!==source)};
 lineSoundVoices.push(source);source.start();}
-ringOnce();lineSoundRepeatTimer=setInterval(ringOnce,30000);
+ringOnce();if(!testOnly)lineSoundRepeatTimer=setInterval(ringOnce,30000);
 }catch(e){console.warn('LINE telephone bell playback failed',e)}
 }
 async function checkLineNotice(){
@@ -631,8 +631,8 @@ document.addEventListener('click',function(e){
   for(let i=1;i<yearDays-1;i++){if(!days.has(i)&&days.has(i-1)&&days.has(i+1)&&new Date(y,0,i+1).getDay()!==0)days.add(i)}
   return days.has(Math.round((new Date(y,m-1,d)-new Date(y,0,1))/86400000));
  }
- function renderCalendar(){const [y,m]=shownMonth.split('-').map(Number);document.getElementById('dailyMonthLabel').textContent=y+'年'+m+'月';calendar.replaceChildren();['日','月','火','水','木','金','土'].forEach(w=>{const d=document.createElement('div');d.className='weekday';d.textContent=w;calendar.append(d)});const start=new Date(y,m-1,1).getDay(),last=new Date(y,m,0).getDate();for(let i=0;i<start;i++)calendar.append(document.createElement('span'));for(let d=1;d<=last;d++){const date=y+'-'+pad(m)+'-'+pad(d),b=document.createElement('button');b.type='button';b.textContent=d;const weekday=new Date(y,m-1,d).getDay();b.classList.toggle('weekendSat',weekday===6);b.classList.toggle('weekendSunHoliday',weekday===0||isJapanHoliday(y,m,d));b.classList.toggle('selected',date===selected);b.classList.toggle('isToday',date===jstToday());b.setAttribute('aria-pressed',String(date===selected));b.setAttribute('aria-label',date+(date===jstToday()?'（今日）':'')+(date===selected?'（選択中）':''));b.onclick=()=>selectDate(date);calendar.append(b)}}
- function selectDate(d){selected=d;shownMonth=d.slice(0,7);renderCalendar();renderAppointments();void renderAvailability()}
+ function renderCalendar(){const [y,m]=shownMonth.split('-').map(Number);document.getElementById('dailyMonthLabel').textContent=y+'年'+m+'月';calendar.replaceChildren();['日','月','火','水','木','金','土'].forEach(w=>{const d=document.createElement('div');d.className='weekday';d.textContent=w;calendar.append(d)});const start=new Date(y,m-1,1).getDay(),last=new Date(y,m,0).getDate();for(let i=0;i<start;i++)calendar.append(document.createElement('span'));for(let d=1;d<=last;d++){const date=y+'-'+pad(m)+'-'+pad(d),b=document.createElement('button');b.type='button';b.textContent=d;const weekday=new Date(y,m-1,d).getDay();b.classList.toggle('weekendSat',weekday===6);b.classList.toggle('weekendSunHoliday',weekday===0||isJapanHoliday(y,m,d));b.classList.toggle('selected',date===selected);b.classList.toggle('isToday',date===jstToday());b.setAttribute('aria-pressed',String(date===selected));b.setAttribute('aria-label',date+(date===jstToday()?'（今日）':'')+(date===selected?'（選択中）':''));if(date<jstToday()){b.disabled=true;b.classList.add('isPastDate');b.setAttribute('aria-disabled','true')}else b.onclick=()=>selectDate(date);calendar.append(b)}}
+ function selectDate(d){if(d<jstToday())return;selected=d;shownMonth=d.slice(0,7);renderCalendar();renderAppointments();void renderAvailability()}
  function renderAppointments(){
  const box=document.getElementById('dailyAppointmentItems'),title=document.getElementById('dailyAppointmentTitle'),count=document.getElementById('dailyAppointmentCount');
  if(!box||!title||!count)return;
@@ -642,14 +642,14 @@ document.addEventListener('click',function(e){
  if(!data.length){const p=document.createElement('p');p.className='note';p.textContent='この日の面接予定はありません。';box.append(p);return;}
  for(const i of data){try{
  const card=document.createElement('div');card.className='item interviewMiniCard unifiedInterviewCard';card.dataset.interviewId=String(i.id??'');
- const profile=typeof interviewLineProfiles!=='undefined'&&interviewLineProfiles?.get?interviewLineProfiles.get(Number(i.id)):null;
+ let profile=null;try{profile=typeof interviewLineProfiles!=='undefined'&&interviewLineProfiles?.get?interviewLineProfiles.get(Number(i.id)):null}catch(e){console.warn('LINEプロフィール取得失敗',e)}
  const head=document.createElement('div');head.className='unifiedInterviewHead';
  const avatar=document.createElement('span');avatar.className='unifiedInterviewAvatar';avatar.textContent='LINE';
  if(profile?.picture){const img=document.createElement('img');img.src=profile.picture;img.alt='LINEアイコン';img.referrerPolicy='no-referrer';img.onerror=()=>img.remove();avatar.prepend(img);}
  const identity=document.createElement('div');identity.className='unifiedInterviewIdentity';
  const name=document.createElement('strong');name.textContent=profile?.name||'LINE名未取得';
  const info=document.createElement('div');info.className='unifiedInterviewMeta';info.textContent=String(i.interview_date||'')+' '+String(i.interview_time||'').slice(0,5)+'｜'+String(i.shop||'店舗未設定');
- const staff=document.createElement('div');staff.className='unifiedInterviewMeta';staff.textContent='担当：'+(typeof interviewAssigneeName==='function'?interviewAssigneeName(i):'未設定')+'｜'+(i.confirmed?'確認済み':i.status||'面接予定');
+ const staff=document.createElement('div');staff.className='unifiedInterviewMeta';let assignee='未設定';try{if(typeof interviewAssigneeName==='function')assignee=interviewAssigneeName(i)||'未設定'}catch(e){console.warn('担当者取得失敗',e)}staff.textContent='担当：'+assignee+'｜'+(i.confirmed?'確認済み':i.status||'面接予定');
  identity.append(name,info,staff);head.append(avatar,identity);card.append(head);
  const actions=document.createElement('div');actions.className='unifiedInterviewActions';
  if(selected===jstToday()&&!i.confirmed){const b=document.createElement('button');b.type='button';b.className='action action-confirm';b.textContent='確認OK';b.onclick=()=>confirmOK(i.id);actions.append(b);}
@@ -769,7 +769,7 @@ window.pickInterviewGanttSlot=function(p){
  document.getElementById('calendarCard')?.scrollIntoView({behavior:'smooth',block:'start'});
 };
 })();
-</script><style id="unifiedSidebarCards20261026">#scheduleView .unifiedSidebarCard{border:1px solid #d7e0ea;border-left:4px solid #8298ae;border-radius:9px;padding:12px 14px;margin:8px 0;background:#fff}#scheduleView .unifiedSidebarCard[data-shop="Grand Luxe"]{border-left-color:#b89950}#scheduleView .unifiedSidebarCard[data-shop="薔薇と紳士"]{border-left-color:#bd6c88}#scheduleView .unifiedSidebarCard[data-shop="LUXY"]{border-left-color:#7969b5}#scheduleView .unifiedSidebarCard[data-shop="Un Secret"]{border-left-color:#4b9a9b}#scheduleView .unifiedSidebarCard[data-shop="BUSTY OSAKA"]{border-left-color:#c78a55}#scheduleView .unifiedSidebarTop{display:flex;align-items:center;gap:12px}#scheduleView .unifiedSidebarAvatar{width:44px;height:44px;min-width:44px;border-radius:50%;background:#e6edf3;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;font-size:10px;color:#61758a}#scheduleView .unifiedSidebarAvatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}#scheduleView .unifiedSidebarInfo{min-width:0;overflow-wrap:anywhere}#scheduleView .unifiedSidebarInfo strong{font-size:14px}#scheduleView .unifiedSidebarMeta{font-size:12px;color:#52667c;margin-top:4px}#scheduleView .unifiedSidebarToggle{border:0;background:#f1f5f9;color:#234767;border-radius:6px;padding:7px 11px;margin-top:9px;cursor:pointer}#scheduleView .unifiedSidebarActions[hidden]{display:none!important}#scheduleView .unifiedSidebarActions{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}#scheduleView .unifiedSidebarActions .action{margin:0!important}</style><script id="interviewSidebarLists20261025">
+</script><style id="unifiedSidebarCards20261026">#scheduleView .unifiedSidebarCard{border:1px solid #d7e0ea;border-left:4px solid #8298ae;border-radius:9px;padding:12px 14px;margin:8px 0;background:#fff}#scheduleView .unifiedSidebarCard[data-shop="Grand Luxe"]{border-left-color:#b89950}#scheduleView .unifiedSidebarCard[data-shop="薔薇と紳士"]{border-left-color:#bd6c88}#scheduleView .unifiedSidebarCard[data-shop="LUXY"]{border-left-color:#7969b5}#scheduleView .unifiedSidebarCard[data-shop="Un Secret"]{border-left-color:#4b9a9b}#scheduleView .unifiedSidebarCard[data-shop="BUSTY OSAKA"]{border-left-color:#c78a55}#scheduleView .unifiedSidebarTop{display:flex;align-items:center;gap:12px}#scheduleView .unifiedSidebarAvatar{width:44px;height:44px;min-width:44px;border-radius:50%;background:#e6edf3;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;font-size:10px;color:#61758a}#scheduleView .unifiedSidebarAvatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}#scheduleView .unifiedSidebarInfo{min-width:0;overflow-wrap:anywhere}#scheduleView .unifiedSidebarInfo strong{font-size:14px}#scheduleView .unifiedSidebarMeta{font-size:12px;color:#52667c;margin-top:4px}#scheduleView .unifiedSidebarToggle{border:0;background:#f1f5f9;color:#234767;border-radius:6px;padding:7px 11px;margin-top:9px;cursor:pointer}#scheduleView .unifiedSidebarActions[hidden]{display:none!important}#scheduleView .unifiedSidebarActions{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}#scheduleView .unifiedSidebarActions .action{margin:0!important}</style><style id="interviewBatchFix20261026">#dailyDashboard .dailyCalendar button.isPastDate{background:#e0e3e7!important;border-color:#cbd1d8!important;color:#89919b!important;cursor:not-allowed!important;opacity:.8;box-shadow:none!important}#dailyDashboard .dailyCalendar button.isPastDate:hover{background:#e0e3e7!important}body .workspace{align-items:start}body .workspace>.side{align-self:start;flex-shrink:0}body .workspace>.side #dailySidebarCalendar{min-height:0}body .workspace>.side .navSection{margin-top:0}#scheduleView .unifiedSidebarCard{display:block!important}#scheduleView .unifiedSidebarTop{display:flex!important}#scheduleView .unifiedSidebarAvatar{display:flex!important}#scheduleView .unifiedSidebarActions[hidden]{display:none!important}</style><script id="interviewSidebarLists20261025">
 (function(){
  const categories={future:'明日以降の面接予定',pending:'日程調整中',misconduct:'不届き者達',past:'過去の面接予定'};
  const bad=['キャンセル','無断トビ','トビ（キャンセル）','返信なし'];
@@ -823,12 +823,12 @@ window.pickInterviewGanttSlot=function(p){
     card.dataset.shop=String(i.shop||'');
     const top=document.createElement('div');top.className='unifiedSidebarTop';
     const avatar=document.createElement('span');avatar.className='unifiedSidebarAvatar';avatar.textContent='LINE';
-    const profile=typeof interviewLineProfiles!=='undefined'?interviewLineProfiles.get(Number(i.id)):null;
+    let profile=null;try{if(typeof interviewLineProfiles!=='undefined')profile=interviewLineProfiles.get(Number(i.id))}catch(e){console.warn('LINEプロフィール取得失敗',e)}
     if(profile?.picture){const img=document.createElement('img');img.src=profile.picture;img.alt='LINEアイコン';img.referrerPolicy='no-referrer';img.onerror=()=>img.remove();avatar.prepend(img)}
     const info=document.createElement('div');info.className='unifiedSidebarInfo';
     const name=document.createElement('strong');name.textContent=profile?.name||'LINE名未取得';
     const datetime=document.createElement('div');datetime.className='unifiedSidebarMeta';datetime.textContent=(i.interview_date||'日付未設定')+' '+String(i.interview_time||'').slice(0,5)+' ｜ '+(i.shop||'店舗未設定');
-    const staff=document.createElement('div');staff.className='unifiedSidebarMeta';staff.textContent='担当：'+(typeof interviewAssigneeName==='function'?interviewAssigneeName(i):'未設定')+' ｜ '+(i.confirmed?'確認済み':i.status||'面接予定');
+    const staff=document.createElement('div');staff.className='unifiedSidebarMeta';let assignee='未設定';try{if(typeof interviewAssigneeName==='function')assignee=interviewAssigneeName(i)||'未設定'}catch(e){console.warn('担当者取得失敗',e)}staff.textContent='担当：'+assignee+' ｜ '+(i.confirmed?'確認済み':i.status||'面接予定');
     info.append(name,datetime,staff);top.append(avatar,info);card.append(top);
     if(category==='pending'){const old=document.createElement('p');old.className='unifiedSidebarMeta';old.textContent='旧予定：'+(i.interview_date||'')+' '+String(i.interview_time||'').slice(0,5);card.append(old)}
     const actions=document.createElement('div');actions.className='unifiedSidebarActions';actions.hidden=true;
@@ -846,6 +846,7 @@ window.pickInterviewGanttSlot=function(p){
   }
   if(!items.length){const p=document.createElement('p');p.className='note';p.textContent='該当する面接予定はありません。';root.append(p)}
  }
+ window.refreshInterviewSidebarCards=render;
  function open(type){
   category=type;store='';month=currentMonth();
   document.body.classList.remove('dashboardHome','lineInboxOpen','lineBookingActive');
