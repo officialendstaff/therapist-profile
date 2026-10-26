@@ -2956,14 +2956,6 @@ window.afterlifeReload=load;
  };
  const storeCodes={'薔薇と紳士':'rose','Grand Luxe':'grandluxe','LUXY':'luxy','Un Secret':'unsecret','BUSTY OSAKA':'busty'};
  // Display-only fixtures. Never read or write Supabase interview records here.
- const demoStores=['薔薇と紳士','Grand Luxe','LUXY','Un Secret','BUSTY OSAKA'];
- const demoNames=['テスト応募者01','テスト応募者02','テスト応募者03','テスト応募者04','テスト応募者05','テスト応募者06','テスト応募者07','テスト応募者08','テスト応募者09','テスト応募者10'];
- const demoRecords=demoNames.map((name,i)=>({
-  name,shop:demoStores[i%demoStores.length],
-  date:'2026-10-'+String(27+Math.floor(i/5)).padStart(2,'0'),
-  time:String(10+i).padStart(2,'0')+':00',staff:'テスト担当',
-  avatar:'LINE'
- }));
  // Mirror the original LINE inbox CSS selectors without reimplementing its styles.
  // Inline source styles remain the single source of truth for both containers.
  const mirrored=document.createElement('style');
@@ -3053,12 +3045,11 @@ window.afterlifeReload=load;
    staff:(typeof interviewAssigneeName==='function'?interviewAssigneeName(row):null)||row.staff_name||row.interviewer||'未設定',
    actual:true
   }}));
-  const fixtures=demoRecords.filter(r=>!selected||storeCodes[r.shop]===selected).map(record=>({record}));
-  const sources=category===0?lineCards.map(node=>({node})):[...actual,...fixtures];
+  const sources=category===0?lineCards.map(node=>({node})):actual;
   const total=sources.length,pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
   page=Math.max(1,Math.min(page,pages));selector.value=String(category);
   document.body.classList.remove('commonFutureOpen');
-  document.getElementById('commonPreviewTitle').textContent=category===0?'求人LINE受信｜全店舗':sections[category]+'｜表示テスト';
+  document.getElementById('commonPreviewTitle').textContent=category===0?'求人LINE受信｜全店舗':sections[category];
   document.getElementById('commonPreviewCount').textContent=total+'件';
   document.getElementById('commonPreviewPage').textContent=page+' / '+pages+'ページ';
   document.getElementById('commonPreviewPrev').disabled=page===1;
