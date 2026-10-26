@@ -1,38 +1,1514 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>共通ページ｜面接一覧プレビュー</title>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>共通ページ｜面接予約管理</title><style>*{box-sizing:border-box}body{margin:0;background:#f5f2ed;color:#211b17;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}.wrap{max-width:560px;margin:auto;padding:18px 14px 60px}.card{background:#fff;border:1px solid #e1d8ce;border-radius:18px;padding:16px;margin-bottom:14px}h1{font-size:21px;margin:4px 0 18px}h2{font-size:17px;margin:0 0 12px}.calHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.calHead button,.choice,.time,.action{border:1px solid #d8cec3;background:#fff;border-radius:11px;padding:11px;font-weight:800}.week,.days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}.week div{text-align:center;font-size:10px;color:#87796e}.day{min-height:48px;border:0;border-radius:10px;background:#f8f5f1;font-weight:800}.day.block{background:#e8e3de;color:#aaa}.day.partial{background:#fff0c9}.day.busy{outline:2px solid #c99c55}.day.sel{background:#211b17;color:#fff}.choices{display:grid;grid-template-columns:1fr 1fr;gap:8px}.choice.on{background:#211b17;color:#fff}.times{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.time{padding:10px 3px;font-size:12px}.time:disabled{background:#eee;color:#aaa}.time.on{background:#9a6b38;color:#fff}.confirm{width:100%;border:0;border-radius:13px;background:#8b643c;color:#fff;padding:15px;font-weight:900;font-size:15px;margin-top:14px}.item{padding:13px 0;border-bottom:1px solid #eee}.item:last-child{border:0}.item b{display:block}.action{margin-top:8px;padding:8px 11px;font-size:12px}.note{font-size:11px;color:#766b63;line-height:1.6}.legend{font-size:11px;color:#766b63;margin-top:9px}.msg{color:#a22;font-size:12px}.template{white-space:pre-wrap;background:#faf8f5;border:1px solid #e5ddd4;border-radius:12px;padding:13px;font-size:13px;line-height:1.8;margin-top:10px}.copyBtn{width:100%;border:1px solid #8b643c;background:#fff;color:#6f4d2d;border-radius:12px;padding:13px;font-weight:900;margin-top:10px}</style>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f3f5f8;color:#183350;font:12px Arial,"Noto Sans JP",sans-serif}
-header{height:76px;background:#17283f;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 22px;border-bottom:3px solid #bda477}
-header h1{font-size:19px;margin:0}header a{color:#fff;border:1px solid #b6c4d5;border-radius:7px;padding:9px 14px;text-decoration:none}
-main{padding:16px;max-width:1510px;margin:auto}.note{margin:0 0 12px;color:#5b6878}
-.cardPanel{border:1px solid #d8e0e9;background:white;border-radius:10px;padding:10px;overflow:hidden}
-.bar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:9px;flex-wrap:wrap}
-h2{margin:0;font-size:17px;color:#183350}.control{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
-select,.pager button{background:white;border:1px solid #b8cce2;border-radius:6px;height:34px;padding:0 9px;color:#183350;font-weight:700}
-.pager{display:flex;align-items:center;gap:8px}.pager button:disabled{opacity:.4}
-.list{display:flex;flex-direction:column;gap:3px;min-height:587px}
-.personCard{display:grid;grid-template-columns:165px minmax(0,1fr) 318px;align-items:center;gap:8px;width:100%;height:56px;min-height:56px;padding:5px 8px;border:1px solid #dce4ee;border-radius:7px;background:#fff;overflow:hidden}
-.person{display:flex;align-items:center;gap:8px;min-width:0}.avatar{width:36px;height:36px;flex:0 0 36px;background:#e7edf4;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:700}
-.identity{display:flex;flex-direction:column;gap:2px;min-width:0}.identity strong{font-size:12px;line-height:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.shop{align-self:flex-start;border:1px solid #d5b667;border-radius:5px;padding:2px 6px;background:#f7edcf;color:#79530c;font-size:10px;font-weight:800;line-height:13px}.shop.rose{background:#f7e6eb;border-color:#dca8b8;color:#872c48}
-.summary{display:flex;align-items:center;gap:6px;min-width:0;overflow:hidden}.appointment{background:#edf5fc;border:1px solid #bed2e8;border-radius:6px;height:34px;display:flex;align-items:center;gap:8px;padding:4px 9px;white-space:nowrap;min-width:0}.appointment strong{font-size:12px}.appointment span{font-size:11px}
-.history{background:#fff3f4;border:1px solid #e3b5bd;color:#953741;padding:6px;border-radius:5px;white-space:nowrap;font-size:10px}
-.actions{display:flex;align-items:center;justify-content:flex-end;gap:4px}.actions button{width:76px;height:32px;min-width:76px;border:1px solid #d5dbe3;background:#edf0f4;color:#8c99a9;font-size:10px;font-weight:800;border-radius:6px;white-space:nowrap;padding:0 2px}
-.actions button.active{background:#176b9b;color:white;border-color:#10547d}
-footer{margin-top:10px;font-size:11px;color:#76869b}
-@media(max-width:1100px){.cardPanel{overflow-x:auto}.list,.bar{min-width:1060px}}
-</style></head><body><header><h1>共通ページ｜面接一覧</h1><a href="../">面接管理に戻る</a></header>
-<main><p class="note">表示確認用プレビューです。応募者はすべてサンプルデータです。登録・変更・キャンセル処理には接続していません。</p>
-<section class="cardPanel"><div class="bar"><h2 id="title">LINE通知</h2><div class="control"><select id="category" aria-label="表示一覧"></select><span id="counter"></span><div class="pager"><button id="prev">前へ</button><b id="page"></b><button id="next">次へ</button></div></div></div><div id="list" class="list"></div><footer>カード高さ56px・1ページ10件・10件未満でも背景高さを維持。履歴は項目と件数だけ表示します。</footer></section></main>
-<script>
-const labels=['LINE通知','明日以降の面接予定','日程調整中','不届き者達','面接実施済み','来世に期待'];const category=document.getElementById('category');labels.forEach((x,i)=>{const o=document.createElement('option');o.value=i;o.textContent=x;category.append(o)});
-const list=document.getElementById('list');let page=1;
-function make(tag,cls,txt){const x=document.createElement(tag);x.className=cls||'';if(txt!==undefined)x.textContent=txt;return x}
-function render(){
-const type=Number(category.value||0);const counts=[19,12,6,9,14,3];const n=counts[type],pages=Math.max(1,Math.ceil(n/10));page=Math.min(Math.max(page,1),pages);
-document.getElementById('title').textContent=labels[type];document.getElementById('counter').textContent=n+'件';document.getElementById('page').textContent=page+' / '+pages+'ページ';document.getElementById('prev').disabled=page===1;document.getElementById('next').disabled=page===pages;list.replaceChildren();
-for(let i=(page-1)*10;i<Math.min(n,page*10);i++){const row=make('div','personCard'),person=make('div','person'),identity=make('div','identity'),shop=make('span','shop'+(i%3===0?' rose':''),i%3===0?'薔薇と紳士':'Grand Luxe');identity.append(make('strong','', 'サンプル応募者 '+String(i+1).padStart(2,'0')),shop);person.append(make('span','avatar','LINE'),identity);
-const summary=make('div','summary'),appointment=make('div','appointment');appointment.append(make('strong','',type===2?'未定':'2026-10-27 15:00'),make('span','',type===2?'':'担当：村上'));summary.append(appointment);if(i%4===0)summary.append(make('span','history','日程変更 2件'));
-const actions=make('div','actions');for(const [j,label] of ['日程変更','キャンセル','面接登録','来世に期待'].entries()){const btn=make('button',type===0&&j===2?'active':'',label);btn.disabled=true;btn.title='プレビュー専用';actions.append(btn)}row.append(person,summary,actions);list.append(row)}
+#staffLock{position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#111,#2a2115);display:flex;align-items:center;justify-content:center;padding:24px}
+#staffLock .lockbox{width:min(360px,92vw);padding:28px 22px;background:rgba(255,255,255,.94);border:1px solid #c99a45;border-radius:18px;text-align:center;box-shadow:0 18px 60px rgba(0,0,0,.35)}
+#staffLock .lockmark{font-size:12px;letter-spacing:.22em;color:#9b6a18;margin-bottom:6px}#staffLock h2{margin:0 0 18px;font-size:24px}
+#staffLock input{box-sizing:border-box;width:100%;padding:14px;border:1px solid #d8c7aa;border-radius:10px;font-size:20px;text-align:center;letter-spacing:.25em}
+#staffLock button{width:100%;margin-top:12px;padding:14px;border:0;border-radius:10px;background:#17130e;color:#fff;font-weight:700;font-size:16px}
+#staffLock .lockerr{min-height:20px;margin-top:10px;color:#b42318;font-size:13px}
+</style>
+<style>.storeTop{margin-bottom:12px}.storeTop .storeNav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.storeTop .choice{width:100%;min-width:0}.noticeBlink{animation:noticePulse 1s ease-in-out infinite!important;background:#a51d29!important;color:#fff!important}@keyframes noticePulse{0%,100%{box-shadow:0 0 0 0 rgba(190,35,45,.1)}50%{box-shadow:0 0 0 5px rgba(190,35,45,.45);opacity:.62}}@media(max-width:700px){.storeTop .storeNav{grid-template-columns:repeat(2,minmax(0,1fr))}}</style>
+<style>
+/* Interview registration visual refresh: presentation only */
+:root{color-scheme:light}
+body{background:#eef1f5;color:#172335}
+.wrap{max-width:620px;padding:20px 14px 72px}
+h1{font-size:24px;letter-spacing:.02em;color:#101c2d;margin:4px 0 20px}
+h2{font-size:17px;color:#16243a;letter-spacing:.01em}
+.card{background:#fff;border:1px solid #d9e0e9;border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 3px 14px rgba(21,39,66,.045)}
+.calHead button,.choice,.time,.action{background:#fff;border:1px solid #c8d2df;border-radius:10px;color:#1c3049;min-height:43px}
+.calHead button{min-width:46px;font-size:21px}
+.calHead b{color:#15243a;font-size:16px}
+.week div{color:#55657a;font-size:11px;font-weight:700}
+.day{background:#f1f5f9;color:#1a304b;min-height:48px;font-size:14px}
+.day.block{background:#e5e9ef;color:#7b8592}
+.day.partial{background:#fff0ce;color:#6c4c0d}
+.day.busy{outline:2px solid #3673b5;outline-offset:-2px}
+.day.sel,.choice.on{background:#163c67;color:#fff;border-color:#163c67}
+.time{font-size:13px;font-weight:750}
+.time:disabled{background:#f0f2f5;color:#9aa4b2}
+.time.on{background:#163c67;border-color:#163c67;color:#fff}
+.confirm{background:#164a7d;color:#fff;border-radius:11px;font-size:16px;padding:16px}
+.confirm:active,.copyBtn:active{filter:brightness(.92)}
+.note,.legend{font-size:12px;color:#526176;line-height:1.7}
+.msg{color:#aa2835;font-size:13px}
+.item{border-bottom:1px solid #e2e8f0}
+.item b{color:#1b2d45}
+.action{font-size:12px;background:#f5f8fc;border-color:#c5d2e1;padding:9px 12px}
+.template{background:#f6f9fc;border:1px solid #d6e0eb;color:#24344a;font-size:13px}
+.copyBtn{background:#fff;border-color:#164a7d;color:#164a7d}
+#pastInterviewToggle{color:#172335!important}
+#pastInterviewCount{color:#526176!important}
+button{cursor:pointer;transition:background-color .12s,border-color .12s}
+button:focus-visible{outline:3px solid #70a9e4;outline-offset:2px}
+@media(max-width:380px){.wrap{padding-inline:10px}.card{padding:14px}.times{gap:4px}.time{font-size:12px}}
+</style>
+<style>
+/* Store-specific page background */
+body{transition:background-color .22s ease}
+body[data-active-shop="薔薇と紳士"]{background:#f0eaf1}
+body[data-active-shop="BUSTY OSAKA"]{background:#fff0d9}
+body[data-active-shop="Grand Luxe"]{background:#fff0f3}
+body[data-active-shop="Un Secret"]{background:#eaf4f1}
+body[data-active-shop="LUXY"]{background:#f6f0e5}
+</style>
+<style>
+/* Desktop interview registration layout */
+.wrap{max-width:1480px;padding:24px 24px 70px}
+.workspace{display:grid;grid-template-columns:220px minmax(0,1fr);gap:18px;align-items:start}
+.side{position:sticky;top:18px}
+.storeNav{display:flex;flex-direction:column;gap:8px}
+.storeNav .choice{width:100%;text-align:left;padding:13px 14px}
+.storeNav .choice.on{background:#163c67;color:#fff}
+.historyNav{margin-top:18px;padding:14px 12px;width:100%;text-align:left;background:#e9eef5;color:#183350;border:1px solid #c9d5e3;border-radius:10px;font-weight:800;cursor:pointer}
+.workMain{display:grid;grid-template-columns:minmax(320px,0.92fr) minmax(350px,1.08fr);gap:18px;align-items:start}
+.workLeft,.workRight{min-width:0}
+.days{gap:5px}.day{min-height:54px}
+.times{display:flex;flex-direction:column;gap:5px;max-height:360px;overflow-y:auto;overscroll-behavior:contain;padding:3px}
+.time{flex:none;width:100%;text-align:left;font-size:14px;padding:12px 16px;min-height:44px}
+.time.on{background:#163c67;color:white}
+.historyPanel{margin-top:18px}
+.historyPanel[hidden]{display:none}
+.historyHeading{display:flex;justify-content:space-between;align-items:center}
+@media(max-width:1100px){.workMain{grid-template-columns:1fr}.side{top:12px}}
+@media(max-width:700px){.wrap{padding:16px 12px 60px}.workspace{grid-template-columns:1fr}.side{position:static}.storeNav{display:grid;grid-template-columns:1fr 1fr}.workMain{grid-template-columns:1fr}.day{min-height:46px}}
+
+/* 2026-10-20 registration workspace */
+.workMain{display:block}.workLeft{display:grid;grid-template-columns:1fr;gap:0}.workRight{display:none}.workspace{grid-template-columns:240px minmax(0,1fr)}.side{max-height:calc(100vh - 40px);overflow:auto}.side .navGroup{margin-bottom:14px}.navBtn{width:100%;text-align:left;padding:12px;border:1px solid #d1dae5;background:#f6f9fc;border-radius:9px;margin:4px 0;font-weight:700;color:#183350}.navPanel{max-height:300px;overflow:auto}.navPanel[hidden]{display:none}.navPanel .item{font-size:12px}.navPanel .action{font-size:11px}.storeNav{border-top:1px solid #ddd;padding-top:14px}.calendarCard{transition:all .2s}.calendarCard.compact{max-width:650px;margin-inline:auto}.calendarCard:not(.compact) .day{min-height:78px;font-size:19px}.registrationStep[hidden]{display:none}.staffChoices{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.staffChoices button{padding:12px 20px;border:1px solid #c8d2df;border-radius:10px;background:white;font-weight:700}.staffChoices button.on{background:#163c67;color:white}.times{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));max-height:none;overflow:visible}.time{text-align:center;padding:12px 4px}.workLeft .card{width:100%}@media(max-width:900px){.workspace{grid-template-columns:1fr}.side{position:static;max-height:none}.calendarCard:not(.compact) .day{min-height:48px;font-size:14px}.times{grid-template-columns:repeat(4,minmax(0,1fr))}} 
+
+/* Desktop calendar-to-split transition */
+@media(min-width:901px){.workspace{grid-template-columns:240px minmax(0,1fr)}.workMain{display:block;min-width:0}.workLeft{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;align-items:start}.workLeft:has(.calendarCard.compact){grid-template-columns:minmax(310px,.9fr) minmax(460px,1.5fr)}.calendarCard{max-width:none!important;margin:0!important}.calendarCard:not(.compact){min-height:590px}.calendarCard:not(.compact) .day{min-height:78px}.calendarCard.compact .day{min-height:44px;font-size:13px}.registrationStep{min-width:0}.registrationStep[hidden]{display:none}.times{grid-template-columns:repeat(5,minmax(0,1fr))}}@media(min-width:901px) and (max-width:1220px){.workLeft:has(.calendarCard.compact){grid-template-columns:minmax(260px,.8fr) minmax(360px,1.2fr)}.times{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:900px){.workLeft{display:grid;grid-template-columns:minmax(0,1fr)}.calendarCard{max-width:none!important}.times{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+#calendarError{color:#b42318;background:#fff1f0;border:1px solid #e9a4a0;border-radius:9px;padding:12px;font-weight:800;margin:12px 0 0}.storeNav.needsSelection{outline:3px solid #d44b4b;outline-offset:5px;border-radius:8px}.day.block,.day.block.partial,.day.block.busy{background:#e5e9ef!important;color:#7b8592!important;outline:none!important}.day{position:relative}.day .markers{position:absolute;bottom:3px;left:0;right:0;display:flex;justify-content:center;gap:5px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;vertical-align:middle}.dot.blue{background:#2477d2}.dot.red{background:#d83e45}.day.busy{outline:none}.day.partial{background:#f1f5f9}
+
+/* Refined management interface */
+body,body[data-active-shop]{background:#f2f3f5!important;color:#1c2837}.wrap{max-width:1560px;padding-top:30px}h1{font-size:23px;font-weight:750;letter-spacing:.05em;margin-bottom:22px}.card{border:1px solid #dce2e8;box-shadow:0 8px 26px rgba(19,35,54,.055);border-radius:14px}.side.card{padding:0;overflow:hidden;background:#fff}.sideTitle{background:#172b43;color:#fff;padding:21px 17px;font-size:12px;font-weight:800;letter-spacing:.12em}.sideTitle small{display:block;font-size:13px;letter-spacing:.05em;color:#cbd5e0;margin-top:7px}.navSection{padding:18px 14px 20px;border-bottom:7px solid #f0f2f5}.navSection:last-child{border-bottom:0}.navSection h2{font-size:14px;font-weight:800;margin:0 0 14px;padding-bottom:12px;border-bottom:1px solid #dce3eb}.navSection h2 small{display:block;font-size:9px;letter-spacing:.17em;color:#a38b64;margin-top:5px}.navBtn{background:#f7f9fb;border-color:#dce3eb;padding:14px 12px;margin:4px 0 9px;font-size:12px}.navBtn:hover,.storeNav .choice:hover{border-color:#b19a72;background:#f8f6f1}.storeNav{border:0;padding:0;gap:9px}.storeNav .choice{border:1px solid #dce3eb;border-radius:8px;padding:13px;font-size:12px;background:#fff}.storeNav .choice.on{background:#172b43;color:#fff;border-color:#172b43;box-shadow:inset 3px 0 #c4a46c}.calHead{padding-bottom:13px;border-bottom:1px solid #e9edf1;margin-bottom:15px}.calHead b{font-size:19px}.day{border-radius:8px}.day.sel{background:#172b43!important;color:#fff!important;box-shadow:inset 0 -3px #c4a46c}.day:not(.block):hover{outline:1px solid #b89a65}.registrationStep h2,.calendarCard h2{border-left:3px solid #b89a65;padding-left:11px}.staffChoices button.on,.time.on,.confirm{background:#172b43!important;border-color:#172b43!important;color:#fff}.confirm{box-shadow:0 3px 10px rgba(20,40,60,.12)}.navPanel{max-height:240px}.navPanel .item{line-height:1.5}.legend{font-size:11px;color:#64748b}@media(max-width:900px){.side.card{overflow:visible}.navSection{padding:15px}.wrap{padding-top:16px}}
+
+/* Full admin shell: header and integrated dark sidebar */
+body,body[data-active-shop]{background:#f3f5f8!important;color:#1d2d40!important}.appHeader{height:76px;background:#17283f;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 max(24px,calc((100vw - 1530px)/2));border-bottom:3px solid #bda477}.brand{display:flex;flex-direction:column;gap:5px}.brand span{color:#cbb080;font-size:10px;font-weight:800;letter-spacing:.15em}.brand strong{font-size:19px;letter-spacing:.06em}.headerRight{display:flex;align-items:center;gap:22px;color:#afbdcd;font-size:10px;letter-spacing:.12em}.headerSymbol{font-size:23px;color:#e1e7ed}.wrap{max-width:1530px;margin:0 auto;padding:24px 22px 60px}.pageHeading{margin:0 0 18px}.pageHeading>span{color:#8a99a9;font-size:10px;font-weight:800;letter-spacing:.15em}.pageHeading h1{font-size:21px;margin:5px 0 0}.workspace{display:grid;grid-template-columns:235px minmax(0,1fr);gap:20px;align-items:start}.side.card{background:#223650!important;color:#f5f8fd!important;border:0!important;border-radius:12px!important;overflow:hidden;padding:0!important;box-shadow:0 10px 28px rgba(15,29,48,.12);max-height:calc(100vh - 125px);overflow-y:auto;position:sticky;top:18px}.sideTitle{background:#17283f!important;border-bottom:1px solid #455773;padding:20px 16px!important;color:#d0b480!important;font-size:11px!important}.sideTitle small{color:#fff!important;font-size:14px!important}.navSection{background:transparent!important;border-bottom:1px solid #455873!important;padding:20px 14px!important}.navSection:last-child{border-bottom:0!important}.navSection h2{color:#f5f8fd!important;border-bottom:1px solid #53647a!important;font-size:13px!important}.navSection h2 small{color:#c5a875!important}.navBtn{background:transparent!important;border:0!important;color:#f3f6fb!important;font-size:12px!important;text-align:left!important;padding:13px 9px!important;margin:2px 0!important}.navBtn:hover{background:#344b68!important;color:#fff!important}.navPanel{background:#172b45;border-radius:7px;padding:0 8px;max-height:210px}.side .item{border-color:#4b5d72!important;color:#f1f4f8!important}.side .item b,.side .note{color:#f1f4f8!important}.side .action{background:#344d6b!important;border-color:#5c7390!important;color:#fff!important;font-size:10px!important;padding:7px!important}.storeNav{display:grid!important;grid-template-columns:1fr!important;gap:3px!important;padding:0!important}.storeNav .choice{background:transparent!important;color:#f3f6fa!important;border:0!important;border-radius:6px!important;text-align:left!important;font-size:12px!important;padding:13px 11px!important;box-shadow:none!important}.storeNav .choice:hover{background:#344d6b!important}.storeNav .choice.on{background:#415c7d!important;color:#fff!important;border:0!important;box-shadow:inset 3px 0 #c7aa73!important}.workMain{min-width:0}.workLeft{min-width:0}.calendarCard,.registrationStep{background:#fff!important;border:1px solid #dce3eb!important;box-shadow:0 4px 20px rgba(20,40,60,.045)!important}.calendarCard:not(.compact){min-height:560px}.calendarCard h2,.registrationStep h2{font-size:16px}.day:not(.block){background:#f0f3f7}.day.block{background:#e2e7ee!important;color:#8995a5!important}.calHead b{font-size:19px}.legend{padding-top:12px}.workRight{display:none}@media(max-width:900px){.appHeader{height:68px;padding:0 15px}.brand strong{font-size:15px}.headerRight{display:none}.wrap{padding:16px 12px 40px}.workspace{grid-template-columns:1fr;gap:14px}.side.card{position:static;max-height:none}.navSection{padding:15px!important}.calendarCard:not(.compact){min-height:0}.workLeft:has(.calendarCard.compact){grid-template-columns:1fr}}
+
+/* Edge-aligned sidebar desktop layout */
+@media(min-width:901px){.wrap{max-width:none!important;margin:0!important;padding:24px 28px 60px 0!important}.workspace{grid-template-columns:235px minmax(0,1fr)!important;gap:24px!important}.side.card{border-radius:0 12px 12px 0!important;top:0!important;max-height:calc(100vh - 76px)!important}.workMain{padding-right:28px!important}}@media(min-width:901px) and (max-width:1150px){.workspace{gap:12px!important}.workMain{padding-right:0!important}}
+ .workspace{grid-template-columns:280px minmax(0,1fr)!important}.side.card{width:280px!important;max-width:280px!important}.sideTitle{font-size:18px!important;color:#fff!important;padding:22px 17px!important}.navSection{padding:18px 14px!important;border-bottom:8px solid #17283f!important}.navSection h2{font-size:15px!important;color:#e6c992!important;border-bottom:1px solid #64758b!important;padding-bottom:13px!important;margin-bottom:12px!important}.navBtn{font-size:13px!important;padding:14px 12px!important;min-height:46px!important;background:#344d69!important;border:1px solid #526b88!important;color:white!important;border-radius:8px!important}.storeNav .choice{font-size:14px!important;padding:13px 12px!important;min-height:46px!important;background:#2b425f!important;margin:3px 0!important}.storeNav .choice.on{background:#506d8e!important}.side .item{font-size:12px!important}.side .item b{font-size:13px!important}.side .action{font-size:11px!important;min-height:35px!important;padding:8px!important}@media(min-width:901px){.wrap{padding-top:0!important}.side.card{min-height:calc(100vh - 76px)!important;max-height:calc(100vh - 76px)!important;top:0!important}.workMain{padding-top:18px!important}}@media(max-width:900px){.workspace{grid-template-columns:1fr!important}.side.card{width:100%!important;max-width:none!important;min-height:0!important;max-height:none!important}}
+ .scheduleView[hidden]{display:none!important}.scheduleView{min-height:480px;padding:24px!important}.scheduleHeader{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:18px;border-bottom:1px solid #dce3eb;margin-bottom:14px}.scheduleHeader h2{font-size:19px!important;margin:0!important}.scheduleHeader .action{margin:0!important;background:#233c59!important;color:#fff!important;border:0!important}.scheduleView .item{padding:17px 12px!important;border-bottom:1px solid #e2e7ed!important}.scheduleView .item b{font-size:15px!important}.scheduleView .action{margin-right:7px!important}.navPanel[hidden]{display:none!important}.navPanel{display:block!important}@media(max-width:900px){.scheduleView{padding:15px!important;min-height:300px}.scheduleHeader h2{font-size:16px!important}}
+ .notifyButton{background:#304c6c;border:1px solid #7790aa;color:#fff;border-radius:7px;padding:9px 12px;font-weight:700;cursor:pointer}.reminderCount{background:#c83939;color:#fff;border-radius:50%;min-width:22px;text-align:center;padding:4px}.reminderPanel{border-left:5px solid #bb893b!important;background:#fffaf0!important;margin-bottom:15px!important}.reminderPanel h2{font-size:17px;color:#8a4d1d}.reminderItem{padding:12px 0;border-top:1px solid #e6d5b5}.reminderItem strong{font-size:15px}.reminderItem p{margin:6px 0 0;font-size:12px}.reminderPanel[hidden]{display:none!important}@media(max-width:900px){.headerRight{display:flex!important}.headerRight>span:not(.reminderCount){display:none}.notifyButton{font-size:10px;padding:8px}}
+</style>
+<style id="storeTopGridFix">.workMain .storeTop .storeNav{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important;align-items:stretch!important}.workMain .storeTop .choice{width:100%!important;min-height:38px!important;height:38px!important;padding:6px 10px!important;margin:0!important;text-align:center!important;font-size:12px!important;line-height:1.2!important}.workMain .storeTop{padding:12px!important;margin-bottom:12px!important}.workMain .storeTop #allStoresChoice{display:block!important;margin:0!important;width:100%!important;background:#2b425f!important;color:white!important;border-radius:8px!important}.workMain .storeTop #allStoresChoice.on{background:#506d8e!important}@media(max-width:700px){.workMain .storeTop .storeNav{grid-template-columns:repeat(3,minmax(0,1fr))!important}}</style>
+<style id="futureSidebarListFix">.side #futurePanel{display:block;max-height:360px;overflow-y:auto;margin-top:8px;padding:0 2px}.side #futurePanel[hidden]{display:none}.side #futurePanel .item{background:#2b425f;color:#fff;border:1px solid #49617c;border-radius:8px;padding:10px 8px;margin:7px 0;font-size:11px;overflow-wrap:anywhere}.side #futurePanel .item b{color:#fff}.side #futurePanel .item .note{color:#c5d0df}.side #futurePanel .action{min-height:27px;padding:4px 6px;font-size:10px}</style>
+<style id="todayReminderBlink">#todayList .item.noticeBlink{animation:noticePulse 1s ease-in-out infinite!important;background:#a51d29!important;color:#fff!important;border-radius:8px;padding:9px!important;cursor:pointer}#todayList .item.noticeBlink .note{color:#fff!important}#todayList .item[data-interview-id]{cursor:default}</style>
+<style id="allStoresCalendarReadOnly">#days .day.allStoresReadOnly{cursor:default!important;pointer-events:none!important;opacity:1!important}#days .day.allStoresReadOnly:focus{outline:none!important}</style>
+<style id="interviewResponsiveDesktopLayout">
+@media(min-width:901px){
+.workMain .workLeft{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:14px!important;align-items:start!important}
+.workMain .workLeft>.storeTop{grid-column:1!important;grid-row:1!important;width:100%!important}
+.workMain .workLeft>.calendarCard{grid-column:1!important;grid-row:2!important;width:100%!important;max-width:none!important}
+.workMain .workLeft>.registrationStep[hidden]{display:none!important}
+.workMain .workLeft:has(>.calendarCard.compact){grid-template-columns:minmax(280px,34%) minmax(0,1fr)!important;column-gap:18px!important}
+.workMain .workLeft:has(>.calendarCard.compact)>.storeTop{grid-column:1!important;grid-row:1!important}
+.workMain .workLeft:has(>.calendarCard.compact)>.calendarCard{grid-column:1!important;grid-row:2!important;min-height:0!important}
+.workMain .workLeft:has(>.calendarCard.compact)>.registrationStep{grid-column:2!important;grid-row:1 / span 2!important;min-width:0!important;width:100%!important;align-self:start!important;padding:24px!important}
+.workMain .workLeft:has(>.calendarCard.compact) .calendarCard .day{min-height:42px!important;font-size:13px!important}
+.workMain .workLeft:has(>.calendarCard.compact) .registrationStep .times{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important;max-height:none!important;overflow:visible!important}
+.workMain .workLeft:has(>.calendarCard.compact) .registrationStep .time{width:100%!important;min-height:44px!important;text-align:center!important}
 }
-category.onchange=()=>{page=1;render()};document.getElementById('prev').onclick=()=>{page--;render()};document.getElementById('next').onclick=()=>{page++;render()};render();
+</style>
+<style id="lineInboxPreviewStyle">.lineInbox .lineLatestPreview{width:100%;display:block;text-align:left;border:0;border-radius:8px;background:#f3f6fa;color:#20364c;padding:11px 13px;cursor:pointer;font:inherit;margin-top:10px}.lineInbox .linePreviewText{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55}.lineInbox .lineLatestPreview small{display:block;margin-top:6px;color:#50647d}.lineInbox .lineAllHistory[hidden]{display:none!important}.lineInbox .lineAllHistory{padding-top:8px}</style>
+<style id="lineInboxRefine">.lineInboxTools{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin:12px 0 16px;padding:13px;background:#f0f4f9;border:1px solid #dce5ef;border-radius:9px}.lineInboxTools label{font-size:12px;font-weight:800;color:#233b57}.lineInboxTools input,.lineInboxTools select{font:inherit;font-size:14px;padding:10px 11px;border:1px solid #aebed0;border-radius:7px;background:#fff;color:#182b43;min-height:42px}.lineInboxTools input{flex:1 1 210px;min-width:130px}.lineInboxTools select{flex:0 1 185px}.lineInboxTools #lineInboxResultCount{font-size:12px;font-weight:700;color:#435c77}.lineInbox .lineMessage{background:#fff;border:1px solid #dce5ef!important;border-radius:10px;margin-bottom:11px;padding:14px!important;box-shadow:0 2px 7px rgba(25,44,67,.045)}.lineInbox .lineMessage[hidden]{display:none!important}.lineInbox .lineSender{display:flex;align-items:center;gap:11px;flex-wrap:wrap}.lineInbox .lineGroupedHistory summary{cursor:pointer;font-weight:700;padding:8px 0;color:#24527d}.lineInbox .lineGroupedEntry{padding:8px 11px;background:#f6f8fb;border-radius:7px;margin-top:7px}.lineInbox .lineCrossHistory{margin:10px 0;font-size:12px;color:#40556e}@media(max-width:650px){.lineInboxTools{align-items:stretch}.lineInboxTools input,.lineInboxTools select{flex:1 1 100%;width:100%}}</style>
+<style id="lineInboxStyle">.lineInbox[hidden]{display:none!important}.lineInbox .lineMessage{padding:13px 8px;border-bottom:1px solid #dbe2eb}.lineInbox .lineMessage strong{color:#172b43}.lineInbox .lineMessage small{color:#607084}.lineInbox .lineMessage p{white-space:pre-wrap;overflow-wrap:anywhere;margin:6px 0}.lineInbox #lineInboxAuth input{display:block;width:100%;max-width:350px;margin:9px 0;padding:11px;border:1px solid #ccd5e0;border-radius:7px}</style>
+<style id="lineStoreVisibilityFix">.lineInbox .lineStoreBadge{display:inline-block!important;font-size:13px!important;font-weight:800!important;line-height:1.35!important;padding:4px 9px!important;border-radius:6px!important;background:#e3eaf5!important;color:#142b4a!important;border:1px solid #9bb0cd!important;margin:3px 7px 3px 0!important;letter-spacing:.02em}.lineInbox .lineReceivedAt{display:inline-block!important;font-size:12px!important;color:#42536a!important;font-weight:600!important}.lineInbox .lineSender strong{font-size:15px!important}.lineInbox .lineGroupedCount{margin-left:auto;white-space:nowrap;font-size:12px;font-weight:700;color:#344a65;background:#e6edf5;padding:5px 8px;border-radius:8px}.lineInbox .lineGroupedHistory{margin:8px 0 0 52px}.lineInbox .lineGroupedHistory summary{cursor:pointer;font-size:12px;font-weight:700;color:#244d80;padding:8px 0}.lineInbox .lineGroupedEntry{margin:7px 0 0 52px}.lineInbox .lineGroupedHistory .lineGroupedEntry{margin-left:0;padding:8px 0;border-top:1px solid #dbe2eb}.lineInbox .lineGroupedEntry small{color:#607084}.lineInbox .lineGroupedEntry p{margin:4px 0 0}.lineInbox .lineSender{display:flex;align-items:center;gap:9px;flex-wrap:wrap}</style>
+<style id="lineHistoryLayout">.lineInbox .lineCrossHistory{margin:9px 0 6px 52px;padding:7px 10px;background:#f2f5f9;border-left:3px solid #5579a4;color:#25384e;font-size:12px;line-height:1.8}.lineInbox .lineCrossHistory b{font-weight:800;margin-right:6px}.lineInbox .lineMessage p{margin-left:52px!important;font-size:14px;line-height:1.65}.lineInbox .lineSender strong{font-size:15px}</style>
+<style id="lineStoreColors">.lineInbox .lineStoreBadge[data-store="rose"],.lineInbox .lineHistoryStore[data-store="rose"]{background:#f7e6eb!important;color:#872c48!important;border-color:#dca8b8!important}.lineInbox .lineStoreBadge[data-store="grandluxe"],.lineInbox .lineHistoryStore[data-store="grandluxe"]{background:#f7edcf!important;color:#79530c!important;border-color:#d5b667!important}.lineInbox .lineStoreBadge[data-store="luxy"],.lineInbox .lineHistoryStore[data-store="luxy"]{background:#ede5fc!important;color:#6137a3!important;border-color:#b9a2e5!important}.lineInbox .lineStoreBadge[data-store="unsecret"],.lineInbox .lineHistoryStore[data-store="unsecret"]{background:#e0f3ed!important;color:#126c57!important;border-color:#8fcdbb!important}.lineInbox .lineStoreBadge[data-store="us"],.lineInbox .lineHistoryStore[data-store="us"]{background:#e0f3ed!important;color:#126c57!important;border-color:#8fcdbb!important}.lineInbox .lineStoreBadge[data-store="busty"],.lineInbox .lineHistoryStore[data-store="busty"]{background:#ffeadf!important;color:#9a441b!important;border-color:#e4ad90!important}.lineInbox .lineHistoryStore{display:inline-block;padding:2px 6px;border:1px solid transparent;border-radius:4px;font-weight:700;margin:2px 0}</style>
+<style id="lineProfilesUI">.lineSender{display:flex;gap:10px;align-items:center}.lineSender>div{min-width:0}.lineSender small{display:block;color:#66758a;font-size:12px;margin-top:3px}.lineAvatar{width:42px;height:42px;flex:none;border-radius:50%;object-fit:cover;background:#e4edf5}.lineAvatar.empty{display:grid;place-items:center;font-size:10px;font-weight:bold;color:#456}.lineMessage{overflow-wrap:anywhere}</style>
+<style id="scheduleExclusiveDisplayFix">
+.workMain:has(#scheduleView:not([hidden]))>.workLeft{display:none!important}
+.workMain:has(#scheduleView:not([hidden]))>#lineInbox{display:none!important}
+.workMain:has(#scheduleView:not([hidden]))>#reminderPanel{display:none!important}
+.workMain:has(#scheduleView:not([hidden]))>.workRight{display:none!important}
+.workMain:has(#scheduleView:not([hidden]))>#scheduleView{display:block!important;width:100%!important}
+</style>
+<style id="pcNotificationPermissionVisibility">#enablePcAlerts[hidden]{display:none!important}</style>
+<style id="lineInboxExclusiveView">
+.workMain:has(#lineInbox:not([hidden]))>.workLeft,
+.workMain:has(#lineInbox:not([hidden]))>.workRight,
+.workMain:has(#lineInbox:not([hidden]))>#scheduleView,
+.workMain:has(#lineInbox:not([hidden]))>#reminderPanel{display:none!important}
+.workMain:has(#lineInbox:not([hidden]))>#lineInbox{display:block!important;width:100%!important}
+</style>
+<style id="strongLineNoticeBlink">
+#lineNoticeNav.noticeBlink{animation:lineAlertFlash .85s steps(1,end) infinite!important;background:#e02020!important;color:#fff!important;border:2px solid #ffdb57!important;box-shadow:0 0 0 3px rgba(255,55,55,.45),0 0 18px rgba(255,45,45,.8)!important;font-size:15px!important;font-weight:900!important;transform-origin:center}
+#lineNoticeNav.noticeBlink #lineNoticeCount{background:#fff!important;color:#b80000!important;border-radius:14px;padding:4px 10px;font-size:15px;font-weight:900}
+#lineNoticeNav.noticeBlink::before{content:"● 新着 ";font-weight:900}
+@keyframes lineAlertFlash{0%,49%{background:#e02020;filter:brightness(1.1);outline:3px solid #ffd94d}50%,100%{background:#243c59;filter:brightness(1);outline:0}}
+</style>
+<style id="lineNoticeClearAlert">
+#lineNoticeNav.noticeBlink{animation:lineNoticeBright 1s steps(1,end) infinite!important;font-size:15px!important;font-weight:900!important;border:3px solid #ffe15a!important;box-shadow:0 0 0 3px rgba(255,50,50,.5),0 0 18px rgba(255,45,45,.7)!important}
+#lineNoticeNav.noticeBlink::before{content:"● 新着 ";font-weight:900}
+#lineNoticeNav.noticeBlink #lineNoticeCount{display:inline-block;background:#fff!important;color:#b90000!important;border-radius:14px;padding:3px 8px}
+@keyframes lineNoticeBright{0%,49%{background:#ec1717!important;color:white!important;filter:brightness(1.2)}50%,100%{background:#701212!important;color:#fff!important;filter:brightness(.85)}}
+</style>
+<style>
+/* Interview action colors across today, future and schedule views */
+.side .action.action-confirm,.scheduleView .action.action-confirm{background:#0878dc!important;border-color:#0878dc!important;color:#fff!important}
+.side .action.action-change,.scheduleView .action.action-change{background:#f47b00!important;border-color:#f47b00!important;color:#fff!important}
+.side .action.action-cancel,.scheduleView .action.action-cancel{background:#e82c39!important;border-color:#e82c39!important;color:#fff!important}
+.side .action.action-confirm:active,.side .action.action-confirm.action-tapped,.scheduleView .action.action-confirm:active,.scheduleView .action.action-confirm.action-tapped{background:#06457d!important;border-color:#06457d!important}
+.side .action.action-change:active,.side .action.action-change.action-tapped,.scheduleView .action.action-change:active,.scheduleView .action.action-change.action-tapped{background:#a84b00!important;border-color:#a84b00!important}
+.side .action.action-cancel:active,.side .action.action-cancel.action-tapped,.scheduleView .action.action-cancel:active,.scheduleView .action.action-cancel.action-tapped{background:#941520!important;border-color:#941520!important}
+.action.action-tapped{box-shadow:inset 0 2px 5px rgba(0,0,0,.3)!important}
+</style>
+<style id="storePaletteAndOverview20261024">
+.workMain .storeTop .choice[data-shop=""]{background:#293e58!important;color:#fff!important;border:2px solid transparent!important}
+.workMain .storeTop .choice[data-shop="Grand Luxe"]{background:#9e3654!important;color:#fff!important;border:2px solid transparent!important}
+.workMain .storeTop .choice[data-shop="Un Secret"]{background:#277b70!important;color:#fff!important;border:2px solid transparent!important}
+.workMain .storeTop .choice[data-shop="LUXY"]{background:#a47732!important;color:#fff!important;border:2px solid transparent!important}
+.workMain .storeTop .choice[data-shop="薔薇と紳士"]{background:#76518a!important;color:#fff!important;border:2px solid transparent!important}
+.workMain .storeTop .choice[data-shop="BUSTY OSAKA"]{background:#c16a35!important;color:#fff!important;border:2px solid transparent!important}
+.workMain .storeTop .choice.on{outline:3px solid #172b43!important;outline-offset:2px!important;box-shadow:0 0 0 2px #fff inset!important}
+@media(min-width:901px){.workLeft:not(:has(.calendarCard.compact)){grid-template-columns:minmax(0,1fr)!important}.workLeft:not(:has(.calendarCard.compact)) .calendarCard{width:100%!important;max-width:none!important}.workLeft:not(:has(.calendarCard.compact)) .calendarCard .day{min-height:78px!important}}
+</style>
+<style id="allStoresFullWidthLayout">@media(min-width:901px){body[data-active-shop=""] .workMain .workLeft{grid-template-columns:minmax(0,1fr)!important}body[data-active-shop=""] .workMain .workLeft>.storeTop,body[data-active-shop=""] .workMain .workLeft>.calendarCard{grid-column:1 / -1!important;width:100%!important;max-width:none!important}body[data-active-shop=""] .workMain .workLeft>.registrationStep{display:none!important}}@media(max-width:900px){body[data-active-shop=""] .workMain .workLeft>.registrationStep{display:none!important}}</style>
+<style id="sidebarNoInnerScroll20261024">.side.card{height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important;overflow-y:visible!important;position:static!important;top:auto!important}.side #futurePanel,.side .navPanel{max-height:none!important;overflow:visible!important}.side .navSection:first-child{padding-top:12px!important}</style>
+<style id="sidebarTapTarget20261024">@media(min-width:901px){.workspace{grid-template-columns:310px minmax(0,1fr)!important}}.side #todayList .item{display:flex;flex-wrap:wrap;align-items:center;column-gap:9px;row-gap:0}.side #todayList .item>b,.side #todayList .item>.note,.side #todayList .item>br{flex-basis:100%}.side #todayList .action{flex:1 1 0;min-width:0;min-height:43px;margin-top:10px!important;padding:10px 5px!important;font-size:11px!important;white-space:nowrap;border-radius:8px!important}.side #todayList .action:focus-visible{outline:3px solid #fff;outline-offset:2px}@media(max-width:900px){.side #todayList .action{min-height:44px}}</style>
+<style id="todayButtonAlignment20261024">.side #todayList .item{padding:9px!important;border-radius:8px!important;box-sizing:border-box;width:100%;border-left:0!important;border-right:0!important}.side #todayList .item:not(.noticeBlink){background:transparent}.side #todayList .item>.action{margin-left:0!important;margin-right:0!important}.side #todayList .item>br{display:none}.side #todayList .item>.note{display:block;width:100%}</style>
+<style id="reminderSingleLine20261024">.reminderPanel{padding:13px 16px!important}.reminderSingleRow{display:flex;align-items:center;gap:14px;flex-wrap:nowrap;min-width:0}.reminderSingleRow h2{margin:0!important;font-size:14px!important;white-space:nowrap;flex:none}.reminderSingleRow .reminderMessage{font-size:12px;color:#77532b;white-space:nowrap}.reminderSingleRow #reminderItems{display:flex;flex-wrap:wrap;align-items:center;gap:8px;min-width:0}.reminderSingleRow .reminderItem{padding:5px 10px;border:1px solid #e1cba9;border-radius:6px;background:#fff;white-space:nowrap}.reminderSingleRow .reminderItem strong{font-size:12px}@media(max-width:900px){.reminderSingleRow{flex-wrap:wrap;gap:8px}.reminderSingleRow .reminderMessage{white-space:normal}.reminderSingleRow .reminderItem{white-space:normal}}</style>
+<style id="inlineBookingLayout">
+#bookingApplicantCard{border:1px solid #d6e1ed;border-radius:10px;padding:12px;margin-bottom:16px;background:#fff}
+#bookingApplicantCard[hidden]{display:none!important}
+#bookingApplicantCard .lineBookActions{display:none!important}
+#bookingApplicantCard .lineMessage{border:0!important;margin:0!important;padding:0!important}
+#bookingApplicantCard .lineAllHistory[hidden]{display:none!important}
+#bookingApplicantCard .lineLatestPreview{width:100%;text-align:left;border:0;background:#f2f5f9;border-radius:8px;padding:10px;cursor:pointer}
+#bookingApplicantCard .linePreviewText{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;white-space:pre-wrap}
+#bookingApplicantCard .lineAllHistory{max-height:300px;overflow:auto}
+#calendarCard.compact{max-width:none!important;margin:0!important}
+.workMain .workLeft:has(>.calendarCard.compact){display:grid!important;grid-template-columns:minmax(0,1fr) minmax(300px,0.9fr)!important;align-items:start;gap:14px}
+.workMain .workLeft:has(>.calendarCard.compact) .calendarCard{grid-column:1!important;grid-row:1!important;min-width:0!important;padding:14px!important}
+.workMain .workLeft:has(>.calendarCard.compact) .registrationStep{grid-column:2!important;grid-row:1!important;min-width:0!important;padding:14px!important}
+#registrationStep #staffChoices{display:none!important}
+#registrationStep #lineSelectedApplicant{display:none!important}
+#registrationStep #shopHint{font-size:13px}
+#registrationStep #save{margin-top:16px;width:100%}
+@media(max-width:700px){.workMain .workLeft:has(>.calendarCard.compact){grid-template-columns:minmax(0,1fr)!important}.workMain .workLeft:has(>.calendarCard.compact) .registrationStep{grid-column:1!important;grid-row:2!important}}
+</style>
+<style id="bookingVerticalStructure">
+.workMain .workLeft{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:14px!important}
+#bookingSharedHeader[hidden]{display:none!important}
+#bookingSharedHeader{grid-column:1!important;grid-row:1!important;min-width:0;width:100%;padding:18px!important;margin:0!important}
+#bookingSharedHeader #bookingApplicantCard{width:100%;margin:0!important}
+#calendarCard{grid-column:1!important;grid-row:2!important;min-width:0;width:100%;margin:0!important}
+#registrationStep{grid-column:1!important;grid-row:3!important;min-width:0;width:100%;margin:0!important}
+#bookingSubmitFooter{grid-column:1!important;grid-row:4!important;min-width:0;width:100%;margin:0!important}
+#bookingSubmitFooter[hidden]{display:none!important}
+#bookingSubmitFooter #save{display:block;width:100%;margin:0!important}
+#bookingSubmitFooter #msg{margin-top:10px}
+#calendarCard.compact{max-width:none!important}
+.workMain .workLeft:has(>.calendarCard.compact){display:grid!important;grid-template-columns:minmax(0,1fr) minmax(300px,0.9fr)!important;gap:14px!important}
+.workMain .workLeft:has(>.calendarCard.compact) #bookingSharedHeader{grid-column:1 / -1!important;grid-row:1!important}
+.workMain .workLeft:has(>.calendarCard.compact) #calendarCard{grid-column:1!important;grid-row:2!important}
+.workMain .workLeft:has(>.calendarCard.compact) #registrationStep{grid-column:2!important;grid-row:2!important}
+.workMain .workLeft:has(>.calendarCard.compact) #bookingSubmitFooter{grid-column:1 / -1!important;grid-row:3!important}
+#registrationStep>h2{display:none!important}
+#registrationStep #messageTemplateCard{margin-top:14px}
+@media(max-width:700px){.workMain .workLeft:has(>.calendarCard.compact){grid-template-columns:minmax(0,1fr)!important}.workMain .workLeft:has(>.calendarCard.compact) #bookingSharedHeader{grid-column:1!important;grid-row:1!important}.workMain .workLeft:has(>.calendarCard.compact) #calendarCard{grid-column:1!important;grid-row:2!important}.workMain .workLeft:has(>.calendarCard.compact) #registrationStep{grid-column:1!important;grid-row:3!important}.workMain .workLeft:has(>.calendarCard.compact) #bookingSubmitFooter{grid-column:1!important;grid-row:4!important}}
+</style>
+<style id="bookingApplicantClarity">
+#bookingApplicantCard .bookingApplicantIdentity{display:flex;align-items:center;gap:12px}
+#bookingApplicantCard .bookingApplicantIdentity .lineAvatar{width:52px;height:52px;flex:0 0 52px;border-radius:50%;object-fit:cover}
+#bookingApplicantCard .bookingApplicantIdentity strong{font-size:17px;display:block;color:#172b43}
+#bookingApplicantCard .bookingApplicantShop{font-size:13px;color:#5c6876;margin-top:4px}
+#bookingApplicantCard .bookingHistoryToggle{margin-top:13px;width:100%;padding:12px 14px;border:1px solid #cbd6e4;border-radius:8px;background:#f3f6fa;color:#183452;font-weight:700;text-align:left;cursor:pointer}
+#bookingApplicantCard .lineAllHistory{margin-top:8px;max-height:350px;overflow:auto;border:1px solid #dce3ec;border-radius:8px;padding:10px}
+#bookingApplicantCard .lineAllHistory[hidden]{display:none!important}
+</style>
+<style id="lineInboxSenderRefresh">#lineInboxMessages .lineSender{display:flex!important;align-items:center!important;gap:12px!important}#lineInboxMessages .lineSender .lineAvatar{width:52px!important;height:52px!important;min-width:52px!important;border-radius:50%!important;object-fit:cover!important}#lineInboxMessages .lineSender>div:nth-child(2){flex:1!important;min-width:0!important}#lineInboxMessages .lineSender strong{font-size:18px!important;display:block!important}#lineInboxMessages .lineReceivedAt,#lineInboxMessages .lineGroupedCount{display:none!important}#lineInboxMessages .lineSender .lineBookActions{display:flex!important;align-items:center!important;gap:8px!important;flex-shrink:0!important;margin:0!important}#lineInboxMessages .lineSender .lineBookButton{min-height:38px!important;padding:8px 14px!important;font-size:13px!important;font-weight:700!important}#lineInboxMessages .lineLinkedLabel{font-size:11px;color:#186b41;font-weight:700}@media(max-width:560px){#lineInboxMessages .lineSender{flex-wrap:wrap!important}#lineInboxMessages .lineSender .lineBookActions{margin-left:auto!important}}</style>
+<style id="lineBookingSwitchFix">body.lineBookingActive #lineInbox{display:none!important}body.lineBookingActive .workMain>.workLeft{display:grid!important}body.lineBookingActive #scheduleView{display:none!important}body.lineBookingActive #bookingSharedHeader:not([hidden]){display:block!important}</style>
+<style id="lineBookingDisplayPriority">body.lineBookingActive .workMain #lineInbox{display:none!important;visibility:hidden!important}body.lineBookingActive .workMain>.workLeft{display:grid!important;visibility:visible!important}body.lineBookingActive .workMain>#scheduleView{display:none!important}</style>
+<style id="interviewSidebarCards20261024">.side.card{background:#e9edf2!important;color:#22364b!important}.side .navSection{border-bottom:1px solid #cbd5e1!important;padding:13px 10px!important}.side .navSection h2{color:#22364b!important;border-color:#cbd5e1!important}.side #lineNoticeNav{background:#174d7b!important;color:#fff!important;border:1px solid #174d7b!important;width:100%;text-align:left;cursor:pointer}.side #lineNoticeNav:after{content:"開く ›";float:right}.side .interviewMiniCard{background:#fff!important;border:1px solid #cbd5e1!important;border-radius:10px;padding:11px!important;margin:8px 0;color:#22364b!important}.side .interviewMiniTop{display:flex;align-items:start;justify-content:space-between;gap:6px}.side .interviewMiniTop b{font-size:12px!important;color:#152d47!important}.side .interviewMiniShop{font-size:10px;font-weight:700;color:#526477;text-align:right}.side .interviewMiniPerson{display:flex;align-items:center;gap:9px;margin:10px 0}.side .interviewMiniAvatar{width:38px;height:38px;flex:0 0 38px;border-radius:50%;background:#dce6ea;color:#526a7a;display:grid;place-items:center;font-size:10px;overflow:hidden}.side .interviewMiniAvatar img{width:100%;height:100%;object-fit:cover}.side .interviewMiniIdentity{min-width:0;display:grid;gap:3px}.side .interviewMiniName{color:#22364b!important;font-size:12px;overflow-wrap:anywhere}.side .interviewMiniStaff{color:#64748b;font-size:11px}.side .interviewMiniActions{display:flex;gap:4px;flex-wrap:wrap}.side .interviewMiniActions .action{margin:0!important;min-height:32px!important;color:#fff!important;border:0!important;border-radius:6px}.side .interviewMiniActions .action-confirm{background:#1769b2!important}.side .interviewMiniActions .action-change{background:#e47a12!important}.side .interviewMiniActions .action-cancel{background:#d93648!important}.side #futurePanel{background:transparent!important;padding:0!important}.side .note{color:#526477!important}</style>
+<style id="interviewStoreNameColors">
+.interviewMiniShop[data-shop="Grand Luxe"]{color:#C69C45!important}
+.interviewMiniShop[data-shop="Un Secret"]{color:#9B72C7!important}
+.interviewMiniShop[data-shop="LUXY"]{color:#D96A96!important}
+.interviewMiniShop[data-shop="薔薇と紳士"]{color:#D65A5A!important}
+.interviewMiniShop[data-shop="BUSTY OSAKA"]{color:#299D9B!important}
+</style>
+<style id="sidebarUnifiedHeadingStyle">
+.side .navSection>h2,.side .navSection>.navBtn{box-sizing:border-box!important;display:flex!important;align-items:center!important;gap:4px!important;width:100%!important;min-height:40px!important;margin:4px 0 9px!important;padding:10px 12px!important;border:1px solid #3b6184!important;border-radius:7px!important;background:#1b507a!important;color:#fff!important;font-family:inherit!important;font-size:12px!important;font-weight:800!important;line-height:1.5!important;letter-spacing:0!important;text-align:left!important}
+.side .navSection>h2 span,.side .navSection>.navBtn span{font-size:inherit!important;font-weight:inherit!important;color:inherit!important}
+.side .navSection>.navBtn:hover{background:#214f74!important}
+</style>
+<style id="sidebarHeadingFinalOverride">
+.side .navSection #lineNoticeNav,.side .navSection>h2,.side .navSection #futureNav,.side .navSection #historyNav{box-sizing:border-box!important;display:flex!important;align-items:center!important;width:100%!important;min-height:40px!important;margin:4px 0 9px!important;padding:10px 12px!important;border:1px solid #3b6184!important;border-radius:7px!important;background:#1b507a!important;color:#fff!important;font-family:inherit!important;font-size:12px!important;font-weight:800!important;line-height:1.5!important;letter-spacing:0!important;text-align:left!important}
+.side .navSection #lineNoticeNav span,.side .navSection>h2 span,.side .navSection #futureNav span,.side .navSection #historyNav span{color:#fff!important;font-size:12px!important;font-weight:800!important}
+</style>
+<style id="panelVisibilityFix">#lineInbox[hidden],#scheduleView[hidden]{display:none!important}.workMain:has(#scheduleView:not([hidden]))>#scheduleView{display:block!important;width:100%!important}</style>
+<style id="lineInboxGuaranteedVisibility">body.lineInboxOpen .workMain>#lineInbox{display:block!important;visibility:visible!important;opacity:1!important;width:100%!important}body.lineInboxOpen .workMain>.workLeft,body.lineInboxOpen .workMain>#scheduleView,body.lineInboxOpen .workMain>.workRight{display:none!important}body:not(.lineInboxOpen) #lineInbox[hidden]{display:none!important}</style>
+<style id="lineRescheduleColor20261024">#lineInboxMessages .lineBookButton[data-interview-id]:not([data-interview-id=""]){background:#d97706!important;border-color:#b45309!important;color:#fff!important}#lineInboxMessages .lineLinkedLabel[disabled]{opacity:1!important}</style>
+<style id="softInterviewActionPalette20261024">
+/* Preserve blue/orange/red semantics with lower saturation and calmer surfaces. */
+.side .interviewMiniActions .action-confirm,
+.side .action.action-confirm,.scheduleView .action.action-confirm{background:#568DB9!important;border-color:#568DB9!important;color:#fff!important}
+.side .interviewMiniActions .action-change,
+.side .action.action-change,.scheduleView .action.action-change{background:#D99A54!important;border-color:#D99A54!important;color:#fff!important}
+.side .interviewMiniActions .action-cancel,
+.side .action.action-cancel,.scheduleView .action.action-cancel{background:#CD7580!important;border-color:#CD7580!important;color:#fff!important}
+.side .interviewMiniActions .action{border-radius:7px!important}
+</style>
+<style id="dailyDashboard20261025">
+@media(min-width:901px){.workspace{grid-template-columns:320px minmax(0,1fr)!important}.side.card{width:100%;min-width:0}.workMain{min-width:0}body.dashboardHome .workMain>.workLeft{display:none!important}body.dashboardHome #dailyDashboard{display:block!important}body.dashboardHome .side #todayList{display:none}body.dashboardHome .side .navSection:has(#todayList)>h2{font-size:14px}}
+#dailyDashboard[hidden]{display:none!important}#dailyDashboard{margin:0 0 16px}:is(#dailyDashboard,#interviewPersistentTop) .dailyGrid{width:100%;display:grid;grid-template-columns:76px repeat(28,minmax(0,1fr));gap:2px;align-items:stretch}:is(#dailyDashboard,#interviewPersistentTop) .dailyHead{font-size:10px;text-align:center;color:#53647a;white-space:nowrap;overflow:visible}:is(#dailyDashboard,#interviewPersistentTop) .dailyName{font-size:12px;font-weight:700;display:flex;align-items:center;white-space:nowrap}:is(#dailyDashboard,#interviewPersistentTop) .dailyCell{min-width:0;height:32px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border-radius:3px}:is(#dailyDashboard,#interviewPersistentTop) .dailyYes{background:#e4f1e6;color:#28643d}:is(#dailyDashboard,#interviewPersistentTop) .dailyNo{background:#f7e7e7;color:#a34a4a}:is(#dailyDashboard,#interviewPersistentTop) .dailyBusy{background:#e6dceb;color:#705080}:is(#dailyDashboard,#interviewPersistentTop) .dailyWait{background:#edf0f4;color:#7d8995}:is(#dailyDashboard,#interviewPersistentTop) .dailySection{margin-bottom:18px}:is(#dailyDashboard,#interviewPersistentTop) .dailyDateTitle{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}:is(#dailyDashboard,#interviewPersistentTop) .dailyAppointments{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}:is(#dailyDashboard,#interviewPersistentTop) .dailyLegend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:#53647a;margin:10px 0 14px}:is(#dailyDashboard,#interviewPersistentTop) .dailyNotice{font-size:12px;color:#69798a;margin-top:10px}:is(#dailyDashboard,#interviewPersistentTop) .dailyMonthNav{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}:is(#dailyDashboard,#interviewPersistentTop) .dailyMonthNav button{border:1px solid #d4dde6;border-radius:6px;background:white;cursor:pointer;padding:4px 10px}:is(#dailyDashboard,#interviewPersistentTop) .dailyCalendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}:is(#dailyDashboard,#interviewPersistentTop) .dailyCalendar button{height:34px;border:1px solid transparent;background:#f4f6f8;border-radius:6px;cursor:pointer;font-size:12px}:is(#dailyDashboard,#interviewPersistentTop) .dailyCalendar button.selected{background:#203c5e;color:white}:is(#dailyDashboard,#interviewPersistentTop) .dailyCalendar .weekday{text-align:center;font-size:11px;color:#64748b;padding:5px 0}#dailySidebarCalendar{margin-bottom:18px}@media(max-width:1200px){:is(#dailyDashboard,#interviewPersistentTop) .dailyGrid{grid-template-columns:64px repeat(28,minmax(0,1fr));gap:1px}:is(#dailyDashboard,#interviewPersistentTop) .dailyCell{font-size:10px;height:30px}:is(#dailyDashboard,#interviewPersistentTop) .dailyName{font-size:11px}:is(#dailyDashboard,#interviewPersistentTop) .dailyHead{font-size:9px}}@media(max-width:900px){:is(#dailyDashboard,#interviewPersistentTop) .dailyGrid{min-width:820px}:is(#dailyDashboard,#interviewPersistentTop) .dailyTableWrap{overflow:auto}}
+</style>
+<style id="dailyDashboardReadabilityFix20261025">
+@media(min-width:901px){
+.workspace{display:grid!important;grid-template-columns:300px minmax(0,1fr)!important;gap:18px!important;align-items:start!important}
+.workspace>.side.card{box-sizing:border-box!important;width:300px!important;min-width:300px!important;max-width:300px!important;padding:16px!important;margin:0!important;overflow:visible!important}
+.workspace>.workMain{min-width:0!important;width:100%!important}
+#dailySidebarCalendar{display:block!important;width:100%!important;min-width:0!important;padding:0 0 14px!important;border-bottom:1px solid #dce3eb}
+#dailySidebarCalendar .dailyMonthNav{display:flex!important;width:100%!important;align-items:center!important;justify-content:space-between!important;margin:12px 0!important}
+#dailySidebarCalendar .dailyCalendar{display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;gap:4px!important;width:100%!important;min-width:0!important}
+#dailySidebarCalendar .dailyCalendar button{width:100%!important;min-width:0!important;height:35px!important;font-size:13px!important;padding:0!important;border-radius:7px!important}
+#dailySidebarCalendar .dailyCalendar .weekday{font-size:12px!important}
+#dailyDashboard{padding:20px!important}
+:is(#dailyDashboard,#interviewPersistentTop) .dailyGrid{grid-template-columns:80px repeat(28,minmax(0,1fr))!important;gap:2px!important}
+:is(#dailyDashboard,#interviewPersistentTop) .dailyCell{font-size:13px!important;height:40px!important}
+:is(#dailyDashboard,#interviewPersistentTop) .dailyHead{font-size:10px!important}
+:is(#dailyDashboard,#interviewPersistentTop) .dailyName{font-size:13px!important}
+:is(#dailyDashboard,#interviewPersistentTop) .dailySection{margin-bottom:22px!important}
+:is(#dailyDashboard,#interviewPersistentTop) .dailyDateTitle h2{font-size:19px!important}
+:is(#dailyDashboard,#interviewPersistentTop) .dailyAppointments{min-height:48px}
+}
+@media(min-width:901px) and (max-width:1250px){.workspace{grid-template-columns:270px minmax(0,1fr)!important}.workspace>.side.card{width:270px!important;min-width:270px!important;max-width:270px!important}:is(#dailyDashboard,#interviewPersistentTop) .dailyGrid{grid-template-columns:65px repeat(28,minmax(0,1fr))!important;gap:1px!important}:is(#dailyDashboard,#interviewPersistentTop) .dailyCell{font-size:11px!important}}
+:is(#dailyDashboard,#interviewPersistentTop) .dailySection:first-child{border-bottom:1px solid #e1e6ed;padding-bottom:18px}
+:is(#dailyDashboard,#interviewPersistentTop) .dailyAppointments>.note{font-size:14px;padding:12px;background:#f5f7fa;border-radius:8px}
+</style>
+<style id="dailyCalendarDateStates20261025">
+#dailySidebarCalendar .dailyCalendar button.isToday:not(.selected){background:#fff0d7!important;color:#88500b!important;border:2px solid #d79b43!important;font-weight:800!important}
+#dailySidebarCalendar .dailyCalendar button.selected{background:#244e7a!important;color:#fff!important;border:2px solid #244e7a!important;font-weight:800!important;box-shadow:0 0 0 2px rgba(36,78,122,.16)!important}
+#dailySidebarCalendar .dailyCalendar button.selected.isToday{box-shadow:0 0 0 2px #e4a43b!important}
+</style>
+<style id="interviewHeaderSidebarRefresh20261025">
+.appHeader{min-height:76px!important;height:auto!important;padding:12px 24px!important;gap:18px!important}
+.appHeader .brand{flex-shrink:0!important}
+.appHeader .headerRight{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:10px!important;flex-wrap:wrap!important}
+.appHeader .headerNavButton,.appHeader #lineNoticeNav{appearance:none;display:inline-flex!important;align-items:center!important;justify-content:center!important;min-height:38px!important;padding:8px 16px!important;border:1px solid #7188a4!important;border-radius:8px!important;background:#263f5d!important;color:#fff!important;font-size:13px!important;font-weight:700!important;line-height:1.2!important;white-space:nowrap!important;cursor:pointer!important;margin:0!important;width:auto!important}
+.appHeader #headerTopNav{background:#fff!important;color:#183350!important;border-color:#fff!important}
+.appHeader #lineNoticeNav{background:#275d83!important;border-color:#5787a7!important}
+.appHeader #lineNoticeNav span{margin-left:5px;color:#fff!important}
+.appHeader .headerNavButton:hover,.appHeader #lineNoticeNav:hover{filter:brightness(1.12)}
+#dailySidebarCalendar h2{font-size:17px!important;margin:0 0 12px!important;color:#193653!important}
+.workspace>.side.card{background:#fff!important;border:1px solid #d8e0e9!important;border-radius:14px!important}
+.side .navSection{border-top:1px solid #e4e9ee!important;padding-top:12px!important;margin-top:12px!important}
+.side .navSection>h2,.side .navSection>.navBtn{font-size:13px!important;min-height:42px!important;padding:10px 12px!important;border-radius:8px!important}
+.side #todayList .item{font-size:12px!important}
+@media(max-width:900px){.appHeader{padding:12px 14px!important}.appHeader .headerRight{gap:6px!important}.appHeader .headerNavButton,.appHeader #lineNoticeNav{padding:7px 10px!important;font-size:12px!important}}
+</style>
+<style id="unifiedInterviewCards20261026">:is(#dailyDashboard,#interviewPersistentTop) .unifiedInterviewCard{border:1px solid #d9e2ed!important;border-left:4px solid #7792b0!important;border-radius:9px;padding:12px!important;background:#fff!important}:is(#dailyDashboard,#interviewPersistentTop) .unifiedInterviewHead{display:flex;align-items:center;gap:12px}:is(#dailyDashboard,#interviewPersistentTop) .unifiedInterviewAvatar{height:44px;width:44px;min-width:44px;border-radius:50%;background:#e6edf3;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:10px;color:#50677e;position:relative}:is(#dailyDashboard,#interviewPersistentTop) .unifiedInterviewAvatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}:is(#dailyDashboard,#interviewPersistentTop) .unifiedInterviewIdentity{min-width:0;overflow-wrap:anywhere}:is(#dailyDashboard,#interviewPersistentTop) .unifiedInterviewIdentity strong{font-size:14px}:is(#dailyDashboard,#interviewPersistentTop) .unifiedInterviewMeta{font-size:12px;color:#50647c;margin-top:4px}:is(#dailyDashboard,#interviewPersistentTop) .unifiedInterviewToggle{margin-top:10px;border:0;background:#f1f5f9;color:#204365;border-radius:6px;padding:7px 11px;cursor:pointer}:is(#dailyDashboard,#interviewPersistentTop) .unifiedInterviewActions[hidden]{display:none!important}:is(#dailyDashboard,#interviewPersistentTop) .unifiedInterviewActions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}:is(#dailyDashboard,#interviewPersistentTop) .unifiedInterviewActions .action{margin:0!important}</style>
+<style id="interviewGantt20261025">
+:is(#dailyDashboard,#interviewPersistentTop) .dailyGrid.dailyGantt{display:grid!important;grid-template-columns:82px minmax(0,1fr)!important;gap:8px 12px!important;width:100%!important;align-items:center!important}
+:is(#dailyDashboard,#interviewPersistentTop) .ganttAxis{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));width:100%;min-width:0}
+:is(#dailyDashboard,#interviewPersistentTop) .ganttAxis span{font-size:11px;font-weight:700;color:#607086;white-space:nowrap}
+:is(#dailyDashboard,#interviewPersistentTop) .ganttTrack{display:grid;grid-template-columns:repeat(28,minmax(0,1fr));gap:0;width:100%;height:40px;border-radius:7px;overflow:hidden;background:#e1e5e9;background-image:linear-gradient(to right,transparent calc(100% - 1px),rgba(255,255,255,.65) calc(100% - 1px));background-size:calc(100% / 14) 100%}
+:is(#dailyDashboard,#interviewPersistentTop) .ganttSegment{height:100%;min-width:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;border-right:1px solid rgba(255,255,255,.7)}
+:is(#dailyDashboard,#interviewPersistentTop) .gantt-yes{background:#b9dfc7;color:#225d38}
+:is(#dailyDashboard,#interviewPersistentTop) .gantt-no{background:#d9dde2;color:#687481}
+:is(#dailyDashboard,#interviewPersistentTop) .gantt-busy{background:#b7a3d6;color:#382453}
+:is(#dailyDashboard,#interviewPersistentTop) .gantt-wait{background:#edf0f3;color:#8c98a5}
+:is(#dailyDashboard,#interviewPersistentTop) .dailyLegend{gap:18px!important;font-size:13px!important}
+@media(max-width:1200px){:is(#dailyDashboard,#interviewPersistentTop) .dailyGrid.dailyGantt{grid-template-columns:66px minmax(0,1fr)!important;gap:7px 8px!important}:is(#dailyDashboard,#interviewPersistentTop) .ganttAxis span{font-size:9px}}
+@media(max-width:900px){:is(#dailyDashboard,#interviewPersistentTop) .dailyGrid.dailyGantt{min-width:0!important}:is(#dailyDashboard,#interviewPersistentTop) .ganttAxis span{font-size:9px}:is(#dailyDashboard,#interviewPersistentTop) .ganttTrack{height:34px}}
+</style>
+<style id="interviewGanttHourGuides20261025">
+:is(#dailyDashboard,#interviewPersistentTop) .ganttTrack{position:relative;isolation:isolate;background-image:none!important}
+:is(#dailyDashboard,#interviewPersistentTop) .ganttTrack::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background-image:repeating-linear-gradient(to right,transparent 0,transparent calc(100% / 14 - 1px),rgba(65,78,93,.46) calc(100% / 14 - 1px),rgba(65,78,93,.46) calc(100% / 14));}
+:is(#dailyDashboard,#interviewPersistentTop) .ganttSegment{position:relative;z-index:1;border-right:0!important}
+:is(#dailyDashboard,#interviewPersistentTop) .ganttAxis{position:relative}
+:is(#dailyDashboard,#interviewPersistentTop) .ganttAxis span{font-size:11px!important}
+</style>
+<style id="interviewGanttSoftDottedGuides20261025">
+/* 14 hourly boundaries, including the 24:00 end edge; soft blue dotted guides. */
+:is(#dailyDashboard,#interviewPersistentTop) .ganttTrack{position:relative!important;overflow:hidden!important;isolation:isolate!important}
+:is(#dailyDashboard,#interviewPersistentTop) .ganttTrack::after{content:""!important;position:absolute!important;inset:0!important;z-index:3!important;pointer-events:none!important;background-image:repeating-linear-gradient(to bottom,rgba(255,255,255,.85) 0 3px,transparent 3px 7px)!important;background-size:1px 7px!important;background-repeat:repeat-y!important;background-position:left top!important;opacity:0!important}
+:is(#dailyDashboard,#interviewPersistentTop) .ganttTrack::before{content:""!important;position:absolute!important;inset:0!important;z-index:3!important;pointer-events:none!important;background-image:repeating-linear-gradient(to bottom,rgba(255,255,255,.92) 0 3px,rgba(255,255,255,0) 3px 7px)!important;background-size:calc(100% / 14) 100%!important;mask-image:repeating-linear-gradient(to right,transparent 0,transparent calc(100% / 14 - 2px),#000 calc(100% / 14 - 2px),#000 calc(100% / 14))!important;-webkit-mask-image:repeating-linear-gradient(to right,transparent 0,transparent calc(100% / 14 - 2px),#000 calc(100% / 14 - 2px),#000 calc(100% / 14))!important}
+:is(#dailyDashboard,#interviewPersistentTop) .ganttSegment{border-right:0!important}
+</style>
+<style id="interviewFutureVisibilityFix20261025">
+.workMain:has(#scheduleView:not([hidden]))>#dailyDashboard{display:none!important}
+.workMain:has(#scheduleView:not([hidden]))>#lineInbox{display:none!important}
+.workMain:has(#scheduleView:not([hidden]))>#scheduleView{display:block!important;visibility:visible!important}
+#scheduleView[hidden]{display:none!important}
+</style>
+<style id="interviewUnifiedLayout20261025">
+@media(min-width:901px){
+ body.dashboardHome .workspace{display:grid!important;grid-template-columns:300px minmax(0,1fr)!important;grid-template-rows:auto 1fr!important;align-items:start!important}
+ body.dashboardHome .workspace>.side.card{display:contents!important}
+ body.dashboardHome #dailySidebarCalendar{grid-column:1!important;grid-row:1!important;position:sticky!important;top:0!important;z-index:35!important;background:#fff!important;border:1px solid #d8e0e9!important;border-radius:12px!important;padding:14px!important;box-shadow:0 3px 12px #172a4314!important}
+ body.dashboardHome .workspace>.workMain{display:contents!important}
+ body.dashboardHome #dailyDashboard{display:contents!important}
+ body.dashboardHome :is(#dailyDashboard,#interviewPersistentTop)>.dailyScheduleSection{grid-column:2!important;grid-row:1!important;position:sticky!important;top:0!important;z-index:35!important;background:#fff!important;border:1px solid #d8e0e9!important;border-radius:12px!important;padding:16px!important;margin:0!important;box-shadow:0 3px 12px #172a4314!important}
+ body.dashboardHome :is(#dailyDashboard,#interviewPersistentTop)>.dailyAppointmentSection{grid-column:2!important;grid-row:2!important;background:#fff!important;border:1px solid #d8e0e9!important;border-radius:12px!important;padding:18px!important}
+ body.dashboardHome .workspace>.side.card>.navSection{grid-column:1!important;grid-row:2!important;background:#fff!important;border:1px solid #d8e0e9!important;border-radius:12px!important;padding:12px!important;margin:0!important}
+ body.dashboardHome :is(#dailyDashboard,#interviewPersistentTop) .dailySection:first-child{border-bottom:0!important}
+ body.dashboardHome #dailySidebarCalendar{min-height:300px!important}
+ body.dashboardHome :is(#dailyDashboard,#interviewPersistentTop)>.dailyScheduleSection{min-height:300px!important}
+ body.dashboardHome :is(#dailyDashboard,#interviewPersistentTop) .ganttTrack{height:30px!important}
+ body.dashboardHome :is(#dailyDashboard,#interviewPersistentTop) .dailyLegend{margin:8px 0!important}
+ body.dashboardHome :is(#dailyDashboard,#interviewPersistentTop) .dailySection{margin-bottom:0!important}
+}
+#headerSettingsPanel:not([hidden]){position:absolute;right:16px;top:calc(100% - 4px);z-index:80;display:flex;flex-direction:column;gap:8px;background:#fff;border:1px solid #d8e0e9;border-radius:10px;padding:12px;box-shadow:0 8px 24px #0002}
+#headerSettingsPanel .notifyButton{color:#203c5e!important;background:#f4f6f9!important}
+.appHeader{position:relative}
+:is(#dailyDashboard,#interviewPersistentTop) .ganttClickable{cursor:pointer!important}
+:is(#dailyDashboard,#interviewPersistentTop) .ganttClickable:hover{filter:brightness(.91);outline:2px solid #274c75;outline-offset:-2px}
+:is(#dailyDashboard,#interviewPersistentTop) .ganttClickable:focus-visible{outline:3px solid #174e9c;outline-offset:-3px}
+@media(max-width:900px){#headerSettingsPanel:not([hidden]){top:100%}}
+</style>
+<style id="interviewHeaderEqualButtons20261025">
+.appHeader .headerRight>#headerTopNav,
+.appHeader .headerRight>#headerBookingNav,
+.appHeader .headerRight>#headerSettingsNav{
+ box-sizing:border-box!important;width:104px!important;min-width:104px!important;max-width:104px!important;
+ height:40px!important;min-height:40px!important;max-height:40px!important;
+ padding:0 10px!important;margin:0!important;display:inline-flex!important;
+ align-items:center!important;justify-content:center!important;
+ font-size:13px!important;line-height:1!important;font-weight:700!important;
+ border-radius:8px!important;white-space:nowrap!important;
+}
+@media(max-width:600px){
+ .appHeader .headerRight>#headerTopNav,
+ .appHeader .headerRight>#headerBookingNav,
+ .appHeader .headerRight>#headerSettingsNav{
+ width:78px!important;min-width:78px!important;max-width:78px!important;
+ height:38px!important;min-height:38px!important;max-height:38px!important;font-size:12px!important;
+ }
+}
+</style>
+<style id="interviewHeaderButtonSpacing20261025">
+.appHeader .headerRight{column-gap:8px!important;row-gap:8px!important}
+.appHeader .headerRight>#headerTopNav,
+.appHeader .headerRight>#headerBookingNav,
+.appHeader .headerRight>#headerSettingsNav{margin:0!important}
+.appHeader .headerRight>#headerLineNavSlot:empty{display:none!important}
+</style>
+<style id="interviewCalendarWeekendHoliday20261025">
+#dailySidebarCalendar .dailyCalendar button.weekendSat:not(.selected):not(.isToday){background:#e8f0fc!important;color:#416fa8!important}
+#dailySidebarCalendar .dailyCalendar button.weekendSunHoliday:not(.selected):not(.isToday){background:#fbe9ec!important;color:#b54d61!important}
+#dailySidebarCalendar .dailyCalendar .weekday:first-child{color:#b54d61!important}
+#dailySidebarCalendar .dailyCalendar .weekday:nth-child(7){color:#416fa8!important}
+</style>
+<style id="interviewGanttHalfHourMarks20261025">
+#dailyScheduleGrid .ganttSegment.gantt-yes{position:relative!important}
+#dailyScheduleGrid .ganttHalfHourMark{position:absolute;top:50%;transform:translate(-50%,-50%);pointer-events:none;color:#416c59;font-size:10px;font-weight:700;line-height:1;white-space:nowrap;user-select:none}
+</style>
+<style id="interviewSidebarCompleted20261025">
+.side .navSection{display:flex!important;flex-direction:column!important;gap:8px!important}
+.side .navSection>.navPanel{display:none!important}
+.side .navSection>.navBtn{display:flex!important;align-items:center!important;justify-content:space-between!important;text-align:left!important;width:100%!important;min-height:38px!important;padding:9px 11px!important}
+#interviewListFilters{display:flex;gap:8px;align-items:center;margin:12px 0 16px;flex-wrap:wrap}
+#interviewListFilters select{width:auto;max-width:100%;min-width:135px;padding:9px 10px;border:1px solid #c8d4e1;border-radius:8px;background:#fff;color:#203c5e;font-weight:700}
+#interviewListFilters .listTotal{margin-left:auto;font-size:12px;color:#53657a}
+</style>
+<style id="interviewGanttHalfHourButtons20261025">
+:is(#dailyDashboard,#interviewPersistentTop) .ganttTrack{display:grid!important;grid-template-columns:repeat(28,minmax(0,1fr))!important;gap:0!important}
+:is(#dailyDashboard,#interviewPersistentTop) .ganttTrack .ganttHalfSlot{min-width:0!important;width:100%!important;height:100%!important;box-sizing:border-box!important;margin:0!important;padding:0!important;border:0!important;border-right:1px dotted rgba(255,255,255,.9)!important;border-radius:0!important;appearance:none!important;font-size:10px!important;font-weight:700!important;position:relative!important;z-index:4!important;cursor:pointer}
+:is(#dailyDashboard,#interviewPersistentTop) .ganttTrack .ganttHalfSlot:nth-child(even){border-right:1px solid rgba(64,82,98,.38)!important}
+:is(#dailyDashboard,#interviewPersistentTop) .ganttTrack .ganttHalfSlot:disabled{cursor:default;opacity:1!important}
+:is(#dailyDashboard,#interviewPersistentTop) .ganttTrack .ganttHalfSlot.ganttClickable:hover,:is(#dailyDashboard,#interviewPersistentTop) .ganttTrack .ganttHalfSlot.ganttClickable:focus-visible{outline:2px solid #1d4ed8!important;outline-offset:-2px!important;filter:brightness(.93)}
+:is(#dailyDashboard,#interviewPersistentTop) .ganttTrack::before,:is(#dailyDashboard,#interviewPersistentTop) .ganttTrack::after{pointer-events:none!important}
+</style>
+<style id="interviewSidebarNavAlignment20261025">
+.side .navSection>.navBtn{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;text-align:left!important}
+.side .navSection>.navBtn>.sidebarNavTitle{flex:1 1 auto!important;min-width:0!important;text-align:left!important}
+.side .navSection>.navBtn>.sidebarNavRight{display:inline-flex!important;align-items:center!important;justify-content:flex-end!important;gap:5px!important;flex:0 0 auto!important;margin-left:auto!important;white-space:nowrap!important;font-variant-numeric:tabular-nums}
+.side .navSection>.navBtn .sidebarNavArrow{display:inline-block!important;width:12px!important;text-align:right!important}
+</style>
+<style id="interviewListCardsVisibility20261025">
+#scheduleView #scheduleViewContent>.item{display:block!important;visibility:visible!important;opacity:1!important;position:relative!important;height:auto!important;min-height:66px!important;padding:13px!important;margin:10px 0!important;border:1px solid #dce4ee!important;border-radius:9px!important;background:#fff!important;color:#1b2d45!important}
+#scheduleView #scheduleViewContent>.item b{display:block!important;color:#1b2d45!important}
+#scheduleView #scheduleViewContent>.item .note{color:#526176!important}
+</style>
+<style id="interviewGanttPastTime20261025">
+#dailyScheduleGrid .ganttSegment.gantt-past{background:#d7dce2!important;color:#87919d!important;border-color:#c8d0d9!important;cursor:not-allowed!important;opacity:1!important}
+#dailyScheduleGrid .ganttSegment.gantt-past:hover{outline:none!important;filter:none!important}
+</style>
+<style id="interviewCardReadability20261026">
+#dailyDashboard #dailyAppointmentItems{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important}
+:is(#dailyDashboard,#interviewPersistentTop) .unifiedInterviewCard,#scheduleView .unifiedSidebarCard{padding:19px 20px!important;min-height:145px!important}
+:is(#dailyDashboard,#interviewPersistentTop) .unifiedInterviewAvatar,#scheduleView .unifiedSidebarAvatar{width:64px!important;height:64px!important;min-width:64px!important;font-size:12px!important}
+:is(#dailyDashboard,#interviewPersistentTop) .unifiedInterviewIdentity strong,#scheduleView .unifiedSidebarInfo strong{font-size:19px!important;line-height:1.4!important;color:#152b44!important}
+:is(#dailyDashboard,#interviewPersistentTop) .interviewEmphasizedDate,#scheduleView .interviewEmphasizedDate{font-size:17px!important;font-weight:800!important;color:#173c62!important;letter-spacing:.02em;margin:6px 0!important}
+:is(#dailyDashboard,#interviewPersistentTop) .unifiedInterviewMeta,#scheduleView .unifiedSidebarMeta{font-size:13px!important;line-height:1.55!important}
+:is(#dailyDashboard,#interviewPersistentTop) .unifiedInterviewActions,#scheduleView .unifiedSidebarActions{display:flex!important;flex-wrap:wrap;gap:9px!important;margin-top:14px!important}
+:is(#dailyDashboard,#interviewPersistentTop) .unifiedInterviewActions .action,#scheduleView .unifiedSidebarActions .action{font-size:14px!important;font-weight:800!important;min-height:39px!important;padding:8px 16px!important}
+.interviewStoreBadge{display:inline-block;width:max-content;max-width:100%;border-radius:6px;padding:4px 10px;font-size:13px!important;font-weight:800!important;border:1px solid #b8c5d4;background:#ecf2f7;color:#25466d}
+.interviewStoreBadge[data-shop="Grand Luxe"]{background:#fff5d9;border-color:#d5bb75;color:#83611d}
+.interviewStoreBadge[data-shop="Un Secret"]{background:#f3ebff;border-color:#ac92ce;color:#7350a0}
+.interviewStoreBadge[data-shop="LUXY"]{background:#fff0f7;border-color:#dca2be;color:#ac416d}
+.interviewStoreBadge[data-shop="薔薇と紳士"]{background:#fff0f0;border-color:#d6a0a0;color:#a43e49}
+.interviewStoreBadge[data-shop="BUSTY OSAKA"]{background:#e7f8f5;border-color:#91c7bb;color:#23786d}
+@media(max-width:750px){#dailyDashboard #dailyAppointmentItems{grid-template-columns:minmax(0,1fr)!important}:is(#dailyDashboard,#interviewPersistentTop) .unifiedInterviewCard,#scheduleView .unifiedSidebarCard{padding:15px!important}}
+</style>
+<style id="lineRegisteredInterview20261026">#lineInboxMessages .lineRegisteredInterview{margin:9px 0 12px 52px;padding:11px 14px;border-radius:8px;background:#edf5fc;border:1px solid #b9cce0;display:grid;gap:5px;color:#21496f}#lineInboxMessages .lineRegisteredInterview strong{font-size:17px!important}#lineInboxMessages .lineRegisteredInterview span{font-size:13px;font-weight:700}@media(max-width:560px){#lineInboxMessages .lineRegisteredInterview{margin-left:0}}</style>
+<style id="lineInboxUniformRows20261026">
+#lineInboxMessages .lineMessage{box-sizing:border-box!important;width:100%!important;margin:0 0 12px!important;padding:12px 16px!important;border-radius:10px!important}
+#lineInboxMessages .lineNoticePrimary{display:grid!important;grid-template-columns:minmax(170px,210px) max-content minmax(100px,1fr) 146px;column-gap:16px;align-items:center;min-height:62px}
+#lineInboxMessages .lineNoticePerson{display:flex;align-items:center;gap:10px;min-width:0}
+#lineInboxMessages .lineNoticePerson .lineAvatar{height:50px!important;width:50px!important;min-width:50px!important;border-radius:50%!important;object-fit:cover}
+#lineInboxMessages .lineNoticeIdentity{display:flex;flex-direction:column;gap:5px;min-width:0}
+#lineInboxMessages .lineNoticeIdentity strong{font-size:16px!important;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#lineInboxMessages .lineNoticeIdentity .lineStoreBadge{font-size:11px!important;width:fit-content;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#lineInboxMessages .lineNoticeAppointment{display:flex;align-items:center;gap:16px;padding:10px 14px;background:#edf5fc;border:1px solid #c2d6e9;border-radius:8px;white-space:nowrap;min-height:42px;box-sizing:border-box}
+#lineInboxMessages .lineNoticeAppointment strong{font-size:17px!important;font-weight:800!important;color:#173c62}
+#lineInboxMessages .lineNoticeAppointment span{font-size:15px!important;font-weight:700!important;color:#334a63}
+#lineInboxMessages .lineNoticeRisk{min-width:0;display:flex;align-items:center;justify-content:center}
+#lineInboxMessages .lineRiskHistory{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;font-size:13px;font-weight:800;color:#9d3743}
+#lineInboxMessages .lineRiskHistory span{border:1px solid #e3b5bd;background:#fff3f4;border-radius:6px;padding:6px 9px;white-space:nowrap}
+#lineInboxMessages .lineBookActions{display:flex!important;justify-content:flex-end!important;align-items:center!important;margin:0!important}
+#lineInboxMessages .lineBookActions .lineBookButton,#lineInboxMessages .lineBookStatus{display:flex!important;align-items:center!important;justify-content:center!important;width:146px!important;min-width:146px!important;max-width:146px!important;height:44px!important;box-sizing:border-box!important;border-radius:8px!important;padding:0 6px!important;font-size:14px!important;font-weight:800!important;white-space:nowrap!important}
+#lineInboxMessages .lineBookStatus{background:#e7f4e9;color:#16753c;border:1px solid #8fcba0}
+#lineInboxMessages .lineLatestPreview{box-sizing:border-box!important;margin-top:9px!important;min-height:72px;max-height:72px;padding:10px 14px!important;display:flex!important;flex-direction:column!important;justify-content:center}
+#lineInboxMessages .lineLatestPreview .linePreviewText{font-size:14px!important;line-height:1.45!important;max-height:2.9em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+#lineInboxMessages .lineLatestPreview small{font-size:11px!important;margin-top:4px!important}
+#lineInboxMessages .lineInterviewHistory{margin:10px 0;padding:10px 13px;border:1px solid #e8c6c6;border-radius:8px;background:#fff7f7;color:#7a343b;font-size:13px}
+#lineInboxMessages .lineInterviewHistory div{margin-top:5px}
+#lineInboxMessages .lineAllHistory[hidden]{display:none!important}
+@media(max-width:1150px){#lineInboxMessages .lineNoticePrimary{grid-template-columns:minmax(135px,180px) minmax(260px,auto) minmax(100px,1fr) 130px;gap:10px}#lineInboxMessages .lineNoticeAppointment{gap:8px;padding:8px}#lineInboxMessages .lineNoticeAppointment strong{font-size:15px!important}#lineInboxMessages .lineNoticeAppointment span{font-size:13px!important}#lineInboxMessages .lineBookActions .lineBookButton,#lineInboxMessages .lineBookStatus{width:130px!important;min-width:130px!important;max-width:130px!important}}
+@media(max-width:850px){#lineInboxMessages .lineNoticePrimary{grid-template-columns:minmax(0,1fr) 140px;row-gap:10px}#lineInboxMessages .lineNoticeAppointment{grid-column:1;grid-row:2;width:max-content;max-width:100%;white-space:normal}#lineInboxMessages .lineNoticeRisk{grid-column:2;grid-row:2}#lineInboxMessages .lineBookActions{grid-column:2;grid-row:1}#lineInboxMessages .lineBookActions .lineBookButton,#lineInboxMessages .lineBookStatus{width:140px!important;min-width:140px!important;max-width:140px!important}}
+@media(max-width:480px){#lineInboxMessages .lineNoticePrimary{grid-template-columns:minmax(0,1fr) 120px}#lineInboxMessages .lineBookActions .lineBookButton,#lineInboxMessages .lineBookStatus{width:120px!important;min-width:120px!important;max-width:120px!important;font-size:12px!important}#lineInboxMessages .lineNoticeAppointment{flex-wrap:wrap;gap:3px}#lineInboxMessages .lineNoticeAppointment strong{font-size:14px!important}#lineInboxMessages .lineNoticeAppointment span{font-size:12px!important}}
+</style>
+<style id="sharedInterviewFourLists20261026">
+/* Shared card body: LINE inbox, future, pending, misconduct; TOP unaffected. */
+#lineInboxMessages .lineNoticePrimary{display:grid!important;grid-template-columns:minmax(155px,210px) minmax(0,1fr) max-content!important;gap:12px!important;align-items:center!important}
+#lineInboxMessages .lineNoticeSummary,#scheduleView .sharedInterviewSummary{display:flex!important;align-items:center!important;min-width:0;gap:12px!important;flex-wrap:wrap}
+.sharedInterviewAppointment{display:inline-flex;box-sizing:border-box;align-items:center;gap:14px;background:#edf5fc;border:1px solid #bed2e8;border-radius:7px;padding:9px 12px;min-width:310px;min-height:44px;white-space:nowrap}
+.sharedInterviewAppointment strong{font-size:16px!important;color:#173c62;font-weight:800}
+.sharedInterviewAppointment span{font-size:14px!important;font-weight:700;color:#334a63}
+.sharedInterviewRisk{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0}
+.sharedInterviewRiskTag{display:inline-flex;align-items:center;gap:6px;background:#fff3f4;border:1px solid #e3b5bd;color:#953741;border-radius:7px;padding:8px 10px;font-size:12px;font-weight:650;white-space:nowrap}
+.sharedInterviewRiskTag b{font-size:13px}
+.sharedInterviewButtons{display:flex!important;align-items:center!important;gap:6px!important;flex-wrap:nowrap!important;justify-content:flex-end!important;margin:0!important}
+.sharedInterviewButtons .action,#lineInboxMessages .sharedInterviewButtons .lineBookButton,#lineInboxMessages .sharedInterviewButtons .lineBookStatus{box-sizing:border-box!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;width:100px!important;min-width:100px!important;max-width:100px!important;height:42px!important;min-height:42px!important;padding:0 6px!important;margin:0!important;border-radius:7px!important;font-size:12px!important;font-weight:800!important;white-space:nowrap!important}
+.sharedInterviewButtons .action:disabled{background:#edf0f4!important;border:1px solid #d5dbe3!important;color:#8c99a9!important;opacity:1!important;cursor:not-allowed!important}
+#scheduleView .unifiedSidebarCard{display:grid!important;grid-template-columns:minmax(165px,210px) minmax(0,1fr);align-items:center;gap:14px;min-height:92px!important;padding:12px 14px!important}
+#scheduleView .unifiedSidebarTop{min-width:0}
+#scheduleView .sharedInterviewMain{display:flex;justify-content:space-between;align-items:center;gap:12px;min-width:0;flex-wrap:wrap}
+#scheduleView .sharedInterviewSummary{flex:1;min-width:310px}
+#scheduleView .unifiedSidebarInfo .interviewStoreBadge{margin-top:7px}
+#lineInboxMessages .lineLatestPreview{margin-top:10px!important}
+@media(max-width:1250px){#lineInboxMessages .lineNoticePrimary{grid-template-columns:minmax(140px,185px) minmax(0,1fr)!important}#lineInboxMessages .sharedInterviewButtons{grid-column:2;justify-content:flex-end!important}#lineInboxMessages .lineNoticeSummary{grid-column:2;grid-row:1}#scheduleView .unifiedSidebarCard{grid-template-columns:minmax(150px,180px) 1fr}.sharedInterviewAppointment{min-width:270px}}
+@media(max-width:750px){#lineInboxMessages .lineNoticePrimary,#scheduleView .unifiedSidebarCard{grid-template-columns:minmax(0,1fr)!important;gap:9px!important}#lineInboxMessages .lineNoticeSummary,#lineInboxMessages .sharedInterviewButtons{grid-column:1;grid-row:auto}.sharedInterviewAppointment{min-width:0;width:100%;white-space:normal}.sharedInterviewButtons{justify-content:flex-start!important;flex-wrap:wrap!important}#scheduleView .sharedInterviewSummary{min-width:0}}
+</style>
+<style id="sidebarLineNoticeBlink20261026">
+#sidebarLineNav.noticeBlink{animation:sidebarNewLineBlink 1s steps(1,end) infinite!important;border:2px solid #ffd85e!important;color:#fff!important;box-shadow:0 0 0 2px rgba(209,35,41,.32),0 0 11px rgba(209,35,41,.55)!important}
+#sidebarLineNav.noticeBlink #sidebarLineCount{font-weight:900!important;font-size:14px!important;color:#fff!important}
+@keyframes sidebarNewLineBlink{0%,49%{background:#b92035!important}50%,100%{background:#174d7b!important}}
+@media(prefers-reduced-motion:reduce){#sidebarLineNav.noticeBlink{animation:none!important;background:#b92035!important}}
+</style>
+<style id="interviewUnifiedInboxLayout20261026">
+#scheduleView .interviewUnifiedListCard{box-sizing:border-box!important;width:100%!important;margin:0 0 12px!important;padding:12px 16px!important;border:1px solid #dce5ef!important;border-radius:10px!important;background:#fff!important;box-shadow:0 2px 7px rgba(25,44,67,.045)}
+#scheduleView .interviewUnifiedListCard .lineNoticePrimary{display:grid!important;grid-template-columns:minmax(155px,210px) minmax(0,1fr) max-content!important;gap:12px!important;align-items:center!important;min-height:62px}
+#scheduleView .interviewUnifiedListCard .lineNoticePerson{display:flex;align-items:center;gap:10px;min-width:0}
+#scheduleView .interviewUnifiedListCard .lineAvatar{height:50px!important;width:50px!important;min-width:50px!important;border-radius:50%;object-fit:cover;background:#e5edf4;color:#6c7d8d;display:grid;place-items:center;font-size:11px;overflow:hidden}
+#scheduleView .interviewUnifiedListCard .lineNoticeIdentity{display:flex;flex-direction:column;align-items:flex-start;min-width:0;gap:5px}
+#scheduleView .interviewUnifiedListCard .lineNoticeIdentity strong{font-size:16px!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;color:#182f4c!important}
+#scheduleView .interviewUnifiedListCard .lineStoreBadge{display:inline-block;width:max-content;font-size:11px!important}
+#scheduleView .interviewUnifiedListCard .lineNoticeSummary{display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-width:0}
+#scheduleView .interviewUnifiedListCard .lineLatestPreview{box-sizing:border-box;width:100%;text-align:left;border:0;border-radius:8px;background:#f3f6fa;color:#20364c;padding:10px 14px;cursor:pointer;margin-top:9px;min-height:72px;max-height:72px;display:flex;flex-direction:column;justify-content:center;font:inherit}
+#scheduleView .interviewUnifiedListCard .lineLatestPreview:disabled{cursor:default;opacity:1}
+#scheduleView .interviewUnifiedListCard .linePreviewText{font-size:14px;line-height:1.45;max-height:2.9em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:pre-wrap;overflow-wrap:anywhere}
+#scheduleView .interviewUnifiedListCard .lineLatestPreview small{color:#50647d;margin-top:4px;font-size:11px}
+#scheduleView .interviewUnifiedListCard .lineAllHistory{margin-top:8px;border:1px solid #dce5ef;border-radius:8px;padding:10px}
+#scheduleView .interviewUnifiedListCard .lineAllHistory[hidden]{display:none!important}
+#scheduleView .interviewUnifiedListCard .lineGroupedEntry{padding:8px;border-bottom:1px solid #e6ebf1}
+#scheduleView .interviewUnifiedListCard .lineGroupedEntry p{margin:4px 0;white-space:pre-wrap}
+#scheduleView .interviewUnifiedListCard .sharedInterviewButtons{grid-column:3;grid-row:1}
+@media(max-width:1250px){#scheduleView .interviewUnifiedListCard .lineNoticePrimary{grid-template-columns:minmax(140px,185px) minmax(0,1fr)!important}#scheduleView .interviewUnifiedListCard .sharedInterviewButtons{grid-column:2;grid-row:2;justify-content:flex-end!important}}
+@media(max-width:750px){#scheduleView .interviewUnifiedListCard .lineNoticePrimary{grid-template-columns:minmax(0,1fr)!important;gap:9px!important}#scheduleView .interviewUnifiedListCard .sharedInterviewButtons{grid-column:1;grid-row:auto;justify-content:flex-start!important}}
+</style>
+<style id="interviewHistoryTypes20261026">
+.sharedInterviewRisk{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+.sharedHistoryDetail{position:relative;color:#903c4c;border:1px solid #e0a9b4;background:#fff3f5;border-radius:7px;font-size:12px;font-weight:800}
+.sharedHistoryDetail summary{list-style:none;cursor:pointer;padding:9px 11px;white-space:nowrap}
+.sharedHistoryDetail summary::-webkit-details-marker{display:none}
+.sharedHistoryDetail summary:after{content:" ▾";font-size:11px}
+.sharedHistoryDetail[open] summary:after{content:" ▴"}
+.sharedHistoryDetailItems{z-index:3;min-width:260px;max-width:min(80vw,460px);padding:8px 12px;background:#fff;border:1px solid #e0a9b4;border-radius:7px;box-shadow:0 5px 12px #0001;color:#633d45;line-height:1.7;font-size:12px;font-weight:600}
+.sharedHistoryDetailItems>div{padding:5px 0;border-bottom:1px solid #f1dfe4}
+.sharedHistoryDetailItems>div:last-child{border:0}
+</style>
+<style id="lineBookingTwoStageStyle20261026">
+body.lineBookingActive .workMain>.workLeft.lineBookingTwoStageActive{display:block!important;width:100%!important;max-width:none!important}
+body.lineBookingActive #lineBookingTwoStage{display:block!important}
+#lineBookingTwoStage[hidden]{display:none!important}
+body.lineBookingActive #bookingSharedHeader{display:none!important}
+body.lineBookingActive #lineBookingTwoStage .lineBookingTopGrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:stretch}
+body.lineBookingActive #lineBookingTwoStage .lineBookingBottomGrid{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);gap:14px;align-items:stretch;margin-top:14px}
+#lineBookingTwoStage #calendarCard,#lineBookingTwoStage #registrationStep{height:100%;box-sizing:border-box;margin:0!important;max-width:none!important;width:100%!important}
+#lineBookingTwoStage #calendarCard{display:flex;flex-direction:column;min-width:0}
+#lineBookingTwoStage #registrationStep{display:block!important;min-width:0}
+#lineBookingTwoStage #registrationStep #lineSelectedApplicant,#lineBookingTwoStage #registrationStep #shopHint,#lineBookingTwoStage #registrationStep #messageTemplateCard{display:none!important}
+#lineBookingTwoStage #registrationStep #times{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;max-height:460px;overflow-y:auto}
+#lineBookingTwoStage #registrationStep .time{width:100%;min-width:0;margin:0;font-size:13px}
+#lineBookingTwoStage #registrationStep .staffChoices{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 14px}
+#lineBookingTwoStage #registrationStep #picked{font-size:13px;margin:8px 0}
+#lineBookingTwoStage #registrationStep>h2{margin-bottom:12px}
+#lineBookingTwoStage #lineBookingApplicantPane,#lineBookingTwoStage #lineBookingConfirmPane{margin:0!important;min-width:0}
+#lineBookingTwoStage #bookingApplicantCard{border:none;padding:0!important;margin:12px 0 0!important}
+#lineBookingTwoStage .bookingHistoryToggle{width:100%;text-align:left}
+#lineBookingTwoStage #bookingSubmitFooter{display:block!important;margin:14px 0 0!important;padding:0!important;border:0!important;box-shadow:none!important}
+#lineBookingTwoStage #save{width:100%;min-height:48px}
+#lineBookingTwoStage #save:disabled{background:#d6dde6!important;color:#7a8795!important;cursor:not-allowed!important;opacity:1!important}
+#lineBookingTwoStage .lineBookingSummaryRow{display:grid;grid-template-columns:minmax(100px,38%) minmax(0,1fr);gap:10px;align-items:center;padding:13px 0;border-bottom:1px solid #e3e9f0}
+#lineBookingTwoStage .lineBookingSummaryRow>span{font-size:13px;color:#5b6980;font-weight:700}
+#lineBookingTwoStage .lineBookingSummaryRow strong{color:#163451;font-size:16px;overflow-wrap:anywhere}
+#lineBookingTwoStage .lineBookingConfirmIdentity{display:flex;align-items:center;gap:9px;min-width:0}
+#lineBookingTwoStage .lineBookingConfirmIdentity img{width:35px;height:35px;object-fit:cover;border-radius:50%;flex-shrink:0}
+@media(max-width:850px){body.lineBookingActive #lineBookingTwoStage .lineBookingTopGrid,body.lineBookingActive #lineBookingTwoStage .lineBookingBottomGrid{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:480px){#lineBookingTwoStage #registrationStep #times{grid-template-columns:repeat(3,minmax(0,1fr))}}
+</style>
+<style id="lineInboxPlacementFix20261026">
+/* LINE inbox must be the right workspace column, never a dashboard grid auto-item. */
+body.lineInboxOpen .workspace{display:grid!important;grid-template-columns:300px minmax(0,1fr)!important;grid-template-rows:auto!important;align-items:start!important}
+body.lineInboxOpen .workspace>.side.card{display:contents!important}
+body.lineInboxOpen .workspace>.workMain{display:block!important;grid-column:2!important;grid-row:1 / span 2!important;min-width:0!important;width:100%!important}
+body.lineInboxOpen .workMain>#lineInbox{display:block!important;width:100%!important;max-width:none!important;min-width:0!important;grid-column:auto!important;grid-row:auto!important}
+body.lineInboxOpen .workMain>.workLeft,body.lineInboxOpen #dailyDashboard,body.lineInboxOpen #scheduleView,body.lineInboxOpen .workMain>.workRight{display:none!important}
+@media(max-width:900px){body.lineInboxOpen .workspace{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto auto!important}body.lineInboxOpen .workspace>.side.card{display:block!important;grid-column:1!important;grid-row:1!important}body.lineInboxOpen .workspace>.workMain{grid-column:1!important;grid-row:2!important}}
+</style>
+<style id="lineBookingSidebarGanttOnly20261026">
+body.lineBookingActive #bookingSharedHeader,body.lineBookingActive #bookingPageTitle{display:none!important}
+body.lineBookingActive #calendarCard,body.lineBookingActive #registrationStep{display:none!important}
+body.lineBookingActive #lineBookingTwoStage .lineBookingTopGrid{display:block!important}
+body.lineBookingActive #lineBookingTwoStage #lineBookingGanttMount>.dailyScheduleSection{display:block!important;visibility:visible!important;width:100%!important;max-width:none!important;grid-column:auto!important;grid-row:auto!important;position:static!important;margin:0!important;min-height:0!important;background:#fff!important;border:1px solid #d8e0e9!important;border-radius:12px!important;padding:14px!important}
+body.lineBookingActive #lineBookingTwoStage #lineBookingGanttMount .dailyGantt{width:100%!important;min-width:0}
+body.lineBookingActive #lineBookingTwoStage #lineBookingGanttMount .ganttTrack{display:grid!important;grid-template-columns:repeat(28,minmax(0,1fr))!important}
+body.lineBookingActive #lineBookingTwoStage #lineBookingGanttMount .ganttHalfSlot{min-width:0!important;max-width:none!important}
+body.lineBookingActive #lineBookingTwoStage .lineBookingBottomGrid{margin-top:14px!important}
+</style>
+<style id="lineSidebarNavigationAlwaysVisible20261026">
+@media(min-width:901px){
+body.lineInboxOpen .workspace{grid-template-rows:300px auto!important}
+body.lineInboxOpen .workspace>.side.card{display:contents!important}
+body.lineInboxOpen .workspace #dailySidebarCalendar{grid-column:1!important;grid-row:1!important}
+body.lineInboxOpen .workspace>.side.card>.navSection{display:flex!important;flex-direction:column!important;grid-column:1!important;grid-row:2!important;align-self:start!important;visibility:visible!important;opacity:1!important}
+body.lineInboxOpen .workspace>.workMain{grid-column:2!important;grid-row:1 / span 2!important}
+}
+</style>
+<style id="strictInterviewViewIsolation20261026">
+/* Only one workspace view may be laid out. The TOP dashboard must never expose registration. */
+body.dashboardHome .workMain>.workLeft,
+body.dashboardHome .workMain>.workRight,
+body.dashboardHome #bookingSharedHeader,
+body.dashboardHome #bookingSubmitFooter,
+body.dashboardHome #calendarCard,
+body.dashboardHome #registrationStep,
+body.dashboardHome #lineBookingTwoStage,
+body.dashboardHome #scheduleView,
+body.dashboardHome #lineInbox{display:none!important}
+body.dashboardHome #dailyDashboard{display:contents!important}
+body.lineInboxOpen .workMain>.workLeft,
+body.lineInboxOpen #bookingSharedHeader,
+body.lineInboxOpen #bookingSubmitFooter,
+body.lineInboxOpen #calendarCard,
+body.lineInboxOpen #registrationStep,
+body.lineInboxOpen #lineBookingTwoStage,
+body.lineInboxOpen #dailyDashboard,
+body.lineInboxOpen #scheduleView{display:none!important}
+body.lineInboxOpen #lineInbox{display:block!important}
+body.lineBookingActive .workMain>#dailyDashboard,
+body.lineBookingActive .workMain>#lineInbox,
+body.lineBookingActive .workMain>#scheduleView{display:none!important}
+body.lineBookingActive .workMain>.workLeft{display:block!important}
+body.lineBookingActive #lineBookingTwoStage{display:block!important}
+body.lineBookingActive #bookingSharedHeader,
+body.lineBookingActive #calendarCard,
+body.lineBookingActive #registrationStep{display:none!important}
+body:not(.lineBookingActive) #lineBookingTwoStage{display:none!important}
+body:not(.dashboardHome):not(.lineInboxOpen):not(.lineBookingActive) .workMain>#dailyDashboard,
+body:not(.dashboardHome):not(.lineInboxOpen):not(.lineBookingActive) .workMain>#lineInbox{display:none!important}
+</style>
+<style id="interviewFivePerPageAndScroll20261026">
+.interviewPager{display:flex;align-items:center;justify-content:center;gap:12px;padding:13px 5px 5px;font-size:13px;color:#314964;font-weight:800}
+.interviewPager button{min-width:75px;min-height:35px;border:1px solid #b8cce2;border-radius:7px;background:#fff;color:#204365;font-weight:800;cursor:pointer}
+.interviewPager button:disabled{color:#9cabba;background:#eff2f5;cursor:default}
+@media(min-width:901px){
+ body .workspace #dailySidebarCalendar{overflow:visible!important;border-radius:12px!important;box-shadow:0 2px 8px #172a4314!important;padding-bottom:16px!important}
+ body .workspace>.side.card>.navSection{position:sticky!important;top:318px!important;z-index:12!important}
+ body .workspace #dailySidebarCalendar{position:sticky!important;top:0!important;z-index:13!important}
+ body.lineInboxOpen #lineInbox,body:not(.dashboardHome):not(.lineBookingActive) #scheduleView{max-height:calc(100dvh - 170px)!important;overflow-y:auto!important;overscroll-behavior:contain}
+ body.lineInboxOpen .workspace .workMain,body:not(.dashboardHome):not(.lineBookingActive) .workspace .workMain{min-height:0!important}
+}
+</style>
+<style id="interviewPagersInHeaders20261026">
+#lineInbox>.scheduleHeader,#scheduleView>.scheduleHeader{display:flex!important;align-items:center!important;justify-content:space-between!important;flex-wrap:wrap!important;gap:10px!important}
+#lineInbox>.scheduleHeader h2,#scheduleView>.scheduleHeader h2{margin:0!important;flex:1 1 auto!important;min-width:0!important}
+#lineInbox>.scheduleHeader .interviewPager,#scheduleView>.scheduleHeader .interviewPager{display:flex!important;flex:0 0 auto!important;align-items:center!important;justify-content:flex-end!important;margin-left:auto!important;padding:0!important;gap:8px!important}
+#lineInbox>.scheduleHeader .interviewPager[hidden],#scheduleView>.scheduleHeader .interviewPager[hidden]{display:none!important}
+#lineInbox>.scheduleHeader .interviewPager button,#scheduleView>.scheduleHeader .interviewPager button{min-height:34px!important}
+@media(min-width:901px){#lineInbox>.scheduleHeader,#scheduleView>.scheduleHeader{position:sticky!important;top:0!important;z-index:20!important;background:#fff!important;padding:4px 0 12px!important;border-bottom:1px solid #dce4ef!important}}
+@media(max-width:650px){#lineInbox>.scheduleHeader .interviewPager,#scheduleView>.scheduleHeader .interviewPager{width:100%;justify-content:flex-end!important}}
+</style>
+<style id="lineBookingGanttRestoredStyles20261026">
+/* interviewGantt20261025 */
+
+#lineBookingGanttMount .dailyGrid.dailyGantt{display:grid!important;grid-template-columns:82px minmax(0,1fr)!important;gap:8px 12px!important;width:100%!important;align-items:center!important}
+#lineBookingGanttMount .ganttAxis{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));width:100%;min-width:0}
+#lineBookingGanttMount .ganttAxis span{font-size:11px;font-weight:700;color:#607086;white-space:nowrap}
+#lineBookingGanttMount .ganttTrack{display:grid;grid-template-columns:repeat(28,minmax(0,1fr));gap:0;width:100%;height:40px;border-radius:7px;overflow:hidden;background:#e1e5e9;background-image:linear-gradient(to right,transparent calc(100% - 1px),rgba(255,255,255,.65) calc(100% - 1px));background-size:calc(100% / 14) 100%}
+#lineBookingGanttMount .ganttSegment{height:100%;min-width:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;border-right:1px solid rgba(255,255,255,.7)}
+#lineBookingGanttMount .gantt-yes{background:#b9dfc7;color:#225d38}
+#lineBookingGanttMount .gantt-no{background:#d9dde2;color:#687481}
+#lineBookingGanttMount .gantt-busy{background:#b7a3d6;color:#382453}
+#lineBookingGanttMount .gantt-wait{background:#edf0f3;color:#8c98a5}
+#lineBookingGanttMount .dailyLegend{gap:18px!important;font-size:13px!important}
+@media(max-width:1200px){#lineBookingGanttMount .dailyGrid.dailyGantt{grid-template-columns:66px minmax(0,1fr)!important;gap:7px 8px!important}#lineBookingGanttMount .ganttAxis span{font-size:9px}}
+@media(max-width:900px){#lineBookingGanttMount .dailyGrid.dailyGantt{min-width:0!important}#lineBookingGanttMount .ganttAxis span{font-size:9px}#lineBookingGanttMount .ganttTrack{height:34px}}
+
+/* interviewGanttHourGuides20261025 */
+
+#lineBookingGanttMount .ganttTrack{position:relative;isolation:isolate;background-image:none!important}
+#lineBookingGanttMount .ganttTrack::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background-image:repeating-linear-gradient(to right,transparent 0,transparent calc(100% / 14 - 1px),rgba(65,78,93,.46) calc(100% / 14 - 1px),rgba(65,78,93,.46) calc(100% / 14));}
+#lineBookingGanttMount .ganttSegment{position:relative;z-index:1;border-right:0!important}
+#lineBookingGanttMount .ganttAxis{position:relative}
+#lineBookingGanttMount .ganttAxis span{font-size:11px!important}
+
+/* interviewGanttSoftDottedGuides20261025 */
+
+/* 14 hourly boundaries, including the 24:00 end edge; soft blue dotted guides. */
+#lineBookingGanttMount .ganttTrack{position:relative!important;overflow:hidden!important;isolation:isolate!important}
+#lineBookingGanttMount .ganttTrack::after{content:""!important;position:absolute!important;inset:0!important;z-index:3!important;pointer-events:none!important;background-image:repeating-linear-gradient(to bottom,rgba(255,255,255,.85) 0 3px,transparent 3px 7px)!important;background-size:1px 7px!important;background-repeat:repeat-y!important;background-position:left top!important;opacity:0!important}
+#lineBookingGanttMount .ganttTrack::before{content:""!important;position:absolute!important;inset:0!important;z-index:3!important;pointer-events:none!important;background-image:repeating-linear-gradient(to bottom,rgba(255,255,255,.92) 0 3px,rgba(255,255,255,0) 3px 7px)!important;background-size:calc(100% / 14) 100%!important;mask-image:repeating-linear-gradient(to right,transparent 0,transparent calc(100% / 14 - 2px),#000 calc(100% / 14 - 2px),#000 calc(100% / 14))!important;-webkit-mask-image:repeating-linear-gradient(to right,transparent 0,transparent calc(100% / 14 - 2px),#000 calc(100% / 14 - 2px),#000 calc(100% / 14))!important}
+#lineBookingGanttMount .ganttSegment{border-right:0!important}
+
+/* interviewGanttHalfHourButtons20261025 */
+
+#lineBookingGanttMount .ganttTrack{display:grid!important;grid-template-columns:repeat(28,minmax(0,1fr))!important;gap:0!important}
+#lineBookingGanttMount .ganttTrack .ganttHalfSlot{min-width:0!important;width:100%!important;height:100%!important;box-sizing:border-box!important;margin:0!important;padding:0!important;border:0!important;border-right:1px dotted rgba(255,255,255,.9)!important;border-radius:0!important;appearance:none!important;font-size:10px!important;font-weight:700!important;position:relative!important;z-index:4!important;cursor:pointer}
+#lineBookingGanttMount .ganttTrack .ganttHalfSlot:nth-child(even){border-right:1px solid rgba(64,82,98,.38)!important}
+#lineBookingGanttMount .ganttTrack .ganttHalfSlot:disabled{cursor:default;opacity:1!important}
+#lineBookingGanttMount .ganttTrack .ganttHalfSlot.ganttClickable:hover,#lineBookingGanttMount .ganttTrack .ganttHalfSlot.ganttClickable:focus-visible{outline:2px solid #1d4ed8!important;outline-offset:-2px!important;filter:brightness(.93)}
+#lineBookingGanttMount .ganttTrack::before,#lineBookingGanttMount .ganttTrack::after{pointer-events:none!important}
+
+/* Copied TOP gantt styling remains valid when mounted in LINE booking. */
+body.lineBookingActive #lineBookingGanttMount .dailyScheduleSection{width:100%!important;min-width:0!important}
+body.lineBookingActive #lineBookingGanttMount .dailyTableWrap{width:100%!important;min-width:0!important;overflow-x:auto!important}
+body.lineBookingActive #lineBookingGanttMount #dailyScheduleGrid.dailyGrid.dailyGantt{display:grid!important;grid-template-columns:82px minmax(0,1fr)!important;gap:8px 12px!important;width:100%!important;align-items:center!important}
+body.lineBookingActive #lineBookingGanttMount .ganttTrack{height:34px!important;border-radius:7px!important;overflow:hidden!important}
+body.lineBookingActive #lineBookingGanttMount .ganttHalfSlot{width:100%!important;height:100%!important;border:0!important;border-right:1px dotted rgba(255,255,255,.9)!important;border-radius:0!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;margin:0!important}
+body.lineBookingActive #lineBookingGanttMount .dailyName{font-weight:700!important;font-size:12px!important;display:flex!important;align-items:center!important}
+@media(max-width:1000px){body.lineBookingActive #lineBookingGanttMount #dailyScheduleGrid.dailyGrid.dailyGantt{min-width:740px!important}}
+</style>
+<style id="lineBookingApplicantAlwaysOpen20261026">
+/* The shared header had a more specific rule forcing a blank card above the Gantt. */
+body.lineBookingActive .workMain .workLeft > #bookingSharedHeader,
+body.lineBookingActive .workMain .workLeft > #bookingSharedHeader:not([hidden]){
+ display:none!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important
+}
+body.lineBookingActive .workMain .workLeft > #lineBookingTwoStage{margin-top:0!important;padding-top:0!important}
+body.lineBookingActive #lineBookingApplicantPane .bookingHistoryToggle{display:none!important}
+body.lineBookingActive #lineBookingApplicantPane #bookingApplicantCard .lineAllHistory,
+body.lineBookingActive #lineBookingApplicantPane #bookingApplicantCard .lineAllHistory[hidden]{
+ display:block!important;visibility:visible!important;max-height:390px!important;overflow-y:auto!important;overscroll-behavior:contain
+}
+</style>
+<style>
+/* Confirmation LINE reminders appear inside the matching appointment card, not below the dashboard. */
+#reminderPanel{display:none!important}
+#dailyAppointmentItems .interviewInlineReminder{display:flex;flex-direction:column;align-items:flex-start;gap:5px;width:100%;text-align:left;margin:10px 0 8px;padding:10px 12px;border:1px solid #d9a95b;border-left:4px solid #bf7f22;border-radius:8px;background:#fff7e9;color:#714511;cursor:pointer;font:inherit}
+#dailyAppointmentItems .interviewInlineReminderTitle{font-size:12px;font-weight:800}
+#dailyAppointmentItems .interviewInlineReminderDescription{font-size:11px;color:#845b24}
+#dailyAppointmentItems .interviewInlineReminder:focus-visible{outline:3px solid #c58b30;outline-offset:2px}
+#dailyAppointmentItems .interviewInlineReminderSent{background:#E3EFFD;color:#285A91;border-color:#8CB1DC;border-left-color:#4F81BD;cursor:default}
+/* Daily interview status palette: pending / LINE sent / confirmed. */
+#dailyAppointmentItems .unifiedInterviewCard.interviewStatePending{border:1px solid #D89A2B!important;border-left:4px solid #D89A2B!important;background:#FFF6E5!important}
+#dailyAppointmentItems .unifiedInterviewCard.interviewStateLineSent{border:1px solid #4F81BD!important;border-left:4px solid #4F81BD!important;background:#EEF5FF!important}
+#dailyAppointmentItems .unifiedInterviewCard.interviewStateConfirmed{border:1px solid #5E9B6B!important;border-left:4px solid #5E9B6B!important;background:#EEF8F0!important}
+/* Keep the alert in the unused area to the right of each applicant's details. */
+:is(#dailyDashboard,#interviewPersistentTop) .unifiedInterviewHead{display:flex;align-items:center;flex-wrap:wrap}
+#dailyAppointmentItems .unifiedInterviewHead .unifiedInterviewIdentity{flex:0 1 auto}
+#dailyAppointmentItems .unifiedInterviewHead .interviewInlineReminder{width:auto;max-width:min(320px,55%);min-width:200px;margin:0 0 0 auto;flex:0 1 auto}
+@media(max-width:520px){#dailyAppointmentItems .unifiedInterviewHead .interviewInlineReminder{max-width:100%;width:100%;margin:8px 0 0 0}}
+
+</style>
+<style id="interviewListHeaderStoreNoScroll20261026">
+/* Keep list tools and pagination on the single top line. */
+#lineInbox>.scheduleHeader,#scheduleView>.scheduleHeader{
+ display:flex!important;align-items:center!important;flex-wrap:nowrap!important;
+ column-gap:12px!important;min-height:48px!important
+}
+#lineInbox>.scheduleHeader h2,#scheduleView>.scheduleHeader h2{flex:1 1 auto!important;min-width:0!important}
+#lineInbox>.scheduleHeader #lineInboxStore,#scheduleView>.scheduleHeader #scheduleHeaderStore{
+ flex:0 1 180px!important;min-width:115px!important;max-width:200px!important;
+ height:36px!important;min-height:36px!important;margin:0!important;
+ padding:5px 9px!important;border:1px solid #b6cade!important;
+ border-radius:7px!important;background:#fff!important;color:#183653!important;
+ font-size:13px!important;font-weight:700!important
+}
+#lineInbox>.scheduleHeader #lineInboxResultCount{font-size:11px!important;color:#536b80!important;white-space:nowrap!important}
+#lineInbox>.scheduleHeader .interviewPager,#scheduleView>.scheduleHeader .interviewPager{margin-left:0!important;white-space:nowrap!important}
+#lineInbox .lineInboxTools{display:none!important}
+#scheduleView #interviewListFilters{margin:4px 0 10px!important;padding:6px 10px!important;min-height:0!important}
+#scheduleView #interviewListFilters select{max-height:35px!important}
+/* No internally scrolling list viewport. Pagination controls the visible items. */
+body.lineInboxOpen #lineInbox,
+body:not(.dashboardHome):not(.lineInboxOpen):not(.lineBookingActive) #scheduleView{
+ max-height:none!important;overflow:visible!important;overscroll-behavior:auto!important
+}
+#lineInbox #lineInboxMessages,#scheduleView #scheduleViewContent{overflow:visible!important;max-height:none!important}
+@media(min-width:901px){
+ body.lineInboxOpen,body:not(.dashboardHome):not(.lineInboxOpen):not(.lineBookingActive){overflow-y:hidden!important}
+ body.lineInboxOpen #lineInbox,body:not(.dashboardHome):not(.lineInboxOpen):not(.lineBookingActive) #scheduleView{
+  box-sizing:border-box!important;max-height:calc(100dvh - 155px)!important;overflow:hidden!important
+ }
+ #lineInboxMessages>.lineMessage,#scheduleViewContent>.item{
+  margin-top:6px!important;margin-bottom:6px!important;padding-top:9px!important;padding-bottom:9px!important
+ }
+ #lineInboxMessages .lineLatestPreview,#scheduleViewContent .lineLatestPreview{padding:7px 10px!important;margin-top:4px!important}
+}
+@media(max-width:900px){
+ #lineInbox>.scheduleHeader,#scheduleView>.scheduleHeader{flex-wrap:wrap!important}
+ #lineInbox>.scheduleHeader .interviewPager,#scheduleView>.scheduleHeader .interviewPager{margin-left:auto!important}
+ body.lineInboxOpen,body:not(.dashboardHome):not(.lineInboxOpen):not(.lineBookingActive){overflow-y:auto!important}
+}
+</style>
+<style id="applicantDetailViewStyle20261026">
+#applicantDetailView[hidden]{display:none!important}
+body.applicantDetailOpen .workMain > :not(#applicantDetailView){display:none!important}
+body.applicantDetailOpen .workspace{display:grid!important;grid-template-columns:300px minmax(0,1fr)!important;grid-template-rows:300px auto!important;gap:12px 14px!important;align-items:start!important}
+body.applicantDetailOpen .workspace>.side.card{display:contents!important}
+body.applicantDetailOpen #dailySidebarCalendar{grid-column:1!important;grid-row:1!important}
+body.applicantDetailOpen .workspace>.side.card>.navSection{grid-column:1!important;grid-row:2!important;display:flex!important}
+body.applicantDetailOpen .workspace>.workMain{display:block!important;grid-column:2!important;grid-row:1 / span 2!important;min-width:0!important;width:100%!important}
+body.applicantDetailOpen #applicantDetailView{display:flex!important;flex-direction:column!important;gap:13px!important;padding:17px!important;margin:0!important;max-height:calc(100dvh - 155px)!important;min-height:0!important;overflow:hidden!important}
+body.applicantDetailOpen{overflow:hidden!important}
+.applicantDetailHeader{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #e0e7f0;padding-bottom:12px}
+.applicantDetailHeader h2{font-size:19px;margin:0 0 4px;color:#192e49}
+.applicantDetailHeader p{margin:0;font-size:11px;color:#66809c}
+.applicantDetailIdentity{display:flex;align-items:center;gap:14px}
+.applicantDetailIdentity .lineAvatar{width:55px;height:55px;min-width:55px;border-radius:50%;object-fit:cover}
+.applicantDetailIdentity strong{display:block;font-size:19px;color:#182f4a}
+.applicantDetailMeta{display:flex;gap:12px;align-items:center;margin-top:5px;font-size:12px;color:#64738a}
+.applicantDetailSummary{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.applicantDetailSummary>div{padding:12px 14px;border:1px solid #d6e1ed;background:#f1f5fa;border-radius:9px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.applicantDetailSummary small{font-size:11px;color:#667b95}
+.applicantDetailSummary strong{font-size:15px;color:#1b3a5a}
+.applicantDetailSummary span{font-size:12px;color:#435b77}
+.applicantDetailColumns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;flex:1;min-height:0}
+.applicantDetailPanel{border:1px solid #dae4ee;border-radius:10px;display:flex;flex-direction:column;min-width:0;min-height:0;padding:12px;background:#fff}
+.applicantDetailPanelHead{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e1e7ee;padding-bottom:10px;margin-bottom:9px}
+.applicantDetailPanel h3{font-size:15px;margin:0;color:#1e3753}
+.applicantDetailPanelHead span{font-size:11px;color:#6c7d92}
+.applicantDetailScroll{overflow-y:auto!important;overscroll-behavior:contain;min-height:0;flex:1}
+.applicantDetailEntry{border:1px solid #e0e6ee;background:#f4f7fb;border-radius:8px;padding:10px 12px;margin-bottom:9px;white-space:pre-wrap;overflow-wrap:anywhere}
+.applicantDetailEntry small{display:block;color:#70829a;font-size:11px;margin-bottom:6px}
+.applicantDetailEntry p{margin:0;font-size:13px;line-height:1.6;color:#22354e}
+#applicantDetailMore{margin-top:10px;width:100%}
+#applicantDetailMore[hidden]{display:none!important}
+.applicantDetailEmpty{padding:17px;color:#70829a;font-size:13px}
+body.applicantDetailOpen #lineInbox,body.applicantDetailOpen #scheduleView,body.applicantDetailOpen #dailyDashboard{display:none!important}
+#lineInboxMessages .lineNoticePerson[data-user],#scheduleViewContent .lineNoticePerson[data-user],#scheduleViewContent .unifiedSidebarPerson[data-user]{cursor:pointer}
+#lineInboxMessages .lineNoticePerson[data-user]:hover strong,#scheduleViewContent [data-user]:hover strong{text-decoration:underline}
+#lineInboxMessages .lineNoticePerson[data-user]:focus-visible,#scheduleViewContent [data-user]:focus-visible{outline:2px solid #2e6599;outline-offset:4px;border-radius:5px}
+@media(max-width:900px){
+ body.applicantDetailOpen{overflow:auto!important}
+ body.applicantDetailOpen .workspace{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto auto!important}
+ body.applicantDetailOpen .workspace>.side.card{display:block!important;grid-column:1!important;grid-row:1!important}
+ body.applicantDetailOpen .workspace>.workMain{grid-column:1!important;grid-row:2!important}
+ body.applicantDetailOpen #applicantDetailView{max-height:none!important;overflow:visible!important}
+ .applicantDetailColumns{grid-template-columns:1fr}
+ .applicantDetailScroll{max-height:45vh!important}
+ .applicantDetailSummary{grid-template-columns:1fr}
+}
+</style>
+<style id="applicantDetailIsolationFinal20261026">
+body.applicantDetailOpen .workMain>#lineInbox,
+body.applicantDetailOpen .workMain>#scheduleView,
+body.applicantDetailOpen .workMain>#dailyDashboard,
+body.applicantDetailOpen .workMain>.workLeft,
+body.applicantDetailOpen .workMain>.workRight{display:none!important}
+body.applicantDetailOpen .workMain>#applicantDetailView:not([hidden]){display:flex!important}
+</style>
+<style id="sidebarCalendarFullBorderFix20261026">
+/* Calendar height is content-driven: never crop its last week or bottom border. */
+@media(min-width:901px){
+ body .workspace{grid-template-rows:max-content auto!important}
+ body .workspace #dailySidebarCalendar{
+  height:auto!important;min-height:0!important;max-height:none!important;
+  align-self:start!important;overflow:visible!important;
+  padding:14px 14px 17px!important;box-sizing:border-box!important;
+  border:1px solid #d8e0e9!important;border-radius:12px!important;
+ }
+ body .workspace>.side.card>.navSection{
+  grid-row:2!important;align-self:start!important;position:relative!important;top:auto!important;
+ }
+}
+</style>
+<style id="afterlifeSidebarStyle20261026">
+/* Separate rejected-applicant category, deliberately positioned after the existing history group. */
+.side .navSection>#afterlifeNav{
+ margin-top:23px!important;margin-bottom:3px!important;
+ background:#60445f!important;border:1px solid #493449!important;color:#fff!important;
+ box-shadow:inset 4px 0 #bba0b7!important;
+}
+.side .navSection>#afterlifeNav:hover,
+.side .navSection>#afterlifeNav[aria-expanded="true"]{
+ background:#755671!important;border-color:#493449!important;color:#fff!important;
+}
+#afterlifeNav .sidebarNavRight{color:#f5eaf3!important}
+#afterlifeView[hidden]{display:none!important}
+body.afterlifeOpen .workMain>#afterlifeView{display:block!important}
+body.afterlifeOpen .workMain>#dailyDashboard,
+body.afterlifeOpen .workMain>#scheduleView,
+body.afterlifeOpen .workMain>#lineInbox,
+body.afterlifeOpen .workMain>#applicantDetailView,
+body.afterlifeOpen .workMain>.workLeft,
+body.afterlifeOpen .workMain>.workRight{display:none!important}
+#afterlifeView{padding:0!important;min-height:230px;background:#fff;overflow:hidden}
+#afterlifeView>.afterlifeHeader{background:#60445f!important;color:#fff!important;padding:15px 20px!important;border-radius:12px 12px 0 0}
+#afterlifeView>.afterlifeHeader h2{color:#fff!important;margin:0!important;font-size:18px}
+#afterlifeListCount{color:#f5eaf3;font-size:12px;font-weight:700}
+.afterlifeEmpty{padding:35px 20px;color:#6b788b;text-align:center;font-size:13px}
+</style>
+<style id="interviewCompactAfterlife20261026">
+body.applicantDetailOpen .workMain>#dailyDashboard,body.applicantDetailOpen .workMain>#scheduleView,body.applicantDetailOpen .workMain>#lineInbox,body.applicantDetailOpen .workMain>#afterlifeView{display:none!important}
+body.applicantDetailOpen .workMain>#applicantDetailView:not([hidden]){display:flex!important;position:relative!important;grid-column:1/-1!important;width:100%!important}
+.applicantDetailHeaderActions{display:flex;align-items:center;gap:8px}
+.afterlifeAction{background:#60445f!important;border:1px solid #60445f!important;color:#fff!important}
+.afterlifeAction:hover{background:#785974!important}
+#lineInboxMessages .lineLatestPreview,#lineInboxMessages .lineAllHistory,#scheduleViewContent .lineLatestPreview,#scheduleViewContent .lineAllHistory{display:none!important}
+#lineInboxMessages .lineMessage,#scheduleViewContent .lineMessage,#scheduleViewContent .unifiedSidebarCard{min-height:0!important;margin-bottom:6px!important;padding:7px 10px!important;border-radius:8px!important}
+#lineInboxMessages .lineNoticePrimary,#scheduleViewContent .lineNoticePrimary,#scheduleViewContent .unifiedSidebarTop{min-height:42px!important;gap:8px!important;align-items:center!important}
+#lineInboxMessages .lineAvatar,#scheduleViewContent .lineAvatar{width:34px!important;height:34px!important;min-width:34px!important}
+#lineInboxMessages .lineBookActions,#scheduleViewContent .lineBookActions{gap:5px!important}
+#lineInboxMessages .action,#scheduleViewContent .action{min-height:29px!important;padding:6px 9px!important;font-size:11px!important}
+#dailyAppointmentItems .unifiedInterviewHead.lineNoticePerson{cursor:pointer}
+#dailyAppointmentItems .unifiedInterviewHead.lineNoticePerson:hover strong{text-decoration:underline}
+</style>
+<style id="afterlifeFeatureStyle20261026">
+.afterlifeDialog{border:1px solid #d9c8d6;border-radius:14px;padding:24px;max-width:min(450px,calc(100vw - 30px));width:100%;box-shadow:0 16px 60px #12182755}
+.afterlifeDialog::backdrop{background:#11182788}
+.afterlifeDialog h2{font-size:20px;color:#60445f;margin:0 0 8px}
+.afterlifeDialog p{font-size:13px}
+#afterlifeReasons{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:10px 0 15px}
+#afterlifeReasons label{display:flex;align-items:center;gap:7px;border:1px solid #e3dce3;border-radius:7px;padding:10px 7px;font-size:12px;cursor:pointer}
+#afterlifeFormError{color:#a3213a;min-height:1em}
+.afterlifeDialogActions{display:flex;justify-content:flex-end;gap:9px}
+.afterlifeDialogActions button{border:1px solid #c3b2c1;border-radius:7px;padding:10px 12px;font-weight:700;cursor:pointer}
+#afterlifeSubmit{background:#60445f;color:#fff}
+#afterlifeSubmit:disabled{opacity:.6;cursor:wait}
+#afterlifeView .afterlifeToolbar{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;gap:12px}
+#afterlifeView .afterlifeToolbar select{padding:8px;border:1px solid #bbc9d8;border-radius:7px}
+#afterlifeEntries{padding:0 15px 12px}
+.afterlifeEntry{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid #dce3ec;border-radius:8px;margin:5px 0}
+.afterlifeEntry .lineNoticePerson{display:flex;align-items:center;gap:9px;flex:1;cursor:pointer}
+.afterlifeEntry .lineAvatar{width:36px;height:36px;border-radius:50%;object-fit:cover}
+.afterlifeEntry .afterlifeReasonsText{font-size:11px;color:#60445f;flex:1}
+.afterlifeRemove{font-size:11px;border:1px solid #a8b7ca;background:#fff;border-radius:6px;padding:8px 12px;cursor:pointer}
+#afterlifePagination{display:flex;align-items:center;justify-content:center;gap:12px;padding:10px}
+#afterlifePagination button{padding:8px 13px;border-radius:7px;border:1px solid #a8b7ca;background:#fff;cursor:pointer}
+</style>
+<style id="topCalendarGanttEqualHeight20261026">
+/* TOP calendar and the staff Gantt occupy the same grid row and share its exact height. */
+@media(min-width:901px){
+ body.dashboardHome .workspace{grid-template-rows:max-content auto!important;align-items:stretch!important}
+ body.dashboardHome .workspace #dailySidebarCalendar{
+  height:100%!important;min-height:0!important;max-height:none!important;
+  align-self:stretch!important;box-sizing:border-box!important;
+  margin:0!important;padding:12px 14px!important;overflow:visible!important;
+ }
+ body.dashboardHome :is(#dailyDashboard,#interviewPersistentTop)>.dailyScheduleSection{
+  height:100%!important;min-height:300px!important;max-height:none!important;
+  align-self:stretch!important;box-sizing:border-box!important;margin:0!important;
+ }
+ body.dashboardHome #dailySidebarCalendar .dailyMonthNav{margin:7px 0!important}
+ body.dashboardHome #dailySidebarCalendar .dailyCalendar{row-gap:3px!important}
+}
+</style>
+<style id="interviewListTitleTopSpacing20261026">
+/* Keep the heading near the top border across every non-TOP applicant list. */
+body.lineInboxOpen .workMain>#lineInbox,
+body:not(.dashboardHome):not(.lineInboxOpen):not(.lineBookingActive):not(.applicantDetailOpen):not(.afterlifeOpen) .workMain>#scheduleView{
+ padding-top:9px!important;
+}
+body.lineInboxOpen #lineInbox>.scheduleHeader,
+body:not(.dashboardHome):not(.lineInboxOpen):not(.lineBookingActive):not(.applicantDetailOpen) #scheduleView>.scheduleHeader{
+ margin-top:0!important;
+}
+body.afterlifeOpen #afterlifeView>.afterlifeHeader{padding-top:10px!important;padding-bottom:10px!important}
+</style>
+<style id="calendarConsistentHeightAllViews20261026">
+/* Reuse the TOP Gantt height and calendar internal spacing in all desktop views. */
+@media(min-width:901px){
+ body:not(.dashboardHome) .workspace #dailySidebarCalendar{
+  height:auto!important;
+  min-height:var(--interview-top-calendar-height,240px)!important;
+  max-height:none!important;
+  box-sizing:border-box!important;
+  padding:12px 14px!important;
+  align-self:start!important;
+  overflow:visible!important;
+ }
+ body:not(.dashboardHome) #dailySidebarCalendar .dailyMonthNav{
+  margin:7px 0!important;
+ }
+ body:not(.dashboardHome) #dailySidebarCalendar .dailyCalendar{
+  row-gap:3px!important;
+ }
+ body:not(.dashboardHome) .workspace{
+  grid-template-rows:max-content auto!important;
+ }
+}
+</style>
+<style id="interviewSidebarAndListSpacingCorrected20261026">
+/* Apply to all non-TOP list screens. Keep list headings next to the upper card edge. */
+body:not(.dashboardHome) #scheduleView.scheduleView{padding-top:5px!important}
+body:not(.dashboardHome) #scheduleView>.scheduleHeader{padding-top:0!important;margin-top:0!important}
+body.lineInboxOpen #lineInbox{padding-top:5px!important}
+body.lineInboxOpen #lineInbox>.scheduleHeader{padding-top:0!important;margin-top:0!important}
+body.afterlifeOpen #afterlifeView>.afterlifeHeader{padding-top:5px!important}
+@media(min-width:901px){
+ /* The sidebar second row begins immediately after its calendar rather than inheriting the main content height. */
+ body:not(.dashboardHome) .workspace{grid-template-rows:min-content min-content!important;align-content:start!important;row-gap:12px!important}
+ body:not(.dashboardHome) .workspace>.side.card>.navSection{
+  grid-column:1!important;grid-row:2!important;align-self:start!important;
+  position:relative!important;top:auto!important;margin:0!important
+ }
+ body:not(.dashboardHome) .workspace #dailySidebarCalendar{
+  grid-column:1!important;grid-row:1!important;margin:0!important
+ }
+ body:not(.dashboardHome) .workspace>.workMain{grid-column:2!important;grid-row:1 / span 2!important;align-self:start!important}
+}
+</style>
+<style id="stableInterviewSidebarLayout20261026">
+/* Non-TOP pages: sidebar owns both children, so main-panel height cannot move nav. */
+@media(min-width:901px){
+ body:not(.dashboardHome) .workspace{
+  display:grid!important;grid-template-columns:300px minmax(0,1fr)!important;
+  grid-template-rows:auto!important;align-items:start!important;align-content:start!important;
+  column-gap:14px!important;row-gap:0!important
+ }
+ body:not(.dashboardHome) .workspace>.side.card{
+  display:flex!important;flex-direction:column!important;gap:12px!important;
+  grid-column:1!important;grid-row:1!important;position:static!important;
+  width:300px!important;min-width:0!important;max-width:300px!important;
+  height:auto!important;max-height:none!important;overflow:visible!important;
+  padding:0!important;margin:0!important;border:0!important;background:transparent!important;
+  border-radius:0!important;box-shadow:none!important
+ }
+ body:not(.dashboardHome) .workspace>.side.card>#dailySidebarCalendar{
+  display:block!important;position:static!important;flex:0 0 auto!important;
+  width:100%!important;grid-column:auto!important;grid-row:auto!important;
+  margin:0!important;align-self:auto!important
+ }
+ body:not(.dashboardHome) .workspace>.side.card>.navSection{
+  display:flex!important;flex-direction:column!important;position:static!important;
+  flex:0 0 auto!important;width:100%!important;grid-column:auto!important;grid-row:auto!important;
+  top:auto!important;margin:0!important;align-self:auto!important
+ }
+ body:not(.dashboardHome) .workspace>.workMain{
+  display:block!important;grid-column:2!important;grid-row:1!important;
+  width:100%!important;min-width:0!important;align-self:start!important
+ }
+}
+</style>
+<style id="interviewMonthInHeaderTenFixed20261026">
+/* TOP remains unchanged. All interview lists use a single heading row. */
+#scheduleView>.scheduleHeader #scheduleHeaderMonth{
+ flex:0 0 124px!important;width:124px!important;min-width:110px!important;
+ height:36px!important;min-height:36px!important;
+ border:1px solid #b8cce2!important;border-radius:7px!important;
+ background:#fff!important;color:#183653!important;
+ padding:5px 9px!important;font-size:12px!important;font-weight:700!important;
+ margin:0!important;
+}
+#scheduleView>.scheduleHeader #scheduleHeaderTotal{
+ flex:0 0 auto!important;font-size:11px!important;color:#63758e!important;
+ white-space:nowrap!important;margin:0!important;
+}
+#scheduleView #interviewListFilters{display:none!important}
+@media(min-width:901px){
+ /* A ten-card page must not lose the tenth card to a cropped viewport. */
+ body:not(.dashboardHome):not(.lineInboxOpen):not(.lineBookingActive):not(.applicantDetailOpen):not(.afterlifeOpen) .workMain>#scheduleView,
+ body.lineInboxOpen .workMain>#lineInbox{
+  max-height:none!important;overflow:visible!important;
+ }
+ body:not(.dashboardHome):not(.lineBookingActive):not(.applicantDetailOpen):not(.afterlifeOpen){overflow-y:auto!important}
+}
+@media(max-width:900px){
+ #scheduleView>.scheduleHeader{flex-wrap:wrap!important}
+ #scheduleView>.scheduleHeader #scheduleHeaderMonth{flex:0 0 124px!important}
+}
+</style>
+<style id="stableSidebarAndDetailIsolation20261026">
+/* The sidebar occupies exactly the same two grid rows in every desktop view.
+   A tall results list must never change the height of the calendar's row. */
+@media(min-width:901px){
+ body .workspace{
+  grid-template-rows:var(--interview-sidebar-row-height,240px) auto!important;
+  align-items:start!important;
+  row-gap:14px!important;
+ }
+ body .workspace #dailySidebarCalendar{
+  grid-column:1!important;grid-row:1!important;
+  height:var(--interview-sidebar-row-height,240px)!important;
+  min-height:var(--interview-sidebar-row-height,240px)!important;
+  max-height:var(--interview-sidebar-row-height,240px)!important;
+  margin:0!important;overflow:visible!important;
+  box-sizing:border-box!important;
+ }
+ body .workspace>.side.card>.navSection{
+  grid-column:1!important;grid-row:2!important;
+  align-self:start!important;position:relative!important;
+  top:auto!important;margin:0!important;
+  z-index:5!important;
+ }
+ body.dashboardHome .workspace #dailySidebarCalendar{
+  height:100%!important;
+  min-height:var(--interview-sidebar-row-height,240px)!important;
+  max-height:none!important;
+ }
+ body.dashboardHome .workspace{grid-template-rows:max-content auto!important}
+}
+body.applicantDetailOpen .workMain>#scheduleView,
+body.applicantDetailOpen .workMain>#lineInbox,
+body.applicantDetailOpen .workMain>#dailyDashboard,
+body.applicantDetailOpen .workMain>#afterlifeView{display:none!important}
+body.applicantDetailOpen .workMain>#applicantDetailView:not([hidden]){display:flex!important}
+#afterlifeView>.afterlifeHeader{
+ display:flex!important;align-items:center!important;gap:12px!important;
+ justify-content:space-between!important;
+}
+#afterlifeView>.afterlifeHeader h2{flex:1 1 auto!important;min-width:0!important}
+#afterlifeView>.afterlifeHeader select{
+ width:172px!important;max-width:40%!important;
+ padding:7px 9px!important;min-height:33px!important;
+ background:#fff!important;color:#183653!important;
+ border:1px solid #cbb8ce!important;border-radius:7px!important;
+ font-size:12px!important;
+}
+#afterlifeView>.afterlifeHeader #afterlifeListCount{flex:0 0 auto!important}
+@media(max-width:900px){
+ #afterlifeView>.afterlifeHeader select{width:130px!important}
+}
+</style>
+<style id="interviewListActualTopGapFix20261026">
+/* Previous padding-top:9px was insufficient because the header still had a 48px minimum height. */
+body.lineInboxOpen .workMain>#lineInbox,
+body:not(.dashboardHome):not(.lineInboxOpen):not(.lineBookingActive):not(.applicantDetailOpen):not(.afterlifeOpen) .workMain>#scheduleView{
+ padding-top:5px!important;
+}
+body.lineInboxOpen #lineInbox>.scheduleHeader,
+body:not(.dashboardHome):not(.lineInboxOpen):not(.lineBookingActive):not(.applicantDetailOpen):not(.afterlifeOpen) #scheduleView>.scheduleHeader{
+ min-height:35px!important;
+ padding-top:0!important;
+ padding-bottom:7px!important;
+ margin-top:0!important;
+ margin-bottom:9px!important;
+ box-sizing:border-box!important;
+}
+body.lineInboxOpen #lineInbox>.scheduleHeader h2,
+body:not(.dashboardHome):not(.lineInboxOpen):not(.lineBookingActive):not(.applicantDetailOpen):not(.afterlifeOpen) #scheduleView>.scheduleHeader h2{
+ line-height:1.3!important;
+ margin:0!important;
+}
+</style>
+<style id="interviewSidebarStableFinal20261026">
+@media (min-width:901px) {
+  /* One independent sidebar column: calendar and nav cannot be separated by main row sizing. */
+  body:not(.dashboardHome) main.wrap .workspace {
+    display:grid!important;grid-template-columns:300px minmax(0,1fr)!important;
+    grid-template-rows:minmax(0,auto)!important;gap:0 14px!important;align-items:start!important;
+  }
+  body:not(.dashboardHome) main.wrap .workspace > aside.side.card {
+    display:flex!important;flex-direction:column!important;gap:12px!important;
+    grid-column:1!important;grid-row:1!important;align-self:start!important;
+    position:relative!important;top:auto!important;
+    height:max-content!important;max-height:none!important;
+    padding:0!important;margin:0!important;width:300px!important;
+    min-width:300px!important;max-width:300px!important;
+    background:transparent!important;border:0!important;box-shadow:none!important;overflow:visible!important;
+  }
+  body:not(.dashboardHome) main.wrap .workspace > aside.side.card > #dailySidebarCalendar {
+    position:relative!important;top:auto!important;
+    display:block!important;grid-column:auto!important;grid-row:auto!important;
+    height:auto!important;min-height:0!important;margin:0!important;flex:none!important;
+  }
+  body:not(.dashboardHome) main.wrap .workspace > aside.side.card > .navSection {
+    position:relative!important;top:auto!important;display:flex!important;flex-direction:column!important;
+    grid-column:auto!important;grid-row:auto!important;align-self:auto!important;
+    margin:0!important;flex:none!important;width:100%!important;
+  }
+  body:not(.dashboardHome) main.wrap .workspace > .workMain {
+    display:block!important;grid-column:2!important;grid-row:1!important;align-self:start!important;
+  }
+}
+</style>
+<style id="calendarGanttAndTitleFinal20261026">
+/* Keep the calendar and Gantt equal in the TOP dashboard and in the booking screen. */
+@media(min-width:901px){
+ body.dashboardHome .workspace #dailySidebarCalendar{
+  height:var(--interview-calendar-match-height,300px)!important;min-height:0!important;max-height:none!important;
+  align-self:start!important;overflow:visible!important;
+ }
+ body:not(.dashboardHome) .workspace>.side.card>#dailySidebarCalendar{
+  height:var(--interview-calendar-match-height,auto)!important;min-height:0!important;max-height:none!important;
+  align-self:start!important;overflow:visible!important;
+ }
+ /* Reduce space above the visible section heading, without changing the label's typography. */
+ :is(#dailyDashboard,#interviewPersistentTop)>.dailyScheduleSection{padding-top:6px!important}
+ :is(#dailyDashboard,#interviewPersistentTop)>.dailyAppointmentSection{padding-top:6px!important}
+ #scheduleView.scheduleView{padding-top:6px!important}
+ #lineInbox.lineInbox{padding-top:6px!important}
+ #afterlifeView .afterlifeHeader{padding-top:6px!important}
+}
+</style>
+<style id="interviewTitleZeroTopGap20261026">
+/* No extra space above section titles in all views. */
+:is(#dailyDashboard,#interviewPersistentTop)>.dailyScheduleSection,
+:is(#dailyDashboard,#interviewPersistentTop)>.dailyAppointmentSection,
+#scheduleView.scheduleView,
+#lineInbox.lineInbox,
+#afterlifeView,
+#applicantDetailView {padding-top:0!important}
+:is(#dailyDashboard,#interviewPersistentTop) .dailyDateTitle,
+#scheduleView>.scheduleHeader,
+#lineInbox>.scheduleHeader,
+#afterlifeView>.afterlifeHeader,
+#applicantDetailView .scheduleHeader {margin-top:0!important;padding-top:0!important}
+:is(#dailyDashboard,#interviewPersistentTop) .dailyDateTitle>h2,
+#scheduleView>.scheduleHeader>h2,
+#lineInbox>.scheduleHeader>h2,
+#afterlifeView>.afterlifeHeader h2 {margin-top:0!important}
+</style>
+<style id="interviewPersistentTopShell20261026">
+@media(min-width:901px){
+ body main.wrap{padding:0 20px 55px 0!important;max-width:none!important}
+ body main.wrap>#interviewPersistentTop{display:grid!important;grid-template-columns:300px minmax(0,1fr)!important;align-items:stretch!important;gap:14px!important;margin:0 0 12px!important}
+ body main.wrap>#interviewPersistentTop>#dailySidebarCalendar,
+ body main.wrap>#interviewPersistentTop>.dailyScheduleSection{
+  display:block!important;position:relative!important;top:auto!important;grid-row:1!important;
+  margin:0!important;width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;
+  box-sizing:border-box!important;align-self:stretch!important;
+  border:1px solid #d8e0e9!important;border-radius:12px!important;background:#fff!important;
+  overflow:visible!important;
+ }
+ body main.wrap>#interviewPersistentTop>#dailySidebarCalendar{grid-column:1!important;padding:12px!important}
+ body main.wrap>#interviewPersistentTop>.dailyScheduleSection{grid-column:2!important;padding:0 12px 12px!important}
+ body main.wrap>.workspace{display:grid!important;grid-template-columns:300px minmax(0,1fr)!important;grid-template-rows:auto!important;gap:14px!important;align-items:start!important}
+ body main.wrap>.workspace>aside.side.card{display:block!important;position:relative!important;grid-column:1!important;grid-row:1!important;
+  width:300px!important;min-width:300px!important;max-width:300px!important;height:auto!important;max-height:none!important;
+  padding:0!important;margin:0!important;border:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important}
+ body main.wrap>.workspace>aside.side.card>.navSection{display:flex!important;position:relative!important;grid-column:auto!important;grid-row:auto!important;top:auto!important;width:100%!important;margin:0!important}
+ body main.wrap>.workspace>.workMain{display:block!important;grid-column:2!important;grid-row:1!important;min-width:0!important;width:100%!important}
+ body.dashboardHome main.wrap>.workspace>.workMain>#dailyDashboard{display:block!important}
+ body.dashboardHome main.wrap>.workspace :is(#dailyDashboard,#interviewPersistentTop)>.dailyAppointmentSection{display:block!important;grid-column:auto!important;grid-row:auto!important}
+ body:not(.dashboardHome) main.wrap>.workspace #dailyDashboard{display:none!important}
+}
+@media(max-width:900px){
+ body main.wrap>#interviewPersistentTop{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin-bottom:12px}
+ body main.wrap>#interviewPersistentTop>.dailyScheduleSection{display:block!important;background:#fff;padding:8px}
+}
+</style>
+<style id="persistentGanttVisualRestoration20261026">
+/* Restores chart styles lost when chart moved out of #dailyDashboard. */
+#interviewPersistentTop .dailyTableWrap{width:100%;min-width:0;overflow-x:auto}
+#interviewPersistentTop .dailyGrid.dailyGantt{display:grid!important;grid-template-columns:76px minmax(0,1fr)!important;gap:6px 10px!important;width:100%!important;align-items:center!important}
+#interviewPersistentTop .dailyName{font-size:12px;font-weight:700;white-space:nowrap}
+#interviewPersistentTop .ganttAxis{display:grid!important;grid-template-columns:repeat(14,minmax(0,1fr))!important;width:100%!important;min-width:0!important}
+#interviewPersistentTop .ganttAxis span{font-size:10px;font-weight:700;color:#607086;white-space:nowrap}
+#interviewPersistentTop .ganttTrack{display:grid!important;grid-template-columns:repeat(28,minmax(0,1fr))!important;gap:0!important;width:100%!important;min-width:0!important;height:30px!important;border-radius:6px!important;overflow:hidden!important;background:#d9dde2!important}
+#interviewPersistentTop .ganttSegment{height:100%!important;min-width:0!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:10px!important;font-weight:800!important;border-right:1px solid rgba(255,255,255,.7)!important}
+#interviewPersistentTop .gantt-yes,#interviewPersistentTop .ganttYes{background:#b9dfc7!important;color:#225d38!important}
+#interviewPersistentTop .gantt-no,#interviewPersistentTop .gantt-past{background:#d9dde2!important;color:#687481!important}
+#interviewPersistentTop .gantt-busy{background:#b7a3d6!important;color:#382453!important}
+#interviewPersistentTop .gantt-wait{background:#edf0f3!important;color:#8c98a5!important}
+#interviewPersistentTop .ganttHalfSlot{display:flex!important;align-items:center!important;justify-content:center!important;min-width:0!important;width:100%!important;height:100%!important;border:0!important;border-right:1px dotted rgba(255,255,255,.8)!important;border-radius:0!important;padding:0!important;margin:0!important;appearance:none!important;font-size:10px!important;font-weight:700!important;cursor:pointer}
+#interviewPersistentTop .ganttHalfSlot:disabled{cursor:default!important;opacity:1!important}
+#interviewPersistentTop .dailyLegend{display:flex!important;align-items:center!important;gap:15px!important;font-size:12px!important;flex-wrap:wrap}
+#interviewPersistentTop .dailyNotice{font-size:12px;margin:8px 0 0}
+#interviewPersistentTop .dailyDateTitle{display:flex;align-items:center;justify-content:space-between}
+@media(max-width:900px){#interviewPersistentTop .dailyTableWrap{overflow-x:auto!important}}
+</style>
+<style id="persistentTopCompact20261026">
+@media(min-width:901px){
+ body main.wrap>#interviewPersistentTop{align-items:stretch!important;gap:14px!important}
+ body main.wrap>#interviewPersistentTop>#dailySidebarCalendar,
+ body main.wrap>#interviewPersistentTop>.dailyScheduleSection{
+  height:auto!important;min-height:0!important;max-height:none!important;align-self:stretch!important;
+ }
+ body main.wrap>#interviewPersistentTop>#dailySidebarCalendar{padding:8px 12px!important}
+ body main.wrap>#interviewPersistentTop>.dailyScheduleSection{padding:4px 12px 8px!important}
+ #interviewPersistentTop .dailyDateTitle{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:16px!important;min-height:24px!important;margin:0 0 5px!important;padding:0!important}
+ #interviewPersistentTop .dailyDateTitle h2{margin:0!important;flex:0 0 auto!important}
+ #interviewPersistentTop .dailyLegend{display:flex!important;align-items:center!important;gap:12px!important;margin:0!important;padding:0!important;font-size:11px!important}
+ #interviewPersistentTop #dailyAvailabilityStatus{margin-left:auto!important}
+ #interviewPersistentTop #dailySidebarCalendar .dailyMonthNav{margin:5px 0!important}
+ #interviewPersistentTop #dailySidebarCalendar .dailyCalendar{row-gap:2px!important}
+ #interviewPersistentTop #dailySidebarCalendar .dailyCalendar button{height:30px!important}
+ #interviewPersistentTop .dailyGrid.dailyGantt{gap:4px 10px!important}
+ #interviewPersistentTop .ganttTrack{height:26px!important}
+}
+</style>
+<style id="interviewUnifiedEightRows20261026">
+/* Desktop shell: no browser-level vertical scrolling; content panels remain reachable. */
+@media(min-width:901px){
+ html,body{height:100%!important;overflow:hidden!important}
+ body main.wrap{height:calc(100dvh - 76px)!important;max-height:calc(100dvh - 76px)!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;padding-bottom:0!important}
+ body main.wrap>#interviewPersistentTop{flex:0 0 auto!important;margin-bottom:10px!important}
+ body main.wrap>.workspace{flex:1 1 auto!important;min-height:0!important;overflow:hidden!important;align-items:start!important}
+ body main.wrap>.workspace>.workMain{height:100%!important;min-height:0!important;overflow:hidden!important}
+ body main.wrap>.workspace>.workMain>#lineInbox,
+ body main.wrap>.workspace>.workMain>#scheduleView,
+ body main.wrap>.workspace>.workMain>#afterlifeView,
+ body main.wrap>.workspace>.workMain>#applicantDetailView{
+  height:100%!important;max-height:100%!important;min-height:0!important;overflow:hidden!important;
+ }
+ body main.wrap>.workspace>.workMain>#lineInbox,
+ body main.wrap>.workspace>.workMain>#scheduleView,
+ body main.wrap>.workspace>.workMain>#afterlifeView{display:flex;flex-direction:column}
+ body main.wrap>.workspace>.workMain>#lineInbox[hidden],
+ body main.wrap>.workspace>.workMain>#scheduleView[hidden],
+ body main.wrap>.workspace>.workMain>#afterlifeView[hidden]{display:none!important}
+ #lineInboxMessages,#scheduleViewContent,#afterlifeEntries{flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;scrollbar-width:thin}
+ body.dashboardHome main.wrap .workMain>#dailyDashboard{max-height:100%!important;overflow-y:auto!important}
+ #applicantDetailView{overflow-y:auto!important}
+ #applicantDetailView .applicantDetailHeader{position:sticky!important;top:0!important;z-index:5!important;background:#fff!important}
+ #lineInboxStatus{display:none!important}
+ /* Shared card geometry in each applicants list. */
+ #lineInboxMessages>.lineMessage,
+ #scheduleViewContent>.item,
+ #afterlifeEntries>.afterlifeEntry{
+  box-sizing:border-box!important;min-height:0!important;
+  margin:3px 0!important;padding:7px 9px!important;
+  border:1px solid #dce4ee!important;border-radius:8px!important;
+ }
+ #lineInboxMessages .lineNoticePrimary,
+ #scheduleViewContent .lineNoticePrimary,
+ #scheduleViewContent .unifiedSidebarTop{min-height:38px!important;align-items:center!important}
+ #lineInboxMessages .sharedInterviewButtons .action,
+ #scheduleViewContent .sharedInterviewButtons .action,
+ #scheduleViewContent .unifiedSidebarActions .action{min-height:32px!important;padding:6px 10px!important}
+ #lineInbox>.scheduleHeader,#scheduleView>.scheduleHeader{padding-top:0!important;margin-top:0!important;flex:0 0 auto!important}
+ #afterlifeView>.afterlifeHeader{flex:0 0 auto!important}
+}
+</style>
+<style id="interviewRegisterButtonContrast20261026">
+/* Distinguish an actionable registration control from disabled/registered buttons. */
+#lineInboxMessages .lineBookButton:not(:disabled),
+#lineInboxMessages .sharedInterviewButtons .lineBookButton:not(:disabled){
+ background:#176b9b!important;border:1px solid #10547d!important;color:#fff!important;
+ font-weight:800!important;opacity:1!important;box-shadow:0 1px 3px rgba(16,84,125,.18)!important;
+}
+#lineInboxMessages .lineBookButton:not(:disabled):hover,
+#lineInboxMessages .sharedInterviewButtons .lineBookButton:not(:disabled):hover{
+ background:#10547d!important;border-color:#0c4163!important;
+}
+#lineInboxMessages .lineBookButton:not(:disabled):focus-visible{
+ outline:3px solid #78b8de!important;outline-offset:2px!important;
+}
+#lineInboxMessages .lineBookButton:disabled{background:#e9edf2!important;border-color:#cbd5e1!important;color:#8b99aa!important;box-shadow:none!important}
+</style>
+<style id="singleInterviewCardDesign20261026">
+@media(min-width:901px){
+ #lineInboxMessages>.interviewCommonCard,
+ #scheduleViewContent>.interviewCommonCard,
+ #afterlifeEntries>.interviewCommonCard{
+  box-sizing:border-box!important;display:block!important;
+  height:56px!important;min-height:56px!important;max-height:56px!important;
+  padding:5px 8px!important;margin:3px 0!important;border:1px solid #dce4ee!important;
+  border-radius:7px!important;background:#fff!important;overflow:hidden!important;
+ }
+ #lineInboxMessages>.interviewCommonCard>.lineNoticePrimary,
+ #scheduleViewContent>.interviewCommonCard>.lineNoticePrimary,
+ #afterlifeEntries>.interviewCommonCard>.lineNoticePrimary{
+  display:grid!important;grid-template-columns:165px minmax(0,1fr) 318px!important;
+  gap:8px!important;align-items:center!important;width:100%!important;
+  height:44px!important;min-height:44px!important;max-height:44px!important;
+  padding:0!important;margin:0!important;overflow:hidden!important;
+ }
+ #lineInboxMessages .interviewCommonCard .lineNoticePerson,
+ #scheduleViewContent .interviewCommonCard .lineNoticePerson,
+ #afterlifeEntries .interviewCommonCard .lineNoticePerson{
+  display:flex!important;flex-direction:row!important;gap:8px!important;
+  align-items:center!important;min-width:0!important;height:44px!important;max-height:44px!important;overflow:hidden!important;
+ }
+ .interviewCommonCard .lineAvatar{width:36px!important;height:36px!important;min-width:36px!important;max-width:36px!important;flex:0 0 36px!important;object-fit:cover!important}
+ .interviewCommonCard .lineNoticeIdentity{display:flex!important;flex-direction:column!important;gap:2px!important;justify-content:center!important;min-width:0!important;height:42px!important;overflow:hidden!important}
+ .interviewCommonCard .lineNoticeIdentity strong{font-size:12px!important;font-weight:800!important;line-height:16px!important;margin:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+ .interviewCommonCard .lineStoreBadge{font-size:10px!important;line-height:13px!important;margin:0!important;padding:2px 6px!important;align-self:flex-start!important}
+ .interviewCommonCard .lineNoticeSummary{display:flex!important;grid-column:2!important;grid-row:1!important;align-items:center!important;gap:6px!important;flex-wrap:nowrap!important;overflow:hidden!important;min-width:0!important}
+ .interviewCommonCard .sharedInterviewAppointment{box-sizing:border-box!important;min-width:0!important;max-width:235px!important;min-height:34px!important;height:34px!important;padding:4px 9px!important;gap:8px!important;overflow:hidden!important;white-space:nowrap!important}
+ .interviewCommonCard .sharedInterviewAppointment strong{font-size:12px!important}
+ .interviewCommonCard .sharedInterviewAppointment span{font-size:11px!important}
+ .interviewCommonCard .sharedInterviewRisk{flex-wrap:nowrap!important;gap:4px!important;min-width:0!important;overflow:hidden!important}
+ .interviewCommonCard .sharedHistoryDetail summary{font-size:10px!important;padding:6px!important}
+ .interviewCommonCard .lineBookActions{grid-column:3!important;grid-row:1!important;display:flex!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-end!important;gap:4px!important;width:318px!important;margin:0!important}
+ .interviewCommonCard .lineBookActions>.action,
+ .interviewCommonCard .lineBookActions>.lineBookButton,
+ .interviewCommonCard .lineBookActions>.lineBookStatus{box-sizing:border-box!important;display:inline-flex!important;justify-content:center!important;align-items:center!important;width:76px!important;min-width:76px!important;max-width:76px!important;height:32px!important;min-height:32px!important;max-height:32px!important;font-size:10px!important;line-height:1!important;padding:0 3px!important;border-radius:6px!important;white-space:nowrap!important}
+ #afterlifeEntries>.interviewCommonCard>.afterlifeRemove{display:none!important}
+ #afterlifeEntries>.interviewCommonCard:focus-within>.afterlifeRemove{display:block!important;position:absolute!important;right:10px!important;bottom:0!important;z-index:10!important}
+ #lineInboxMessages>.interviewCommonCard>.lineLatestPreview,#scheduleViewContent>.interviewCommonCard>.lineLatestPreview{display:none!important}
+}
+</style>
+<style id="afterlifeCancelWithinSharedCard20261026">
+@media(min-width:901px){
+ #afterlifeEntries>.interviewCommonCard{position:relative!important}
+ #afterlifeEntries>.interviewCommonCard>.afterlifeRemove{
+  display:inline-flex!important;position:absolute!important;right:330px!important;top:16px!important;
+  height:24px!important;padding:2px 6px!important;font-size:10px!important;line-height:1!important;
+  z-index:2!important;border-radius:5px!important;white-space:nowrap!important
+ }
+ #afterlifeEntries>.interviewCommonCard:focus-within>.afterlifeRemove{
+  display:inline-flex!important;position:absolute!important;right:330px!important;top:16px!important;bottom:auto!important
+ }
+ #afterlifeEntries>.interviewCommonCard .afterlifeReasonsText{
+  overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;
+  padding-right:78px!important;min-width:0!important;font-size:11px!important
+ }
+}
+</style>
+<style id="interviewHistoryCountOnly20261026">
+.sharedInterviewRisk .sharedHistoryCount{display:inline-flex!important;align-items:center!important;justify-content:center!important;white-space:nowrap!important;background:#fff3f4!important;border:1px solid #e3b5bd!important;color:#953741!important;border-radius:6px!important;padding:6px 8px!important;font-size:11px!important;font-weight:700!important;line-height:1.15!important;cursor:default!important}
+</style>
+<style id="lineInboxTenRowsNoBottomGap20261026">
+/* Preserve the existing LINE applicant cards; only change list pagination and outer blank space. */
+@media(min-width:901px){
+ body.lineInboxOpen main.wrap .workspace>.workMain>#lineInbox{
+  height:auto!important;min-height:0!important;max-height:100%!important;
+  padding-bottom:0!important;align-self:start!important;overflow:hidden!important;
+ }
+ body.lineInboxOpen #lineInbox #lineInboxMessages{
+  flex:0 1 auto!important;min-height:0!important;max-height:calc(100dvh - 345px)!important;
+  margin-bottom:0!important;padding-bottom:0!important;overflow-y:auto!important;
+ }
+ body.lineInboxOpen #lineInbox #lineInboxMessages>.lineMessage:last-of-type{margin-bottom:0!important}
+}
+</style>
+<style id="lineInboxFixedTenSlotBackground20261026">
+/* Keep the LINE inbox white list surface sized for ten cards, even with fewer results. */
+@media(min-width:901px){
+ body.lineInboxOpen main.wrap .workspace>.workMain>#lineInbox{
+  height:auto!important;
+  min-height:var(--line-ten-row-panel-height,620px)!important;
+  padding-bottom:8px!important;
+  box-sizing:border-box!important;
+  background:#fff!important;
+ }
+ body.lineInboxOpen #lineInbox #lineInboxMessages{
+  min-height:var(--line-ten-row-content-height,570px)!important;
+  max-height:none!important;
+  overflow-y:auto!important;
+  box-sizing:border-box!important;
+ }
+}
+</style><style id="commonPreviewFullShell20261026">
+body{margin:0!important;background:#f2f4f8!important}
+body .appHeader{position:relative!important;top:auto!important}
+body main.wrap{padding:0 20px 0 0!important;width:100%!important;max-width:none!important;height:calc(100dvh - 62px)!important;display:flex!important;flex-direction:column!important;overflow:hidden!important}
+body main.wrap>#interviewPersistentTop{display:grid!important;grid-template-columns:300px minmax(0,1fr)!important;gap:14px!important;flex:0 0 auto!important;align-items:stretch!important;margin:0 0 10px!important}
+body main.wrap>#interviewPersistentTop>#dailySidebarCalendar,body main.wrap>#interviewPersistentTop>.dailyScheduleSection{
+ height:196px!important;min-height:196px!important;max-height:196px!important;overflow:hidden!important;
+ align-self:stretch!important;box-sizing:border-box!important;background:#fff!important;
+ border:1px solid #d8e0e9!important;border-radius:10px!important;margin:0!important}
+body main.wrap>#interviewPersistentTop>#dailySidebarCalendar{padding:7px 12px!important}
+body main.wrap>#interviewPersistentTop>.dailyScheduleSection{padding:3px 12px!important}
+#interviewPersistentTop .dailyDateTitle{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:12px!important;min-height:22px!important;padding:0!important;margin:0 0 5px!important}
+#interviewPersistentTop .dailyDateTitle h2{font-size:16px!important;margin:0!important}
+#interviewPersistentTop .dailyLegend{display:flex!important;align-items:center!important;gap:12px!important;font-size:11px!important;margin:0!important}
+#interviewPersistentTop #dailyAvailabilityStatus{margin-left:auto!important}
+#interviewPersistentTop .dailyGrid.dailyGantt{display:grid!important;grid-template-columns:65px minmax(0,1fr)!important;gap:4px 10px!important;width:100%!important;align-items:center!important}
+#interviewPersistentTop .ganttAxis{display:grid!important;grid-template-columns:repeat(14,minmax(0,1fr))!important}
+#interviewPersistentTop .ganttAxis span{font-size:10px!important}
+#interviewPersistentTop .ganttTrack{height:25px!important;width:100%!important;display:grid!important;grid-template-columns:repeat(28,minmax(0,1fr))!important;overflow:hidden!important;border-radius:5px!important}
+#interviewPersistentTop .ganttSegment{display:flex!important;align-items:center!important;justify-content:center!important;font-size:9px!important;height:100%!important;min-width:0!important}
+#interviewPersistentTop .gantt-yes{background:#b9dfc7!important;color:#225d38!important}
+#interviewPersistentTop .gantt-no{background:#d9dde2!important;color:#687481!important}
+#interviewPersistentTop .gantt-busy{background:#b7a3d6!important;color:#382453!important}
+body main.wrap>.workspace{display:grid!important;grid-template-columns:300px minmax(0,1fr)!important;gap:14px!important;flex:1 1 auto!important;min-height:0!important;overflow:hidden!important;align-items:start!important}
+body main.wrap>.workspace>aside.side.card{position:relative!important;display:block!important;width:300px!important;min-width:300px!important;max-width:300px!important;height:auto!important;max-height:none!important;grid-row:1!important;grid-column:1!important;border:0!important;padding:0!important;margin:0!important;background:transparent!important;box-shadow:none!important}
+body main.wrap>.workspace>aside.side.card>.navSection{display:flex!important;flex-direction:column!important;position:relative!important;gap:0!important;top:auto!important;margin:0!important;width:100%!important;grid-row:auto!important;grid-column:auto!important}
+body main.wrap>.workspace>.workMain{display:block!important;min-width:0!important;width:100%!important;height:100%!important;grid-row:1!important;grid-column:2!important;overflow:hidden!important}
+body main.wrap>.workspace>.workMain>#lineInbox{box-sizing:border-box!important;display:flex!important;flex-direction:column!important;height:auto!important;min-height:0!important;max-height:100%!important;padding:10px 12px 8px!important;margin:0!important;overflow:hidden!important;background:#fff!important}
+#lineInbox>.scheduleHeader{padding:0 0 7px!important;margin:0 0 5px!important;flex:0 0 auto!important;min-height:28px!important;display:flex!important;align-items:center!important;justify-content:space-between!important}
+#lineInbox>.scheduleHeader h2{font-size:16px!important;margin:0!important}
+#lineInboxMessages{display:block!important;overflow-y:auto!important;min-height:0!important;max-height:calc(100dvh - 335px)!important;flex:0 1 auto!important;padding:0!important;margin:0!important;background:#fff!important;scrollbar-width:thin}
+#lineInboxMessages>.lineMessage{box-sizing:border-box!important;display:block!important;height:56px!important;min-height:56px!important;max-height:56px!important;margin:3px 0!important;padding:5px 8px!important;background:#fff!important;border:1px solid #dce4ee!important;border-radius:7px!important;overflow:hidden!important}
+#lineInboxMessages>.lineMessage>.lineNoticePrimary{box-sizing:border-box!important;display:grid!important;grid-template-columns:165px minmax(0,1fr) 318px!important;align-items:center!important;gap:8px!important;height:44px!important;min-height:44px!important;max-height:44px!important;margin:0!important;padding:0!important;overflow:hidden!important}
+#lineInboxMessages .lineNoticePerson{display:flex!important;align-items:center!important;gap:8px!important;min-width:0!important;height:44px!important}
+#lineInboxMessages .lineAvatar{width:36px!important;height:36px!important;min-width:36px!important;max-height:36px!important;object-fit:cover!important}
+#lineInboxMessages .lineNoticeIdentity{display:flex!important;flex-direction:column!important;justify-content:center!important;gap:2px!important;min-width:0!important;height:42px!important;overflow:hidden!important}
+#lineInboxMessages .lineNoticeIdentity strong{font-size:12px!important;line-height:16px!important;margin:0!important}
+#lineInboxMessages .lineStoreBadge{font-size:10px!important;line-height:13px!important;margin:0!important;padding:2px 6px!important;align-self:flex-start!important}
+#lineInboxMessages .lineNoticeSummary{display:flex!important;align-items:center!important;gap:8px!important;grid-column:2!important;grid-row:1!important;min-width:0!important;overflow:hidden!important;flex-wrap:nowrap!important}
+#lineInboxMessages .sharedInterviewAppointment{display:inline-flex!important;align-items:center!important;gap:8px!important;height:34px!important;min-height:34px!important;min-width:0!important;flex:0 1 235px!important;padding:4px 9px!important;box-sizing:border-box!important;white-space:nowrap!important}
+#lineInboxMessages .sharedInterviewAppointment strong{font-size:12px!important}
+#lineInboxMessages .sharedInterviewAppointment span{font-size:11px!important}
+#lineInboxMessages .sharedInterviewRisk{display:flex!important;flex-wrap:nowrap!important;gap:5px!important;overflow:hidden!important}
+#lineInboxMessages .sharedHistoryCount{display:inline-flex!important;align-items:center!important;background:#fff3f4!important;border:1px solid #e3b5bd!important;color:#953741!important;border-radius:5px!important;padding:5px 6px!important;font-size:10px!important;font-weight:700!important;white-space:nowrap!important}
+#lineInboxMessages .lineBookActions{display:flex!important;grid-column:3!important;grid-row:1!important;gap:4px!important;align-items:center!important;justify-content:flex-end!important;width:318px!important;margin:0!important;padding:0!important;flex-wrap:nowrap!important}
+#lineInboxMessages .lineBookActions .action{display:inline-flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;width:76px!important;min-width:76px!important;max-width:76px!important;height:32px!important;min-height:32px!important;max-height:32px!important;font-size:10px!important;font-weight:800!important;padding:0 3px!important;border-radius:6px!important;white-space:nowrap!important}
+#lineInboxMessages .lineBookActions .action:disabled{background:#edf0f4!important;border:1px solid #d5dbe3!important;color:#8c99a9!important;opacity:1!important}
+#lineInboxMessages .lineBookActions .action.lineBookButton{background:#176b9b!important;border-color:#10547d!important;color:#fff!important}
+#lineInboxMessages .lineBookActions .action.afterlifeAction{background:#60445f!important;border-color:#60445f!important;color:#fff!important}
+#lineInboxMessages .lineBookActions .action.afterlifeAction[disabled]{background:#60445f!important;color:#fff!important;opacity:1!important}
+body .navBtn.previewSelected{outline:2px solid #4f8fcb!important;outline-offset:-3px!important}
+#previewHint{font-size:10px;color:#63758a;margin:7px 0 0}
+#previewHeaderTools{display:flex;align-items:center;gap:8px}
+#previewHeaderTools select,#previewHeaderTools button{font-size:11px;height:28px;border:1px solid #bed2e8;border-radius:5px;background:white;color:#173c62;padding:0 8px}
+#previewHeaderTools button:disabled{opacity:.4}
+#previewPageLabel{white-space:nowrap;font-weight:800;font-size:11px}
+@media(max-width:1100px){#lineInboxMessages{overflow-x:auto!important}#lineInboxMessages>.lineMessage{min-width:1000px!important}#lineInbox>.scheduleHeader{flex-wrap:wrap!important}}
+@media(max-width:900px){html,body{overflow:auto!important}body main.wrap{height:auto!important;overflow:visible!important}body main.wrap>#interviewPersistentTop,body main.wrap>.workspace{grid-template-columns:minmax(0,1fr)!important;overflow:visible!important}body main.wrap>.workspace>aside.side.card{width:auto!important;min-width:0!important;max-width:none!important}body main.wrap>.workspace>.workMain{grid-column:1!important;height:auto!important}#lineInboxMessages{max-height:none!important}}
+</style></head><body class="lineInboxOpen">
+<header class="appHeader"><div class="brand"><span>MATTAN KOUGYOU</span><strong>面接予約管理</strong></div><div class="headerRight"><button class="headerNavButton" type="button" id="returnMain">面接管理に戻る</button><span>INTERVIEW MANAGEMENT</span><span class="headerSymbol" aria-hidden="true">◈</span></div></header>
+<main class="wrap">
+<section id="interviewPersistentTop" aria-label="共通カレンダーと担当者スケジュール">
+<section id="dailySidebarCalendar"><div class="dailyMonthNav"><button type="button" id="calPrev">‹</button><strong id="monthLabel"></strong><button type="button" id="calNext">›</button></div><div class="dailyCalendar" id="dailyCalendarDays"></div></section>
+<div class="dailySection dailyScheduleSection"><div class="dailyDateTitle"><h2 id="dailyScheduleTitle"></h2><div class="dailyLegend"><span>🟩 対応可能</span><span>⬜ 対応不可（グレー）</span><span>🟪 面接予約済み</span></div><span id="dailyAvailabilityStatus" class="note">照合済み</span></div><div class="dailyTableWrap"><div class="dailyGrid dailyGantt" id="dailyScheduleGrid"></div></div></div>
+</section>
+<div class="workspace"><aside class="side card"><div class="navSection">
+<button class="navBtn" data-index="0" type="button"><span class="sidebarNavTitle">LINE通知</span><span class="sidebarNavRight"><span class="sidebarCount"></span><span class="sidebarNavArrow">▶</span></span></button>
+<button class="navBtn" data-index="1" type="button"><span class="sidebarNavTitle">明日以降の面接予定</span><span class="sidebarNavRight"><span class="sidebarCount"></span><span class="sidebarNavArrow">▶</span></span></button>
+<button class="navBtn" data-index="2" type="button"><span class="sidebarNavTitle">日程調整中</span><span class="sidebarNavRight"><span class="sidebarCount"></span><span class="sidebarNavArrow">▶</span></span></button>
+<button class="navBtn" data-index="3" type="button"><span class="sidebarNavTitle">不届き者達</span><span class="sidebarNavRight"><span class="sidebarCount"></span><span class="sidebarNavArrow">▶</span></span></button>
+<button class="navBtn" data-index="4" type="button"><span class="sidebarNavTitle">面接実施済み</span><span class="sidebarNavRight"><span class="sidebarCount"></span><span class="sidebarNavArrow">▶</span></span></button>
+<button class="navBtn afterlifeNavBtn" data-index="5" type="button"><span class="sidebarNavTitle">来世に期待</span><span class="sidebarNavRight"><span class="sidebarCount"></span><span class="sidebarNavArrow">▶</span></span></button>
+<button class="navBtn" type="button" style="margin-top:22px!important;background:#234969!important;color:#fff!important" aria-current="page"><span class="sidebarNavTitle">共通ページ</span><span class="sidebarNavRight">確認用 ▶</span></button>
+</div></aside><div class="workMain"><section class="card lineInbox" id="lineInbox">
+<div class="scheduleHeader"><h2 id="listTitle">求人LINE受信｜全店舗</h2><div id="previewHeaderTools"><select id="previewCategory" aria-label="一覧の種類"></select><span id="previewTotal"></span><button id="previewPrev" type="button">前へ</button><strong id="previewPageLabel"></strong><button id="previewNext" type="button">次へ</button></div></div>
+<div id="lineInboxMessages" aria-label="共通カード一覧"></div><p id="previewHint">レイアウト確認用のサンプルです。登録・変更・キャンセル等の操作は無効です。元の面接管理ページには変更を加えていません。</p>
+</section></div></div></main>
+<script>
+(function(){
+const views=['LINE通知','明日以降の面接予定','日程調整中','不届き者達','面接実施済み','来世に期待'];
+const counts=[19,12,6,9,14,3];let view=0,page=1;
+const category=document.getElementById('previewCategory'),list=document.getElementById('lineInboxMessages');
+function el(tag,cls,txt){const x=document.createElement(tag);if(cls)x.className=cls;if(txt!==undefined)x.textContent=txt;return x}
+views.forEach((v,i)=>{const opt=document.createElement('option');opt.value=i;opt.textContent=v;category.append(opt)});
+document.querySelectorAll('.navBtn[data-index]').forEach(btn=>{const i=+btn.dataset.index;btn.querySelector('.sidebarCount').textContent=counts[i]+'件';btn.onclick=()=>{view=i;page=1;render()}});
+document.getElementById('returnMain').onclick=()=>location.href='../';
+const now=new Date(),jp=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Tokyo',year:'numeric',month:'numeric',day:'numeric'}).formatToParts(now);let day=+jp.find(x=>x.type==='day').value,month=+jp.find(x=>x.type==='month').value,year=+jp.find(x=>x.type==='year').value,sel=day;
+function dateText(){return year+'-'+String(month).padStart(2,'0')+'-'+String(sel).padStart(2,'0')}
+function drawCal(){const d=document.getElementById('dailyCalendarDays');d.replaceChildren();document.getElementById('monthLabel').textContent=year+'年'+String(month).padStart(2,'0')+'月';
+for(const w of ['日','月','火','水','木','金','土'])d.append(el('span','',w));const wd=new Date(Date.UTC(year,month-1,1)).getUTCDay(),n=new Date(Date.UTC(year,month,0)).getUTCDate();for(let i=0;i<wd;i++)d.append(el('span'));
+for(let i=1;i<=n;i++){const b=el('button',i===sel?'selected':'',String(i));b.type='button';b.onclick=()=>{sel=i;drawCal();drawTimeline()};d.append(b)}}
+document.getElementById('calPrev').onclick=()=>{month--;if(month<1){year--;month=12}sel=1;drawCal();drawTimeline()};document.getElementById('calNext').onclick=()=>{month++;if(month>12){year++;month=1}sel=1;drawCal();drawTimeline()};
+function drawTimeline(){const grid=document.getElementById('dailyScheduleGrid');grid.replaceChildren();grid.append(el('div','dailyName','担当者'));const axis=el('div','ganttAxis');for(let h=10;h<=23;h++)axis.append(el('span','',h+':00'));grid.append(axis);const team=['社長','オオタ','村上','お祭り'];
+team.forEach((name,k)=>{grid.append(el('div','dailyName',name));const track=el('div','ganttTrack');for(let i=0;i<28;i++){const busy=(k===1&&i===11)||(k===2&&i>=19&&i<=21);const slot=el('span','ganttSegment '+(busy?'gantt-busy':i<12?'gantt-no':'gantt-yes'),i%2?'30':'00');track.append(slot)}grid.append(track)});document.getElementById('dailyScheduleTitle').textContent=dateText()+'｜担当者スケジュール'}
+function makeCard(i){
+const item=el('div','lineMessage'),primary=el('div','lineNoticePrimary'),person=el('div','lineNoticePerson'),avatar=el('span','lineAvatar empty','LINE'),identity=el('div','lineNoticeIdentity');
+const shop=el('span','lineStoreBadge',i%3===0?'薔薇と紳士':'Grand Luxe');shop.dataset.store=i%3===0?'rose':'grandluxe';identity.append(el('strong','', '確認用応募者 '+String(i+1).padStart(2,'0')),shop);person.append(avatar,identity);
+const summary=el('div','lineNoticeSummary'),appointment=el('div','sharedInterviewAppointment');appointment.append(el('strong','',view===2?'未定':'2026-10-27 15:00'));if(view!==2)appointment.append(el('span','','担当：村上'));summary.append(appointment);
+if(i%4===0){const wrap=el('div','sharedInterviewRisk');wrap.append(el('span','sharedHistoryCount',i%8===0?'日程変更 2件':'キャンセル 1件'));summary.append(wrap)}
+const actions=el('div','lineBookActions sharedInterviewButtons');for(const [j,name] of ['日程変更','キャンセル','面接登録','来世に期待'].entries()){const b=el('button','action '+(j===2?'lineBookButton':j===3?'afterlifeAction':j===0?'action-change':'action-cancel'),name);b.type='button';b.disabled=true;b.title='表示確認用（操作不可）';actions.append(b)}
+primary.append(person,summary,actions);item.append(primary);return item}
+function render(){
+category.value=String(view);document.querySelectorAll('.navBtn[data-index]').forEach(b=>b.classList.toggle('previewSelected',Number(b.dataset.index)===view));
+const total=counts[view],pages=Math.max(1,Math.ceil(total/10));page=Math.max(1,Math.min(page,pages));
+document.getElementById('listTitle').textContent=view===0?'求人LINE受信｜全店舗':views[view];document.getElementById('previewTotal').textContent=total+'件';
+document.getElementById('previewPageLabel').textContent=page+' / '+pages+'ページ';document.getElementById('previewPrev').disabled=page===1;document.getElementById('previewNext').disabled=page===pages;
+list.replaceChildren();for(let i=(page-1)*10;i<Math.min(total,page*10);i++)list.append(makeCard(i))
+}
+category.onchange=()=>{view=Number(category.value);page=1;render()};document.getElementById('previewPrev').onclick=()=>{page--;render()};document.getElementById('previewNext').onclick=()=>{page++;render()};
+drawCal();drawTimeline();render();
+})();
 </script></body></html>
