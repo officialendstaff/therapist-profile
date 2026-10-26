@@ -786,7 +786,7 @@ body.afterlifeOpen .workMain>.workRight{display:none!important}
 <aside class="side card"><section id="dailySidebarCalendar"><h2>日付選択</h2><div class="dailyMonthNav"><button type="button" id="dailyPrevMonth" aria-label="前月">‹</button><strong id="dailyMonthLabel"></strong><button type="button" id="dailyNextMonth" aria-label="翌月">›</button></div><div class="dailyCalendar" id="dailyCalendarDays"></div></section><div class="navSection"><button type="button" class="navBtn" id="sidebarLineNav"><span class="sidebarNavTitle">LINE通知</span><span class="sidebarNavRight"><span id="sidebarLineCount">—件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><button class="navBtn" id="futureNav" type="button" aria-expanded="true"><span class="sidebarNavTitle">明日以降の面接予定</span><span class="sidebarNavRight"><span id="futureInterviewCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><div class="navPanel" id="futurePanel" hidden><div id="list">読み込み中...</div></div><button class="navBtn" id="pendingNav" type="button" aria-expanded="false"><span class="sidebarNavTitle">日程調整中</span><span class="sidebarNavRight"><span id="pendingInterviewCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><div class="navPanel" id="pendingPanel" hidden><div id="pendingInterviewList"></div></div><button class="navBtn" id="misconductNav" type="button"><span class="sidebarNavTitle">不届き者達</span><span class="sidebarNavRight"><span id="misconductCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><button class="navBtn" id="historyNav" type="button" aria-expanded="false"><span class="sidebarNavTitle">面接実施済み</span><span class="sidebarNavRight"><span id="pastInterviewCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><div class="navPanel" id="historyPanel" hidden><div id="pastInterviewList">読み込み中...</div></div><button class="navBtn afterlifeNavBtn" id="afterlifeNav" type="button" aria-expanded="false"><span class="sidebarNavTitle">来世に期待</span><span class="sidebarNavRight"><span id="afterlifeCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button></div></aside>
 <div class="workMain"><section class="card" id="dailyDashboard" hidden><div class="dailySection dailyAppointmentSection"><div class="dailyDateTitle"><h2 id="dailyAppointmentTitle">本日の面接予定</h2><span id="dailyAppointmentCount"></span></div><div class="dailyAppointments" id="dailyAppointmentItems"></div></div><div class="dailySection dailyScheduleSection"><div class="dailyDateTitle"><h2 id="dailyScheduleTitle">担当者スケジュール</h2><span id="dailyAvailabilityStatus" class="note"></span></div><div class="dailyLegend"><span>🟩 対応可能</span><span>⬜ 対応不可（グレー）</span><span>🟪 面接予約済み</span></div><div class="dailyTableWrap"><div class="dailyGrid" id="dailyScheduleGrid"></div></div><p class="dailyNotice">10:00〜23:30・30分単位。空き枠をタップして日時を選択できます。</p></div></section><section class="card lineInbox" id="lineInbox" hidden><div class="scheduleHeader"><h2>求人LINE受信｜全店舗</h2><button type="button" class="action" id="lineInboxBack" hidden style="display:none!important" aria-hidden="true" tabindex="-1">TOPに戻る</button></div><p class="note" id="lineInboxStatus">受信データを確認しています。</p><div id="lineInboxAuth" hidden><p class="note">求人管理の管理者アカウントでログインしてください。</p><input type="email" id="lineInboxEmail" autocomplete="username" placeholder="メールアドレス"><input type="password" id="lineInboxPassword" autocomplete="current-password" placeholder="パスワード"><button type="button" class="action" id="lineInboxLogin">ログイン</button></div><div class="lineInboxTools"><label for="lineInboxStore">店舗</label><select id="lineInboxStore"><option value="">全店舗</option><option value="rose">薔薇と紳士</option><option value="grandluxe">Grand Luxe</option><option value="luxy">LUXY</option><option value="unsecret">Un Secret</option><option value="us">Un Secret（旧ID）</option></select><span id="lineInboxResultCount" aria-live="polite"></span></div><div id="lineInboxMessages"></div></section><section class="card reminderPanel" id="reminderPanel" hidden><div class="reminderSingleRow"><h2>確認LINEの送信時間です</h2><span class="reminderMessage">応募者へ確認LINEを送信してください。</span><div id="reminderItems"></div></div></section><section class="card scheduleView" id="scheduleView" hidden><div class="scheduleHeader"><h2 id="scheduleTitle">面接予定一覧</h2><button type="button" id="backToCalendar" class="action" hidden style="display:none!important" aria-hidden="true" tabindex="-1">TOPに戻る</button></div><div id="scheduleViewContent"></div></section>
 <section class="card afterlifeView" id="afterlifeView" hidden><div class="scheduleHeader afterlifeHeader"><h2>来世に期待</h2><span id="afterlifeListCount">0件</span></div><div class="afterlifeEmpty">現在、登録された応募者はいません。</div></section>
-<section class="card applicantDetailView" id="applicantDetailView" hidden aria-labelledby="applicantDetailTitle"><div class="applicantDetailHeader"><div><h2 id="applicantDetailTitle">応募者詳細</h2><p id="applicantDetailOrigin" class="note">求人LINE受信 ＞ 応募者詳細</p></div><button type="button" class="action" id="applicantDetailBack">一覧へ戻る</button></div><div class="applicantDetailIdentity"><span id="applicantDetailAvatar" class="lineAvatar empty">LINE</span><div><strong id="applicantDetailName">読み込み中</strong><div class="applicantDetailMeta"><span id="applicantDetailShop" class="lineStoreBadge">店舗</span><span id="applicantDetailLatest"></span></div></div></div><div class="applicantDetailSummary"><div><small>現在の面接状況</small><strong id="applicantDetailSchedule">確認中</strong><span id="applicantDetailStaff"></span></div><div><small>面接・対応履歴</small><strong id="applicantDetailRisk">確認中</strong><span id="applicantDetailStatus"></span></div></div><div class="applicantDetailColumns"><section class="applicantDetailPanel"><div class="applicantDetailPanelHead"><h3>LINE受信履歴</h3><span id="applicantDetailMessageCount"></span></div><div id="applicantDetailMessages" class="applicantDetailScroll" aria-live="polite"></div><button type="button" id="applicantDetailMore" class="action" hidden>さらに表示</button></section><section class="applicantDetailPanel"><div class="applicantDetailPanelHead"><h3>面接・対応履歴</h3></div><div id="applicantDetailHistory" class="applicantDetailScroll"></div></section></div></section>
+<section class="card applicantDetailView" id="applicantDetailView" hidden aria-labelledby="applicantDetailTitle"><div class="applicantDetailHeader"><div><h2 id="applicantDetailTitle">応募者詳細</h2><p id="applicantDetailOrigin" class="note">求人LINE受信 ＞ 応募者詳細</p></div><div class="applicantDetailHeaderActions"><button type="button" class="action afterlifeAction" id="applicantDetailAfterlife">来世に期待</button><button type="button" class="action" id="applicantDetailBack">一覧へ戻る</button></div></div><div class="applicantDetailIdentity"><span id="applicantDetailAvatar" class="lineAvatar empty">LINE</span><div><strong id="applicantDetailName">読み込み中</strong><div class="applicantDetailMeta"><span id="applicantDetailShop" class="lineStoreBadge">店舗</span><span id="applicantDetailLatest"></span></div></div></div><div class="applicantDetailSummary"><div><small>現在の面接状況</small><strong id="applicantDetailSchedule">確認中</strong><span id="applicantDetailStaff"></span></div><div><small>面接・対応履歴</small><strong id="applicantDetailRisk">確認中</strong><span id="applicantDetailStatus"></span></div></div><div class="applicantDetailColumns"><section class="applicantDetailPanel"><div class="applicantDetailPanelHead"><h3>LINE受信履歴</h3><span id="applicantDetailMessageCount"></span></div><div id="applicantDetailMessages" class="applicantDetailScroll" aria-live="polite"></div><button type="button" id="applicantDetailMore" class="action" hidden>さらに表示</button></section><section class="applicantDetailPanel"><div class="applicantDetailPanelHead"><h3>面接・対応履歴</h3></div><div id="applicantDetailHistory" class="applicantDetailScroll"></div></section></div></section>
 <div class="workLeft">
 <div class="storeTop card" hidden style="display:none!important"><nav class="storeNav" aria-label="店舗選択"><button type="button" class="choice" data-shop="" id="allStoresChoice">全店舗</button>
 <button type="button" class="choice" data-shop="Grand Luxe">Grand Luxe</button>
@@ -1142,6 +1142,7 @@ const interviewHistory=(historyByLine.get(key)||[]).sort((a,b)=>String(b.intervi
 const cancellationHistory='';
 const sharedSummary=interviewSharedInfoHTML(linkedInterview,interviewSharedHistoryForLine(x.account_id,x.line_user_id));
 const body=event=>'<div class="lineGroupedEntry"><small>'+escape(new Date(event.received_at).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'}))+'</small><p>'+escape(event.message_text??('['+(event.message_type||'メッセージ')+']'))+'</p></div>';
+const rejectButton='<button type="button" class="action afterlifeAction" data-account="'+escape(x.account_id)+'" data-user="'+escape(x.line_user_id)+'" data-name="'+escape(name)+'" data-picture="'+escape(picture||'')+'">来世に期待</button>';
 return '<div class="lineMessage"><div class="lineNoticePrimary">'+
  '<div class="lineNoticePerson" role="button" tabindex="0" title="応募者詳細を開く" data-account="'+escape(x.account_id)+'" data-user="'+escape(x.line_user_id)+'">'+(picture?'<img class="lineAvatar" src="'+escape(picture)+'" alt="LINEアイコン">':'<span class="lineAvatar empty">LINE</span>')+'<div class="lineNoticeIdentity"><strong>'+escape(name)+'</strong><span class="lineStoreBadge" data-store="'+escape(x.account_id)+'">'+escape(storeNames[x.account_id]||x.account_id)+'</span></div></div>'+
  '<div class="lineNoticeSummary">'+sharedSummary+'</div>'+
@@ -1150,6 +1151,7 @@ return '<div class="lineMessage"><div class="lineNoticePrimary">'+
  '<button type="button" class="lineLatestPreview" aria-expanded="false"><span class="linePreviewText">'+escape(x.message_text??('['+(x.message_type||'メッセージ')+']'))+'</span><small>タップで受信履歴を表示（'+events.length+'件）</small></button>'+
  '<div class="lineAllHistory" hidden>'+history+cancellationHistory+events.map(body).join('')+'</div></div>';
 }).join('')||'<p class="note">受信メッセージはありません。</p>';
+messages.querySelectorAll('.lineLatestPreview,.lineAllHistory').forEach(el=>el.remove());
 applyLineInboxFilters();
 }catch(e){console.error('LINE受信データ取得エラー',e);window.interviewInboxLastError=String(e?.stack||e);if(visible){status.textContent='LINE受信情報を取得できませんでした：'+(e?.message||String(e));messages.innerHTML='<button type="button" class="action" id="lineInboxRetry">再読み込み</button>';document.getElementById('lineInboxRetry').onclick=()=>refresh();}}}
 let lineInboxPage=1;
@@ -1238,7 +1240,9 @@ document.addEventListener('click',function(e){
  card.classList.add(i.confirmed?'interviewStateConfirmed':reminderAcknowledged().includes(reminderRecordId)?'interviewStateLineSent':'interviewStatePending');
  let profile=null;try{profile=typeof interviewLineProfiles!=='undefined'&&interviewLineProfiles?.get?interviewLineProfiles.get(Number(i.id)):null}catch(e){console.warn('LINEプロフィール取得失敗',e)}
  const head=document.createElement('div');head.className='unifiedInterviewHead';
- const avatar=document.createElement('span');avatar.className='unifiedInterviewAvatar';avatar.textContent='LINE';
+ const avatar=document.createElement('span');avatar.className='unifiedInterviewAvatar';
+ const linked=(window.interviewSharedHistoryLinks||[]).find(l=>String(l.interview_id)===String(i.id));
+ if(linked?.line_user_id){head.classList.add('lineNoticePerson');head.dataset.account=linked.account_id;head.dataset.user=linked.line_user_id;head.tabIndex=0;head.setAttribute('role','button');head.title='応募者詳細を開く';}avatar.textContent='LINE';
  if(profile?.picture){const img=document.createElement('img');img.src=profile.picture;img.alt='LINEアイコン';img.referrerPolicy='no-referrer';img.onerror=()=>img.remove();avatar.prepend(img);}
  const identity=document.createElement('div');identity.className='unifiedInterviewIdentity';
  const name=document.createElement('strong');name.textContent=profile?.name||'LINE名未取得';
@@ -1248,6 +1252,7 @@ document.addEventListener('click',function(e){
  const actions=document.createElement('div');actions.className='unifiedInterviewActions';
  if(selected===jstToday()&&!i.confirmed){const b=document.createElement('button');b.type='button';b.className='action action-confirm';b.textContent='確認OK';b.onclick=()=>confirmOK(i.id);actions.append(b);}
  for(const [label,klass,handler] of [['日程変更','action-change',()=>chooseReschedule(i.id)],['キャンセル','action-cancel',()=>cancelIt(i.id)]]){const b=document.createElement('button');b.type='button';b.className='action '+klass;b.textContent=label;b.onclick=handler;actions.append(b);}
+ if(linked?.line_user_id){const reject=document.createElement('button');reject.type='button';reject.className='action afterlifeAction';reject.textContent='来世に期待';reject.dataset.account=linked.account_id;reject.dataset.user=linked.line_user_id;reject.dataset.name=profile?.name||'LINE利用者';reject.dataset.picture=profile?.picture||'';actions.append(reject);}
  const toggle=document.createElement('button');toggle.type='button';toggle.className='unifiedInterviewToggle';toggle.textContent='詳細・操作を表示 ▾';toggle.setAttribute('aria-expanded','false');actions.hidden=false;card.append(actions);box.append(card);
  }catch(error){console.error('面接カード表示エラー',i?.id,error);const fallback=document.createElement('p');fallback.className='note';fallback.textContent=String(i.interview_time||'')+'｜'+String(i.shop||'')+'（詳細取得エラー）';box.append(fallback);}}
  window.refreshInterviewReminderCards?.();
@@ -1488,6 +1493,7 @@ window.pickInterviewGanttSlot=function(p){
       add('日程変更','action-change',()=>misconduct?rescheduleFromHistory(i.id):category==='pending'?changeDate(i.id):chooseReschedule(i.id),false);
       add('キャンセル','action-cancel',()=>cancelIt(i.id),closed||misconduct);
       add('登録済み','lineBookStatus',null,true);
+      if(matchedLink?.line_user_id){const reject=document.createElement('button');reject.type='button';reject.className='action afterlifeAction';reject.textContent='来世に期待';reject.dataset.account=matchedLink.account_id;reject.dataset.user=matchedLink.line_user_id;reject.dataset.name=profile.name||'LINE利用者';reject.dataset.picture=profile.picture||'';actions.append(reject);}
       top.append(actions);
     }
     card.append(top);
@@ -1512,7 +1518,7 @@ window.pickInterviewGanttSlot=function(p){
       preview.onclick=()=>{details.hidden=!details.hidden;preview.setAttribute('aria-expanded',String(!details.hidden));helper.textContent=details.hidden?'タップで受信履歴を表示（'+events.length+'件）':'タップで閉じる'};
       card.append(preview,details);
     }
-    root.append(card);
+    card.querySelectorAll('.lineLatestPreview,.lineAllHistory').forEach(el=>el.remove());root.append(card);
    }catch(error){console.error('面接一覧カード表示エラー',i?.id,error);const fallback=document.createElement('div');fallback.className='item';fallback.textContent=[i.interview_date,String(i.interview_time||'').slice(0,5),i.shop,i.status].filter(Boolean).join(' ｜ ');root.append(fallback)}
   }
   if(!items.length){const p=document.createElement('p');p.className='note';p.textContent='該当する面接予定はありません。';root.append(p)}
@@ -1624,9 +1630,9 @@ window.pickInterviewGanttSlot=function(p){
  // Conservative page sizing prevents items from disappearing behind a clipped scrolling viewport.
  window.interviewListVisibleCount=function(){
   const h=window.innerHeight||900;
-  if(h<750)return 3;
-  if(h<1060)return 4;
-  return 5;
+  if(h<750)return 6;
+  if(h<1060)return 9;
+  return 10;
  };
  const moveLineStore=()=>{
   const header=document.querySelector('#lineInbox>.scheduleHeader');
@@ -1684,7 +1690,7 @@ window.pickInterviewGanttSlot=function(p){
   const account=target.dataset.account,user=target.dataset.user;
   if(!account||!user)return;
   selection={account,user};page=20;entries=[];
-  origin=byId('scheduleView')&&!byId('scheduleView').hidden?'面接予定一覧':'求人LINE受信一覧';
+  origin=document.body.classList.contains('dashboardHome')?'本日の面接予定':document.body.classList.contains('afterlifeOpen')?'来世に期待':byId('scheduleView')&&!byId('scheduleView').hidden?'面接予定一覧':'求人LINE受信一覧';
   put('applicantDetailOrigin',origin+' ＞ 応募者詳細');
   put('applicantDetailName',target.querySelector('.lineNoticeIdentity strong')?.textContent||'LINE利用者');
   put('applicantDetailShop',labels[account]||account);
@@ -1696,15 +1702,16 @@ window.pickInterviewGanttSlot=function(p){
   const inbox=byId('lineInbox');
   if(!opened){
    previousView={
-    lineInboxOpen:document.body.classList.contains('lineInboxOpen'),
+    lineInboxOpen:document.body.classList.contains('lineInboxOpen'),dashboardHome:document.body.classList.contains('dashboardHome'),afterlifeOpen:document.body.classList.contains('afterlifeOpen'),
     inboxDisplay:inbox.style.getPropertyValue('display'),
     inboxPriority:inbox.style.getPropertyPriority('display')
    };
   }
   inbox.style.setProperty('display','none','important');
-  document.body.classList.remove('lineInboxOpen');
+  document.body.classList.remove('lineInboxOpen','dashboardHome','afterlifeOpen');
   document.body.classList.add('applicantDetailOpen');
   root.hidden=false;opened=true;fillMessages();
+  const reject=byId('applicantDetailAfterlife');reject.dataset.account=account;reject.dataset.user=user;reject.dataset.name=byId('applicantDetailName').textContent;reject.dataset.picture=avatar?.querySelector('img')?.src||'';
   put('applicantDetailSchedule','確認中');put('applicantDetailRisk','確認中');
   put('applicantDetailStaff','');put('applicantDetailStatus','');
   try{
@@ -1729,6 +1736,8 @@ window.pickInterviewGanttSlot=function(p){
   document.body.classList.remove('applicantDetailOpen');
   const inbox=byId('lineInbox');
   if(previousView?.lineInboxOpen)document.body.classList.add('lineInboxOpen');
+  if(previousView?.dashboardHome)document.body.classList.add('dashboardHome');
+  if(previousView?.afterlifeOpen)document.body.classList.add('afterlifeOpen');
   if(previousView?.inboxDisplay){
    inbox.style.setProperty('display',previousView.inboxDisplay,previousView.inboxPriority);
   }else{
@@ -1738,9 +1747,9 @@ window.pickInterviewGanttSlot=function(p){
  }
  back.addEventListener('click',close);
  byId('applicantDetailMore').addEventListener('click',()=>{page+=20;fillMessages()});
- document.addEventListener('click',e=>{const target=e.target.closest('#lineInboxMessages .lineNoticePerson[data-user],#scheduleViewContent .lineNoticePerson[data-user],#scheduleViewContent .unifiedSidebarPerson[data-user]');if(target&&!e.target.closest('button')){e.preventDefault();open(target)}},true);
- document.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const target=e.target.closest('#lineInboxMessages .lineNoticePerson[data-user],#scheduleViewContent .lineNoticePerson[data-user],#scheduleViewContent .unifiedSidebarPerson[data-user]');if(target){e.preventDefault();open(target)}});
- document.querySelectorAll('#sidebarLineNav,#futureNav,#pendingNav,#misconductNav,#historyNav,#topNav,#topButton,#bookingNav').forEach(button=>button.addEventListener('click',close,true));
+ document.addEventListener('click',e=>{const target=e.target.closest('#lineInboxMessages .lineNoticePerson[data-user],#scheduleViewContent .lineNoticePerson[data-user],#scheduleViewContent .unifiedSidebarPerson[data-user],#dailyAppointmentItems .lineNoticePerson[data-user],#afterlifeView .lineNoticePerson[data-user]');if(target&&!e.target.closest('button')){e.preventDefault();open(target)}},true);
+ document.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const target=e.target.closest('#lineInboxMessages .lineNoticePerson[data-user],#scheduleViewContent .lineNoticePerson[data-user],#scheduleViewContent .unifiedSidebarPerson[data-user],#dailyAppointmentItems .lineNoticePerson[data-user],#afterlifeView .lineNoticePerson[data-user]');if(target){e.preventDefault();open(target)}});
+ document.querySelectorAll('#sidebarLineNav,#futureNav,#pendingNav,#misconductNav,#historyNav,#afterlifeNav,#headerTopNav,#headerBookingNav,#topNav,#topButton,#bookingNav').forEach(button=>button.addEventListener('click',close,true));
 })();
 </script><script id="afterlifeSidebarLogic20261026">
 (function(){
