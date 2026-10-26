@@ -3176,4 +3176,20 @@ window.afterlifeReload=load;
  });
  render();
 })();
-</script></body></html>
+</script><script id="removeFutureInterviewPage20261026">
+(function(){
+ 'use strict';
+ function removeFuturePage(){
+  document.getElementById('futureNav')?.remove();
+  document.getElementById('futurePanel')?.remove();
+  document.querySelector('#commonPreviewCategory option[value="1"]')?.remove();
+  if(document.getElementById('commonPreviewCategory')?.value==='1'){
+   document.getElementById('commonPreviewCategory').value='0';
+   document.getElementById('commonPreviewNav')?.click();
+  }
+ }
+ removeFuturePage();
+ document.addEventListener('DOMContentLoaded',removeFuturePage,{once:true});
+})();
+</script>
+</body></html>
