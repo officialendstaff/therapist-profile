@@ -1340,7 +1340,7 @@ body.commonPreviewOpen main.wrap>.workspace>.workMain>:not(#commonPreviewPanel){
 body.commonPreviewOpen main.wrap>.workspace>.workMain>#commonPreviewPanel{
  display:block!important;box-sizing:border-box!important;position:relative!important;
  width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
- padding:8px 12px 8px!important;margin:0!important;overflow:visible!important;
+ padding:12px 16px!important;margin:0!important;overflow:visible!important;
  background:#fff!important;border:1px solid #d8e0e9!important;border-radius:10px!important;
  box-shadow:none!important
 }
@@ -1368,7 +1368,7 @@ body.commonPreviewOpen #commonPreviewNav{box-shadow:0 0 0 2px #78addc!important;
 #commonPreviewMessages{
  box-sizing:border-box!important;display:flex!important;flex-direction:column!important;
  width:100%!important;height:auto!important;min-height:620px!important;max-height:none!important;
- gap:6px!important;margin:0!important;padding:3px 0!important;overflow:visible!important;
+ gap:12px!important;margin:0!important;padding:0!important;overflow:visible!important;
  background:#fff!important
 }
 /* Card geometry comes exclusively from the original LINE inbox stylesheet mirror. */
@@ -1389,6 +1389,12 @@ body.commonPreviewOpen #commonPreviewNav{box-shadow:0 0 0 2px #78addc!important;
  body.commonPreviewOpen main.wrap>.workspace>aside.side.card{width:100%!important;max-width:none!important;min-width:0!important}
  body.commonPreviewOpen main.wrap>.workspace>.workMain{grid-column:1!important;grid-row:2!important}
 }
+
+/* The common page inherits the original inbox's header and store-filter structure. */
+#commonPreviewPanel>.scheduleHeader{display:flex!important;align-items:center!important;justify-content:space-between!important}
+#commonPreviewPanel>.lineInboxTools{display:flex!important;align-items:center!important;gap:10px!important}
+#commonPreviewPanel>.commonPreviewTools{display:flex!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;margin:8px 0!important}
+#commonPreviewMessages>.lineMessage{margin-bottom:0!important}
 </style><style id="nativeCommonListExactExclusivity20261026">
 /* The old listing panes must not occupy layout or display under the common view. */
 body.commonPreviewOpen .workMain > #lineInbox,
