@@ -1844,6 +1844,7 @@ async function load(){
   if(a.error)throw a.error;
   interviews=a.data||[];
   window.interviewDashboardRows=interviews;
+  window.dispatchEvent(new Event('interview-dashboard-rows-updated'));
   void window.interviewSharedLoadHistory?.();
   msg.textContent='';
   renderList();
@@ -3011,7 +3012,27 @@ window.afterlifeReload=load;
  function render(){
   const selected=storeFilter?.value||'';
   const lineCards=[...document.querySelectorAll('#lineInboxMessages > .lineMessage')].filter(el=>!selected||el.querySelector('.lineStoreBadge')?.dataset.store===selected);
-  const sources=category===0?lineCards.map(node=>({node})):demoRecords.filter(r=>!selected||storeCodes[r.shop]===selected).map(record=>({record}));
+  const realRows=Array.isArray(window.interviewDashboardRows)?window.interviewDashboardRows:[];
+  const today=new Date(Date.now()+9*60*60*1000).toISOString().slice(0,10);
+  const actual=realRows.filter(row=>{
+   if(selected&&storeCodes[row.shop]!==selected)return false;
+   const status=String(row.status||'');
+   if(category===1)return String(row.interview_date||'')>=today&&!['キャンセル','面接済','採用','不採用','無断トビ','トビ（キャンセル）','日程調整中'].includes(status);
+   if(category===2)return status==='日程調整中';
+   if(category===3)return ['無断トビ','トビ（キャンセル）'].includes(status);
+   if(category===4)return ['採用','不採用','来店済み','面接済'].includes(status);
+   if(category===5)return status==='来世に期待';
+   return false;
+  }).map((row,i)=>({record:{
+   name:row.line_name||row.applicant_name||row.name||'応募者',
+   shop:row.shop||'店舗未設定',
+   date:String(row.interview_date||'未定').slice(0,10),
+   time:String(row.interview_time||'').slice(0,5),
+   staff:row.staff_name||row.interviewer||'未設定',
+   actual:true
+  }}));
+  const fixtures=demoRecords.filter(r=>!selected||storeCodes[r.shop]===selected).map(record=>({record}));
+  const sources=category===0?lineCards.map(node=>({node})):[...actual,...fixtures];
   const total=sources.length,pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
   page=Math.max(1,Math.min(page,pages));selector.value=String(category);
   document.body.classList.remove('commonFutureOpen');
@@ -3136,7 +3157,10 @@ window.afterlifeReload=load;
   futureButton.setAttribute('aria-expanded','true');
   if(typeof interviews!=='undefined'&&!interviews.length&&typeof load==='function')void load().then(()=>render());
  };
- storeFilter?.addEventListener('change',()=>{page=1;render()});
+ window.addEventListener('interview-dashboard-rows-updated',()=>{if(previewExclusive&&category!==0)render()});
+ // Refresh the current list when an interview is registered elsewhere.
+ setInterval(()=>{if(previewExclusive&&category!==0&&typeof load==='function')void load().catch(console.error)},30000);
+  storeFilter?.addEventListener('change',()=>{page=1;render()});
  selector.addEventListener('change',()=>{
   category=Math.max(0,Math.min(5,Number(selector.value)||0));page=1;render();void loadActualLineInbox();
  });
