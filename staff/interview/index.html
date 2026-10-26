@@ -3038,7 +3038,7 @@ window.afterlifeReload=load;
   const actual=realRows.filter(row=>{
    if(selected&&storeCodes[row.shop]!==selected)return false;
    const status=String(row.status||'');
-   if(category===1)return String(row.interview_date||'')>=today&&!['キャンセル','面接済','採用','不採用','無断トビ','トビ（キャンセル）','日程調整中'].includes(status);
+   if(category===1)return String(row.interview_date||'').slice(0,10)>today&&!['キャンセル','面接済','採用','不採用','無断トビ','トビ（キャンセル）','日程調整中'].includes(status);
    if(category===2)return status==='日程調整中';
    if(category===3)return ['無断トビ','トビ（キャンセル）'].includes(status);
    if(category===4)return ['採用','不採用','来店済み','面接済'].includes(status);
