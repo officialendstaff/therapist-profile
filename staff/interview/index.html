@@ -867,6 +867,25 @@ body.afterlifeOpen #afterlifeView>.afterlifeHeader{padding-top:10px!important;pa
   grid-template-rows:max-content auto!important;
  }
 }
+</style><style id="interviewSidebarAndListSpacingCorrected20261026">
+/* Apply to all non-TOP list screens. Keep list headings next to the upper card edge. */
+body:not(.dashboardHome) #scheduleView.scheduleView{padding-top:5px!important}
+body:not(.dashboardHome) #scheduleView>.scheduleHeader{padding-top:0!important;margin-top:0!important}
+body.lineInboxOpen #lineInbox{padding-top:5px!important}
+body.lineInboxOpen #lineInbox>.scheduleHeader{padding-top:0!important;margin-top:0!important}
+body.afterlifeOpen #afterlifeView>.afterlifeHeader{padding-top:5px!important}
+@media(min-width:901px){
+ /* The sidebar second row begins immediately after its calendar rather than inheriting the main content height. */
+ body:not(.dashboardHome) .workspace{grid-template-rows:min-content min-content!important;align-content:start!important;row-gap:12px!important}
+ body:not(.dashboardHome) .workspace>.side.card>.navSection{
+  grid-column:1!important;grid-row:2!important;align-self:start!important;
+  position:relative!important;top:auto!important;margin:0!important
+ }
+ body:not(.dashboardHome) .workspace #dailySidebarCalendar{
+  grid-column:1!important;grid-row:1!important;margin:0!important
+ }
+ body:not(.dashboardHome) .workspace>.workMain{grid-column:2!important;grid-row:1 / span 2!important;align-self:start!important}
+}
 </style><style id="interviewMonthInHeaderTenFixed20261026">
 /* TOP remains unchanged. All interview lists use a single heading row. */
 #scheduleView>.scheduleHeader #scheduleHeaderMonth{
