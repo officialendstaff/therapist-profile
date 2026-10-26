@@ -2685,6 +2685,7 @@ window.pickInterviewGanttSlot=function(p){
   const account=target.dataset.account,user=target.dataset.user;
   if(!account||!user)return;
   selection={account,user};page=20;entries=[];
+  const commonPanel=byId('commonPreviewPanel');const fromCommon=!!commonPanel&&!commonPanel.hidden&&document.body.classList.contains('commonPreviewOpen');
   origin=document.body.classList.contains('dashboardHome')?'本日の面接予定':document.body.classList.contains('afterlifeOpen')?'来世に期待':byId('scheduleView')&&!byId('scheduleView').hidden?'面接予定一覧':'求人LINE受信一覧';
   put('applicantDetailOrigin',origin+' ＞ 応募者詳細');
   put('applicantDetailName',target.querySelector('.lineNoticeIdentity strong')?.textContent||'LINE利用者');
@@ -2697,7 +2698,7 @@ window.pickInterviewGanttSlot=function(p){
   const inbox=byId('lineInbox');
   if(!opened){
    previousView={
-    lineInboxOpen:document.body.classList.contains('lineInboxOpen'),dashboardHome:document.body.classList.contains('dashboardHome'),afterlifeOpen:document.body.classList.contains('afterlifeOpen'),
+    lineInboxOpen:document.body.classList.contains('lineInboxOpen'),dashboardHome:document.body.classList.contains('dashboardHome'),afterlifeOpen:document.body.classList.contains('afterlifeOpen'),commonPreviewOpen:fromCommon,
     sourcePanels:['lineInbox','scheduleView','dailyDashboard','afterlifeView'].map(id=>{
       const el=byId(id);
       return {id,hidden:el.hidden,display:el.style.getPropertyValue('display'),priority:el.style.getPropertyPriority('display')};
@@ -2710,7 +2711,8 @@ window.pickInterviewGanttSlot=function(p){
     const el=byId(id);if(!el)continue;
     el.hidden=true;el.style.setProperty('display','none','important');
   }
-  document.body.classList.remove('lineInboxOpen','dashboardHome','afterlifeOpen');
+  if(fromCommon)commonPanel.hidden=true;
+  document.body.classList.remove('lineInboxOpen','dashboardHome','afterlifeOpen','commonPreviewOpen');
   document.body.classList.add('applicantDetailOpen');
   root.hidden=false;opened=true;fillMessages();
   const reject=byId('applicantDetailAfterlife');reject.dataset.account=account;reject.dataset.user=user;reject.dataset.name=byId('applicantDetailName').textContent;reject.dataset.picture=avatar?.querySelector('img')?.src||'';
@@ -2745,12 +2747,13 @@ window.pickInterviewGanttSlot=function(p){
   if(previousView?.lineInboxOpen)document.body.classList.add('lineInboxOpen');
   if(previousView?.dashboardHome)document.body.classList.add('dashboardHome');
   if(previousView?.afterlifeOpen)document.body.classList.add('afterlifeOpen');
+  if(previousView?.commonPreviewOpen){document.body.classList.add('commonPreviewOpen');const panel=byId('commonPreviewPanel');if(panel)panel.hidden=false;}
   previousView=null;
  }
  back.addEventListener('click',close);
  byId('applicantDetailMore').addEventListener('click',()=>{page+=20;fillMessages()});
- document.addEventListener('click',e=>{const target=e.target.closest('#lineInboxMessages .lineNoticePerson[data-user],#scheduleViewContent .lineNoticePerson[data-user],#scheduleViewContent .unifiedSidebarPerson[data-user],#dailyAppointmentItems .lineNoticePerson[data-user],#afterlifeView .lineNoticePerson[data-user]');if(target&&!e.target.closest('button')){e.preventDefault();open(target)}},true);
- document.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const target=e.target.closest('#lineInboxMessages .lineNoticePerson[data-user],#scheduleViewContent .lineNoticePerson[data-user],#scheduleViewContent .unifiedSidebarPerson[data-user],#dailyAppointmentItems .lineNoticePerson[data-user],#afterlifeView .lineNoticePerson[data-user]');if(target){e.preventDefault();open(target)}});
+ document.addEventListener('click',e=>{const target=e.target.closest('#commonPreviewMessages .lineNoticePerson[data-user],#lineInboxMessages .lineNoticePerson[data-user],#scheduleViewContent .lineNoticePerson[data-user],#scheduleViewContent .unifiedSidebarPerson[data-user],#dailyAppointmentItems .lineNoticePerson[data-user],#afterlifeView .lineNoticePerson[data-user]');if(target&&!e.target.closest('button')){e.preventDefault();open(target)}},true);
+ document.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const target=e.target.closest('#commonPreviewMessages .lineNoticePerson[data-user],#lineInboxMessages .lineNoticePerson[data-user],#scheduleViewContent .lineNoticePerson[data-user],#scheduleViewContent .unifiedSidebarPerson[data-user],#dailyAppointmentItems .lineNoticePerson[data-user],#afterlifeView .lineNoticePerson[data-user]');if(target){e.preventDefault();open(target)}});
  document.querySelectorAll('#sidebarLineNav,#futureNav,#pendingNav,#misconductNav,#historyNav,#afterlifeNav,#headerTopNav,#headerBookingNav,#topNav,#topButton,#bookingNav').forEach(button=>button.addEventListener('click',close,true));
 })();
 </script><dialog id="afterlifeDialog" class="afterlifeDialog"><form method="dialog" id="afterlifeForm"><h2>来世に期待</h2><p id="afterlifePersonLabel"></p><p>お断り理由（複数選択可）</p><div id="afterlifeReasons"></div><p id="afterlifeFormError" role="alert"></p><div class="afterlifeDialogActions"><button type="button" id="afterlifeCancel">キャンセル</button><button type="submit" id="afterlifeSubmit">来世に期待へ登録</button></div></form></dialog><script id="afterlifeSidebarLogic20261026">
@@ -3016,6 +3019,15 @@ window.afterlifeReload=load;
   item.hidden=false;item.removeAttribute('id');
   item.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));
   const record=source.record;
+  const linked=(window.interviewSharedHistoryLinks||[]).find(l=>String(l.interview_id)===String(record.interviewId));
+  const person=item.querySelector('.lineNoticePerson');
+  if(person){
+   person.removeAttribute('data-account');person.removeAttribute('data-user');
+   if(linked?.account_id&&linked?.line_user_id){
+    person.dataset.account=linked.account_id;person.dataset.user=linked.line_user_id;
+    person.tabIndex=0;person.setAttribute('role','button');person.style.cursor='pointer';
+   }
+  }
   const name=item.querySelector('.lineNoticeIdentity strong');
   if(name)name.textContent=record.name;
   const badge=item.querySelector('.lineStoreBadge');
@@ -3068,7 +3080,8 @@ window.afterlifeReload=load;
    date:String(row.interview_date||'未定').slice(0,10),
    time:String(row.interview_time||'').slice(0,5),
    staff:(typeof interviewAssigneeName==='function'?interviewAssigneeName(row):null)||row.staff_name||row.interviewer||'未設定',
-   actual:true
+   actual:true,
+   interviewId:row.id
   }}));
   const sources=category===0?lineCards.map(node=>({node})):actual;
   const total=sources.length,pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
