@@ -2399,9 +2399,11 @@ window.pickInterviewGanttSlot=function(p){
    sidebarRows=result.data||[];sidebarError='';
    void window.interviewSharedLoadHistory?.();
    window.interviewDashboardRows=sidebarRows;
-   if(typeof interviews!=='undefined'&&(!interviews.length||sidebarRows.length>interviews.length))interviews=sidebarRows;
+   // Status changes must replace stale cached rows even when the row count is unchanged.
+   if(typeof interviews!=='undefined')interviews=sidebarRows;
+   window.dispatchEvent(new Event('interview-dashboard-rows-updated'));
    // Keep the primary interview state owned by load(); sidebar fetch must not overwrite it.
-   if(document.body.classList.contains('dashboardHome')&&typeof window.refreshDailyDashboard==='function')window.refreshDailyDashboard();
+   if(typeof window.refreshDailyDashboard==='function')window.refreshDailyDashboard();
   }catch(e){sidebarError=e?.message||String(e);console.error('Sidebar interview fetch failed',e)}
   finally{sidebarFetching=false;updateCounts();if(!document.getElementById('scheduleView').hidden&&document.getElementById('interviewListFilters'))render()}
  }
