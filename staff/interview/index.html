@@ -3050,7 +3050,7 @@ window.afterlifeReload=load;
    shop:row.shop||'店舗未設定',
    date:String(row.interview_date||'未定').slice(0,10),
    time:String(row.interview_time||'').slice(0,5),
-   staff:row.staff_name||row.interviewer||'未設定',
+   staff:(typeof interviewAssigneeName==='function'?interviewAssigneeName(row):null)||row.staff_name||row.interviewer||'未設定',
    actual:true
   }}));
   const fixtures=demoRecords.filter(r=>!selected||storeCodes[r.shop]===selected).map(record=>({record}));
