@@ -633,7 +633,32 @@ document.addEventListener('click',function(e){
  }
  function renderCalendar(){const [y,m]=shownMonth.split('-').map(Number);document.getElementById('dailyMonthLabel').textContent=y+'年'+m+'月';calendar.replaceChildren();['日','月','火','水','木','金','土'].forEach(w=>{const d=document.createElement('div');d.className='weekday';d.textContent=w;calendar.append(d)});const start=new Date(y,m-1,1).getDay(),last=new Date(y,m,0).getDate();for(let i=0;i<start;i++)calendar.append(document.createElement('span'));for(let d=1;d<=last;d++){const date=y+'-'+pad(m)+'-'+pad(d),b=document.createElement('button');b.type='button';b.textContent=d;const weekday=new Date(y,m-1,d).getDay();b.classList.toggle('weekendSat',weekday===6);b.classList.toggle('weekendSunHoliday',weekday===0||isJapanHoliday(y,m,d));b.classList.toggle('selected',date===selected);b.classList.toggle('isToday',date===jstToday());b.setAttribute('aria-pressed',String(date===selected));b.setAttribute('aria-label',date+(date===jstToday()?'（今日）':'')+(date===selected?'（選択中）':''));b.onclick=()=>selectDate(date);calendar.append(b)}}
  function selectDate(d){selected=d;shownMonth=d.slice(0,7);renderCalendar();renderAppointments();void renderAvailability()}
- function renderAppointments(){const data=(window.interviews||interviews||[]).filter(i=>i.interview_date===selected&&!['キャンセル','面接済','採用','不採用','無断トビ','トビ（キャンセル）','日程調整中'].includes(i.status)).sort((a,b)=>String(a.interview_time).localeCompare(String(b.interview_time)));const title=selected===jstToday()?'本日の面接予定':selected+' の面接予定';document.getElementById('dailyAppointmentTitle').textContent=title;document.getElementById('dailyAppointmentCount').textContent=data.length+'件';const box=document.getElementById('dailyAppointmentItems');box.replaceChildren();if(!data.length){const p=document.createElement('p');p.className='note';p.textContent='この日の面接予定はありません。';box.append(p)}for(const i of data){const el=document.createElement('div');el.className='item interviewMiniCard';const name=typeof interviewLineProfiles!=='undefined'?interviewLineProfiles.get(Number(i.id))?.name:null;const assigned=typeof interviewAssigneeName==='function'?interviewAssigneeName(i):'未設定';el.innerHTML='<strong>'+escapeInterviewText(String(i.interview_time).slice(0,5))+'｜'+escapeInterviewText(i.shop)+'</strong><p class="note">LINE名：'+escapeInterviewText(name||'未取得')+'｜担当：'+escapeInterviewText(assigned)+'</p><p class="note">'+escapeInterviewText(i.confirmed?'確認済み':i.status||'面接予定')+'</p><button type="button" class="action action-change">日程変更</button>';el.querySelector('button').onclick=()=>chooseReschedule(i.id);box.append(el)}}
+ function renderAppointments(){
+  const box=document.getElementById('dailyAppointmentItems');
+  const title=document.getElementById('dailyAppointmentTitle');
+  const count=document.getElementById('dailyAppointmentCount');
+  if(!box||!title||!count)return;
+  const excluded=new Set(['キャンセル','面接済','採用','不採用','無断トビ','トビ（キャンセル）','日程調整中']);
+  const source=Array.isArray(interviews)?interviews:[];
+  const data=source.filter(i=>String(i.interview_date||'').slice(0,10)===selected&&!excluded.has(i.status)).sort((a,b)=>String(a.interview_time||'').localeCompare(String(b.interview_time||'')));
+  title.textContent=selected===jstToday()?'本日の面接予定':selected+' の面接予定';
+  count.textContent=data.length+'件';
+  box.replaceChildren();
+  if(!data.length){const p=document.createElement('p');p.className='note';p.textContent='この日の面接予定はありません。';box.append(p);return;}
+  for(const i of data){
+   const el=document.createElement('div');el.className='item interviewMiniCard';el.dataset.interviewId=String(i.id??'');
+   const strong=document.createElement('strong');strong.textContent=String(i.interview_time||'時間未設定').slice(0,5)+'｜'+String(i.shop||'店舗未設定');
+   const details=document.createElement('p');details.className='note';
+   let name='未取得',assigned='未設定';
+   try{if(typeof interviewLineProfiles!=='undefined'&&interviewLineProfiles?.get)name=interviewLineProfiles.get(Number(i.id))?.name||'未取得';}catch(e){console.warn('LINE profile display',e);}
+   try{if(typeof interviewAssigneeName==='function')assigned=interviewAssigneeName(i)||'未設定';}catch(e){console.warn('Assignee display',e);}
+   details.textContent='LINE名：'+name+'｜担当：'+assigned;
+   const status=document.createElement('p');status.className='note';status.textContent=i.confirmed?'確認済み':String(i.status||'面接予定');
+   const action=document.createElement('button');action.type='button';action.className='action action-change';action.textContent='日程変更';action.onclick=()=>{if(typeof chooseReschedule==='function')chooseReschedule(i.id)};
+   el.append(strong,details,status,action);box.append(el);
+  }
+ }
+
  async function renderAvailability(){
  const id=++requestId,grid=document.getElementById('dailyScheduleGrid'),status=document.getElementById('dailyAvailabilityStatus');
  grid.replaceChildren();grid.classList.add('dailyGantt');
