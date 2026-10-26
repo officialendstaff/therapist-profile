@@ -449,51 +449,48 @@ function togglePastInterviews(){const e=document.getElementById('pastInterviewLi
 async function restoreInterview(id){const i=interviews.find(x=>Number(x.id)===Number(id));if(!i||!confirm('この面接を未確認の面接予定一覧に戻しますか？'))return;const {error}=await sb.from('staff_interviews').update({confirmed:false,alert:false,updated_at:new Date().toISOString()}).eq('id',id);if(error)return alert(error.message);await load()}
 const reminderSent=new Set();const reminderClosed=new Set();const reminderAckKey='interview_reminder_ack_v1';function reminderAcknowledged(){try{return JSON.parse(localStorage.getItem(reminderAckKey)||'[]')}catch{return []}}function acknowledgeInterviewReminder(interviewId){const i=interviews.find(x=>String(x.id)===String(interviewId));if(!i)return;const id=String(i.id)+'|'+i.interview_date+'|'+i.interview_time;localStorage.setItem(reminderAckKey,JSON.stringify([...new Set([...reminderAcknowledged(),id])].slice(-300)));checkReminders()}function acknowledgeReminders(){const ids=Array.from(document.querySelectorAll('#reminderItems .reminderItem')).map(e=>e.dataset.reminderId).filter(Boolean);localStorage.setItem(reminderAckKey,JSON.stringify([...new Set([...reminderAcknowledged(),...ids])].slice(-300)));document.querySelectorAll('#todayList .item').forEach(e=>e.classList.remove('noticeBlink'));}document.getElementById('lineNoticeNav').onclick=()=>{document.body.classList.remove('dashboardHome');document.getElementById('lineNoticeNav').classList.remove('noticeBlink')};function checkReminders(){const now=Date.now(),items=interviews.filter(i=>{if(i.confirmed||['キャンセル','面接済','採用','不採用','無断トビ','トビ（キャンセル）','日程調整中'].includes(i.status))return false;const t=String(i.interview_time||'').slice(0,5).split(':').map(Number);if(t.length!==2||t.some(Number.isNaN))return false;const due=new Date(i.interview_date+'T00:00:00+09:00').getTime()+(t[0]*60+t[1]-120)*60000;return now>=due&&now<due+120*60000});const panel=document.getElementById('reminderPanel'),list=document.getElementById('reminderItems'),count=document.getElementById('reminderCount');panel.hidden=items.length===0;count.hidden=items.length===0;count.textContent=String(items.length);const pendingIds=new Set(items.map(i=>String(i.id)+'|'+i.interview_date+'|'+i.interview_time).filter(id=>!reminderAcknowledged().includes(id)));document.querySelectorAll('#todayList .item[data-interview-id]').forEach(e=>e.classList.toggle('noticeBlink',Array.from(pendingIds).some(id=>id.startsWith(e.dataset.interviewId+'|'))));list.replaceChildren();for(const i of items){const id=String(i.id)+'|'+i.interview_date+'|'+i.interview_time;if(!reminderSent.has(id)){reminderSent.add(id);if('Notification'in window&&Notification.permission==='granted'){try{new Notification('面接確認LINEの送信時間です',{body:i.shop+'｜'+i.interview_date+' '+String(i.interview_time).slice(0,5)+'　面接2時間前です',tag:'interview-reminder-'+i.id})}catch(e){console.warn('Desktop notification unavailable',e)}}}const div=document.createElement('div');div.className='reminderItem';div.dataset.reminderId=id;const label=document.createElement('strong');label.textContent=i.interview_date+' '+String(i.interview_time).slice(0,5)+'｜'+i.shop;div.append(label);list.append(div)}}const pcAlertsButton=document.getElementById('enablePcAlerts');function syncPcAlertsButton(){pcAlertsButton.hidden=('Notification'in window&&Notification.permission==='granted');pcAlertsButton.style.display=pcAlertsButton.hidden?'none':'';if(!pcAlertsButton.hidden)pcAlertsButton.textContent='PC通知を許可'}syncPcAlertsButton();window.addEventListener('focus',syncPcAlertsButton);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')syncPcAlertsButton()});pcAlertsButton.onclick=async()=>{if(!('Notification'in window)){alert('このブラウザはPC通知に対応していません。ページ内通知を使用します。');return}await Notification.requestPermission();syncPcAlertsButton()};setInterval(()=>{if(document.visibilityState==='visible')load();else checkReminders()},60000);function escapeInterviewText(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
 let interviewLineProfiles=new Map();
-async function loadInterviewLineProfilesFromDatabase(){
- try{
-  const {data,error}=await sb.from('staff_interview_line_links').select('interview_id,account_id,line_user_id,line_display_name,line_picture_url');
-  if(error)throw error;
-  const links=data||[];
-  for(const link of links){
-   if(link.interview_id==null)continue;
-   const id=Number(link.interview_id),old=interviewLineProfiles.get(id)||{};
-   interviewLineProfiles.set(id,{name:old.name&&old.name!=='未取得'?old.name:(link.line_display_name||'未取得'),picture:old.picture||link.line_picture_url||''});
-  }
-  renderList();window.refreshDailyDashboard?.();window.refreshInterviewSidebarCards?.();
-  const {data:authData}=await sb.auth.getSession();
-  const session=authData?.session;
-  if(!session)return;
-  const endpoint='https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/recruit-line-profiles';
-  const groups={};
-  for(const link of links){
-   if(!link.interview_id||!link.line_user_id)continue;
-   const old=interviewLineProfiles.get(Number(link.interview_id));
-   if(old?.picture)continue;
-   const account=String(link.account_id||'');
-   if(!account)continue;
-   (groups[account]??=new Set()).add(String(link.line_user_id));
-  }
-  for(const [account,ids] of Object.entries(groups)){
-   const list=[...ids];
-   for(let i=0;i<list.length;i+=30){
-    try{
-     const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json','apikey':'sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos','Authorization':'Bearer '+session.access_token},body:JSON.stringify({account_id:account,user_ids:list.slice(i,i+30)})});
-     if(!response.ok){console.warn('LINE画像取得失敗',account,response.status);continue}
-     const payload=await response.json();
-     for(const link of links){
-      if(link.account_id!==account||link.interview_id==null)continue;
-      const profile=payload.profiles?.[link.line_user_id];
-      if(!profile)continue;
-      const id=Number(link.interview_id),old=interviewLineProfiles.get(id)||{};
-      interviewLineProfiles.set(id,{name:profile.displayName||old.name||link.line_display_name||'未取得',picture:profile.pictureUrl||old.picture||''});
-     }
-    }catch(e){console.warn('LINE画像取得通信失敗',account,e)}
+let interviewProfileLoading=null;
+async function loadInterviewLineProfilesFromDatabase(){return loadInterviewLineProfiles()}
+async function loadInterviewLineProfiles(){
+ if(interviewProfileLoading)return interviewProfileLoading;
+ interviewProfileLoading=(async()=>{
+  try{
+   const auth=window.interviewStaffAuth;
+   if(!auth?.token())return;
+   const data=await auth.api('inbox');
+   const links=(data.links||[]).filter(l=>l.interview_id!=null);
+   const profiles=data.profiles||{};
+   const apply=(link,profile)=>{
+    const id=Number(link.interview_id),old=interviewLineProfiles.get(id)||{};
+    interviewLineProfiles.set(id,{name:profile?.displayName||link.line_display_name||old.name||'未取得',picture:profile?.pictureUrl||link.line_picture_url||old.picture||''});
+   };
+   for(const link of links)apply(link,profiles[link.account_id+':'+link.line_user_id]);
+   renderList();window.refreshDailyDashboard?.();window.refreshInterviewSidebarCards?.();
+   const profileClient=supabase.createClient('https://vjjnkflbfsjihwzjsjpr.supabase.co','sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos',{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storage:window.sessionStorage,storageKey:'mattan-recruit-auth'}});
+   const {data:sessionData}=await profileClient.auth.getSession();
+   const session=sessionData?.session;
+   if(!session)return;
+   const groups={};
+   for(const link of links){
+    if(!link.line_user_id||interviewLineProfiles.get(Number(link.interview_id))?.picture)continue;
+    (groups[link.account_id]??=new Set()).add(link.line_user_id);
    }
-  }
-  renderList();window.refreshDailyDashboard?.();window.refreshInterviewSidebarCards?.();
- }catch(e){console.warn('面接LINE紐づけ取得失敗',e)}
+   for(const [account,ids] of Object.entries(groups)){
+    const list=[...ids];
+    for(let i=0;i<list.length;i+=30){
+     try{
+      const response=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/recruit-line-profiles',{method:'POST',headers:{'Content-Type':'application/json','apikey':'sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos','Authorization':'Bearer '+session.access_token},body:JSON.stringify({account_id:account,user_ids:list.slice(i,i+30)})});
+      if(!response.ok){console.warn('面接LINE画像取得',account,response.status);continue}
+      const payload=await response.json();
+      for(const link of links){if(link.account_id===account&&payload.profiles?.[link.line_user_id])apply(link,payload.profiles[link.line_user_id])}
+     }catch(e){console.warn('面接LINE画像通信失敗',e)}
+    }
+   }
+   renderList();window.refreshDailyDashboard?.();window.refreshInterviewSidebarCards?.();
+  }catch(e){console.warn('Interview LINE profile fetch failed',e)}
+ })().finally(()=>{interviewProfileLoading=null});
+ return interviewProfileLoading;
 }
-async function loadInterviewLineProfiles(){try{const auth=window.interviewStaffAuth;if(!auth?.token())return;const data=await auth.api('inbox');const profiles=data.profiles||{};for(const l of data.links||[]){if(l.interview_id==null)continue;const p=profiles[l.account_id+':'+l.line_user_id]||{},old=interviewLineProfiles.get(Number(l.interview_id))||{};interviewLineProfiles.set(Number(l.interview_id),{name:p.displayName||l.line_display_name||old.name||'未取得',picture:p.pictureUrl||l.line_picture_url||old.picture||''})}renderList();window.refreshDailyDashboard?.();window.refreshInterviewSidebarCards?.()}catch(e){console.warn('Interview LINE profile fetch failed',e)}}
 window.addEventListener('interview-auth-ready',()=>{void loadInterviewLineProfiles();void loadInterviewLineProfilesFromDatabase()});
 function interviewAssigneeName(i){return Object.keys(interviewStaffIds).find(name=>interviewStaffIds[name]===i.interviewer_user_id)||'未設定'}
 // Keep the original interview record; only hide pending cases after seven days.
