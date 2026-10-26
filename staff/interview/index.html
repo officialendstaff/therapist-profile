@@ -454,6 +454,16 @@ body,body[data-active-shop]{background:#f3f5f8!important;color:#1d2d40!important
 #scheduleView .interviewUnifiedListCard .sharedInterviewButtons{grid-column:3;grid-row:1}
 @media(max-width:1250px){#scheduleView .interviewUnifiedListCard .lineNoticePrimary{grid-template-columns:minmax(140px,185px) minmax(0,1fr)!important}#scheduleView .interviewUnifiedListCard .sharedInterviewButtons{grid-column:2;grid-row:2;justify-content:flex-end!important}}
 @media(max-width:750px){#scheduleView .interviewUnifiedListCard .lineNoticePrimary{grid-template-columns:minmax(0,1fr)!important;gap:9px!important}#scheduleView .interviewUnifiedListCard .sharedInterviewButtons{grid-column:1;grid-row:auto;justify-content:flex-start!important}}
+</style><style id="interviewHistoryTypes20261026">
+.sharedInterviewRisk{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+.sharedHistoryDetail{position:relative;color:#903c4c;border:1px solid #e0a9b4;background:#fff3f5;border-radius:7px;font-size:12px;font-weight:800}
+.sharedHistoryDetail summary{list-style:none;cursor:pointer;padding:9px 11px;white-space:nowrap}
+.sharedHistoryDetail summary::-webkit-details-marker{display:none}
+.sharedHistoryDetail summary:after{content:" ▾";font-size:11px}
+.sharedHistoryDetail[open] summary:after{content:" ▴"}
+.sharedHistoryDetailItems{z-index:3;min-width:260px;max-width:min(80vw,460px);padding:8px 12px;background:#fff;border:1px solid #e0a9b4;border-radius:7px;box-shadow:0 5px 12px #0001;color:#633d45;line-height:1.7;font-size:12px;font-weight:600}
+.sharedHistoryDetailItems>div{padding:5px 0;border-bottom:1px solid #f1dfe4}
+.sharedHistoryDetailItems>div:last-child{border:0}
 </style></head><body><div id="staffLock" style="display:none"><div class="lockbox"><div class="lockmark">MATTAN KOUGYOU</div><h2>STAFF LOGIN</h2><input id="staffPin" type="password" placeholder="パスワード" autocomplete="off"><button id="staffUnlock" type="button">ログイン</button><div id="staffLockErr" class="lockerr"></div></div></div><header class="appHeader"><div class="brand"><span>MATTAN KOUGYOU</span><strong>面接予約管理</strong></div><div class="headerRight"><button type="button" id="headerTopNav" class="headerNavButton">TOP</button><button type="button" id="headerBookingNav" class="headerNavButton">面接登録</button><div id="headerLineNavSlot"></div><button type="button" id="headerSettingsNav" class="headerNavButton" aria-expanded="false">設定</button><div id="headerSettingsPanel" hidden><button type="button" id="enablePcAlerts" class="notifyButton">PC通知を許可</button><button type="button" id="lineSoundTest" class="notifyButton" title="LINE通知音を確認">通知音テスト</button></div><span id="reminderCount" class="reminderCount" hidden>0</span><span>INTERVIEW MANAGEMENT</span><span class="headerSymbol" aria-hidden="true">◈</span></div></header><main class="wrap"><div class="workspace">
 <aside class="side card"><section id="dailySidebarCalendar"><h2>日付選択</h2><div class="dailyMonthNav"><button type="button" id="dailyPrevMonth" aria-label="前月">‹</button><strong id="dailyMonthLabel"></strong><button type="button" id="dailyNextMonth" aria-label="翌月">›</button></div><div class="dailyCalendar" id="dailyCalendarDays"></div></section><div class="navSection"><button type="button" class="navBtn" id="sidebarLineNav"><span class="sidebarNavTitle">LINE通知</span><span class="sidebarNavRight"><span id="sidebarLineCount">—件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><button class="navBtn" id="futureNav" type="button" aria-expanded="true"><span class="sidebarNavTitle">明日以降の面接予定</span><span class="sidebarNavRight"><span id="futureInterviewCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><div class="navPanel" id="futurePanel" hidden><div id="list">読み込み中...</div></div><button class="navBtn" id="pendingNav" type="button" aria-expanded="false"><span class="sidebarNavTitle">日程調整中</span><span class="sidebarNavRight"><span id="pendingInterviewCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><div class="navPanel" id="pendingPanel" hidden><div id="pendingInterviewList"></div></div><button class="navBtn" id="misconductNav" type="button"><span class="sidebarNavTitle">不届き者達</span><span class="sidebarNavRight"><span id="misconductCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><button class="navBtn" id="historyNav" type="button" aria-expanded="false"><span class="sidebarNavTitle">面接実施済み</span><span class="sidebarNavRight"><span id="pastInterviewCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><div class="navPanel" id="historyPanel" hidden><div id="pastInterviewList">読み込み中...</div></div></div></aside>
 <div class="workMain"><section class="card" id="dailyDashboard" hidden><div class="dailySection dailyAppointmentSection"><div class="dailyDateTitle"><h2 id="dailyAppointmentTitle">本日の面接予定</h2><span id="dailyAppointmentCount"></span></div><div class="dailyAppointments" id="dailyAppointmentItems"></div></div><div class="dailySection dailyScheduleSection"><div class="dailyDateTitle"><h2 id="dailyScheduleTitle">担当者スケジュール</h2><span id="dailyAvailabilityStatus" class="note"></span></div><div class="dailyLegend"><span>🟩 対応可能</span><span>⬜ 対応不可（グレー）</span><span>🟪 面接予約済み</span></div><div class="dailyTableWrap"><div class="dailyGrid" id="dailyScheduleGrid"></div></div><p class="dailyNotice">10:00〜23:30・30分単位。空き枠をタップして日時を選択できます。</p></div></section><section class="card lineInbox" id="lineInbox" hidden><div class="scheduleHeader"><h2>求人LINE受信｜全店舗</h2><button type="button" class="action" id="lineInboxBack" hidden style="display:none!important" aria-hidden="true" tabindex="-1">TOPに戻る</button></div><p class="note" id="lineInboxStatus">受信データを確認しています。</p><div id="lineInboxAuth" hidden><p class="note">求人管理の管理者アカウントでログインしてください。</p><input type="email" id="lineInboxEmail" autocomplete="username" placeholder="メールアドレス"><input type="password" id="lineInboxPassword" autocomplete="current-password" placeholder="パスワード"><button type="button" class="action" id="lineInboxLogin">ログイン</button></div><div class="lineInboxTools"><label for="lineInboxStore">店舗</label><select id="lineInboxStore"><option value="">全店舗</option><option value="rose">薔薇と紳士</option><option value="grandluxe">Grand Luxe</option><option value="luxy">LUXY</option><option value="unsecret">Un Secret</option><option value="us">Un Secret（旧ID）</option></select><span id="lineInboxResultCount" aria-live="polite"></span></div><div id="lineInboxMessages"></div></section><section class="card reminderPanel" id="reminderPanel" hidden><div class="reminderSingleRow"><h2>確認LINEの送信時間です</h2><span class="reminderMessage">応募者へ確認LINEを送信してください。</span><div id="reminderItems"></div></div></section><section class="card scheduleView" id="scheduleView" hidden><div class="scheduleHeader"><h2 id="scheduleTitle">面接予定一覧</h2><button type="button" id="backToCalendar" class="action" hidden style="display:none!important" aria-hidden="true" tabindex="-1">TOPに戻る</button></div><div id="scheduleViewContent"></div></section>
@@ -487,39 +497,51 @@ window.interviewSharedRefreshInboxData=function(data){
  window.refreshInterviewSidebarCards?.();
 };
 const interviewSharedEscape=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function interviewSharedBadStatus(status){
- if(status==='キャンセル')return 'キャンセル';
- if(['無断トビ','トビ（キャンセル）','返信なし'].includes(status))return '無断トビ';
- if(status==='日程調整中')return '日程調整期限切れ';
- return '';
-}
+window.interviewSharedHistoryRows=[];
+let interviewSharedHistoryLoading=null;
+window.interviewSharedLoadHistory=async function(){
+ if(interviewSharedHistoryLoading)return interviewSharedHistoryLoading;
+ interviewSharedHistoryLoading=(async()=>{
+  try{
+   const {data,error}=await sb.from('staff_interview_history').select('id,interview_id,event_type,original_date,original_time,original_interviewer_user_id,original_shop,recorded_at').order('recorded_at',{ascending:false}).limit(2000);
+   if(error)throw error;
+   window.interviewSharedHistoryRows=data||[];
+   window.refreshInterviewSidebarCards?.();
+  }catch(error){console.warn('面接履歴の取得失敗',error)}
+ })().finally(()=>{interviewSharedHistoryLoading=null});
+ return interviewSharedHistoryLoading;
+};
 function interviewSharedRelatedHistory(record,sourceRows){
- const source=Array.isArray(sourceRows)?sourceRows:[];
  const links=window.interviewSharedHistoryLinks||[];
  const own=links.filter(l=>String(l.interview_id)===String(record?.id));
  const keys=new Set(own.map(l=>String(l.account_id)+':'+String(l.line_user_id)));
- const ids=new Set(links.filter(l=>keys.has(String(l.account_id)+':'+String(l.line_user_id))).map(l=>String(l.interview_id)));
- const results=source.filter(i=>ids.has(String(i.id))&&interviewSharedBadStatus(i.status));
- if(record&&interviewSharedBadStatus(record.status)&&!results.some(i=>String(i.id)===String(record.id)))results.push(record);
- return results.sort((a,b)=>String(b.interview_date||'').localeCompare(String(a.interview_date||'')));
+ const ids=new Set([String(record?.id),...links.filter(l=>keys.has(String(l.account_id)+':'+String(l.line_user_id))).map(l=>String(l.interview_id))]);
+ return (window.interviewSharedHistoryRows||[]).filter(e=>ids.has(String(e.interview_id)));
+}
+function interviewSharedHistoryForLine(account,lineUser){
+ const links=window.interviewSharedHistoryLinks||[];
+ const ids=new Set(links.filter(l=>String(l.account_id)===String(account)&&String(l.line_user_id)===String(lineUser)).map(l=>String(l.interview_id)));
+ return (window.interviewSharedHistoryRows||[]).filter(e=>ids.has(String(e.interview_id)));
+}
+function interviewSharedHistoryText(item){
+ const date=String(item.original_date||'日付不明')+' '+String(item.original_time||'').slice(0,5);
+ const staff=typeof interviewAssigneeName==='function'?interviewAssigneeName({interviewer_user_id:item.original_interviewer_user_id}):'未設定';
+ return date+'　担当：'+staff+'　店舗：'+String(item.original_shop||'未設定');
+}
+function interviewSharedHistoryHTML(items){
+ const types=['日程変更','無断トビ','キャンセル'];
+ const distinct=[...new Map((items||[]).map(e=>[String(e.id||e.event_key),e])).values()];
+ return '<div class="sharedInterviewRisk">'+types.filter(t=>distinct.some(e=>e.event_type===t)).map(t=>{
+  const rows=distinct.filter(e=>e.event_type===t);
+  return '<details class="sharedHistoryDetail"><summary>'+interviewSharedEscape(t)+' 履歴　'+rows.length+'件</summary><div class="sharedHistoryDetailItems">'+rows.map(e=>'<div>'+interviewSharedEscape(interviewSharedHistoryText(e))+'</div>').join('')+'</div></details>';
+ }).join('')+'</div>';
 }
 function interviewSharedInfoHTML(record,history=[],opts={}){
  const hasRecord=!!record,dt=hasRecord&&record.interview_date?String(record.interview_date)+' '+String(record.interview_time||'').slice(0,5):'未定';
  const staff=hasRecord&&typeof interviewAssigneeName==='function'?interviewAssigneeName(record):'';
  const label=hasRecord&&record.status==='日程調整中'?'未定':dt;
- const risks=[];
- const seen=new Set();
- for(const item of history){
-  const kind=interviewSharedBadStatus(item.status);
-  const id=String(item.id);
-  if(!kind||seen.has(id))continue;
-  seen.add(id);
-  const t=String(item.interview_date||'')+' '+String(item.interview_time||'').slice(0,5);
-  const who=typeof interviewAssigneeName==='function'?interviewAssigneeName(item):'未設定';
-  risks.push('<span class="sharedInterviewRiskTag">'+interviewSharedEscape(t)+'　担当：'+interviewSharedEscape(who)+'　<b>'+interviewSharedEscape(kind)+'</b></span>');
- }
  const appointment='<div class="sharedInterviewAppointment"><strong>'+interviewSharedEscape(label)+'</strong>'+(hasRecord&&record.status!=='日程調整中'?'<span>担当：'+interviewSharedEscape(staff)+'</span>':'')+'</div>';
- return appointment+'<div class="sharedInterviewRisk">'+risks.join('')+'</div>';
+ return appointment+interviewSharedHistoryHTML(history);
 }
 
 let interviewProfileLoading=null;
@@ -569,6 +591,7 @@ async function load(){
   if(a.error)throw a.error;
   interviews=a.data||[];
   window.interviewDashboardRows=interviews;
+  void window.interviewSharedLoadHistory?.();
   msg.textContent='';
   renderList();
   window.refreshDailyDashboard?.();if(!document.getElementById('scheduleView').hidden&&document.getElementById('interviewListFilters'))window.refreshInterviewSidebarCards?.();
@@ -764,8 +787,8 @@ const registered=!!linkedInterview&&!['キャンセル','無断トビ','トビ�
 const other=[...(storeHistory.get(x.line_user_id)||new Map())].filter(([shop])=>shop!==x.account_id).sort((a,b)=>new Date(a[1])-new Date(b[1]));
 const history=other.length?'<div class="lineCrossHistory"><b>過去履歴</b> '+other.map(([shop,when])=>'<span class="lineHistoryStore" data-store="'+escape(shop)+'">'+escape(storeNames[shop]||shop)+'・'+escape(new Date(when).toLocaleDateString('ja-JP',{timeZone:'Asia/Tokyo'}))+'</span>').join(' ／ ')+'</div>':'';
 const interviewHistory=(historyByLine.get(key)||[]).sort((a,b)=>String(b.interview_date+' '+b.interview_time).localeCompare(String(a.interview_date+' '+a.interview_time)));
-const cancellationHistory=interviewHistory.length?'<div class="lineInterviewHistory"><strong>面接履歴</strong>'+interviewHistory.map(i=>'<div>'+escape(i.interview_date+' '+String(i.interview_time).slice(0,5))+'｜'+escape(i.status==='トビ（キャンセル）'?'無断トビ':i.status)+'｜'+escape(i.shop)+'</div>').join('')+'</div>':'';
-const sharedSummary=interviewSharedInfoHTML(linkedInterview,interviewHistory);
+const cancellationHistory='';
+const sharedSummary=interviewSharedInfoHTML(linkedInterview,interviewSharedHistoryForLine(x.account_id,x.line_user_id));
 const body=event=>'<div class="lineGroupedEntry"><small>'+escape(new Date(event.received_at).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'}))+'</small><p>'+escape(event.message_text??('['+(event.message_type||'メッセージ')+']'))+'</p></div>';
 return '<div class="lineMessage"><div class="lineNoticePrimary">'+
  '<div class="lineNoticePerson">'+(picture?'<img class="lineAvatar" src="'+escape(picture)+'" alt="LINEアイコン">':'<span class="lineAvatar empty">LINE</span>')+'<div class="lineNoticeIdentity"><strong>'+escape(name)+'</strong><span class="lineStoreBadge" data-store="'+escape(x.account_id)+'">'+escape(storeNames[x.account_id]||x.account_id)+'</span></div></div>'+
@@ -1014,6 +1037,7 @@ window.pickInterviewGanttSlot=function(p){
    const result=await Promise.race([client.from('staff_interviews').select('*').order('interview_date').order('interview_time'),new Promise((_,reject)=>setTimeout(()=>reject(new Error('通信タイムアウト')),15000))]);
    if(result.error)throw result.error;
    sidebarRows=result.data||[];sidebarError='';
+   void window.interviewSharedLoadHistory?.();
    window.interviewDashboardRows=sidebarRows;
    if(typeof interviews!=='undefined'&&(!interviews.length||sidebarRows.length>interviews.length))interviews=sidebarRows;
    // Keep the primary interview state owned by load(); sidebar fetch must not overwrite it.
