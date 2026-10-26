@@ -2939,6 +2939,9 @@ window.afterlifeReload=load;
  const selector=document.getElementById('commonPreviewCategory');
  const storeFilter=document.getElementById('commonPreviewStore');
  if(!button||!panel||!list||!selector)return;
+ // One shared DOM renderer and one shared stylesheet for every list category.
+ // Category-specific presentation overrides are prohibited.
+ document.body.classList.remove('commonFutureOpen');
  const sections=['LINE通知','明日以降の面接予定','日程調整中','不届き者達','面接実施済み','来世に期待'];
  const totals=[0,0,0,0,0,0]; // No fabricated records or counts.
  const PAGE_SIZE=10;
@@ -2993,7 +2996,7 @@ window.afterlifeReload=load;
   });
   const isLine=category===0;
   const isFuture=category===1;
-  document.body.classList.toggle('commonFutureOpen',isFuture);
+  document.body.classList.remove('commonFutureOpen');
   const today=new Date(Date.now()+9*60*60*1000).toISOString().slice(0,10);
   const futureRows=isFuture?(typeof interviews!=='undefined'?interviews:[]).filter(i=>
    i.interview_date>=today&&!['キャンセル','面接済','採用','不採用','無断トビ','トビ（キャンセル）','日程調整中'].includes(i.status)
