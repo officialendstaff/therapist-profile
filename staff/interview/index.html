@@ -430,6 +430,7 @@ async function load(){
   const a=await Promise.race([sb.from('staff_interviews').select('*').order('interview_date').order('interview_time'),timeout(12000)]);
   if(a.error)throw a.error;
   interviews=a.data||[];
+  window.interviewDashboardRows=interviews;
   msg.textContent='';
   renderList();
   window.refreshDailyDashboard?.();if(!document.getElementById('scheduleView').hidden&&document.getElementById('interviewListFilters'))window.refreshInterviewSidebarCards?.();
@@ -637,7 +638,7 @@ document.addEventListener('click',function(e){
  const box=document.getElementById('dailyAppointmentItems'),title=document.getElementById('dailyAppointmentTitle'),count=document.getElementById('dailyAppointmentCount');
  if(!box||!title||!count)return;
  const excluded=new Set(['キャンセル','面接済','採用','不採用','無断トビ','トビ（キャンセル）','日程調整中']);
- const data=(Array.isArray(interviews)?interviews:[]).filter(i=>String(i.interview_date||'').slice(0,10)===selected&&!excluded.has(i.status)).sort((a,b)=>String(a.interview_time||'').localeCompare(String(b.interview_time||'')));
+ const data=(Array.isArray(window.interviewDashboardRows)&&window.interviewDashboardRows.length?window.interviewDashboardRows:(Array.isArray(interviews)?interviews:[])).filter(i=>String(i.interview_date||'').slice(0,10)===selected&&!excluded.has(i.status)).sort((a,b)=>String(a.interview_time||'').localeCompare(String(b.interview_time||'')));
  title.textContent=selected===jstToday()?'本日の面接予定':selected+' の面接予定';count.textContent=data.length+'件';box.replaceChildren();
  if(!data.length){const p=document.createElement('p');p.className='note';p.textContent='この日の面接予定はありません。';box.append(p);return;}
  for(const i of data){try{
@@ -695,7 +696,7 @@ document.addEventListener('click',function(e){
     responses.forEach((set,j)=>group.people.forEach(p=>{values[p][offset+j]=ids[names[p]]&&set.has(String(ids[names[p]]))?'yes':'no'}));
    }
   }
-  const active=(typeof interviews==='undefined'?[]:interviews).filter(i=>i.interview_date===selected&&!['キャンセル','面接済','採用','不採用','無断トビ','トビ（キャンセル）','日程調整中'].includes(i.status));
+  const active=(Array.isArray(window.interviewDashboardRows)&&window.interviewDashboardRows.length?window.interviewDashboardRows:(typeof interviews==='undefined'?[]:interviews)).filter(i=>i.interview_date===selected&&!['キャンセル','面接済','採用','不採用','無断トビ','トビ（キャンセル）','日程調整中'].includes(i.status));
   for(const i of active){
    const p=names.findIndex(n=>String(ids[n])===String(i.interviewer_user_id));if(p<0)continue;
    const start=Number(String(i.interview_time).slice(0,2))*60+Number(String(i.interview_time).slice(3,5));
@@ -708,7 +709,7 @@ document.addEventListener('click',function(e){
  document.getElementById('dailyPrevMonth').onclick=()=>{const [y,m]=shownMonth.split('-').map(Number);const d=new Date(y,m-2,1);shownMonth=d.getFullYear()+'-'+pad(d.getMonth()+1);renderCalendar()};
  document.getElementById('dailyNextMonth').onclick=()=>{const [y,m]=shownMonth.split('-').map(Number);const d=new Date(y,m,1);shownMonth=d.getFullYear()+'-'+pad(d.getMonth()+1);renderCalendar()};
  window.refreshDailyDashboard=()=>{if(document.body.classList.contains('dashboardHome')){renderAppointments();void renderAvailability()}};
- window.showDailyDashboard=()=>{document.getElementById('lineInbox').hidden=true;document.body.classList.remove('lineInboxOpen');document.getElementById('scheduleView').hidden=true;document.querySelector('.workLeft').style.removeProperty('display');document.body.classList.add('dashboardHome');dashboard.hidden=false;selectDate(jstToday())};
+ window.showDailyDashboard=()=>{document.getElementById('lineInbox').hidden=true;document.body.classList.remove('lineInboxOpen');document.getElementById('scheduleView').hidden=true;document.querySelector('.workLeft').style.removeProperty('display');document.body.classList.add('dashboardHome');dashboard.hidden=false;selectDate(jstToday());void load()};
  const start=()=>{if(!selected){selected=jstToday();shownMonth=selected.slice(0,7);renderCalendar()}if(!document.body.classList.contains('lineInboxOpen')&&document.getElementById('scheduleView').hidden)window.showDailyDashboard()};
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
@@ -796,6 +797,8 @@ window.pickInterviewGanttSlot=function(p){
    const result=await Promise.race([client.from('staff_interviews').select('*').order('interview_date').order('interview_time'),new Promise((_,reject)=>setTimeout(()=>reject(new Error('通信タイムアウト')),15000))]);
    if(result.error)throw result.error;
    sidebarRows=result.data||[];sidebarError='';
+   window.interviewDashboardRows=sidebarRows;
+   if(typeof interviews!=='undefined'&&(!interviews.length||sidebarRows.length>interviews.length))interviews=sidebarRows;
    // Keep the primary interview state owned by load(); sidebar fetch must not overwrite it.
    if(typeof window.refreshDailyDashboard==='function')window.refreshDailyDashboard();
   }catch(e){sidebarError=e?.message||String(e);console.error('Sidebar interview fetch failed',e)}
