@@ -833,7 +833,7 @@ window.pickInterviewGanttSlot=function(p){
 }
 </style><style id="interviewBatchFix20261026">#dailyDashboard .dailyCalendar button.isPastDate{background:#e0e3e7!important;border-color:#cbd1d8!important;color:#89919b!important;cursor:not-allowed!important;opacity:.8;box-shadow:none!important}#dailyDashboard .dailyCalendar button.isPastDate:hover{background:#e0e3e7!important}body .workspace{align-items:start}body .workspace>.side{align-self:start;flex-shrink:0}body .workspace>.side #dailySidebarCalendar{min-height:0}body .workspace>.side .navSection{margin-top:0}#scheduleView .unifiedSidebarCard{display:block!important;min-height:130px}#scheduleView .unifiedSidebarInfo{flex:1;min-width:0}#scheduleView .unifiedSidebarMeta{line-height:1.55}#scheduleView .unifiedSidebarToggle{display:block;width:100%;text-align:center}#scheduleView .unifiedSidebarCard{display:block!important}#scheduleView .unifiedSidebarTop{display:flex!important}#scheduleView .unifiedSidebarAvatar{display:flex!important}#scheduleView .unifiedSidebarActions[hidden]{display:none!important}</style><script id="interviewSidebarLists20261025">
 (function(){
- const categories={future:'明日以降の面接予定',pending:'日程調整中',misconduct:'不届き者達',past:'過去の面接予定'};
+ const categories={future:'明日以降の面接予定',pending:'日程調整中',misconduct:'不届き者達',past:'面接実施済み'};
  const bad=['キャンセル','無断トビ','トビ（キャンセル）','返信なし'];
  const closed=['キャンセル','面接済','採用','不採用','無断トビ','トビ（キャンセル）','日程調整中','返信なし'];
  let category='future',store='',month='';let sidebarRows=null;let sidebarError='';let sidebarFetching=false;
