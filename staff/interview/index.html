@@ -1460,9 +1460,23 @@ body.commonPreviewOpen #commonPreviewNav{box-shadow:0 0 0 2px #78addc!important;
  body.commonPreviewOpen main.wrap>.workspace>aside.side.card{width:100%!important;max-width:none!important;min-width:0!important}
  body.commonPreviewOpen main.wrap>.workspace>.workMain{grid-column:1!important;grid-row:2!important}
 }
+</style><style id="nativeCommonListExactExclusivity20261026">
+/* The old listing panes must not occupy layout or display under the common view. */
+body.commonPreviewOpen .workMain > #lineInbox,
+body.commonPreviewOpen .workMain > #scheduleView,
+body.commonPreviewOpen .workMain > #afterlifeView,
+body.commonPreviewOpen .workMain > #applicantDetailView,
+body.commonPreviewOpen .workMain > #dailyDashboard,
+body.commonPreviewOpen .workMain > .workLeft,
+body.commonPreviewOpen .workMain > .workRight,
+body.commonPreviewOpen .workMain > :not(#commonPreviewPanel){display:none!important;visibility:hidden!important}
+body.commonPreviewOpen .workMain > #commonPreviewPanel{display:block!important;visibility:visible!important}
+#commonPreviewMessages .lineStoreBadge[data-store="rose"]{background:#f7e6eb!important;color:#872c48!important;border-color:#dca8b8!important}
+#commonPreviewMessages .lineStoreBadge[data-store="grandluxe"]{background:#f7edcf!important;color:#79530c!important;border-color:#d5b667!important}
+#commonPreviewMessages .lineNoticeIdentity .lineStoreBadge{border-style:solid!important;border-width:1px!important;border-radius:5px!important;font-weight:800!important}
 </style></head><body><div id="staffLock" style="display:none"><div class="lockbox"><div class="lockmark">MATTAN KOUGYOU</div><h2>STAFF LOGIN</h2><input id="staffPin" type="password" placeholder="パスワード" autocomplete="off"><button id="staffUnlock" type="button">ログイン</button><div id="staffLockErr" class="lockerr"></div></div></div><header class="appHeader"><div class="brand"><span>MATTAN KOUGYOU</span><strong>面接予約管理</strong></div><div class="headerRight"><button type="button" id="headerTopNav" class="headerNavButton">TOP</button><button type="button" id="headerBookingNav" class="headerNavButton">面接登録</button><div id="headerLineNavSlot"></div><button type="button" id="headerSettingsNav" class="headerNavButton" aria-expanded="false">設定</button><div id="headerSettingsPanel" hidden><button type="button" id="enablePcAlerts" class="notifyButton">PC通知を許可</button><button type="button" id="lineSoundTest" class="notifyButton" title="LINE通知音を確認">通知音テスト</button></div><span id="reminderCount" class="reminderCount" hidden>0</span><span>INTERVIEW MANAGEMENT</span><span class="headerSymbol" aria-hidden="true">◈</span></div></header><main class="wrap"><div class="workspace">
 <aside class="side card"><section id="dailySidebarCalendar"><div class="dailyMonthNav"><button type="button" id="dailyPrevMonth" aria-label="前月">‹</button><strong id="dailyMonthLabel"></strong><button type="button" id="dailyNextMonth" aria-label="翌月">›</button></div><div class="dailyCalendar" id="dailyCalendarDays"></div></section><div class="navSection"><button type="button" class="navBtn" id="sidebarLineNav"><span class="sidebarNavTitle">LINE通知</span><span class="sidebarNavRight"><span id="sidebarLineCount">—件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><button class="navBtn" id="futureNav" type="button" aria-expanded="true"><span class="sidebarNavTitle">明日以降の面接予定</span><span class="sidebarNavRight"><span id="futureInterviewCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><div class="navPanel" id="futurePanel" hidden><div id="list">読み込み中...</div></div><button class="navBtn" id="pendingNav" type="button" aria-expanded="false"><span class="sidebarNavTitle">日程調整中</span><span class="sidebarNavRight"><span id="pendingInterviewCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><div class="navPanel" id="pendingPanel" hidden><div id="pendingInterviewList"></div></div><button class="navBtn" id="misconductNav" type="button"><span class="sidebarNavTitle">不届き者達</span><span class="sidebarNavRight"><span id="misconductCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><button class="navBtn" id="historyNav" type="button" aria-expanded="false"><span class="sidebarNavTitle">面接実施済み</span><span class="sidebarNavRight"><span id="pastInterviewCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><div class="navPanel" id="historyPanel" hidden><div id="pastInterviewList">読み込み中...</div></div><button class="navBtn afterlifeNavBtn" id="afterlifeNav" type="button" aria-expanded="false"><span class="sidebarNavTitle">来世に期待</span><span class="sidebarNavRight"><span id="afterlifeCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><button type="button" id="commonPreviewNav" class="navBtn" style="margin-top:22px!important;background:#234969!important;border:1px solid #66849c!important;color:#fff!important" aria-controls="commonPreviewPanel" aria-expanded="false"><span class="sidebarNavTitle">共通ページ</span><span class="sidebarNavRight"><span style="font-size:11px">確認用</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button></div></aside>
-<div class="workMain"><section class="card" id="commonPreviewPanel" hidden aria-label="共通ページの表示確認">
+<div class="workMain"><section class="card lineInbox" id="commonPreviewPanel" hidden aria-label="共通ページの表示確認">
  <div class="scheduleHeader commonPreviewHeader">
   <h2 id="commonPreviewTitle">求人LINE受信｜全店舗</h2>
   <div class="commonPreviewTools">
@@ -2740,15 +2754,57 @@ window.afterlifeReload=load;
   for(let i=(page-1)*PAGE_SIZE;i<Math.min(total,page*PAGE_SIZE);i++)fragment.append(card(i));
   list.replaceChildren(fragment);
  }
+ // Preserve the original panes so the preview can be removed without losing
+ // their visibility, inline display or accessibility state.
+ const originalPanes=[...panel.parentElement.children].filter(node=>node!==panel);
+ const savedPanes=new Map();
+ let previewExclusive=false;
+ function keepOtherViewsHidden(){
+  if(!previewExclusive)return;
+  for(const node of originalPanes){
+   if(!savedPanes.has(node)){
+    savedPanes.set(node,{
+     hidden:node.hidden,
+     inert:node.inert,
+     ariaHidden:node.getAttribute('aria-hidden'),
+     display:node.style.getPropertyValue('display'),
+     priority:node.style.getPropertyPriority('display')
+    });
+   }
+   if(!node.hidden)node.hidden=true;
+   if(node.style.getPropertyValue('display')!=='none'||node.style.getPropertyPriority('display')!=='important')
+    node.style.setProperty('display','none','important');
+   if(!node.inert)node.inert=true;
+   if(node.getAttribute('aria-hidden')!=='true')node.setAttribute('aria-hidden','true');
+  }
+ }
+ const paneObserver=new MutationObserver(()=>keepOtherViewsHidden());
+ originalPanes.forEach(node=>paneObserver.observe(node,{attributes:true,attributeFilter:['hidden','style','inert','aria-hidden']}));
  function close(){
+  if(!previewExclusive)return;
+  previewExclusive=false;
   document.body.classList.remove('commonPreviewOpen');
   panel.hidden=true;
+  for(const [node,state] of savedPanes){
+   node.hidden=state.hidden;
+   node.inert=state.inert;
+   if(state.ariaHidden===null)node.removeAttribute('aria-hidden');
+   else node.setAttribute('aria-hidden',state.ariaHidden);
+   if(state.display)node.style.setProperty('display',state.display,state.priority);
+   else node.style.removeProperty('display');
+  }
+  savedPanes.clear();
   button.setAttribute('aria-expanded','false');
  }
  function open(){
-  // Do not mutate the original list content or application data.
+  // The preview is an exclusive native view, not a panel layered over LINE.
+  if(!previewExclusive){
+   previewExclusive=true;
+   keepOtherViewsHidden();
+  }
   document.body.classList.remove('dashboardHome','lineInboxOpen','lineBookingActive','applicantDetailOpen','afterlifeOpen');
   document.body.classList.add('commonPreviewOpen');
+  keepOtherViewsHidden();
   panel.hidden=false;
   button.setAttribute('aria-expanded','true');
   render();
