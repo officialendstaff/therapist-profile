@@ -2700,19 +2700,43 @@ window.afterlifeReload=load;
   return card;
  }
  function render(){
-  const total=totals[category], pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
+  const originals=[...document.querySelectorAll('#lineInboxMessages > .lineMessage')].filter(el=>{
+   const person=el.querySelector('.lineNoticePerson[data-account][data-user]');
+   return !person||!window.afterlifeIsRejected?.(person.dataset.account,person.dataset.user);
+  });
+  const isLine=category===0;
+  const total=isLine?originals.length:totals[category];
+  const pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
   page=Math.max(1,Math.min(page,pages));
   selector.value=String(category);
-  document.getElementById('commonPreviewTitle').textContent=
-   category===0?'求人LINE受信｜全店舗':sections[category];
+  document.getElementById('commonPreviewTitle').textContent=isLine?'求人LINE受信｜全店舗':sections[category];
   document.getElementById('commonPreviewCount').textContent=total+'件';
   document.getElementById('commonPreviewPage').textContent=page+' / '+pages+'ページ';
   document.getElementById('commonPreviewPrev').disabled=page===1;
   document.getElementById('commonPreviewNext').disabled=page===pages;
   const fragment=document.createDocumentFragment();
-  for(let i=(page-1)*PAGE_SIZE;i<Math.min(total,page*PAGE_SIZE);i++)fragment.append(card(i));
+  if(isLine){
+   originals.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE).forEach(original=>{
+    const copy=original.cloneNode(true);
+    copy.hidden=false;
+    copy.removeAttribute('id');
+    copy.querySelectorAll('[id]').forEach(node=>node.removeAttribute('id'));
+    copy.querySelectorAll('button,input,select,a').forEach(node=>{
+     node.setAttribute('aria-disabled','true');
+     node.setAttribute('tabindex','-1');
+     if(node.matches('button,input,select'))node.disabled=true;
+     if(node.matches('a'))node.removeAttribute('href');
+    });
+    fragment.append(copy);
+   });
+  }else{
+   for(let i=(page-1)*PAGE_SIZE;i<Math.min(total,page*PAGE_SIZE);i++)fragment.append(card(i));
+  }
   list.replaceChildren(fragment);
+  const note=panel.querySelector('.commonPreviewNote');
+  if(note)note.textContent=isLine?'元のLINE一覧カードをそのまま複製しています（操作は無効）。':'表示確認用サンプルです。実データには未接続です。';
  }
+
  // Preserve the original panes so the preview can be removed without losing
  // their visibility, inline display or accessibility state.
  const originalPanes=[...panel.parentElement.children].filter(node=>node!==panel);
@@ -2772,7 +2796,7 @@ window.afterlifeReload=load;
   category=Math.max(0,Math.min(5,Number(selector.value)||0));page=1;render();
  });
  document.getElementById('commonPreviewPrev').addEventListener('click',()=>{if(page>1){page--;render()}});
- document.getElementById('commonPreviewNext').addEventListener('click',()=>{if(page<Math.ceil(totals[category]/PAGE_SIZE)){page++;render()}});
+ document.getElementById('commonPreviewNext').addEventListener('click',()=>{if(!document.getElementById('commonPreviewNext').disabled){page++;render()}});
  button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();open()});
  document.addEventListener('click',event=>{
   const other=event.target.closest('#headerTopNav,#headerBookingNav,#sidebarLineNav,#futureNav,#pendingNav,#misconductNav,#historyNav,#afterlifeNav');
