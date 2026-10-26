@@ -886,6 +886,37 @@ body.afterlifeOpen #afterlifeView>.afterlifeHeader{padding-top:5px!important}
  }
  body:not(.dashboardHome) .workspace>.workMain{grid-column:2!important;grid-row:1 / span 2!important;align-self:start!important}
 }
+</style><style id="stableInterviewSidebarLayout20261026">
+/* Non-TOP pages: sidebar owns both children, so main-panel height cannot move nav. */
+@media(min-width:901px){
+ body:not(.dashboardHome) .workspace{
+  display:grid!important;grid-template-columns:300px minmax(0,1fr)!important;
+  grid-template-rows:auto!important;align-items:start!important;align-content:start!important;
+  column-gap:14px!important;row-gap:0!important
+ }
+ body:not(.dashboardHome) .workspace>.side.card{
+  display:flex!important;flex-direction:column!important;gap:12px!important;
+  grid-column:1!important;grid-row:1!important;position:static!important;
+  width:300px!important;min-width:0!important;max-width:300px!important;
+  height:auto!important;max-height:none!important;overflow:visible!important;
+  padding:0!important;margin:0!important;border:0!important;background:transparent!important;
+  border-radius:0!important;box-shadow:none!important
+ }
+ body:not(.dashboardHome) .workspace>.side.card>#dailySidebarCalendar{
+  display:block!important;position:static!important;flex:0 0 auto!important;
+  width:100%!important;grid-column:auto!important;grid-row:auto!important;
+  margin:0!important;align-self:auto!important
+ }
+ body:not(.dashboardHome) .workspace>.side.card>.navSection{
+  display:flex!important;flex-direction:column!important;position:static!important;
+  flex:0 0 auto!important;width:100%!important;grid-column:auto!important;grid-row:auto!important;
+  top:auto!important;margin:0!important;align-self:auto!important
+ }
+ body:not(.dashboardHome) .workspace>.workMain{
+  display:block!important;grid-column:2!important;grid-row:1!important;
+  width:100%!important;min-width:0!important;align-self:start!important
+ }
+}
 </style><style id="interviewMonthInHeaderTenFixed20261026">
 /* TOP remains unchanged. All interview lists use a single heading row. */
 #scheduleView>.scheduleHeader #scheduleHeaderMonth{
