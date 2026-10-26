@@ -1049,10 +1049,18 @@ if(nav&&nav!==sidebarNotice)nav.classList.toggle('noticeBlink',unread>0);
 }
 
 const escape=s=>String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-async function refresh(){try{if(!visible)return;status.textContent='LINE受信データを読み込み中です。';
+let inboxRefreshPending=null;
+async function refresh(){
+ if(!visible)return;
+ if(inboxRefreshPending)return inboxRefreshPending;
+ inboxRefreshPending=refreshOnce().finally(()=>{inboxRefreshPending=null});
+ return inboxRefreshPending;
+}
+async function refreshOnce(){try{if(!visible)return;status.textContent='LINE受信データを読み込み中です。';
 const access=window.interviewStaffAuth;
 if(!access?.token()){status.textContent='面接予約管理にログインすると受信内容を表示できます。';messages.innerHTML='';return}
 const data=await Promise.race([access.api('inbox'),new Promise((_,reject)=>setTimeout(()=>reject(new Error('受信データの取得がタイムアウトしました。再試行してください。')),12000))]);
+window.interviewInboxStage='fetch-complete';
 status.textContent='受信データ取得完了・一覧を構築中…';
 const rows=data.events||[];
 const allLinks=data.links||[];
@@ -1060,7 +1068,7 @@ window.interviewSharedHistoryLinks=allLinks;
 window.interviewLineDetailData=data;
 // Defer sidebar updates until the separate interview list is opened.
 status.textContent='LINE受信情報を表示しています…';
-window.interviewSharedRefreshInboxData?.(data);
+// Sidebar summary is refreshed when that list is opened, not during inbox rendering.
 const linkMap=new Map(allLinks.map(x=>[x.account_id+':'+x.line_user_id,x]));
 const historyByLine=new Map();
 for(const l of allLinks){const key=l.account_id+':'+l.line_user_id;const list=historyByLine.get(key)||[];const record=interviews.find(i=>String(i.id)===String(l.interview_id));if(record&&['無断トビ','トビ（キャンセル）','キャンセル'].includes(record.status))list.push(record);historyByLine.set(key,list)}
@@ -1103,7 +1111,7 @@ return '<div class="lineMessage"><div class="lineNoticePrimary">'+
  '<div class="lineAllHistory" hidden>'+history+cancellationHistory+events.map(body).join('')+'</div></div>';
 }).join('')||'<p class="note">受信メッセージはありません。</p>';
 applyLineInboxFilters();
-}catch(e){console.error('LINE受信データ取得エラー',e);if(visible){status.textContent='LINE受信情報を取得できませんでした：'+(e?.message||String(e));messages.innerHTML='<button type="button" class="action" id="lineInboxRetry">再読み込み</button>';document.getElementById('lineInboxRetry').onclick=()=>refresh();}}}
+}catch(e){console.error('LINE受信データ取得エラー',e);window.interviewInboxLastError=String(e?.stack||e);if(visible){status.textContent='LINE受信情報を取得できませんでした：'+(e?.message||String(e));messages.innerHTML='<button type="button" class="action" id="lineInboxRetry">再読み込み</button>';document.getElementById('lineInboxRetry').onclick=()=>refresh();}}}
 let lineInboxPage=1;
 function applyLineInboxFilters(reset=false){
  if(reset)lineInboxPage=1;
@@ -1136,7 +1144,7 @@ setInterval(()=>{checkLineNotice();if(document.visibilityState==='visible'&&visi
 })();
 </script><script>
 document.addEventListener('click',function(e){
- const nav=e.target.closest('#lineNoticeNav');
+ const nav=null; // Primary LINE navigation is handled by the dedicated click listener.
  if(nav){
   document.body.classList.remove('lineBookingActive','dashboardHome');window.restoreLineBookingLayout?.();
   document.body.classList.add('lineInboxOpen');
