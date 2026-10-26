@@ -1585,11 +1585,11 @@ window.pickInterviewGanttSlot=function(p){
   const count=document.getElementById('lineInboxResultCount');
   if(count&&count.parentElement!==header)header.append(count);
   const pager=document.getElementById('lineInboxPager');
-  if(pager&&pager.parentElement===header)header.append(pager);
+  if(pager&&pager.parentElement===header&&header.lastElementChild!==pager)header.append(pager);
  };
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',moveLineStore);
  else moveLineStore();
- new MutationObserver(moveLineStore).observe(document.getElementById('lineInbox')||document.documentElement,{childList:true,subtree:true});
+ // No subtree observer: re-appending a pager can otherwise trigger an endless mutation cycle.
 })();
 </script><script id="applicantDetailViewLogic20261026">
 (function(){
