@@ -1661,7 +1661,6 @@ return '<div class="lineMessage"><div class="lineNoticePrimary">'+
  '<div class="lineAllHistory" hidden>'+history+cancellationHistory+events.map(body).join('')+'</div></div>';
 }).join('')||'<p class="note">受信メッセージはありません。</p>';
 messages.querySelectorAll('.lineLatestPreview,.lineAllHistory').forEach(el=>el.remove());
-window.interviewNormalizeCards?.(messages);
 applyLineInboxFilters();
  }catch(e){console.error('LINE受信データ取得エラー',e);window.interviewInboxLastError=String(e?.stack||e);if(visible){status.textContent='LINE受信情報を取得できませんでした：'+(e?.message||String(e));if(!messages.querySelector('.lineMessage')){messages.innerHTML='<button type="button" class="action" id="lineInboxRetry">再読み込み</button>';document.getElementById('lineInboxRetry').onclick=()=>refresh()}}}}
 let lineInboxPage=1;
