@@ -774,7 +774,7 @@ window.interviewSharedRefreshInboxData=function(data){
  const map=new Map();
  for(const link of data.links||[]){if(link.interview_id==null)continue;const key=String(link.account_id)+':'+String(link.line_user_id);const events=grouped.get(key)||[];events.sort((a,b)=>String(b.received_at).localeCompare(String(a.received_at)));map.set(String(link.interview_id),events)}
  window.interviewSharedMessages=map;
- window.refreshInterviewSidebarCards?.();
+ if(!document.getElementById('scheduleView')?.hidden)window.refreshInterviewSidebarCards?.();
 };
 const interviewSharedEscape=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 window.interviewSharedHistoryRows=[];
@@ -927,7 +927,7 @@ async function loadInterviewLineProfiles(){
     interviewLineProfiles.set(id,{name:profile?.displayName||link.line_display_name||old.name||'未取得',picture:profile?.pictureUrl||link.line_picture_url||old.picture||''});
    };
    for(const link of links)apply(link,profiles[link.account_id+':'+link.line_user_id]);
-   renderList();window.refreshDailyDashboard?.();window.refreshInterviewSidebarCards?.();
+   renderList();if(document.body.classList.contains('dashboardHome'))window.refreshDailyDashboard?.();if(!document.getElementById('scheduleView')?.hidden)window.refreshInterviewSidebarCards?.();
    const profileClient=supabase.createClient('https://vjjnkflbfsjihwzjsjpr.supabase.co','sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos',{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storage:window.sessionStorage,storageKey:'mattan-recruit-auth'}});
    const {data:sessionData}=await profileClient.auth.getSession();
    const session=sessionData?.session;
@@ -1052,11 +1052,14 @@ const escape=s=>String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>
 async function refresh(){try{if(!visible)return;status.textContent='LINE受信データを読み込み中です。';
 const access=window.interviewStaffAuth;
 if(!access?.token()){status.textContent='面接予約管理にログインすると受信内容を表示できます。';messages.innerHTML='';return}
-const data=await Promise.race([access.api('inbox'),new Promise((_,reject)=>setTimeout(()=>reject(new Error('受信データの取得がタイムアウトしました。')),12000))]);
+const data=await Promise.race([access.api('inbox'),new Promise((_,reject)=>setTimeout(()=>reject(new Error('受信データの取得がタイムアウトしました。再試行してください。')),12000))]);
+status.textContent='受信データ取得完了・一覧を構築中…';
 const rows=data.events||[];
 const allLinks=data.links||[];
 window.interviewSharedHistoryLinks=allLinks;
 window.interviewLineDetailData=data;
+// Defer sidebar updates until the separate interview list is opened.
+status.textContent='LINE受信情報を表示しています…';
 window.interviewSharedRefreshInboxData?.(data);
 const linkMap=new Map(allLinks.map(x=>[x.account_id+':'+x.line_user_id,x]));
 const historyByLine=new Map();
@@ -1377,7 +1380,7 @@ window.pickInterviewGanttSlot=function(p){
    window.interviewDashboardRows=sidebarRows;
    if(typeof interviews!=='undefined'&&(!interviews.length||sidebarRows.length>interviews.length))interviews=sidebarRows;
    // Keep the primary interview state owned by load(); sidebar fetch must not overwrite it.
-   if(typeof window.refreshDailyDashboard==='function')window.refreshDailyDashboard();
+   if(document.body.classList.contains('dashboardHome')&&typeof window.refreshDailyDashboard==='function')window.refreshDailyDashboard();
   }catch(e){sidebarError=e?.message||String(e);console.error('Sidebar interview fetch failed',e)}
   finally{sidebarFetching=false;updateCounts();if(!document.getElementById('scheduleView').hidden&&document.getElementById('interviewListFilters'))render()}
  }
