@@ -453,14 +453,44 @@ async function loadInterviewLineProfilesFromDatabase(){
  try{
   const {data,error}=await sb.from('staff_interview_line_links').select('interview_id,account_id,line_user_id,line_display_name,line_picture_url');
   if(error)throw error;
-  for(const link of data||[]){
+  const links=data||[];
+  for(const link of links){
    if(link.interview_id==null)continue;
    const id=Number(link.interview_id),old=interviewLineProfiles.get(id)||{};
    interviewLineProfiles.set(id,{name:old.name&&old.name!=='未取得'?old.name:(link.line_display_name||'未取得'),picture:old.picture||link.line_picture_url||''});
   }
-  renderList();
-  window.refreshDailyDashboard?.();
-  window.refreshInterviewSidebarCards?.();
+  renderList();window.refreshDailyDashboard?.();window.refreshInterviewSidebarCards?.();
+  const {data:authData}=await sb.auth.getSession();
+  const session=authData?.session;
+  if(!session)return;
+  const endpoint='https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/recruit-line-profiles';
+  const groups={};
+  for(const link of links){
+   if(!link.interview_id||!link.line_user_id)continue;
+   const old=interviewLineProfiles.get(Number(link.interview_id));
+   if(old?.picture)continue;
+   const account=String(link.account_id||'');
+   if(!account)continue;
+   (groups[account]??=new Set()).add(String(link.line_user_id));
+  }
+  for(const [account,ids] of Object.entries(groups)){
+   const list=[...ids];
+   for(let i=0;i<list.length;i+=30){
+    try{
+     const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json','apikey':'sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos','Authorization':'Bearer '+session.access_token},body:JSON.stringify({account_id:account,user_ids:list.slice(i,i+30)})});
+     if(!response.ok){console.warn('LINE画像取得失敗',account,response.status);continue}
+     const payload=await response.json();
+     for(const link of links){
+      if(link.account_id!==account||link.interview_id==null)continue;
+      const profile=payload.profiles?.[link.line_user_id];
+      if(!profile)continue;
+      const id=Number(link.interview_id),old=interviewLineProfiles.get(id)||{};
+      interviewLineProfiles.set(id,{name:profile.displayName||old.name||link.line_display_name||'未取得',picture:profile.pictureUrl||old.picture||''});
+     }
+    }catch(e){console.warn('LINE画像取得通信失敗',account,e)}
+   }
+  }
+  renderList();window.refreshDailyDashboard?.();window.refreshInterviewSidebarCards?.();
  }catch(e){console.warn('面接LINE紐づけ取得失敗',e)}
 }
 async function loadInterviewLineProfiles(){try{const auth=window.interviewStaffAuth;if(!auth?.token())return;const data=await auth.api('inbox');const profiles=data.profiles||{};for(const l of data.links||[]){if(l.interview_id==null)continue;const p=profiles[l.account_id+':'+l.line_user_id]||{},old=interviewLineProfiles.get(Number(l.interview_id))||{};interviewLineProfiles.set(Number(l.interview_id),{name:p.displayName||l.line_display_name||old.name||'未取得',picture:p.pictureUrl||l.line_picture_url||old.picture||''})}renderList();window.refreshDailyDashboard?.();window.refreshInterviewSidebarCards?.()}catch(e){console.warn('Interview LINE profile fetch failed',e)}}
