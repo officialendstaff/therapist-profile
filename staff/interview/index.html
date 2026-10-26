@@ -1315,7 +1315,8 @@ body:not(.dashboardHome):not(.lineInboxOpen):not(.lineBookingActive):not(.applic
   box-sizing:border-box!important;
  }
 }
-</style><style id="nativeCommonListPreview20261026">
+</style><style id="nativeCommonListPreview20261026">body:not(.commonPreviewOpen) #commonPreviewNav.commonActualInboxSelected{box-shadow:0 0 0 2px #78addc!important;border-color:#78addc!important}
+
 /* Preview is a single native view in workMain, with no iframe or overlay. */
 /* Legacy desktop shell disables root scrolling; release it ONLY for this view. */
 html:has(body.commonPreviewOpen){overflow:hidden!important;height:100%!important}
@@ -3079,7 +3080,22 @@ window.afterlifeReload=load;
  });
  document.getElementById('commonPreviewPrev').addEventListener('click',()=>{if(page>1){page--;render()}});
  document.getElementById('commonPreviewNext').addEventListener('click',()=>{if(!document.getElementById('commonPreviewNext').disabled){page++;render()}});
- button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();open()});
+ // Common view reuses the actual LINE inbox DOM, not a visually approximated copy.
+ button.addEventListener('click',event=>{
+  event.preventDefault();
+  event.stopPropagation();
+  if(previewExclusive)close();
+  panel.hidden=true;
+  document.body.classList.remove('commonPreviewOpen');
+  const originalNav=document.getElementById('sidebarLineNav');
+  if(originalNav)originalNav.click();
+  button.classList.add('commonActualInboxSelected');
+ });
+ document.addEventListener('click',event=>{
+  if(event.target.closest('#sidebarLineNav,#headerTopNav,#headerBookingNav,#futureNav,#pendingNav,#misconductNav,#historyNav,#afterlifeNav')){
+   button.classList.remove('commonActualInboxSelected');
+  }
+ },true);
  document.addEventListener('click',event=>{
   const other=event.target.closest('#headerTopNav,#headerBookingNav,#sidebarLineNav,#futureNav,#pendingNav,#misconductNav,#historyNav,#afterlifeNav');
   if(other&&document.body.classList.contains('commonPreviewOpen'))close();
