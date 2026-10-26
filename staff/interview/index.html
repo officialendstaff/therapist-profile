@@ -2977,7 +2977,7 @@ window.afterlifeReload=load;
   });
   const isLine=category===0;
   const hasActualLineCards=isLine&&originals.length>0;
-  const total=isLine&&!hasActualLineCards?10:isLine?originals.length:totals[category];
+  const total=isLine?originals.length:totals[category];
   const pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
   page=Math.max(1,Math.min(page,pages));
   selector.value=String(category);
@@ -3001,7 +3001,7 @@ window.afterlifeReload=load;
     });
     fragment.append(copy);
    });
-  }else{
+  }else if(!isLine){
    for(let i=(page-1)*PAGE_SIZE;i<Math.min(total,page*PAGE_SIZE);i++)fragment.append(card(i));
   }
   list.replaceChildren(fragment);
@@ -3050,6 +3050,16 @@ window.afterlifeReload=load;
   savedPanes.clear();
   button.setAttribute('aria-expanded','false');
  }
+ async function loadActualLineInbox(){
+  if(category!==0)return;
+  const cards=document.querySelectorAll('#lineInboxMessages > .lineMessage');
+  if(cards.length)return;
+  if(typeof window.refreshInterviewLineInbox!=='function')return;
+  const count=document.getElementById('commonPreviewCount');
+  if(count)count.textContent='読込中';
+  try{await window.refreshInterviewLineInbox()}catch(error){console.error('共通ページ LINE読み込みエラー',error)}
+  if(previewExclusive&&category===0)render();
+ }
  function open(){
   // The preview is an exclusive native view, not a panel layered over LINE.
   if(!previewExclusive){
@@ -3065,7 +3075,7 @@ window.afterlifeReload=load;
  }
  storeFilter?.addEventListener('change',()=>{page=1;render()});
  selector.addEventListener('change',()=>{
-  category=Math.max(0,Math.min(5,Number(selector.value)||0));page=1;render();
+  category=Math.max(0,Math.min(5,Number(selector.value)||0));page=1;render();void loadActualLineInbox();
  });
  document.getElementById('commonPreviewPrev').addEventListener('click',()=>{if(page>1){page--;render()}});
  document.getElementById('commonPreviewNext').addEventListener('click',()=>{if(!document.getElementById('commonPreviewNext').disabled){page++;render()}});
