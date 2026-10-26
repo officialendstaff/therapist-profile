@@ -894,6 +894,57 @@ body.afterlifeOpen #afterlifeView>.afterlifeHeader{padding-top:10px!important;pa
  #scheduleView>.scheduleHeader{flex-wrap:wrap!important}
  #scheduleView>.scheduleHeader #scheduleHeaderMonth{flex:0 0 124px!important}
 }
+</style><style id="stableSidebarAndDetailIsolation20261026">
+/* The sidebar occupies exactly the same two grid rows in every desktop view.
+   A tall results list must never change the height of the calendar's row. */
+@media(min-width:901px){
+ body .workspace{
+  grid-template-rows:var(--interview-sidebar-row-height,240px) auto!important;
+  align-items:start!important;
+  row-gap:14px!important;
+ }
+ body .workspace #dailySidebarCalendar{
+  grid-column:1!important;grid-row:1!important;
+  height:var(--interview-sidebar-row-height,240px)!important;
+  min-height:var(--interview-sidebar-row-height,240px)!important;
+  max-height:var(--interview-sidebar-row-height,240px)!important;
+  margin:0!important;overflow:visible!important;
+  box-sizing:border-box!important;
+ }
+ body .workspace>.side.card>.navSection{
+  grid-column:1!important;grid-row:2!important;
+  align-self:start!important;position:relative!important;
+  top:auto!important;margin:0!important;
+  z-index:5!important;
+ }
+ body.dashboardHome .workspace #dailySidebarCalendar{
+  height:100%!important;
+  min-height:var(--interview-sidebar-row-height,240px)!important;
+  max-height:none!important;
+ }
+ body.dashboardHome .workspace{grid-template-rows:max-content auto!important}
+}
+body.applicantDetailOpen .workMain>#scheduleView,
+body.applicantDetailOpen .workMain>#lineInbox,
+body.applicantDetailOpen .workMain>#dailyDashboard,
+body.applicantDetailOpen .workMain>#afterlifeView{display:none!important}
+body.applicantDetailOpen .workMain>#applicantDetailView:not([hidden]){display:flex!important}
+#afterlifeView>.afterlifeHeader{
+ display:flex!important;align-items:center!important;gap:12px!important;
+ justify-content:space-between!important;
+}
+#afterlifeView>.afterlifeHeader h2{flex:1 1 auto!important;min-width:0!important}
+#afterlifeView>.afterlifeHeader select{
+ width:172px!important;max-width:40%!important;
+ padding:7px 9px!important;min-height:33px!important;
+ background:#fff!important;color:#183653!important;
+ border:1px solid #cbb8ce!important;border-radius:7px!important;
+ font-size:12px!important;
+}
+#afterlifeView>.afterlifeHeader #afterlifeListCount{flex:0 0 auto!important}
+@media(max-width:900px){
+ #afterlifeView>.afterlifeHeader select{width:130px!important}
+}
 </style></head><body><div id="staffLock" style="display:none"><div class="lockbox"><div class="lockmark">MATTAN KOUGYOU</div><h2>STAFF LOGIN</h2><input id="staffPin" type="password" placeholder="パスワード" autocomplete="off"><button id="staffUnlock" type="button">ログイン</button><div id="staffLockErr" class="lockerr"></div></div></div><header class="appHeader"><div class="brand"><span>MATTAN KOUGYOU</span><strong>面接予約管理</strong></div><div class="headerRight"><button type="button" id="headerTopNav" class="headerNavButton">TOP</button><button type="button" id="headerBookingNav" class="headerNavButton">面接登録</button><div id="headerLineNavSlot"></div><button type="button" id="headerSettingsNav" class="headerNavButton" aria-expanded="false">設定</button><div id="headerSettingsPanel" hidden><button type="button" id="enablePcAlerts" class="notifyButton">PC通知を許可</button><button type="button" id="lineSoundTest" class="notifyButton" title="LINE通知音を確認">通知音テスト</button></div><span id="reminderCount" class="reminderCount" hidden>0</span><span>INTERVIEW MANAGEMENT</span><span class="headerSymbol" aria-hidden="true">◈</span></div></header><main class="wrap"><div class="workspace">
 <aside class="side card"><section id="dailySidebarCalendar"><h2>日付選択</h2><div class="dailyMonthNav"><button type="button" id="dailyPrevMonth" aria-label="前月">‹</button><strong id="dailyMonthLabel"></strong><button type="button" id="dailyNextMonth" aria-label="翌月">›</button></div><div class="dailyCalendar" id="dailyCalendarDays"></div></section><div class="navSection"><button type="button" class="navBtn" id="sidebarLineNav"><span class="sidebarNavTitle">LINE通知</span><span class="sidebarNavRight"><span id="sidebarLineCount">—件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><button class="navBtn" id="futureNav" type="button" aria-expanded="true"><span class="sidebarNavTitle">明日以降の面接予定</span><span class="sidebarNavRight"><span id="futureInterviewCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><div class="navPanel" id="futurePanel" hidden><div id="list">読み込み中...</div></div><button class="navBtn" id="pendingNav" type="button" aria-expanded="false"><span class="sidebarNavTitle">日程調整中</span><span class="sidebarNavRight"><span id="pendingInterviewCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><div class="navPanel" id="pendingPanel" hidden><div id="pendingInterviewList"></div></div><button class="navBtn" id="misconductNav" type="button"><span class="sidebarNavTitle">不届き者達</span><span class="sidebarNavRight"><span id="misconductCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><button class="navBtn" id="historyNav" type="button" aria-expanded="false"><span class="sidebarNavTitle">面接実施済み</span><span class="sidebarNavRight"><span id="pastInterviewCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button><div class="navPanel" id="historyPanel" hidden><div id="pastInterviewList">読み込み中...</div></div><button class="navBtn afterlifeNavBtn" id="afterlifeNav" type="button" aria-expanded="false"><span class="sidebarNavTitle">来世に期待</span><span class="sidebarNavRight"><span id="afterlifeCount">0件</span><span class="sidebarNavArrow" aria-hidden="true">▶</span></span></button></div></aside>
 <div class="workMain"><section class="card" id="dailyDashboard" hidden><div class="dailySection dailyAppointmentSection"><div class="dailyDateTitle"><h2 id="dailyAppointmentTitle">本日の面接予定</h2><span id="dailyAppointmentCount"></span></div><div class="dailyAppointments" id="dailyAppointmentItems"></div></div><div class="dailySection dailyScheduleSection"><div class="dailyDateTitle"><h2 id="dailyScheduleTitle">担当者スケジュール</h2><span id="dailyAvailabilityStatus" class="note"></span></div><div class="dailyLegend"><span>🟩 対応可能</span><span>⬜ 対応不可（グレー）</span><span>🟪 面接予約済み</span></div><div class="dailyTableWrap"><div class="dailyGrid" id="dailyScheduleGrid"></div></div><p class="dailyNotice">10:00〜23:30・30分単位。空き枠をタップして日時を選択できます。</p></div></section><section class="card lineInbox" id="lineInbox" hidden><div class="scheduleHeader"><h2>求人LINE受信｜全店舗</h2><button type="button" class="action" id="lineInboxBack" hidden style="display:none!important" aria-hidden="true" tabindex="-1">TOPに戻る</button></div><p class="note" id="lineInboxStatus">受信データを確認しています。</p><div id="lineInboxAuth" hidden><p class="note">求人管理の管理者アカウントでログインしてください。</p><input type="email" id="lineInboxEmail" autocomplete="username" placeholder="メールアドレス"><input type="password" id="lineInboxPassword" autocomplete="current-password" placeholder="パスワード"><button type="button" class="action" id="lineInboxLogin">ログイン</button></div><div class="lineInboxTools"><label for="lineInboxStore">店舗</label><select id="lineInboxStore"><option value="">全店舗</option><option value="rose">薔薇と紳士</option><option value="grandluxe">Grand Luxe</option><option value="luxy">LUXY</option><option value="unsecret">Un Secret</option><option value="us">Un Secret（旧ID）</option></select><span id="lineInboxResultCount" aria-live="polite"></span></div><div id="lineInboxMessages"></div></section><section class="card reminderPanel" id="reminderPanel" hidden><div class="reminderSingleRow"><h2>確認LINEの送信時間です</h2><span class="reminderMessage">応募者へ確認LINEを送信してください。</span><div id="reminderItems"></div></div></section><section class="card scheduleView" id="scheduleView" hidden><div class="scheduleHeader"><h2 id="scheduleTitle">面接予定一覧</h2><button type="button" id="backToCalendar" class="action" hidden style="display:none!important" aria-hidden="true" tabindex="-1">TOPに戻る</button></div><div id="scheduleViewContent"></div></section>
@@ -1833,11 +1884,18 @@ window.pickInterviewGanttSlot=function(p){
   if(!opened){
    previousView={
     lineInboxOpen:document.body.classList.contains('lineInboxOpen'),dashboardHome:document.body.classList.contains('dashboardHome'),afterlifeOpen:document.body.classList.contains('afterlifeOpen'),
-    inboxDisplay:inbox.style.getPropertyValue('display'),
-    inboxPriority:inbox.style.getPropertyPriority('display')
+    sourcePanels:['lineInbox','scheduleView','dailyDashboard','afterlifeView'].map(id=>{
+      const el=byId(id);
+      return {id,hidden:el.hidden,display:el.style.getPropertyValue('display'),priority:el.style.getPropertyPriority('display')};
+    })
    };
   }
-  inbox.style.setProperty('display','none','important');
+  // Explicitly hide every other view: the existing :has() and body-mode CSS
+  // has higher specificity than the old detail-only styles.
+  for(const id of ['lineInbox','scheduleView','dailyDashboard','afterlifeView']){
+    const el=byId(id);if(!el)continue;
+    el.hidden=true;el.style.setProperty('display','none','important');
+  }
   document.body.classList.remove('lineInboxOpen','dashboardHome','afterlifeOpen');
   document.body.classList.add('applicantDetailOpen');
   root.hidden=false;opened=true;fillMessages();
@@ -1864,15 +1922,15 @@ window.pickInterviewGanttSlot=function(p){
   opened=false;selection=null;
   root.hidden=true;
   document.body.classList.remove('applicantDetailOpen');
-  const inbox=byId('lineInbox');
+  for(const panel of previousView?.sourcePanels||[]){
+    const el=byId(panel.id);if(!el)continue;
+    el.hidden=panel.hidden;
+    if(panel.display)el.style.setProperty('display',panel.display,panel.priority);
+    else el.style.removeProperty('display');
+  }
   if(previousView?.lineInboxOpen)document.body.classList.add('lineInboxOpen');
   if(previousView?.dashboardHome)document.body.classList.add('dashboardHome');
   if(previousView?.afterlifeOpen)document.body.classList.add('afterlifeOpen');
-  if(previousView?.inboxDisplay){
-   inbox.style.setProperty('display',previousView.inboxDisplay,previousView.inboxPriority);
-  }else{
-   inbox.style.removeProperty('display');
-  }
   previousView=null;
  }
  back.addEventListener('click',close);
@@ -1940,11 +1998,14 @@ const main=document.createElement('div');main.className='afterlifeToolbar';
 const select=document.createElement('select');select.setAttribute('aria-label','店舗切替');
 select.innerHTML='<option value="">全店舗</option>'+Object.entries(labels).filter(([a])=>a!=='us').map(([a,n])=>'<option value="'+a+'">'+n+'</option>').join('');
 select.onchange=()=>{shop=select.value;page=1;render()};
-main.append(select);
+const titleRow=list.querySelector('.afterlifeHeader');
+if(titleRow)titleRow.insertBefore(select,document.getElementById('afterlifeListCount'));
+else main.append(select);
 const entriesNode=document.createElement('div');entriesNode.id='afterlifeEntries';
 const paging=document.createElement('div');paging.id='afterlifePagination';
 list.querySelector('.afterlifeEmpty')?.remove();
-list.append(main,entriesNode,paging);
+if(main.childElementCount)list.append(main);
+list.append(entriesNode,paging);
 function render(){
  const rows=entries.filter(e=>!shop||e.account_id===shop||shop==='unsecret'&&e.account_id==='us');
  const pageSize=window.interviewListVisibleCount?.()||10,pages=Math.max(1,Math.ceil(rows.length/pageSize));
