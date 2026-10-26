@@ -2977,8 +2977,14 @@ window.afterlifeReload=load;
    return matchesStore&&(!person||!window.afterlifeIsRejected?.(person.dataset.account,person.dataset.user));
   });
   const isLine=category===0;
+  const isFuture=category===1;
+  const futureRows=isFuture?(typeof interviews!=='undefined'?interviews:[]).filter(i=>i.interview_date>nowJst().date&&!['キャンセル','面接済','採用','不採用','無断トビ','トビ（キャンセル）','日程調整中'].includes(i.status)).filter(i=>{
+   const selected=storeFilter?.value||'';
+   const map={'薔薇と紳士':'rose','Grand Luxe':'grandluxe','LUXY':'luxy','Un Secret':'unsecret','BUSTY OSAKA':'busty'};
+   return !selected||map[i.shop]===selected;
+  }).sort((a,b)=>(a.interview_date+' '+a.interview_time).localeCompare(b.interview_date+' '+b.interview_time)):[];
   const hasActualLineCards=isLine&&originals.length>0;
-  const total=isLine?originals.length:totals[category];
+  const total=isLine?originals.length:isFuture?futureRows.length:totals[category];
   const pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
   page=Math.max(1,Math.min(page,pages));
   selector.value=String(category);
@@ -3001,6 +3007,29 @@ window.afterlifeReload=load;
      if(node.matches('a'))node.removeAttribute('href');
     });
     fragment.append(copy);
+   });
+  }else if(isFuture){
+   futureRows.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE).forEach(i=>{
+    const row=make('div','lineMessage interviewCommonCard');
+    row.dataset.interviewId=String(i.id);
+    const primary=make('div','lineNoticePrimary');
+    const person=make('div','lineNoticePerson');
+    const profile=typeof interviewLineProfiles!=='undefined'?interviewLineProfiles.get(Number(i.id)):null;
+    const avatar=make('span','lineAvatar empty','LINE');
+    if(profile?.picture){avatar.textContent='';const img=make('img');img.src=profile.picture;img.alt='LINEアイコン';img.referrerPolicy='no-referrer';img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%';img.onerror=()=>{avatar.textContent='LINE'};avatar.append(img)}
+    const identity=make('div','lineNoticeIdentity');
+    identity.append(make('strong','',profile?.name||'未取得'));
+    const shop=make('span','lineStoreBadge',i.shop||'');identity.append(shop);person.append(avatar,identity);
+    const summary=make('div','lineNoticeSummary');
+    const appointment=make('div','sharedInterviewAppointment');
+    appointment.append(make('strong','',i.interview_date+' '+String(i.interview_time||'').slice(0,5)));
+    appointment.append(make('span','', '担当：'+interviewAssigneeName(i)));
+    summary.append(appointment,make('span','interviewStatus',i.confirmed?'確認OK':i.status||'面接予定'));
+    const actions=make('div','lineBookActions sharedInterviewButtons');
+    const change=make('button','action action-change','日程変更');change.type='button';change.onclick=()=>chooseReschedule(i.id);
+    const cancel=make('button','action action-cancel','キャンセル');cancel.type='button';cancel.onclick=()=>cancelIt(i.id);
+    actions.append(change,cancel);
+    primary.append(person,summary,actions);row.append(primary);fragment.append(row);
    });
   }else if(!isLine){
    for(let i=(page-1)*PAGE_SIZE;i<Math.min(total,page*PAGE_SIZE);i++)fragment.append(card(i));
@@ -3074,6 +3103,13 @@ window.afterlifeReload=load;
   button.setAttribute('aria-expanded','true');
   render();
  }
+ // The future sidebar opens the shared layout with actual interview records.
+ const futureButton=document.getElementById('futureNav');
+ if(futureButton)futureButton.onclick=()=>{
+  category=1;page=1;storeFilter.value='';open();
+  futureButton.setAttribute('aria-expanded','true');
+  if(typeof interviews!=='undefined'&&!interviews.length&&typeof load==='function')void load().then(()=>render());
+ };
  storeFilter?.addEventListener('change',()=>{page=1;render()});
  selector.addEventListener('change',()=>{
   category=Math.max(0,Math.min(5,Number(selector.value)||0));page=1;render();void loadActualLineInbox();
