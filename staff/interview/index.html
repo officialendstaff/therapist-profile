@@ -2953,72 +2953,63 @@ window.afterlifeReload=load;
   return node;
  };
  const storeCodes={'薔薇と紳士':'rose','Grand Luxe':'grandluxe','LUXY':'luxy','Un Secret':'unsecret','BUSTY OSAKA':'busty'};
- const sharedTemplate=document.querySelector('#lineInboxMessages > .lineMessage');
- function sharedEmptyTemplate(){
+ // Display-only fixtures. Never read or write Supabase interview records here.
+ const demoStores=['薔薇と紳士','Grand Luxe','LUXY','Un Secret','BUSTY OSAKA'];
+ const demoNames=['テスト応募者01','テスト応募者02','テスト応募者03','テスト応募者04','テスト応募者05','テスト応募者06','テスト応募者07','テスト応募者08','テスト応募者09','テスト応募者10'];
+ const demoRecords=demoNames.map((name,i)=>({
+  name,shop:demoStores[i%demoStores.length],
+  date:'2026-10-'+String(27+Math.floor(i/5)).padStart(2,'0'),
+  time:String(10+i).padStart(2,'0')+':00',staff:'テスト担当',
+  avatar:'LINE'
+ }));
+ function makeSharedCard(source){
+  // Single identical card DOM for every category; content alone changes.
   const item=make('div','lineMessage');
   const primary=make('div','lineNoticePrimary');
   const person=make('div','lineNoticePerson');
-  person.append(make('span','lineAvatar empty','LINE'));
+  const avatar=make('span','lineAvatar empty',source.record?.avatar||'LINE');
   const identity=make('div','lineNoticeIdentity');
-  identity.append(make('strong','', ''));
-  identity.append(make('span','lineStoreBadge',''));
-  person.append(identity);
+  identity.append(make('strong','',source.record?.name||'テスト応募者'));
+  const store=make('span','lineStoreBadge',source.record?.shop||'薔薇と紳士');
+  store.dataset.store=storeCodes[source.record?.shop]||'rose';
+  identity.append(store);person.append(avatar,identity);
   const summary=make('div','lineNoticeSummary');
+  const appointment=make('div','lineRegisteredInterview');
+  appointment.append(make('strong','',(source.record?.date||'2026-10-27')+' '+(source.record?.time||'10:00')));
+  appointment.append(make('span','', '担当：'+(source.record?.staff||'テスト担当')));
+  summary.append(appointment);
   const actions=make('div','lineBookActions');
-  ['日程変更','キャンセル','面接登録','来世に期待'].forEach(label=>{
-   const action=make('button','action',label);action.type='button';actions.append(action);
+  ['日程変更','キャンセル','面接登録','来世に期待'].forEach((label,i)=>{
+   const action=make('button','action '+['action-change','action-cancel','lineBookButton','afterlifeAction'][i],label);
+   action.type='button';action.disabled=true;actions.append(action);
   });
   primary.append(person,summary,actions);item.append(primary);
   return item;
  }
- function makeSharedCard(source){
-  // Every category uses the exact same LINE message card DOM as the shared page.
-  const original=source.node||document.querySelector('#lineInboxMessages > .lineMessage')||sharedTemplate;
-  const item=original?original.cloneNode(true):sharedEmptyTemplate();
-  item.hidden=false;item.removeAttribute('id');
-  item.querySelectorAll('[id]').forEach(node=>node.removeAttribute('id'));
-  if(source.record){
-   const record=source.record;
-   const name=item.querySelector('.lineNoticeIdentity strong');
-   if(name)name.textContent=record.line_name||record.applicant_name||record.name||'応募者';
-   const badge=item.querySelector('.lineStoreBadge');
-   if(badge){badge.textContent=record.shop||'店舗未設定';badge.dataset.store=storeCodes[record.shop]||'';}
-   const appointment=item.querySelector('.sharedInterviewAppointment,.lineNoticeSummary');
-   if(appointment)appointment.textContent=(record.interview_date||'未定')+' '+(record.interview_time||'').slice(0,5)+(record.staff_name?' 担当：'+record.staff_name:'');
-  }
-  item.querySelectorAll('button,input,select,a').forEach(node=>{
-   node.setAttribute('aria-disabled','true');node.setAttribute('tabindex','-1');
-   if(node.matches('button,input,select'))node.disabled=true;
-   if(node.matches('a'))node.removeAttribute('href');
-  });
-  return item;
- }
  function render(){
   const selected=storeFilter?.value||'';
-  const today=new Date(Date.now()+9*60*60*1000).toISOString().slice(0,10);
-  const all=typeof interviews!=='undefined'?interviews:[];
-  const records=all.filter(record=>{
-   if(selected&&storeCodes[record.shop]!==selected)return false;
-   if(category===1)return record.interview_date>today&&!['キャンセル','面接済','採用','不採用','無断トビ','トビ（キャンセル）','日程調整中'].includes(record.status);
-   if(category===2)return record.status==='日程調整中';
-   if(category===3)return ['無断トビ','トビ（キャンセル）'].includes(record.status);
-   if(category===4)return ['採用','不採用','来店済み','面接済'].includes(record.status);
-   return false;
-  });
   const lineCards=[...document.querySelectorAll('#lineInboxMessages > .lineMessage')].filter(el=>!selected||el.querySelector('.lineStoreBadge')?.dataset.store===selected);
-  const sources=category===0?lineCards.map(node=>({node})):records.map(record=>({record}));
+  const sources=category===0?lineCards.map(node=>({node})):demoRecords.filter(r=>!selected||storeCodes[r.shop]===selected).map(record=>({record}));
   const total=sources.length,pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
   page=Math.max(1,Math.min(page,pages));selector.value=String(category);
   document.body.classList.remove('commonFutureOpen');
-  document.getElementById('commonPreviewTitle').textContent=category===0?'求人LINE受信｜全店舗':sections[category];
+  document.getElementById('commonPreviewTitle').textContent=category===0?'求人LINE受信｜全店舗':sections[category]+'｜表示テスト';
   document.getElementById('commonPreviewCount').textContent=total+'件';
   document.getElementById('commonPreviewPage').textContent=page+' / '+pages+'ページ';
   document.getElementById('commonPreviewPrev').disabled=page===1;
   document.getElementById('commonPreviewNext').disabled=page===pages;
   const fragment=document.createDocumentFragment();
   sources.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE).forEach(source=>{
-   const item=makeSharedCard(source);
-   if(item)fragment.append(item);
+   if(source.node){
+    const copy=source.node.cloneNode(true);copy.hidden=false;copy.removeAttribute('id');
+    copy.querySelectorAll('[id]').forEach(node=>node.removeAttribute('id'));
+    copy.querySelectorAll('button,input,select,a').forEach(node=>{
+     node.setAttribute('aria-disabled','true');node.setAttribute('tabindex','-1');
+     if(node.matches('button,input,select'))node.disabled=true;
+     if(node.matches('a'))node.removeAttribute('href');
+    });
+    fragment.append(copy);
+   }else fragment.append(makeSharedCard(source));
   });
   list.replaceChildren(fragment);
  }
