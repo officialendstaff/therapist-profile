@@ -1055,9 +1055,6 @@ window.pickInterviewGanttSlot=function(p){
   for(const [id,type] of [['futureNav','future'],['pendingNav','pending'],['misconductNav','misconduct'],['historyNav','past']]){
    document.getElementById(id)?.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();open(type)},true)
   }
-  document.getElementById('sidebarLineNav')?.addEventListener('click',()=>{
-   const btn=document.getElementById('lineNoticeNav');if(btn){btn.click();}else{document.body.classList.remove('dashboardHome');document.body.classList.add('lineInboxOpen');document.getElementById('lineInbox').hidden=false;document.getElementById('dailyDashboard').hidden=true;document.getElementById('scheduleView').hidden=true;}const status=document.getElementById('lineInboxStatus');if(status)status.textContent='LINE受信データを読み込み中です。';if(typeof window.refreshInterviewLineInbox==='function'){Promise.resolve(window.refreshInterviewLineInbox()).catch(e=>{if(status)status.textContent='LINE受信の取得エラー：'+(e?.message||String(e))})}else if(status)status.textContent='LINE受信機能を初期化できませんでした。';
-  });
   const count=()=>{updateCounts();if(!document.getElementById('scheduleView').hidden&&document.getElementById('interviewListFilters'))render()};
   const watcher=new MutationObserver(count);const el=document.getElementById('futureInterviewCount');if(el)watcher.observe(el,{childList:true,characterData:true,subtree:true});
   updateCounts();void fetchSidebarRows();setInterval(fetchSidebarRows,60000);
