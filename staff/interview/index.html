@@ -1367,28 +1367,12 @@ body.commonPreviewOpen #commonPreviewNav{box-shadow:0 0 0 2px #78addc!important;
 #commonPreviewPanel .visuallyHidden{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%)!important}
 #commonPreviewMessages{
  box-sizing:border-box!important;display:flex!important;flex-direction:column!important;
- width:100%!important;height:620px!important;min-height:620px!important;max-height:none!important;
+ width:100%!important;height:auto!important;min-height:620px!important;max-height:none!important;
  gap:6px!important;margin:0!important;padding:3px 0!important;overflow:visible!important;
  background:#fff!important
 }
-/* Identical geometry to the existing LINE inbox rows; no compressed cards. */
-#commonPreviewMessages>.lineMessage{box-sizing:border-box!important;display:block!important;flex:0 0 56px!important;width:100%!important;height:56px!important;min-height:56px!important;max-height:56px!important;margin:0!important;padding:5px 8px!important;border:1px solid #dce4ee!important;border-radius:7px!important;background:#fff!important;overflow:hidden!important}
-#commonPreviewMessages>.lineMessage>.lineNoticePrimary{box-sizing:border-box!important;display:grid!important;grid-template-columns:165px minmax(0,1fr) 318px!important;align-items:center!important;gap:8px!important;width:100%!important;height:44px!important;min-height:44px!important;max-height:44px!important;margin:0!important;padding:0!important;overflow:hidden!important}
-#commonPreviewMessages .lineNoticePerson{display:flex!important;flex-direction:row!important;align-items:center!important;gap:8px!important;min-width:0!important;width:auto!important;height:44px!important;max-height:44px!important;overflow:hidden!important}
-#commonPreviewMessages .lineAvatar{box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 36px!important;width:36px!important;height:36px!important;min-width:36px!important;max-height:36px!important;border-radius:50%!important;object-fit:cover!important}
-#commonPreviewMessages .lineNoticeIdentity{display:flex!important;flex-direction:column!important;gap:2px!important;justify-content:center!important;min-width:0!important;max-width:calc(100% - 44px)!important;height:42px!important;overflow:hidden!important}
-#commonPreviewMessages .lineNoticeIdentity strong{display:block!important;margin:0!important;font-size:12px!important;line-height:16px!important;font-weight:800!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
-#commonPreviewMessages .lineStoreBadge{display:inline-flex!important;align-self:flex-start!important;width:auto!important;font-size:10px!important;line-height:13px!important;padding:2px 6px!important;margin:0!important}
-#commonPreviewMessages .lineNoticeSummary{box-sizing:border-box!important;display:flex!important;align-items:center!important;gap:6px!important;grid-column:2!important;grid-row:1!important;min-width:0!important;width:auto!important;overflow:hidden!important;white-space:nowrap!important;flex-wrap:nowrap!important}
-#commonPreviewMessages .sharedInterviewAppointment{box-sizing:border-box!important;display:inline-flex!important;align-items:center!important;gap:8px!important;flex:0 1 235px!important;width:235px!important;min-width:0!important;max-width:235px!important;height:34px!important;min-height:34px!important;max-height:34px!important;padding:4px 9px!important;white-space:nowrap!important}
-#commonPreviewMessages .sharedInterviewAppointment strong{font-size:12px!important;line-height:1.2!important}
-#commonPreviewMessages .sharedInterviewAppointment span{font-size:11px!important}
-#commonPreviewMessages .sharedInterviewRisk{display:flex!important;gap:5px!important;white-space:nowrap!important;overflow:hidden!important;min-width:0!important}
-#commonPreviewMessages .sharedHistoryCount{display:inline-flex!important;align-items:center!important;justify-content:center!important;padding:5px 6px!important;white-space:nowrap!important;border-radius:5px!important;background:#fff3f4!important;border:1px solid #e3b5bd!important;color:#953741!important;font-size:10px!important;font-weight:700!important;line-height:1.2!important}
-#commonPreviewMessages .lineBookActions{display:flex!important;grid-column:3!important;grid-row:1!important;width:318px!important;max-width:318px!important;gap:4px!important;margin:0!important;padding:0!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-end!important}
-#commonPreviewMessages .lineBookActions>.action{box-sizing:border-box!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;width:76px!important;min-width:76px!important;max-width:76px!important;height:32px!important;min-height:32px!important;max-height:32px!important;padding:0 3px!important;margin:0!important;border-radius:6px!important;font-size:10px!important;line-height:1!important;font-weight:700!important;white-space:nowrap!important;background:#edf0f4!important;color:#8c99a9!important;border:1px solid #d5dbe3!important;opacity:1!important;cursor:default!important}
-#commonPreviewMessages .lineBookActions>.lineBookButton{background:#176b9b!important;color:white!important;border-color:#10547d!important}
-#commonPreviewMessages .lineBookActions>.afterlifeAction{background:#60445f!important;color:white!important;border-color:#60445f!important}
+/* Card geometry comes exclusively from the original LINE inbox stylesheet mirror. */
+#commonPreviewMessages>.lineMessage{pointer-events:none!important}
 #commonPreviewPanel .commonPreviewNote{
  color:#65768b!important;font-size:10px!important;line-height:1.3!important;
  margin:5px 0 0!important;padding:0!important
@@ -1419,20 +1403,6 @@ body.commonPreviewOpen .workMain > #commonPreviewPanel{display:block!important;v
 #commonPreviewMessages .lineStoreBadge[data-store="rose"]{background:#f7e6eb!important;color:#872c48!important;border-color:#dca8b8!important}
 #commonPreviewMessages .lineStoreBadge[data-store="grandluxe"]{background:#f7edcf!important;color:#79530c!important;border-color:#d5b667!important}
 #commonPreviewMessages .lineNoticeIdentity .lineStoreBadge{border-style:solid!important;border-width:1px!important;border-radius:5px!important;font-weight:800!important}
-</style><style id="commonPreviewActualLineInboxGeometry20261026">
-/* Use the SAME card geometry as the actual LINE inbox, not the old compressed preview. */
-@media(min-width:901px){
-body.commonPreviewOpen #commonPreviewMessages{height:620px!important;min-height:620px!important;gap:6px!important;padding:0!important}
-body.commonPreviewOpen #commonPreviewMessages>.lineMessage{flex:0 0 56px!important;height:56px!important;min-height:56px!important;max-height:56px!important}
-body.commonPreviewOpen #commonPreviewMessages>.lineMessage>.lineNoticePrimary{grid-template-columns:165px minmax(0,1fr) 318px!important}
-body.commonPreviewOpen #commonPreviewMessages .lineNoticePerson{gap:10px!important}
-body.commonPreviewOpen #commonPreviewMessages .lineAvatar{width:40px!important;height:40px!important;min-width:40px!important;flex:0 0 40px!important}
-body.commonPreviewOpen #commonPreviewMessages .lineNoticeIdentity strong{font-size:13px!important}
-body.commonPreviewOpen #commonPreviewMessages .lineNoticeIdentity .lineStoreBadge{font-size:11px!important}
-body.commonPreviewOpen #commonPreviewMessages .sharedInterviewAppointment{height:34px!important;min-height:34px!important}
-body.commonPreviewOpen #commonPreviewMessages .sharedInterviewAppointment strong{font-size:12px!important}
-body.commonPreviewOpen #commonPreviewMessages .lineBookActions>.action{font-size:10px!important}
-}
 </style><style id="commonPreviewMirroredActualInbox20261026">
 #commonPreviewMessages .lineSender{display:flex!important;align-items:center!important;gap:12px!important}#commonPreviewMessages .lineSender .lineAvatar{width:52px!important;height:52px!important;min-width:52px!important;border-radius:50%!important;object-fit:cover!important}#commonPreviewMessages .lineSender>div:nth-child(2){flex:1!important;min-width:0!important}#commonPreviewMessages .lineSender strong{font-size:18px!important;display:block!important}#commonPreviewMessages .lineReceivedAt,#commonPreviewMessages .lineGroupedCount{display:none!important}#commonPreviewMessages .lineSender .lineBookActions{display:flex!important;align-items:center!important;gap:8px!important;flex-shrink:0!important;margin:0!important}#commonPreviewMessages .lineSender .lineBookButton{min-height:38px!important;padding:8px 14px!important;font-size:13px!important;font-weight:700!important}#commonPreviewMessages .lineLinkedLabel{font-size:11px;color:#186b41;font-weight:700}@media(max-width:560px){#commonPreviewMessages .lineSender{flex-wrap:wrap!important}#commonPreviewMessages .lineSender .lineBookActions{margin-left:auto!important}}
 #commonPreviewMessages .lineBookButton[data-interview-id]:not([data-interview-id=""]){background:#d97706!important;border-color:#b45309!important;color:#fff!important}#commonPreviewMessages .lineLinkedLabel[disabled]{opacity:1!important}
