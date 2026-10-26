@@ -3061,7 +3061,7 @@ window.afterlifeReload=load;
    if(category===4)return ['採用','不採用','来店済み','面接済'].includes(status);
    if(category===5)return status==='来世に期待';
    return false;
-  }).map((row,i)=>({record:{
+  }).sort((a,b)=>category===4?String(b.interview_date||'').localeCompare(String(a.interview_date||''))||String(b.interview_time||'').localeCompare(String(a.interview_time||'')):0).map((row,i)=>({record:{
    name:(typeof interviewLineProfiles!=='undefined'?interviewLineProfiles.get(Number(row.id))?.name:null)||row.line_name||row.applicant_name||row.name||'応募者',
    picture:(typeof interviewLineProfiles!=='undefined'?interviewLineProfiles.get(Number(row.id))?.picture:null)||'',
    shop:row.shop||'店舗未設定',
