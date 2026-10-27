@@ -199,6 +199,7 @@ async function refreshLineInboxReadOnly(){
    body:JSON.stringify({action:'inbox',token})
   });
   const data=await response.json();
+  if(response.status===401){lineInboxReadOnly.status='login-required';lineInboxReadOnly.error='unauthorized';lineInboxReadOnly.applicants=[];if(currentPage==='LINE通知'&&!$('sharedPanel').hidden&&$('applicantDetail').hidden)renderList();return false}
   if(!response.ok)throw new Error(data.error||'inbox_request_failed');
   lineInboxReadOnly.events=Array.isArray(data.events)?data.events:[];
   lineInboxReadOnly.links=Array.isArray(data.links)?data.links:[];
@@ -279,5 +280,5 @@ $('home').onclick=()=>{showHome();selected=new Date(now);monthView=new Date(now.
 $('sound').onclick=async()=>{try{const C=window.AudioContext||window.webkitAudioContext;if(!C)throw Error('非対応');const ctx=new C();await ctx.resume();const osc=ctx.createOscillator(),gain=ctx.createGain();osc.frequency.value=880;gain.gain.value=.08;osc.connect(gain);gain.connect(ctx.destination);osc.start();osc.stop(ctx.currentTime+.2);osc.onended=()=>ctx.close();alert('通知テスト音を再生しました。聞こえない場合はPCの音量・ブラウザ設定を確認してください。')}catch(e){alert('通知音の再生に失敗しました：'+e.message)}};
 $('detailBack').onclick=closeApplicantDetail;
 $('pagePrev').onclick=()=>{pageNumber--;renderList()};$('pageNext').onclick=()=>{pageNumber++;renderList()};renderCalendar();renderChart();renderList();renderTodayTest();showHome();
-refreshLineInboxReadOnly();setInterval(()=>{if(!document.hidden&&lineInboxReadOnly.status!=='loading')refreshLineInboxReadOnly()},30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshLineInboxReadOnly()});
+refreshLineInboxReadOnly();setInterval(()=>{if(!document.hidden&&lineInboxReadOnly.status!=='loading'&&lineInboxReadOnly.status!=='login-required')refreshLineInboxReadOnly()},30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&lineInboxReadOnly.status!=='login-required')refreshLineInboxReadOnly()});
 </script></body></html>
