@@ -107,17 +107,38 @@ const lineInboxReadOnly={status:'idle',events:[],links:[],profiles:{},applicants
 const LINE_SHOPS={rose:'薔薇と紳士',grandluxe:'Grand Luxe',luxy:'LUXY',unsecret:'Un Secret',us:'Un Secret',busty:'BUSTY OSAKA'};
 function normalizeLineInbox(data){
  const grouped=new Map(),links=new Map();
- for(const link of data.links||[]){if(!link.account_id||!link.line_user_id)continue;links.set(String(link.account_id)+':'+String(link.line_user_id),link)}
+ const interviews=new Map((data.interviews||[]).map(x=>[String(x.id),x]));
+ const staff=new Map((data.staff||[]).map(x=>[String(x.user_id),x.display_name]));
+ const history=new Map();
+ for(const h of data.history||[]){const k=String(h.interview_id);if(!history.has(k))history.set(k,[]);history.get(k).push(h)}
+ for(const link of data.links||[]){
+  if(!link.account_id||!link.line_user_id)continue;
+  const key=String(link.account_id)+':'+String(link.line_user_id);
+  if(!links.has(key))links.set(key,[]);
+  links.get(key).push(link)
+ }
  for(const event of data.events||[]){
   if(!event.account_id||!event.line_user_id)continue;
   const account=String(event.account_id),user=String(event.line_user_id),key=account+':'+user;
   if(!grouped.has(key))grouped.set(key,{accountId:account,lineUserId:user,shop:LINE_SHOPS[account]||account,messages:[]});
   grouped.get(key).messages.push({text:String(event.message_text??('['+(event.message_type||'メッセージ')+']')),receivedAt:String(event.received_at||'')});
  }
+ const inactive=new Set(['キャンセル','無断トビ','トビ（キャンセル）','返信なし']);
  return [...grouped.values()].map(item=>{
   item.messages.sort((a,b)=>b.receivedAt.localeCompare(a.receivedAt));
-  const key=item.accountId+':'+item.lineUserId,link=links.get(key)||{},profile=data.profiles?.[key]||{};
-  return {...item,name:profile.displayName||link.line_display_name||'LINE利用者',picture:profile.pictureUrl||link.line_picture_url||'',interviewId:link.interview_id??null,lastReceived:item.messages[0]?.receivedAt||''};
+  const key=item.accountId+':'+item.lineUserId,all=links.get(key)||[];
+  const linked=all.map(l=>({link:l,interview:interviews.get(String(l.interview_id))})).filter(x=>x.interview);
+  linked.sort((a,b)=>String(b.interview.interview_date||'').localeCompare(String(a.interview.interview_date||''))||String(b.interview.interview_time||'').localeCompare(String(a.interview.interview_time||'')));
+  const active=linked.find(x=>!inactive.has(x.interview.status));
+  const selected=active||linked[0],link=selected?.link||all[0]||{},profile=data.profiles?.[key]||{};
+  const past=linked.flatMap(x=>{
+   const i=x.interview,events=(history.get(String(i.id))||[]).map(h=>({type:h.event_type||'変更',scheduledAt:[h.original_date,h.original_time].filter(Boolean).join(' '),updatedAt:h.recorded_at||''}));
+   if(inactive.has(i.status))events.push({type:i.status,scheduledAt:[i.interview_date,i.interview_time].filter(Boolean).join(' '),updatedAt:i.updated_at||''});
+   return events
+  }).filter(e=>e.scheduledAt).sort((a,b)=>String(b.updatedAt).localeCompare(String(a.updatedAt)));
+  const date=active?[active.interview.interview_date,active.interview.interview_time].filter(Boolean).join(' '):'';
+  const assignee=active?staff.get(String(active.interview.interviewer_user_id))||'担当者未登録':'';
+  return {...item,name:profile.displayName||link.line_display_name||'LINE利用者',picture:profile.pictureUrl||link.line_picture_url||'',interviewId:active?.interview.id??null,date,staff:assignee,history:past,lastReceived:item.messages[0]?.receivedAt||''};
  }).sort((a,b)=>b.lastReceived.localeCompare(a.lastReceived));
 }
 async function refreshLineInboxReadOnly(){
