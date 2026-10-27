@@ -3032,7 +3032,6 @@ window.afterlifeReload=load;
   if(name)name.textContent=record.name;
   const badge=item.querySelector('.lineStoreBadge');
   if(badge){badge.textContent=record.shop;badge.dataset.store=storeCodes[record.shop]||'';}
-  const person=item.querySelector('.lineNoticePerson');
   const oldAvatar=person?.querySelector('.lineAvatar');
   if(oldAvatar){
    const avatar=record.picture?document.createElement('img'):make('span','lineAvatar empty','LINE');
