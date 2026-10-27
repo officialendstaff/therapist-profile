@@ -92,6 +92,7 @@ button{font-family:inherit;letter-spacing:inherit}
 .live-line-card .interview-datetime.live-date-pending{background:#fff5e8!important;border-color:#e8c38f!important;color:#99601d!important}
 .live-line-card .interview-datetime.live-date-pending strong,.live-line-card .interview-datetime.live-date-pending span{color:#99601d!important}
 .live-line-card .interview-datetime.live-date-pending span{font-size:9px}
+.line-test-card{border-left:3px solid #c08a28!important;background:#fffdf6!important}.line-test-card .identity strong{color:#936018!important}.line-test-card .card-actions button:not(:disabled){filter:none!important;cursor:pointer!important}.line-test-card .card-actions button:not(:disabled):nth-child(1){background:#568db9!important;color:white!important}.line-test-card .card-actions button:not(:disabled):nth-child(2){background:#d99a54!important;color:white!important}.line-test-card .card-actions button:not(:disabled):nth-child(3){background:#cd7580!important;color:white!important}.line-test-card .card-actions button:not(:disabled):nth-child(4){background:#a65a68!important;color:white!important}
 </style></head><body>
 <header class="header"><button class="brand" id="home">⌂ TOP</button><div class="header-actions"><button id="headerLineInbox" type="button"><svg class="header-bell" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>LINE通知</button><button disabled title="面接登録画面は次工程で実装">面接登録</button><button id="sound">通知設定</button></div></header>
 <section class="calendar" aria-label="月間カレンダー"><div class="cal-head"><button id="prev" aria-label="前月">◀</button><span id="month"></span><button id="next" aria-label="翌月">▶</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="days" id="days"></div></section>
@@ -178,8 +179,32 @@ const LIST_BUTTON_POLICY={
 function allowListButton(page,id){return (LIST_BUTTON_POLICY[page]||[]).includes(id)}
 function makeTestCard(record,key){const state=testState.get(key)||{sent:false,ok:false,selected:''};testState.set(key,state);const card=document.createElement('article');card.className='applicant'+(state.ok?' confirmed':state.sent?' sent':'');const avatar=document.createElement('div');avatar.className='avatar';avatar.textContent='LINE';const identity=document.createElement('div');identity.className='identity';const name=document.createElement('strong');name.textContent=record.name;const store=document.createElement('small');store.className='shop-label';store.textContent=key.startsWith('不届き者:')?'不届き者':record.shop;identity.append(name,store);avatar.tabIndex=0;name.tabIndex=0;avatar.setAttribute('role','button');name.setAttribute('role','button');avatar.setAttribute('aria-label','応募者詳細を開く');name.setAttribute('aria-label','応募者詳細を開く');for(const el of [avatar,name]){el.onclick=()=>openApplicantDetail(record,key);el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openApplicantDetail(record,key)}}}const date=document.createElement('div');date.className='interview-datetime';const when=document.createElement('strong');when.textContent=record.date;const staff=document.createElement('span');staff.textContent='担当：'+record.staff;date.append(when,staff);const confirmations=document.createElement('div');confirmations.className='confirmation-controls';const send=document.createElement('button');send.textContent=state.sent?'送信済み':'LINE送信';send.className=state.sent?'sent-btn':'';send.disabled=!allowListButton(key.startsWith('today:')?'今日の予定':currentPage,'send');send.onclick=()=>{state.sent=!state.sent;send.textContent=state.sent?'送信済み':'LINE送信';send.classList.toggle('sent-btn',state.sent);card.classList.toggle('sent',state.sent&&!state.ok)};const ok=document.createElement('button');ok.textContent='確認OK';ok.className='ok-btn'+(state.ok?' is-ok':'');ok.disabled=!allowListButton(key.startsWith('today:')?'今日の予定':currentPage,'ok');ok.onclick=()=>{state.ok=!state.ok;ok.classList.toggle('is-ok',state.ok);card.classList.toggle('confirmed',state.ok);card.classList.toggle('sent',state.sent&&!state.ok)};confirmations.append(send,ok);const history=document.createElement('div');history.className='history-labels';const entries=(record.history||[]).map(entry=>Array.isArray(entry)?{type:entry[0],scheduledAt:typeof entry[1]==='string'?entry[1]:null}:entry).filter(entry=>entry&&entry.scheduledAt&&/^(日程変更|変更|キャンセル|キャン|無断トビ)$/.test(entry.type)).sort((a,b)=>b.scheduledAt.localeCompare(a.scheduledAt));for(const entry of entries){const type=entry.type==='変更'?'日程変更':entry.type==='キャン'?'キャンセル':entry.type;const tag=document.createElement('span');tag.className='history-tag'+(type==='キャンセル'?' cancel':type==='無断トビ'?' no-show':'');tag.textContent=type+'：'+entry.scheduledAt;history.append(tag)}
 const actions=document.createElement('div');actions.className='card-actions';for(const [id,label,color] of [['register','面接登録','#568DB9'],['change','日程変更','#D99A54'],['cancel','キャンセル','#CD7580'],['future','来世期待','#A65A68']]){const b=document.createElement('button');b.textContent=label;b.style.setProperty('--btn-color',color);b.disabled=!allowListButton(key.startsWith('today:')?'今日の予定':currentPage,id);b.classList.toggle('pressed',state.selected===id);b.onclick=()=>{state.selected=id;actions.querySelectorAll('button').forEach(x=>x.classList.toggle('pressed',x===b))};actions.append(b)}card.append(avatar,identity,date,confirmations,history,actions);return card}
+/* Isolated, removable test applicant. Never writes to Supabase or sends LINE messages. */
+const LINE_TEST_KEY='interview_new_line_test_v1';
+function getLineTestState(){try{return JSON.parse(localStorage.getItem(LINE_TEST_KEY))||{}}catch{return {}}}
+function saveLineTestState(next){localStorage.setItem(LINE_TEST_KEY,JSON.stringify(next));pageNumber=1;renderList()}
+function lineTestRecord(){
+ const st=getLineTestState();
+ return {accountId:'test-only',lineUserId:'test-only',isTest:true,name:'【テスト】面接連携確認',shop:'薔薇と紳士',picture:'',date:st.date||'',staff:st.staff||'',lastReceived:new Date().toISOString(),messages:[{text:'【テスト】面接日時・日程変更・履歴表示を確認するための仮メッセージです。',receivedAt:new Date().toISOString()}],history:st.history||[]};
+}
+function handleLineTestAction(label){
+ const st=getLineTestState(),now=new Date().toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'});
+ if(label==='面接登録'||label==='日程変更'){
+  const input=prompt('【テスト専用】面接日時を入力（例：2026-10-28 15:00）',st.date||'2026-10-28 15:00');
+  if(input===null)return;
+  if(!/^\\d{4}-\\d{2}-\\d{2} (?:[01]\\d|2[0-3]):[0-5]\\d$/.test(input)){alert('日時は YYYY-MM-DD HH:MM で入力してください');return}
+  const staff=prompt('【テスト専用】担当者',st.staff||'村上');if(staff===null)return;
+  if(st.date)(st.history??=[]).unshift({type:'日程変更',scheduledAt:st.date,updatedAt:now});
+  st.date=input;st.staff=staff.trim()||'担当未定';st.status='面接予定';saveLineTestState(st);return
+ }
+ if(label==='キャンセル'||label==='来世期待'){
+  if(!confirm('【テスト専用】'+label+'に変更しますか？'))return;
+  if(st.date)(st.history??=[]).unshift({type:label==='キャンセル'?'キャンセル':'キャンセル',scheduledAt:st.date,updatedAt:now});
+  st.date='';st.staff='';st.status=label;saveLineTestState(st)
+ }
+}
 function makeLiveLineCard(record){
- const card=document.createElement('article');card.className='applicant live-line-card';
+ const card=document.createElement('article');card.className='applicant live-line-card'+(record.isTest?' line-test-card':'');
  const avatar=document.createElement('div');avatar.className='avatar';
  if(record.picture&&/^https:\/\//.test(record.picture)){const img=document.createElement('img');img.src=record.picture;img.alt='LINEアイコン';img.referrerPolicy='no-referrer';avatar.append(img)}else avatar.textContent='LINE';
  const identity=document.createElement('div');identity.className='identity';
@@ -200,13 +225,13 @@ function makeLiveLineCard(record){
  for(const entry of past){const tag=document.createElement('span');tag.className='history-tag'+(entry.type==='キャンセル'?' cancel':entry.type==='無断トビ'?' no-show':'');tag.textContent=entry.type+'：'+entry.scheduledAt;tags.append(tag)}
  history.append(preview,tags);
  const actions=document.createElement('div');actions.className='card-actions';
- for(const [label,color] of [['面接登録','#568DB9'],['日程変更','#D99A54'],['キャンセル','#CD7580'],['来世期待','#A65A68']]){const b=document.createElement('button');b.textContent=label;b.style.setProperty('--btn-color',color);b.disabled=true;b.title='実データの操作連携は未完了です';actions.append(b)}
+ for(const [label,color] of [['面接登録','#568DB9'],['日程変更','#D99A54'],['キャンセル','#CD7580'],['来世期待','#A65A68']]){const b=document.createElement('button');b.textContent=label;b.style.setProperty('--btn-color',color);b.disabled=!record.isTest;b.title=record.isTest?'テスト専用：本番データには反映しません':'実データの操作連携は未完了です';if(record.isTest)b.onclick=()=>handleLineTestAction(label);actions.append(b)}
  card.append(avatar,identity,date,controls,history,actions);return card
 }
 function renderList(){
  const list=$('applicantList');list.replaceChildren();$('pageTitle').textContent=currentPage;
  if(currentPage==='LINE通知'){
-  const records=lineInboxReadOnly.applicants,total=Math.max(1,Math.ceil(records.length/8));pageNumber=Math.min(Math.max(1,pageNumber),total);
+  const records=[lineTestRecord(),...lineInboxReadOnly.applicants],total=Math.max(1,Math.ceil(records.length/8));pageNumber=Math.min(Math.max(1,pageNumber),total);
   $('pageIndicator').textContent=pageNumber+' / '+total;$('pagePrev').disabled=pageNumber===1;$('pageNext').disabled=pageNumber===total;
   records.slice((pageNumber-1)*8,pageNumber*8).forEach(record=>list.append(makeLiveLineCard(record)));
   const labels={idle:'LINE受信データを準備しています',loading:'LINE受信データを更新中',ready:records.length?'LINE受信データを表示中（約30秒ごとに更新）':'LINE受信データは0件です',error:'LINE受信データを取得できませんでした。既存の面接管理へのログイン状態をご確認ください。', 'login-required':'面接管理へのログインが必要です。既存の面接管理ページでログインしてください。'};
