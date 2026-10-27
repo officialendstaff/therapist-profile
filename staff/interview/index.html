@@ -3044,6 +3044,15 @@ window.afterlifeReload=load;
    if(el.matches('button,input,select'))el.disabled=true;
    if(el.matches('a'))el.removeAttribute('href');
   });
+  if(category===1){
+   const buttons=[...item.querySelectorAll('.lineBookActions button')];
+   buttons.forEach((btn,i)=>{
+    if(i===2)return;
+    btn.disabled=false;btn.removeAttribute('aria-disabled');btn.removeAttribute('tabindex');
+    btn.dataset.sharedAction=['reschedule','cancel','','afterlife'][i];
+    btn.dataset.interviewId=String(record.interviewId);
+   });
+  }
   return item;
  }
  function render(){
@@ -3094,6 +3103,50 @@ window.afterlifeReload=load;
   });
   list.replaceChildren(fragment);
  }
+ list.addEventListener('click',async event=>{
+  const btn=event.target.closest('button[data-shared-action]');
+  if(!btn||category!==1)return;
+  event.preventDefault();event.stopPropagation();
+  const id=Number(btn.dataset.interviewId);
+  const row=(window.interviewDashboardRows||[]).find(x=>Number(x.id)===id);
+  if(!row){alert('面接予定が見つかりません。');return}
+  const action=btn.dataset.sharedAction;
+  if(action==='afterlife'){
+   const card=btn.closest('.lineMessage');
+   const identity=card?.querySelector('.lineNoticePerson');
+   if(!identity?.dataset.account||!identity?.dataset.user){alert('LINEアカウントの紐づけが必要です。');return}
+   const trigger=document.createElement('button');
+   trigger.className='afterlifeAction';
+   trigger.dataset.account=identity.dataset.account;
+   trigger.dataset.user=identity.dataset.user;
+   trigger.dataset.name=card.querySelector('.lineNoticeIdentity strong')?.textContent||'';
+   trigger.dataset.picture=card.querySelector('.lineAvatar')?.src||'';
+   document.body.append(trigger);trigger.click();trigger.remove();
+   return;
+  }
+  if(action==='reschedule'){
+   const choice=prompt('日程変更：1＝新しい日時を設定、2＝日程調整中へ移動','1');
+   if(choice===null)return;
+   if(choice==='1'){close();await changeDate(id);return}
+   if(choice!=='2'){alert('1または2を入力してください。');return}
+   if(!confirm('日程調整中へ移動しますか？'))return;
+  }
+  if(action==='cancel'&&!confirm('キャンセルとして不届き者達へ移動しますか？'))return;
+  btn.disabled=true;
+  try{
+   const status=action==='cancel'?'キャンセル':'日程調整中';
+   const {error}=await sb.from('staff_interviews').update({status,alert:action==='cancel',updated_at:new Date().toISOString()}).eq('id',id);
+   if(error)throw error;
+   const {error:historyError}=await sb.from('staff_interview_history').insert({
+    interview_id:id,event_type:action==='cancel'?'キャンセル':'日程変更',
+    original_date:row.interview_date,original_time:row.interview_time,
+    original_shop:row.shop,original_interviewer_user_id:row.interviewer_user_id
+   });
+   if(historyError)console.warn('履歴保存失敗',historyError);
+   await load();await window.interviewSharedLoadHistory?.();render();
+  }catch(error){alert('変更に失敗しました：'+error.message)}
+  finally{btn.disabled=false}
+ });
  // Preserve the original panes so the preview can be removed without losing
  // their visibility, inline display or accessibility state.
  const originalPanes=[...panel.parentElement.children].filter(node=>node!==panel);
