@@ -1712,6 +1712,20 @@ body.applicantDetailOpen .workMain>#applicantDetailView:not([hidden]){display:fl
  }
 }
 
+</style><style id="interviewCommonButtonSizeFix20261027">
+/* Use the same compact dimensions as the original LINE-based interview cards. */
+@media(min-width:901px){
+ #commonPreviewMessages .lineBookActions{gap:4px!important;width:318px!important;max-width:318px!important;flex-wrap:nowrap!important}
+ #commonPreviewMessages .lineBookActions>button,
+ #commonPreviewMessages .lineBookActions>.action,
+ #commonPreviewMessages .lineBookActions>.lineBookButton,
+ #commonPreviewMessages .lineBookActions>.lineBookStatus{
+  box-sizing:border-box!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  flex:0 0 76px!important;width:76px!important;min-width:76px!important;max-width:76px!important;
+  height:32px!important;min-height:32px!important;max-height:32px!important;
+  font-size:10px!important;line-height:1!important;padding:0 3px!important;border-radius:6px!important;
+ }
+}
 </style><style id="interviewUnifiedActionColors20261027">
 /* Shared interview lists: color indicates the action; disabled remains neutral. */
 #commonPreviewMessages .lineBookActions>button:nth-child(1):not(:disabled):not([aria-disabled="true"]),
