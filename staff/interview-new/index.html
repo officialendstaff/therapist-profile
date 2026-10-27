@@ -191,7 +191,7 @@ function normalizeLineInbox(data){
 }
 async function refreshLineInboxReadOnly(){
  const token=localStorage.getItem('interview_staff_session_v2')||sessionStorage.getItem('interview_staff_session_v2');
- if(!token){lineInboxReadOnly.status='login-required';return false}
+ if(!token){lineInboxReadOnly.status='login-required';lineInboxReadOnly.error='session_missing';if(currentPage==='LINE通知'&&!$('sharedPanel').hidden&&$('applicantDetail').hidden)renderList();return false}
  lineInboxReadOnly.status='loading';
  try{
   const response=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access',{
@@ -261,7 +261,7 @@ function renderList(){
   const records=lineInboxReadOnly.applicants,total=Math.max(1,Math.ceil(records.length/8));pageNumber=Math.min(Math.max(1,pageNumber),total);
   $('pageIndicator').textContent=pageNumber+' / '+total;$('pagePrev').disabled=pageNumber===1;$('pageNext').disabled=pageNumber===total;
   records.slice((pageNumber-1)*8,pageNumber*8).forEach(record=>list.append(makeLiveLineCard(record)));
-  const labels={idle:'LINE受信データを準備しています',loading:'LINE受信データを更新中',ready:records.length?'LINE受信データを表示中（約30秒ごとに更新）':'LINE受信データは0件です',error:'', 'login-required':'面接管理へのログインが必要です。既存の面接管理ページでログインしてください。'};
+  const labels={idle:'LINE受信データを準備しています',loading:'LINE受信データを更新中',ready:records.length?'LINE受信データを表示中（約30秒ごとに更新）':'LINE受信データは0件です',error:'LINE受信データの取得に失敗しました。接続または認証状態をご確認ください。', 'login-required':'面接管理のログイン情報が見つかりません。既存の面接管理ページでログインしてから、このページを再読み込みしてください。'};
   $('listNote').textContent=labels[lineInboxReadOnly.status]||'';return;
  }
  const records=applicantData[currentPage]?.length?applicantData[currentPage]:Array.from({length:8},(_,i)=>({...testExamples[i%testExamples.length],name:i<4?testExamples[i].name:testExamples[i%testExamples.length].name+'（テスト'+(i+1)+'）'}));
