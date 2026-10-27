@@ -3207,6 +3207,21 @@ window.afterlifeReload=load;
   savedPanes.clear();
   button.setAttribute('aria-expanded','false');
  }
+ let sharedPersonLinksLoading=null;
+ async function ensureSharedPersonLinks(){
+  if((window.interviewSharedHistoryLinks||[]).length)return;
+  if(sharedPersonLinksLoading)return sharedPersonLinksLoading;
+  sharedPersonLinksLoading=(async()=>{
+   try{
+    const data=await auth.api('inbox');
+    const links=(data.links||[]).filter(l=>l.interview_id!=null);
+    window.interviewSharedHistoryLinks=links;
+    window.interviewLineDetailData=data;
+    if(previewExclusive)render();
+   }catch(error){console.warn('応募者詳細のLINE紐づけ取得に失敗',error)}
+  })().finally(()=>{sharedPersonLinksLoading=null});
+  return sharedPersonLinksLoading;
+ }
  async function loadActualLineInbox(){
   if(category!==0)return;
   const cards=document.querySelectorAll('#lineInboxMessages > .lineMessage');
@@ -3229,6 +3244,7 @@ window.afterlifeReload=load;
   panel.hidden=false;
   button.setAttribute('aria-expanded','true');
   render();
+  if(category!==0)void ensureSharedPersonLinks();
  }
  // Capture the sidebar action before legacy handlers can open scheduleView.
  // Keep a single entrypoint for the future list regardless of registration order.
