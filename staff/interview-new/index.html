@@ -84,6 +84,28 @@ button{font-family:inherit;letter-spacing:inherit}
 'use strict';
 const now=new Date();now.setHours(0,0,0,0);let monthView=new Date(now.getFullYear(),now.getMonth(),1),selected=new Date(now),chosen=null;
 const commonPages=['LINE通知','明日以降','日程調整','面接済み','不届き者','来世期待'];let currentPage='LINE通知',pageNumber=1;const applicantData=Object.fromEntries(commonPages.map(k=>[k,[]]));const testState=new Map();const testExamples=[{name:'あき',shop:'薔薇と紳士',date:'2026-10-27 15:00',staff:'村上',history:[{type:'日程変更',scheduledAt:'2026-10-26 15:00'},{type:'キャンセル',scheduledAt:'2026-10-24 19:00'}]},{name:'noa',shop:'Grand Luxe',date:'2026-10-27 16:00',staff:'オオタ',history:[]},{name:'170♥',shop:'薔薇と紳士',date:'2026-10-27 17:30',staff:'社長',history:[{type:'無断トビ',scheduledAt:'2026-10-20 14:30'}]},{name:'テスト応募者',shop:'Un Secret',date:'2026-10-27 19:00',staff:'社長',history:[{type:'日程変更',scheduledAt:'2026-10-26 19:00'},{type:'無断トビ',scheduledAt:'2026-10-21 18:00'}]}];
+/* Read-only LINE inbox adapter. Do not replace the eight test cards until migration is approved. */
+const lineInboxReadOnly={status:'idle',events:[],links:[],profiles:{},error:''};
+async function refreshLineInboxReadOnly(){
+ const token=localStorage.getItem('interview_staff_session_v2')||sessionStorage.getItem('interview_staff_session_v2');
+ if(!token){lineInboxReadOnly.status='login-required';return false}
+ lineInboxReadOnly.status='loading';
+ try{
+  const response=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access',{
+   method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',
+   body:JSON.stringify({action:'inbox',token})
+  });
+  const data=await response.json();
+  if(!response.ok)throw new Error(data.error||'inbox_request_failed');
+  lineInboxReadOnly.events=Array.isArray(data.events)?data.events:[];
+  lineInboxReadOnly.links=Array.isArray(data.links)?data.links:[];
+  lineInboxReadOnly.profiles=data.profiles&&typeof data.profiles==='object'?data.profiles:{};
+  lineInboxReadOnly.error='';lineInboxReadOnly.status='ready';
+  window.dispatchEvent(new Event('interview-new-line-data-ready'));
+  return true;
+ }catch(error){lineInboxReadOnly.status='error';lineInboxReadOnly.error=String(error.message||error);console.warn('LINE読み取り接続',error);return false}
+}
+window.interviewNewLineReadOnly={refresh:refreshLineInboxReadOnly,status:()=>lineInboxReadOnly.status,summary:()=>({events:lineInboxReadOnly.events.length,links:lineInboxReadOnly.links.length,profiles:Object.keys(lineInboxReadOnly.profiles).length})};
 let detailReturn=null;
 function detailEntry(parent,title,content,kind='',time=''){const el=document.createElement('div');el.className='detail-entry '+kind;if(time){const t=document.createElement('time');t.textContent=time;el.append(t)}const heading=document.createElement('strong');heading.textContent=title;el.append(heading);const body=document.createElement('div');body.textContent=content;el.append(body);parent.append(el)}
 function openApplicantDetail(record,key){if(!$('applicantDetail').hidden)return;detailReturn={home:!$('todayPanel').hidden,page:currentPage,number:pageNumber,scroll:window.scrollY};$('todayPanel').hidden=true;$('sharedPanel').hidden=true;$('applicantDetail').hidden=false;$('detailName').textContent=record.name||'LINE表示名未取得';$('detailShop').textContent=record.shop||'';$('detailReceived').textContent=record.lastReceived?'最終受信：'+record.lastReceived:'最終受信：未取得';$('detailDate').textContent=record.date||'面接予定なし';$('detailStaff').textContent=record.staff?'担当：'+record.staff:'';const state=testState.get(key)||{};$('detailConfirm').textContent=state.ok?'確認OK':state.sent?'送信済み':'未確認';$('detailConfirm').className=state.ok?'detail-confirm-ok':'';const line=$('detailLine');line.replaceChildren();const messages=record.messages||[];if(messages.length){for(const msg of messages){detailEntry(line,'受信メッセージ',msg.text||'', '',msg.receivedAt||'')}}else{const empty=document.createElement('p');empty.className='detail-empty';empty.textContent='LINE受信履歴は未連携です';line.append(empty)}const history=$('detailHistory');history.replaceChildren();const entries=(record.history||[]).filter(e=>e&&typeof e==='object'&&!Array.isArray(e)&&e.scheduledAt).slice().sort((a,b)=>(b.updatedAt||b.scheduledAt).localeCompare(a.updatedAt||a.scheduledAt));detailEntry(history,'面接登録',record.date+'　'+(record.shop||'')+'　担当：'+(record.staff||''),'registered');for(const e of entries){const type=e.type==='変更'?'日程変更':e.type==='キャン'?'キャンセル':e.type;const kind=type==='日程変更'?'changed':type==='キャンセル'?'cancel':type==='無断トビ'?'no-show':'';const content=type==='日程変更'?'変更前：'+e.scheduledAt+(e.newScheduledAt?' → 変更後：'+e.newScheduledAt:''): '対象：'+e.scheduledAt;detailEntry(history,type,content,kind,e.updatedAt||'')}window.scrollTo(0,0)}
