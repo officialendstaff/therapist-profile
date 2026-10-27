@@ -115,6 +115,10 @@ button{font-family:inherit;letter-spacing:inherit}
 .chart-grid .slot.blocked{background:#d4d8df!important;border-color:#d4d8df!important;color:#64748b!important}
 .chart-grid .slot.booked{background:#FACC15!important;border:1px solid #A16207!important;color:#422006!important}
 .chart-grid .slot.chosen{outline:3px solid #163d6a;outline-offset:-2px}
+/* Date box: fill the useful vertical space without changing applicant row height. */
+.live-line-card .interview-datetime{height:58px!important;min-height:58px!important;max-height:58px!important;align-self:center!important;justify-content:center!important;gap:4px!important;padding:6px 5px!important}
+.live-line-card .interview-datetime strong{line-height:1.25!important}
+.live-line-card .interview-datetime span{line-height:1.25!important}
 </style></head><body>
 <header class="header"><button class="brand" id="home">⌂ TOP</button><div class="header-actions"><button id="headerLineInbox" type="button"><svg class="header-bell" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>LINE通知</button><button disabled title="面接登録画面は次工程で実装">面接登録</button><button id="sound">通知設定</button></div></header>
 <section class="calendar" aria-label="月間カレンダー"><div class="cal-head"><button id="prev" aria-label="前月">◀</button><span id="month"></span><button id="next" aria-label="翌月">▶</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="days" id="days"></div></section>
