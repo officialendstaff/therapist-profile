@@ -76,6 +76,8 @@ button{font-family:inherit;letter-spacing:inherit}
 
 \n/* Enforce exclusive visibility of list and detail views */\n#todayPanel[hidden],#sharedPanel[hidden],#applicantDetail[hidden]{display:none!important}\n.applicant .confirmation-controls button:disabled,.applicant .card-actions button:disabled,.today-test-card .confirmation-controls button:disabled,.today-test-card .card-actions button:disabled{background:#e3e5e9!important;background-image:none!important;border:1px solid #d5d9df!important;color:#8c949f!important;opacity:1!important;cursor:not-allowed!important;box-shadow:none!important;filter:none!important;text-shadow:none!important;outline:none!important}
 .nav .nav-group-space{height:39px;flex:none}
+/* Confirmation buttons are active only in today's list; keep dimensions unchanged. */
+#sharedPanel .confirmation-controls button:disabled{background:#e3e5e9!important;background-image:none!important;border-color:#d5d9df!important;color:#8c949f!important;box-shadow:none!important;filter:none!important;opacity:1!important;cursor:not-allowed!important}
 /* LINE notification uses consistent green in both navigation areas. */
 .nav button[data-page="LINE通知"]{color:#16803e!important}
 .nav button[data-page="LINE通知"].active{background:#edf8f0!important;color:#147c39!important;border-color:#d2ead9!important}
