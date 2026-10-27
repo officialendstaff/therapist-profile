@@ -185,7 +185,7 @@ function getLineTestState(){try{return JSON.parse(localStorage.getItem(LINE_TEST
 function saveLineTestState(next){localStorage.setItem(LINE_TEST_KEY,JSON.stringify(next));pageNumber=1;renderList()}
 function lineTestRecord(){
  const st=getLineTestState();
- return {accountId:'test-only',lineUserId:'test-only',isTest:true,name:'【テスト】面接連携確認',shop:'薔薇と紳士',picture:'',date:st.date||'',staff:st.staff||'',lastReceived:new Date().toISOString(),messages:[{text:'【テスト】面接日時・日程変更・履歴表示を確認するための仮メッセージです。',receivedAt:new Date().toISOString()}],history:st.history||[]};
+ return {accountId:'test-only',lineUserId:'test-only',isTest:true,name:'【テスト】面接連携確認',shop:'薔薇と紳士',picture:'',date:st.date||'',staff:st.staff||'',lastReceived:new Date().toISOString(),messages:[{text:'【テスト】面接日時・日程変更・履歴表示を確認するための仮メッセージです。',receivedAt:new Date().toISOString()}],history:st.history?.length?st.history:[{type:'日程変更',scheduledAt:'2026-10-26 15:00',updatedAt:'2026-10-26 16:00'},{type:'キャンセル',scheduledAt:'2026-10-24 19:00',updatedAt:'2026-10-24 20:00'}]};
 }
 function handleLineTestAction(label){
  const st=getLineTestState(),now=new Date().toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'});
@@ -225,7 +225,7 @@ function makeLiveLineCard(record){
  for(const entry of past){const tag=document.createElement('span');tag.className='history-tag'+(entry.type==='キャンセル'?' cancel':entry.type==='無断トビ'?' no-show':'');tag.textContent=entry.type+'：'+entry.scheduledAt;tags.append(tag)}
  history.append(preview,tags);
  const actions=document.createElement('div');actions.className='card-actions';
- for(const [label,color] of [['面接登録','#568DB9'],['日程変更','#D99A54'],['キャンセル','#CD7580'],['来世期待','#A65A68']]){const b=document.createElement('button');b.textContent=label;b.style.setProperty('--btn-color',color);b.disabled=!record.isTest;b.title=record.isTest?'テスト専用：本番データには反映しません':'実データの操作連携は未完了です';if(record.isTest)b.onclick=()=>handleLineTestAction(label);actions.append(b)}
+ for(const [label,color] of [['面接登録','#568DB9'],['日程変更','#D99A54'],['キャンセル','#CD7580'],['来世期待','#A65A68']]){const b=document.createElement('button');b.textContent=label;b.style.setProperty('--btn-color',color);b.disabled=!record.isTest||!['面接登録','来世期待'].includes(label);b.title=record.isTest?'テスト専用：本番データには反映しません':'実データの操作連携は未完了です';if(record.isTest)b.onclick=()=>handleLineTestAction(label);actions.append(b)}
  card.append(avatar,identity,date,controls,history,actions);return card
 }
 function renderList(){
@@ -234,7 +234,7 @@ function renderList(){
   const records=[lineTestRecord(),...lineInboxReadOnly.applicants],total=Math.max(1,Math.ceil(records.length/8));pageNumber=Math.min(Math.max(1,pageNumber),total);
   $('pageIndicator').textContent=pageNumber+' / '+total;$('pagePrev').disabled=pageNumber===1;$('pageNext').disabled=pageNumber===total;
   records.slice((pageNumber-1)*8,pageNumber*8).forEach(record=>list.append(makeLiveLineCard(record)));
-  const labels={idle:'LINE受信データを準備しています',loading:'LINE受信データを更新中',ready:records.length?'LINE受信データを表示中（約30秒ごとに更新）':'LINE受信データは0件です',error:'LINE受信データを取得できませんでした。既存の面接管理へのログイン状態をご確認ください。', 'login-required':'面接管理へのログインが必要です。既存の面接管理ページでログインしてください。'};
+  const labels={idle:'LINE受信データを準備しています',loading:'LINE受信データを更新中',ready:records.length?'LINE受信データを表示中（約30秒ごとに更新）':'LINE受信データは0件です',error:'', 'login-required':'面接管理へのログインが必要です。既存の面接管理ページでログインしてください。'};
   $('listNote').textContent=labels[lineInboxReadOnly.status]||'';return;
  }
  const records=applicantData[currentPage]?.length?applicantData[currentPage]:Array.from({length:8},(_,i)=>({...testExamples[i%testExamples.length],name:i<4?testExamples[i].name:testExamples[i%testExamples.length].name+'（テスト'+(i+1)+'）'}));
