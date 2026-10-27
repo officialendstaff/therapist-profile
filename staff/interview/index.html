@@ -2699,7 +2699,7 @@ window.pickInterviewGanttSlot=function(p){
     const el=byId(id);if(!el)continue;
     el.hidden=true;el.style.setProperty('display','none','important');
   }
-  if(fromCommon)commonPanel.hidden=true;
+  if(fromCommon){commonPanel.hidden=true;const detail=byId('applicantDetailView');if(detail){detail.hidden=false;detail.inert=false;detail.removeAttribute('aria-hidden');detail.style.removeProperty('display');}}
   document.body.classList.remove('lineInboxOpen','dashboardHome','afterlifeOpen','commonPreviewOpen');
   document.body.classList.add('applicantDetailOpen');
   root.hidden=false;root.inert=false;root.removeAttribute('aria-hidden');root.style.removeProperty('display');opened=true;fillMessages();
@@ -2735,7 +2735,7 @@ window.pickInterviewGanttSlot=function(p){
   if(previousView?.lineInboxOpen)document.body.classList.add('lineInboxOpen');
   if(previousView?.dashboardHome)document.body.classList.add('dashboardHome');
   if(previousView?.afterlifeOpen)document.body.classList.add('afterlifeOpen');
-  if(previousView?.commonPreviewOpen){document.body.classList.add('commonPreviewOpen');const panel=byId('commonPreviewPanel');if(panel)panel.hidden=false;window.dispatchEvent(new Event('interview-common-preview-restored'));}
+  if(previousView?.commonPreviewOpen){document.body.classList.add('commonPreviewOpen');const panel=byId('commonPreviewPanel');if(panel)panel.hidden=false;const detail=byId('applicantDetailView');if(detail){detail.hidden=true;detail.inert=true;detail.setAttribute('aria-hidden','true');detail.style.setProperty('display','none','important');}window.dispatchEvent(new Event('interview-common-preview-restored'));}
   previousView=null;
  }
  back.addEventListener('click',close);
