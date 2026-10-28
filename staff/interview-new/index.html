@@ -257,9 +257,12 @@ function openPendingActionPage(label,record){
  const panel=$('sharedPanel');if(!panel)return;
  panel.replaceChildren();panel.hidden=false;$('todayPanel').hidden=true;$('applicantDetail').hidden=true;
  const wrap=document.createElement('section');wrap.className='main-panel';
- const heading=document.createElement('h1');heading.textContent=label;
+ const titleRow=document.createElement('div');titleRow.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%';
+ const heading=document.createElement('h1');heading.textContent=label;heading.style.margin='0';
+ const titleBack=document.createElement('button');titleBack.type='button';titleBack.textContent='戻る';titleBack.style.cssText='padding:7px 16px;border:1px solid #cbd5e1;border-radius:6px;background:#f8fafc;color:#17283e;cursor:pointer;flex:none';
+ titleBack.onclick=()=>showCommon('LINE通知');titleRow.append(heading,titleBack);
  const context=document.createElement('p');context.className='status';context.textContent='LINE応募者：'+(record.name||'Unknown')+' ／ '+(record.shop||'')+'（LINE ID：'+(record.lineUserId||'未取得')+'）';
- wrap.append(heading,context);
+ wrap.append(titleRow,context);
  const form=document.createElement('form');form.style.cssText='display:grid;gap:12px;max-width:540px;margin-top:16px';
  const field=(title,type,value,required=false)=>{
   const lab=document.createElement('label');lab.style.cssText='display:grid;gap:5px;font-size:13px;font-weight:600';lab.textContent=title;
