@@ -99,8 +99,8 @@ form.onsubmit=async e=>{
    const {data:auth,error:authError}=await sb.auth.getUser();
    if(authError||!auth?.user)throw new Error('ログイン状態を確認できません。求人管理に戻ってログインし直してください。');
   }
-  if(!document.querySelector('input[name="recruit_source_choice"]:checked'))throw new Error('求人媒体を1つ以上選択してください');
-  if(!document.querySelector('input[name="id_type_choice"]:checked'))throw new Error('身分証の種類を1つ以上選択してください');
+  if(!staffMode&&!document.querySelector('input[name="recruit_source_choice"]:checked'))throw new Error('求人媒体を1つ以上選択してください');
+  if(!staffMode&&!document.querySelector('input[name="id_type_choice"]:checked'))throw new Error('身分証の種類を1つ以上選択してください');
   submitBtn.disabled=true;
   msg.textContent='登録処理中です…';
   const applicantId=uuid();
