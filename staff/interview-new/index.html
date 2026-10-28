@@ -300,12 +300,25 @@ function openPendingActionPage(label,record){
  const name=field('応募者名','text',record.name==='Unknown'?'':record.name||'',true);
  const date=field('面接日','text','',true);date.readOnly=true;date.placeholder='上部カレンダーから選択';
  const time=field('面接開始時間','text','',true);time.readOnly=true;time.placeholder='上部タイムチャートから選択';
- const syncChosen=()=>{date.value=dateKey(selected);time.value=chosen?chosen.match(/\\d{2}:\\d{2}/)?.[0]||'':'';staff.value=chosen?chosen.replace(/\\s+\\d{2}:\\d{2}$/,''):''};syncChosen();registrationSelectionSync=syncChosen;
+ const syncChosen=()=>{date.value=dateKey(selected);time.value=chosen?chosen.match(/\\d{2}:\\d{2}/)?.[0]||'':'';staff.value=chosen?chosen.replace(/\\s+\\d{2}:\\d{2}$/,''):''};registrationSelectionSync=syncChosen;
  const lab=document.createElement('label');lab.textContent='担当者';const staff=document.createElement('select');staff.required=true;
- for(const v of ['','社長','オオタ','村上','お祭り']){const opt=document.createElement('option');opt.value=v;opt.textContent=v||'担当者を選択';staff.append(opt)}lab.append(staff);form.append(lab);
+ for(const v of ['','社長','オオタ','村上','お祭り']){const opt=document.createElement('option');opt.value=v;opt.textContent=v||'担当者を選択';staff.append(opt)}lab.append(staff);form.append(lab);syncChosen();
  const note=document.createElement('p');note.className='status';note.textContent='現在は入力内容の確認までです。データベースへの登録は行いません。';
  const preview=document.createElement('button');preview.type='submit';preview.textContent='面接登録';preview.className='registration-preview';
- form.append(note,preview);form.onsubmit=e=>{e.preventDefault();note.textContent='保存処理の接続確認中です。登録はまだ実行されません。';};
+ form.append(note,preview);let saving=false;form.onsubmit=async e=>{e.preventDefault();if(saving)return;
+  const selectedStaff=CHART_STAFF_SOURCE.find(x=>x.name===staff.value);
+  if(!chosen||!selectedStaff||!date.value||!time.value||chosen!==staff.value+' '+time.value){note.textContent='上部タイムチャートで担当者と時間を選択してください。';return}
+  if(!record.accountId||!record.lineUserId){note.textContent='LINE応募者との紐付け情報がありません。保存できません。';return}
+  const token=localStorage.getItem('interview_staff_session_v2')||sessionStorage.getItem('interview_staff_session_v2');
+  if(!token){note.textContent='認証が必要です。LINE通知一覧でログインしてください。';return}
+  saving=true;preview.disabled=true;note.textContent='面接を登録しています…';
+  try{
+   const response=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({action:'create_linked_interview',token,account_id:record.accountId,line_user_id:record.lineUserId,line_display_name:name.value,shop:shop.value,interview_date:date.value,interview_time:time.value,interviewer_user_id:selectedStaff.id})});
+   const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'登録に失敗しました');
+   registrationSelectionSync=null;await refreshLineInboxReadOnly();await refreshChartAvailability();
+   showCommon(date.value===dateKey(new Date())?'今日の予定':'明日以降');
+  }catch(error){note.textContent='保存できませんでした：'+String(error.message||error);preview.disabled=false;saving=false}
+ };
  right.append(form);layout.append(left,right);wrap.append(layout);panel.append(wrap);
 }
 function openLegacyPendingAction(label,record,panel,wrap){
