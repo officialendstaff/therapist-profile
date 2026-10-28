@@ -199,7 +199,7 @@ function normalizeLineInbox(data){
    return events
   }).filter(e=>e.scheduledAt).sort((a,b)=>String(b.updatedAt).localeCompare(String(a.updatedAt)));
   const date=active?[active.interview.interview_date,active.interview.interview_time].filter(Boolean).join(' '):'';
-  const assignee=active?staff.get(String(active.interview.interviewer_user_id))||'担当者未登録':'';
+  const assignee=active?(staff.get(String(active.interview.interviewer_user_id))||CHART_STAFF_SOURCE.find(x=>x.id===active.interview.interviewer_user_id)?.name||'担当者未登録'):'';
   return {...item,name:profile.displayName||link.line_display_name||'Unknown',picture:profile.pictureUrl||link.line_picture_url||'',interviewId:active?.interview.id??null,date,staff:assignee,history:past,lastReceived:item.messages[0]?.receivedAt||''};
  }).sort((a,b)=>b.lastReceived.localeCompare(a.lastReceived));
 }
@@ -347,7 +347,7 @@ function makeLiveLineCard(record){
  for(const label of ['LINE送信','確認OK']){const b=document.createElement('button');b.textContent=label;b.disabled=true;controls.append(b)}
  const history=makeCardInformation(record);
  const actions=document.createElement('div');actions.className='card-actions';
- for(const [label,color] of [['面接登録','#568DB9'],['日程変更','#D99A54'],['キャンセル','#CD7580'],['来世期待','#A65A68']]){const b=document.createElement('button');b.textContent=label;b.style.setProperty('--btn-color',color);b.disabled=!(label==='面接登録'||label==='来世期待');if(!b.disabled){b.title='画面準備中（データは変更されません）';b.onclick=()=>openPendingActionPage(label,record)}else b.title='実データの操作連携は未完了です';actions.append(b)}
+ for(const [label,color] of [['面接登録','#568DB9'],['日程変更','#D99A54'],['キャンセル','#CD7580'],['来世期待','#A65A68']]){const b=document.createElement('button');b.textContent=label;b.style.setProperty('--btn-color',color);b.disabled=!(label==='面接登録'||label==='来世期待')||(label==='面接登録'&&Boolean(record.interviewId));if(!b.disabled){b.title='操作画面を開きます';b.onclick=()=>openPendingActionPage(label,record)}else b.title=label==='面接登録'&&record.interviewId?'面接登録済み':'実データの操作連携は未完了です';actions.append(b)}
  card.append(avatar,identity,date,controls,history,actions);return card
 }
 function renderList(){
