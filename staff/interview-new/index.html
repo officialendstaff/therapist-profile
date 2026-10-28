@@ -280,14 +280,27 @@ function makeCardInformation(record){
 }
 function makeTestCard(record,key){const state=testState.get(key)||{sent:false,ok:false,selected:''};testState.set(key,state);const card=document.createElement('article');card.className='applicant unified-applicant-card'+(state.ok?' confirmed':state.sent?' sent':'');const avatar=document.createElement('div');avatar.className='avatar';avatar.textContent='LINE';const identity=document.createElement('div');identity.className='identity';const name=document.createElement('strong');name.textContent=record.name;const store=document.createElement('small');store.className='shop-label';store.textContent=key.startsWith('不届き者:')?'不届き者':record.shop;identity.append(name,store);applyShopTheme(store,record.shop);avatar.tabIndex=0;name.tabIndex=0;avatar.setAttribute('role','button');name.setAttribute('role','button');avatar.setAttribute('aria-label','応募者詳細を開く');name.setAttribute('aria-label','応募者詳細を開く');for(const el of [avatar,name]){el.onclick=()=>openApplicantDetail(record,key);el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openApplicantDetail(record,key)}}}const date=document.createElement('div');date.className='interview-datetime';const when=document.createElement('strong');when.textContent=record.date;const staff=document.createElement('span');staff.textContent='担当：'+record.staff;date.append(when,staff);applyStaffTheme(staff,record.staff);if(!record.date){when.textContent='日程未定';date.classList.add('live-date-pending')}const confirmations=document.createElement('div');confirmations.className='confirmation-controls';const send=document.createElement('button');send.textContent=state.sent?'送信済み':'LINE送信';send.className=state.sent?'sent-btn':'';send.disabled=!allowListButton(key.startsWith('today:')?'今日の予定':currentPage,'send');send.onclick=()=>{state.sent=!state.sent;send.textContent=state.sent?'送信済み':'LINE送信';send.classList.toggle('sent-btn',state.sent);card.classList.toggle('sent',state.sent&&!state.ok)};const ok=document.createElement('button');ok.textContent='確認OK';ok.className='ok-btn'+(state.ok?' is-ok':'');ok.disabled=!allowListButton(key.startsWith('today:')?'今日の予定':currentPage,'ok');ok.onclick=()=>{state.ok=!state.ok;ok.classList.toggle('is-ok',state.ok);card.classList.toggle('confirmed',state.ok);card.classList.toggle('sent',state.sent&&!state.ok)};confirmations.append(send,ok);const history=makeCardInformation(record);
 const actions=document.createElement('div');actions.className='card-actions';for(const [id,label,color] of [['register','面接登録','#568DB9'],['change','日程変更','#D99A54'],['cancel','キャンセル','#CD7580'],['future','来世期待','#A65A68']]){const b=document.createElement('button');b.textContent=label;b.style.setProperty('--btn-color',color);b.disabled=!allowListButton(key.startsWith('today:')?'今日の予定':currentPage,id);b.classList.toggle('pressed',state.selected===id);b.onclick=()=>{state.selected=id;actions.querySelectorAll('button').forEach(x=>x.classList.toggle('pressed',x===b))};actions.append(b)}card.append(avatar,identity,date,confirmations,history,actions);return card}
-function openPendingActionPage(label,record){
+function openRescheduleChoice(record){
+ const origin=currentPage==='今日の予定'?'今日の予定':currentPage;
+ const panel=$('registrationPanel');panel.replaceChildren();panel.hidden=false;$('todayPanel').hidden=true;$('sharedPanel').hidden=true;$('applicantDetail').hidden=true;
+ const wrap=document.createElement('section');wrap.className='main-panel';const heading=document.createElement('h1');heading.textContent='日程変更';wrap.append(heading);
+ const details=document.createElement('p');details.className='status';details.textContent=[record.name,record.shop,record.date,'担当：'+record.staff].filter(Boolean).join(' ／ ');wrap.append(details);
+ const choices=document.createElement('div');choices.style.cssText='display:grid;grid-template-columns:repeat(2,minmax(0,180px));gap:10px;margin-top:20px';
+ for(const [label,color] of [['変更','#d99a54'],['未定','#7c8798'],['修正','#568db9'],['戻る','#8b95a3']]){const button=document.createElement('button');button.type='button';button.textContent=label;button.style.cssText='padding:13px;border-radius:7px;border:1px solid '+color+';background:white;color:'+color+';font-weight:700;cursor:pointer';button.onclick=()=>{if(label==='戻る')return origin==='今日の予定'?showHome():showCommon(origin);if(label==='未定')return markInterviewPending(record,origin);openPendingActionPage('面接登録',record,label,origin)};choices.append(button)}wrap.append(choices);panel.append(wrap)
+}
+async function markInterviewPending(record,origin){
+ if(!confirm(record.name+' の面接を日程未定に変更しますか？'))return;
+ const token=localStorage.getItem('interview_staff_session_v2')||sessionStorage.getItem('interview_staff_session_v2');if(!token){alert('再ログインしてください');return}
+ try{const res=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'reschedule_linked_interview',token,mode:'未定',interview_id:record.interviewId,account_id:record.accountId,line_user_id:record.lineUserId})});const data=await res.json();if(!res.ok||!data.ok)throw Error(data.error||'保存できません');await refreshInterviewLists();showCommon('日程調整')}catch(e){alert('日程未定への変更に失敗しました：'+e.message)}
+}
+function openPendingActionPage(label,record,mode='登録',returnPage=null){
  const panel=$('registrationPanel');if(!panel)return;
  panel.replaceChildren();panel.hidden=false;$('sharedPanel').hidden=true;$('todayPanel').hidden=true;$('applicantDetail').hidden=true;
  const wrap=document.createElement('section');wrap.className='main-panel';
  const titleRow=document.createElement('div');titleRow.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%';
  const heading=document.createElement('h1');heading.textContent=label;heading.style.margin='0';
  const titleBack=document.createElement('button');titleBack.type='button';titleBack.textContent='戻る';titleBack.style.cssText='padding:7px 16px;border:1px solid #cbd5e1;border-radius:6px;background:#f8fafc;color:#17283e;cursor:pointer;flex:none';
- titleBack.onclick=()=>showCommon(record.interviewId?'明日以降':'LINE通知');titleRow.append(heading,titleBack);wrap.append(titleRow);
+ titleBack.onclick=()=>returnPage==='今日の予定'?showHome():showCommon(returnPage||'LINE通知');titleRow.append(heading,titleBack);wrap.append(titleRow);
  if(label!=='面接登録'){panel.append(wrap);return openLegacyPendingAction(label,record,panel,wrap);}
  const layout=document.createElement('div');layout.className='registration-layout';
  const left=document.createElement('section');left.className='registration-left';
@@ -306,7 +319,7 @@ function openPendingActionPage(label,record){
  else {const empty=document.createElement('p');empty.className='status';empty.textContent='LINE履歴を読み込み可能なデータがありません。';messages.append(empty)}
  left.append(messages);
  const right=document.createElement('section');right.className='registration-right';
- const rightTitle=document.createElement('h2');rightTitle.className='registration-subtitle';rightTitle.textContent='登録内容';right.append(rightTitle);
+ const rightTitle=document.createElement('h2');rightTitle.className='registration-subtitle';rightTitle.textContent=mode==='登録'?'登録内容':mode+'内容';right.append(rightTitle);
  const form=document.createElement('form');form.className='registration-form';
  const field=(title,type,value,required=false)=>{const lab=document.createElement('label');lab.textContent=title;const input=document.createElement('input');input.type=type;input.value=value||'';input.required=required;lab.append(input);form.append(lab);return input};
  const shop=field('店舗名','text',record.shop||'',true);shop.readOnly=true;
@@ -317,7 +330,7 @@ function openPendingActionPage(label,record){
  const lab=document.createElement('label');lab.textContent='担当者';const staff=document.createElement('select');staff.required=true;
  for(const v of ['','社長','オオタ','村上','お祭り']){const opt=document.createElement('option');opt.value=v;opt.textContent=v||'担当者を選択';staff.append(opt)}lab.append(staff);form.append(lab);syncChosen();
  const note=document.createElement('p');note.className='status';note.textContent='日時は上部カレンダーとタイムチャートから選択してください。';
- const preview=document.createElement('button');preview.type='submit';preview.textContent='面接登録';preview.className='registration-preview';
+ const preview=document.createElement('button');preview.type='submit';preview.textContent=mode==='登録'?'面接登録':mode+'を確定';preview.className='registration-preview';
  form.append(note,preview);let saving=false;form.onsubmit=async e=>{e.preventDefault();if(saving)return;
   const selectedStaff=CHART_STAFF_SOURCE.find(x=>x.name===staff.value);
   if(!chosen||!selectedStaff||!date.value||!time.value||chosen!==staff.value+' '+time.value){note.textContent='上部タイムチャートで担当者と時間を選択してください。';return}
@@ -326,7 +339,7 @@ function openPendingActionPage(label,record){
   if(!token){note.textContent='認証が必要です。LINE通知一覧でログインしてください。';return}
   saving=true;preview.disabled=true;note.textContent='面接を登録しています…';
   try{
-   const response=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({action:'create_linked_interview',token,account_id:record.accountId,line_user_id:record.lineUserId,line_display_name:name.value,shop:shop.value,interview_date:date.value,interview_time:time.value,interviewer_user_id:selectedStaff.id})});
+   const response=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({action:mode==='登録'?'create_linked_interview':'reschedule_linked_interview',mode,interview_id:record.interviewId,token,account_id:record.accountId,line_user_id:record.lineUserId,line_display_name:name.value,shop:shop.value,interview_date:date.value,interview_time:time.value,interviewer_user_id:selectedStaff.id})});
    const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'登録に失敗しました');
    registrationSelectionSync=null;await refreshLineInboxReadOnly();await refreshChartAvailability();
    showCommon(date.value===dateKey(new Date())?'今日の予定':'明日以降');
@@ -370,7 +383,7 @@ function makeLiveLineCard(record){
  for(const label of ['LINE送信','確認OK']){const b=document.createElement('button');b.textContent=label;b.disabled=true;controls.append(b)}
  const history=makeCardInformation(record);
  const actions=document.createElement('div');actions.className='card-actions';
- for(const [label,color] of [['面接登録','#568DB9'],['日程変更','#D99A54'],['キャンセル','#CD7580'],['来世期待','#A65A68']]){const b=document.createElement('button');b.textContent=label;b.style.setProperty('--btn-color',color);b.disabled=!(label==='面接登録'||label==='来世期待'||(label==='キャンセル'&&Boolean(record.interviewId)))||(label==='面接登録'&&Boolean(record.interviewId));if(!b.disabled){b.title='操作画面を開きます';b.onclick=()=>label==='キャンセル'?cancelLiveInterview(record,b):openPendingActionPage(label,record)}else b.title=label==='面接登録'&&record.interviewId?'面接登録済み':'実データの操作連携は未完了です';actions.append(b)}
+ for(const [label,color] of [['面接登録','#568DB9'],['日程変更','#D99A54'],['キャンセル','#CD7580'],['来世期待','#A65A68']]){const b=document.createElement('button');b.textContent=label;b.style.setProperty('--btn-color',color);b.disabled=!(label==='面接登録'||label==='来世期待'||(label==='キャンセル'&&Boolean(record.interviewId)))||(label==='面接登録'&&Boolean(record.interviewId));if(!b.disabled){b.title='操作画面を開きます';b.onclick=()=>label==='キャンセル'?cancelLiveInterview(record,b):label==='日程変更'?openRescheduleChoice(record):openPendingActionPage(label,record)}else b.title=label==='面接登録'&&record.interviewId?'面接登録済み':'実データの操作連携は未完了です';actions.append(b)}
  card.append(avatar,identity,date,controls,history,actions);return card
 }
 const liveInterviewLists={status:'idle',rows:[],error:''};
@@ -383,7 +396,7 @@ async function refreshInterviewLists(){
  if(!$('todayPanel').hidden)renderTodayTest();else if(!$('sharedPanel').hidden&&currentPage!=='LINE通知')renderList();return true;
  }catch(e){liveInterviewLists.status='error';liveInterviewLists.error=e.message;if(!$('todayPanel').hidden)renderTodayTest();else if(!$('sharedPanel').hidden&&currentPage!=='LINE通知')renderList();return false}
 }
-function recordsForLivePage(page){const today=dateKey(new Date());return liveInterviewLists.rows.filter(r=>{const day=r.date.slice(0,10),done=['来店済み','採用','不採用','辞退','在籍','入店'].includes(r.status),closed=['キャンセル','無断トビ','トビ（キャンセル）','返信なし'].includes(r.status);if(page==='今日の予定')return day===today&&!done&&!closed;if(page==='明日以降')return day>today&&!done&&!closed;if(page==='面接済み')return done;if(page==='日程変更')return r.status==='日程変更'||r.history.some(h=>['変更','日程変更'].includes(h.type));return false}).sort((a,b)=>page==='明日以降'?a.date.localeCompare(b.date):b.date.localeCompare(a.date))}
+function recordsForLivePage(page){const today=dateKey(new Date());return liveInterviewLists.rows.filter(r=>{const day=r.date.slice(0,10),done=['来店済み','採用','不採用','辞退','在籍','入店'].includes(r.status),closed=['キャンセル','無断トビ','トビ（キャンセル）','返信なし'].includes(r.status);if(page==='今日の予定')return day===today&&!done&&!closed;if(page==='明日以降')return day>today&&!done&&!closed;if(page==='面接済み')return done;if(page==='日程調整'||page==='日程変更')return r.status==='日程未定'||r.status==='日程変更'||r.history.some(h=>['変更','日程変更','未定'].includes(h.type));return false}).sort((a,b)=>page==='明日以降'?a.date.localeCompare(b.date):b.date.localeCompare(a.date))}
 function makeRealInterviewCard(record){const card=makeTestCard(record,'real:'+record.interviewId);const avatar=card.querySelector('.avatar');if(avatar&&record.picture&&/^https:\/\//.test(record.picture)){avatar.replaceChildren();const img=document.createElement('img');img.src=record.picture;img.alt='LINEアイコン';img.referrerPolicy='no-referrer';img.onerror=()=>{avatar.textContent='LINE'};avatar.append(img)}const box=card.querySelector('.interview-datetime');if(box&&['採用','不採用','辞退'].includes(record.status)){box.querySelector('strong').textContent=record.status;box.classList.add('outcome-'+({'採用':'hired','不採用':'rejected','辞退':'withdrawn'}[record.status]));}card.querySelectorAll('.confirmation-controls button').forEach(b=>{b.disabled=true;b.title='操作連携の確認待ち'});card.querySelectorAll('.card-actions button').forEach(b=>{const label=b.textContent;if(['明日以降','今日の予定'].includes(currentPage)&&['日程変更','キャンセル','来世期待'].includes(label)){b.disabled=false;b.title=label==='キャンセル'?'面接をキャンセルして履歴に保存':'操作画面を開く';b.onclick=()=>label==='キャンセル'?cancelLiveInterview(record,b):openPendingActionPage(label,record)}else{b.disabled=true;b.title='この一覧では操作できません'}});return card}
 function renderList(){
  const list=$('applicantList');list.replaceChildren();$('pageTitle').textContent=currentPage;
