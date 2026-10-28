@@ -320,7 +320,7 @@ function openPendingActionPage(label,record,mode='登録',returnPage=null){
  const past=document.createElement('div');past.className='registration-past';past.hidden=true;past.textContent='過去履歴の詳細はデータ連携後に表示します。';history.onclick=()=>{past.hidden=!past.hidden};left.append(past);
  const historyTitle=document.createElement('h2');historyTitle.textContent='LINE履歴';historyTitle.className='registration-subtitle';left.append(historyTitle);
  const messages=document.createElement('div');messages.className='registration-messages';messages.setAttribute('aria-label','LINEメッセージ履歴');
- const raw=record.messages||record.lineMessages||record.messageHistory;
+ const inboxMatch=lineInboxReadOnly.applicants.find(a=>a.accountId===record.accountId&&a.lineUserId===record.lineUserId);const raw=record.messages?.length?record.messages:(inboxMatch?.messages||record.lineMessages||record.messageHistory);
  if(Array.isArray(raw)&&raw.length){raw.forEach(item=>{const bubble=document.createElement('div');bubble.className='registration-message'+((item.direction==='outbound'||item.sender==='staff')?' outgoing':'');bubble.textContent=item.text||item.message||'';messages.append(bubble)})}
  else {const empty=document.createElement('p');empty.className='status';empty.textContent='LINE履歴を読み込み可能なデータがありません。';messages.append(empty)}
  left.append(messages);
