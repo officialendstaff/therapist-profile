@@ -176,6 +176,7 @@ const LINE_SHOPS={rose:'薔薇と紳士',grandluxe:'Grand Luxe',luxy:'LUXY',unse
 function normalizeLineInbox(data){
  const grouped=new Map(),links=new Map();
  const interviews=new Map((data.interviews||[]).map(x=>[String(x.id),x]));
+ const formStatus=new Map((data.formStatus||[]).map(x=>[String(x.interview_id),String(x.status||'')]));
  const staff=new Map((data.staff||[]).map(x=>[String(x.user_id),x.display_name]));
  const history=new Map();
  for(const h of data.history||[]){const k=String(h.interview_id);if(!history.has(k))history.set(k,[]);history.get(k).push(h)}
@@ -201,11 +202,11 @@ function normalizeLineInbox(data){
   const selected=active||linked[0],link=selected?.link||all[0]||{},profile=data.profiles?.[key]||{};
   const past=linked.flatMap(x=>{
    const i=x.interview,events=(history.get(String(i.id))||[]).map(h=>({type:h.event_type||'変更',scheduledAt:[h.original_date,h.original_time].filter(Boolean).join(' '),updatedAt:h.recorded_at||''}));
-   if(inactive.has(i.status))events.push({type:i.status,scheduledAt:[i.interview_date,i.interview_time].filter(Boolean).join(' '),updatedAt:i.updated_at||''});
+   if(inactive.has(i.status)&&!events.some(e=>e.type===i.status))events.push({type:i.status,scheduledAt:[i.interview_date,i.interview_time].filter(Boolean).join(' '),updatedAt:i.updated_at||''});
    return events
   }).filter(e=>e.scheduledAt).sort((a,b)=>String(b.updatedAt).localeCompare(String(a.updatedAt)));
   const date=active?[active.interview.interview_date,active.interview.interview_time].filter(Boolean).join(' '):'';
-  const outcome=active?String(active.interview.status||''):'';
+  const outcome=active?(formStatus.get(String(active.interview.id))||String(active.interview.status||'')):'';
   const assignee=active?(staff.get(String(active.interview.interviewer_user_id))||CHART_STAFF_SOURCE.find(x=>x.id===active.interview.interviewer_user_id)?.name||'担当者未登録'):'';
   return {...item,name:profile.displayName||link.line_display_name||'Unknown',picture:profile.pictureUrl||link.line_picture_url||'',interviewId:active?.interview.id??null,date,staff:assignee,outcome,history:past,lastReceived:item.messages[0]?.receivedAt||''};
  }).sort((a,b)=>b.lastReceived.localeCompare(a.lastReceived));
