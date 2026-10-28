@@ -141,6 +141,12 @@ button{font-family:inherit;letter-spacing:inherit}
 .registration-message{background:#fff;padding:9px 12px;border-radius:10px;font-size:12px;max-width:85%;white-space:pre-wrap;overflow-wrap:anywhere}.registration-message.outgoing{align-self:flex-end;background:#dff1e5}
 .registration-form{display:flex;flex-direction:column;gap:11px;flex:1}.registration-form label{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600}.registration-form input,.registration-form select{width:100%;min-height:36px;padding:7px;border:1px solid #cbd5e1;border-radius:5px;background:#fff}.registration-preview{align-self:flex-start;padding:9px 14px;border:1px solid #8ba8c7;border-radius:6px;background:#eaf2fb}
 @media(max-width:850px){.registration-layout{grid-template-columns:minmax(0,1fr);height:auto;max-height:none}.registration-left{min-height:350px}.registration-messages{height:240px;flex:none}.registration-meta{flex-wrap:wrap}}
+
+.live-line-card .interview-datetime.outcome-hired{background:#e4f4e9!important;border-color:#95cba7!important;color:#287447!important}
+.live-line-card .interview-datetime.outcome-rejected{background:#fce9ea!important;border-color:#e7a4ab!important;color:#a43e4a!important}
+.live-line-card .interview-datetime.outcome-withdrawn{background:#f1ebfa!important;border-color:#c6b2e4!important;color:#73549a!important}
+.live-line-card .interview-datetime[class*='outcome-'] strong,.live-line-card .interview-datetime[class*='outcome-'] span{color:inherit!important}
+.live-line-card .history-tag.cancel{background:#edf0f4!important;border:1px solid #aab3c0!important;color:#526071!important}
 </style></head><body>
 <header class="header"><button class="brand" id="home">⌂ TOP</button><div class="header-actions"><button id="headerLineInbox" type="button"><svg class="header-bell" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>LINE通知</button><button disabled title="面接登録画面は次工程で実装">面接登録</button><button id="sound">通知設定</button></div></header>
 <section class="calendar" aria-label="月間カレンダー"><div class="cal-head"><button id="prev" aria-label="前月">◀</button><span id="month"></span><button id="next" aria-label="翌月">▶</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="days" id="days"></div></section>
@@ -199,8 +205,9 @@ function normalizeLineInbox(data){
    return events
   }).filter(e=>e.scheduledAt).sort((a,b)=>String(b.updatedAt).localeCompare(String(a.updatedAt)));
   const date=active?[active.interview.interview_date,active.interview.interview_time].filter(Boolean).join(' '):'';
+  const outcome=active?String(active.interview.status||''):'';
   const assignee=active?(staff.get(String(active.interview.interviewer_user_id))||CHART_STAFF_SOURCE.find(x=>x.id===active.interview.interviewer_user_id)?.name||'担当者未登録'):'';
-  return {...item,name:profile.displayName||link.line_display_name||'Unknown',picture:profile.pictureUrl||link.line_picture_url||'',interviewId:active?.interview.id??null,date,staff:assignee,history:past,lastReceived:item.messages[0]?.receivedAt||''};
+  return {...item,name:profile.displayName||link.line_display_name||'Unknown',picture:profile.pictureUrl||link.line_picture_url||'',interviewId:active?.interview.id??null,date,staff:assignee,outcome,history:past,lastReceived:item.messages[0]?.receivedAt||''};
  }).sort((a,b)=>b.lastReceived.localeCompare(a.lastReceived));
 }
 async function refreshLineInboxReadOnly(){
@@ -340,9 +347,10 @@ function makeLiveLineCard(record){
  for(const el of [avatar,name]){el.tabIndex=0;el.setAttribute('role','button');el.onclick=()=>openApplicantDetail(record,'live:'+record.accountId+':'+record.lineUserId);el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();el.click()}}}
  const date=document.createElement('div');date.className='interview-datetime';const last=document.createElement('strong');
  const caption=document.createElement('span');
- if(record.date&&record.staff){last.textContent=record.date;caption.textContent='担当：'+record.staff}
+ if(['採用','不採用','辞退'].includes(record.outcome)){last.textContent=record.outcome;caption.textContent=[record.date,record.staff?'担当：'+record.staff:''].filter(Boolean).join(' ／ ');date.classList.add('outcome-'+({'採用':'hired','不採用':'rejected','辞退':'withdrawn'}[record.outcome]))}
+ else if(record.date&&record.staff){last.textContent=record.date;caption.textContent='担当：'+record.staff}
  else{last.textContent='日程未定';caption.textContent=record.lastReceived?'最終LINE：'+new Date(record.lastReceived).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'}):'最終LINE受信なし';date.classList.add('live-date-pending')}
- date.append(last,caption);if(record.staff)applyStaffTheme(caption,record.staff);
+ date.append(last,caption);if(record.staff&&!['採用','不採用','辞退'].includes(record.outcome))applyStaffTheme(caption,record.staff);
  const controls=document.createElement('div');controls.className='confirmation-controls';
  for(const label of ['LINE送信','確認OK']){const b=document.createElement('button');b.textContent=label;b.disabled=true;controls.append(b)}
  const history=makeCardInformation(record);
