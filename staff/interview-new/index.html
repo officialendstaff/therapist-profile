@@ -338,6 +338,15 @@ function openLegacyPendingAction(label,record,panel,wrap){
  form.append(note,preview);form.onsubmit=e=>{e.preventDefault();note.textContent='理由・メモ：'+(reason.value||'未入力')+'（未保存）'};
  wrap.append(form);panel.append(wrap);
 }
+async function cancelLiveInterview(record,button){
+ if(!record.interviewId)return;
+ if(!confirm(record.name+' の面接をキャンセルしますか？\\n元の面接日時は履歴に保存されます。'))return;
+ const token=localStorage.getItem('interview_staff_session_v2')||sessionStorage.getItem('interview_staff_session_v2');
+ if(!token){alert('再ログインしてください。');return}
+ button.disabled=true;
+ try{const response=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'cancel_linked_interview',token,interview_id:record.interviewId,account_id:record.accountId,line_user_id:record.lineUserId})});const data=await response.json();if(!response.ok)throw Error(data.error||'cancel_failed');await refreshLineInboxReadOnly();}
+ catch(error){alert('キャンセルの保存に失敗しました：'+error.message);button.disabled=false}
+}
 function makeLiveLineCard(record){
  const card=document.createElement('article');card.className='applicant live-line-card unified-applicant-card';
  const avatar=document.createElement('div');avatar.className='avatar';
@@ -356,7 +365,7 @@ function makeLiveLineCard(record){
  for(const label of ['LINE送信','確認OK']){const b=document.createElement('button');b.textContent=label;b.disabled=true;controls.append(b)}
  const history=makeCardInformation(record);
  const actions=document.createElement('div');actions.className='card-actions';
- for(const [label,color] of [['面接登録','#568DB9'],['日程変更','#D99A54'],['キャンセル','#CD7580'],['来世期待','#A65A68']]){const b=document.createElement('button');b.textContent=label;b.style.setProperty('--btn-color',color);b.disabled=!(label==='面接登録'||label==='来世期待')||(label==='面接登録'&&Boolean(record.interviewId));if(!b.disabled){b.title='操作画面を開きます';b.onclick=()=>openPendingActionPage(label,record)}else b.title=label==='面接登録'&&record.interviewId?'面接登録済み':'実データの操作連携は未完了です';actions.append(b)}
+ for(const [label,color] of [['面接登録','#568DB9'],['日程変更','#D99A54'],['キャンセル','#CD7580'],['来世期待','#A65A68']]){const b=document.createElement('button');b.textContent=label;b.style.setProperty('--btn-color',color);b.disabled=!(label==='面接登録'||label==='来世期待'||(label==='キャンセル'&&Boolean(record.interviewId)))||(label==='面接登録'&&Boolean(record.interviewId));if(!b.disabled){b.title='操作画面を開きます';b.onclick=()=>label==='キャンセル'?cancelLiveInterview(record,b):openPendingActionPage(label,record)}else b.title=label==='面接登録'&&record.interviewId?'面接登録済み':'実データの操作連携は未完了です';actions.append(b)}
  card.append(avatar,identity,date,controls,history,actions);return card
 }
 function renderList(){
