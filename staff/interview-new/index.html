@@ -310,7 +310,7 @@ function makeCardInformation(record){
  const history=document.createElement('div');history.className='history-labels live-line-content';
  const tags=document.createElement('div');tags.className='live-line-history';
  const allEntries=(record.history||[]).map(e=>Array.isArray(e)?{type:e[0],scheduledAt:e[1]}:e).filter(e=>e&&e.type&&e.scheduledAt).sort((a,b)=>(b.updatedAt||b.scheduledAt).localeCompare(a.updatedAt||a.scheduledAt));const counts={'日程変更':0,'キャンセル':0,'無断トビ':0};
- for(const entry of allEntries){const type=entry.type==='変更'?'日程変更':entry.type==='キャン'?'キャンセル':entry.type;if(Object.prototype.hasOwnProperty.call(counts,type))counts[type]++;}
+ const countedEvents=new Map();for(const entry of allEntries){const type=entry.type==='変更'?'日程変更':entry.type==='キャン'?'キャンセル':entry.type;if(!Object.prototype.hasOwnProperty.call(counts,type))continue;const key=type+'|'+entry.scheduledAt;const at=Date.parse(entry.updatedAt||'');const prior=countedEvents.get(key);if(Number.isFinite(at)&&Number.isFinite(prior)&&Math.abs(at-prior)<2000)continue;counts[type]++;countedEvents.set(key,at);}
  for(const type of ['日程変更','キャンセル','無断トビ']){if(!counts[type])continue;const tag=document.createElement('span');tag.className='history-tag'+(type==='キャンセル'?' cancel':type==='無断トビ'?' no-show':'');tag.textContent=type+'　'+counts[type]+'回';tag.title=type+'：'+counts[type]+'回';tags.append(tag)}
  const preview=document.createElement('span');preview.className='live-line-preview';preview.textContent=String(record.messages?.[0]?.text||'').split(/\r?\n/)[0];preview.title=record.messages?.[0]?.text||'';
  history.append(tags,preview);return history
