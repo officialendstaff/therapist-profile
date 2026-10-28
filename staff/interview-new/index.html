@@ -255,12 +255,36 @@ function makeTestCard(record,key){const state=testState.get(key)||{sent:false,ok
 const actions=document.createElement('div');actions.className='card-actions';for(const [id,label,color] of [['register','面接登録','#568DB9'],['change','日程変更','#D99A54'],['cancel','キャンセル','#CD7580'],['future','来世期待','#A65A68']]){const b=document.createElement('button');b.textContent=label;b.style.setProperty('--btn-color',color);b.disabled=!allowListButton(key.startsWith('today:')?'今日の予定':currentPage,id);b.classList.toggle('pressed',state.selected===id);b.onclick=()=>{state.selected=id;actions.querySelectorAll('button').forEach(x=>x.classList.toggle('pressed',x===b))};actions.append(b)}card.append(avatar,identity,date,confirmations,history,actions);return card}
 function openPendingActionPage(label,record){
  const panel=$('sharedPanel');if(!panel)return;
- const previous=panel.innerHTML;panel.innerHTML='';panel.hidden=false;$('todayPanel').hidden=true;$('applicantDetail').hidden=true;
+ panel.replaceChildren();panel.hidden=false;$('todayPanel').hidden=true;$('applicantDetail').hidden=true;
  const wrap=document.createElement('section');wrap.className='main-panel';
  const heading=document.createElement('h1');heading.textContent=label;
- const note=document.createElement('p');note.className='status';note.textContent=(record.name||'応募者')+' ／ '+(record.shop||'')+'：この操作画面は次工程で作成します。面接データは変更されていません。';
- const back=document.createElement('button');back.type='button';back.textContent='LINE通知一覧へ戻る';back.style.cssText='padding:9px 14px;margin-top:16px;border:1px solid #cbd5e1;border-radius:6px;background:#f8fafc;cursor:pointer';
- back.onclick=()=>{panel.innerHTML=previous;currentPage='LINE通知';renderList()};wrap.append(heading,note,back);panel.append(wrap);
+ const context=document.createElement('p');context.className='status';context.textContent='LINE応募者：'+(record.name||'Unknown')+' ／ '+(record.shop||'')+'（LINE ID：'+(record.lineUserId||'未取得')+'）';
+ wrap.append(heading,context);
+ const form=document.createElement('form');form.style.cssText='display:grid;gap:12px;max-width:540px;margin-top:16px';
+ const field=(title,type,value,required=false)=>{
+  const lab=document.createElement('label');lab.style.cssText='display:grid;gap:5px;font-size:13px;font-weight:600';lab.textContent=title;
+  const input=document.createElement('input');input.type=type;input.value=value||'';input.required=required;input.style.cssText='width:100%;min-height:38px;padding:8px;border:1px solid #cbd5e1;border-radius:6px';lab.append(input);form.append(lab);return input;
+ };
+ const name=field('応募者名','text',record.name==='Unknown'?'':record.name,true);
+ const shop=field('店舗','text',record.shop,true);shop.readOnly=true;
+ let date=null,time=null,staff=null,reason=null;
+ if(label==='面接登録'){
+  date=field('面接日','date','',true);time=field('面接開始時間','time','',true);time.step=1800;
+  const lab=document.createElement('label');lab.textContent='担当者';lab.style.cssText='display:grid;gap:5px;font-size:13px;font-weight:600';
+  staff=document.createElement('select');staff.required=true;staff.style.cssText='min-height:38px;border:1px solid #cbd5e1;border-radius:6px';
+  for(const v of ['','社長','オオタ','村上','お祭り']){const option=document.createElement('option');option.value=v;option.textContent=v||'担当者を選択';staff.append(option)}lab.append(staff);form.append(lab);
+ }else{
+  const lab=document.createElement('label');lab.textContent='理由・メモ';lab.style.cssText='display:grid;gap:5px;font-size:13px;font-weight:600';
+  reason=document.createElement('textarea');reason.rows=3;reason.style.cssText='padding:8px;border:1px solid #cbd5e1;border-radius:6px';lab.append(reason);form.append(lab);
+ }
+ const note=document.createElement('p');note.className='status';note.textContent='現在は入力内容の確認までです。データベースへの登録・移動は行いません。';
+ const actions=document.createElement('div');actions.style.cssText='display:flex;gap:8px;flex-wrap:wrap';
+ const preview=document.createElement('button');preview.type='submit';preview.textContent='入力内容を確認';preview.style.cssText='padding:9px 14px;border:1px solid #8ba8c7;border-radius:6px;background:#eaf2fb';
+ const back=document.createElement('button');back.type='button';back.textContent='LINE通知一覧へ戻る';back.style.cssText='padding:9px 14px;border:1px solid #cbd5e1;border-radius:6px;background:#f8fafc';
+ back.onclick=()=>showCommon('LINE通知');
+ actions.append(preview,back);form.append(note,actions);
+ form.onsubmit=e=>{e.preventDefault();const info=[label,'応募者：'+name.value,'店舗：'+shop.value];if(date)info.push('面接日時：'+date.value+' '+time.value,'担当者：'+staff.value);if(reason)info.push('理由・メモ：'+(reason.value||'未入力'));note.textContent=info.join(' ／ ')+'。未保存です。';};
+ wrap.append(form);panel.append(wrap);
 }
 function makeLiveLineCard(record){
  const card=document.createElement('article');card.className='applicant live-line-card unified-applicant-card';
