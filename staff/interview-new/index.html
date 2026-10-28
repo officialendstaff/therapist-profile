@@ -296,8 +296,9 @@ function allowListButton(page,id){return (LIST_BUTTON_POLICY[page]||[]).includes
 function makeCardInformation(record){
  const history=document.createElement('div');history.className='history-labels live-line-content';
  const tags=document.createElement('div');tags.className='live-line-history';
- const allEntries=(record.history||[]).map(e=>Array.isArray(e)?{type:e[0],scheduledAt:e[1]}:e).filter(e=>e&&e.type&&e.scheduledAt).sort((a,b)=>(b.updatedAt||b.scheduledAt).localeCompare(a.updatedAt||a.scheduledAt));const changeCount=allEntries.filter(e=>['変更','日程変更'].includes(e.type)).length;const entries=allEntries.filter(e=>!['変更','日程変更'].includes(e.type)).slice(0,3);const changeTag=document.createElement('span');changeTag.className='history-tag';changeTag.textContent='日程変更　'+changeCount+'回';if(changeCount>0)tags.append(changeTag);
- for(const entry of entries){const type=entry.type==='変更'?'日程変更':entry.type==='キャン'?'キャンセル':entry.type;const tag=document.createElement('span');tag.className='history-tag'+(type==='キャンセル'?' cancel':type==='無断トビ'?' no-show':'');tag.textContent=type;tag.title=type+'：'+entry.scheduledAt;tags.append(tag)}
+ const allEntries=(record.history||[]).map(e=>Array.isArray(e)?{type:e[0],scheduledAt:e[1]}:e).filter(e=>e&&e.type&&e.scheduledAt).sort((a,b)=>(b.updatedAt||b.scheduledAt).localeCompare(a.updatedAt||a.scheduledAt));const counts={'日程変更':0,'キャンセル':0,'無断トビ':0};
+ for(const entry of allEntries){const type=entry.type==='変更'?'日程変更':entry.type==='キャン'?'キャンセル':entry.type;if(Object.prototype.hasOwnProperty.call(counts,type))counts[type]++;}
+ for(const type of ['日程変更','キャンセル','無断トビ']){if(!counts[type])continue;const tag=document.createElement('span');tag.className='history-tag'+(type==='キャンセル'?' cancel':type==='無断トビ'?' no-show':'');tag.textContent=type+'　'+counts[type]+'回';tag.title=type+'：'+counts[type]+'回';tags.append(tag)}
  const preview=document.createElement('span');preview.className='live-line-preview';preview.textContent=record.messages?.[0]?.text||'';preview.title=preview.textContent;
  history.append(tags,preview);return history
 }
