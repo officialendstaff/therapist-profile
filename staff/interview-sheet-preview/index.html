@@ -1,1 +1,583 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>面接シート｜試作プレビュー</title><style>*{box-sizing:border-box}body{margin:0;background:#eef3f9;color:#1b304b;font:14px/1.55 system-ui,-apple-system,"Noto Sans JP",sans-serif}.wrap{width:100%;max-width:none;margin:0;padding:12px}.top,.summary,.panel,.foot{background:#fff;border:1px solid #d4e1f0;border-radius:10px;padding:18px;margin-bottom:14px}.top,.summary,.foot{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}h1{font-size:22px;margin:0}h2{font-size:16px;margin:0}.muted{color:#667991;font-size:12px}.grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(330px,1fr);gap:14px}.stack{display:grid;gap:14px;align-content:start}.panel{margin:0;padding:0;overflow:hidden}.panel-head{background:#edf4fc;padding:13px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}.panel-body{padding:16px}.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{border-bottom:1px solid #e5edf6;padding-bottom:8px}.field label{display:block;color:#687c92;font-size:12px}.field strong{font-size:14px}button,select,input,textarea{font:inherit}button{cursor:pointer;border:1px solid #c7d8ec;border-radius:7px;padding:8px 13px;background:#fff;color:#24578d}button.primary{background:#3279cc;color:white;border-color:#3279cc}button:disabled{opacity:.5;cursor:default}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.control{display:grid;gap:5px;margin-bottom:12px}.control label{font-size:12px;color:#5b6e85}select,input,textarea{width:100%;padding:10px;border:1px solid #cbd8e9;border-radius:7px;background:#fff;color:#24354a}textarea{min-height:95px}.status{padding:5px 10px;background:#e6f5ee;color:#168253;border-radius:99px;font-size:12px}.choices{display:flex;gap:8px}.choices button{flex:1}.choices button.selected{background:#2d79c9;color:#fff}.hidden{display:none!important}.foot{position:sticky;bottom:0;box-shadow:0 -5px 18px #d6e1ee9c}.note{font-size:12px;color:#62748b}.warn{background:#fff5e8;border:1px solid #f0d3a8;border-radius:8px;padding:10px 14px;margin-bottom:14px}@media(max-width:850px){.wrap{padding:10px}.grid{grid-template-columns:1fr}.fields{grid-template-columns:1fr}.foot{padding:10px}.top h1{font-size:18px}}</style></head><body><main class="wrap"><div class="warn">試作ページ：画面構成の確認専用です。実データの取得・保存・PDF出力は行いません。</div><header class="top"><h1>面接シート <span class="muted">PCレイアウト試作</span></h1><span class="status" id="saveState">変更なし</span></header><section class="summary"><div><strong>桑景寺 令奈</strong><div class="muted">サンプル応募者 ／ 薔薇と紳士</div></div><div>面接予定：2026/10/27 13:00<div class="muted">担当：社長 ／ 状態：面接済み</div></div><span class="status" id="summaryResult">採否未選択</span></section><div class="grid"><div class="stack"><section class="panel"><div class="panel-head"><h2>① 応募者情報</h2><div class="row"><button id="editApplicant">編集する</button><button data-fold="applicant">折りたたむ</button></div></div><div class="panel-body" id="applicant"><div class="fields" id="applicantView"><div class="field"><label>氏名</label><strong>桑景寺 令奈</strong></div><div class="field"><label>生年月日</label><strong>1994/05/08</strong></div><div class="field"><label>電話番号</label><strong>090-XXXX-XXXX</strong></div><div class="field"><label>応募媒体</label><strong>バニラ</strong></div><div class="field"><label>喫煙</label><strong>あり</strong></div><div class="field"><label>タトゥー</label><strong>あり</strong></div><div class="field"><label>身分証</label><strong>運転免許証</strong></div><div class="field"><label>応募経験</label><strong>未経験</strong></div></div><div class="hidden" id="applicantEdit"><div class="fields"><div class="control"><label>氏名</label><input value="桑景寺 令奈"></div><div class="control"><label>電話番号</label><input value="090-XXXX-XXXX"></div><div class="control"><label>応募媒体</label><input value="バニラ"></div><div class="control"><label>身分証</label><input value="運転免許証"></div></div><p class="note">試作のため、編集内容は画面内だけで保持します。</p></div></div></section><section class="panel"><div class="panel-head"><h2>② 面接管理</h2><button data-fold="interview">折りたたむ</button></div><div class="panel-body" id="interview"><div class="control"><label>紐付ける面接予定</label><select><option>2026/10/27 13:00｜薔薇と紳士｜来店済み</option><option>未紐付け</option></select></div><div class="fields"><div class="control"><label>担当者</label><select><option>社長</option><option>オオタ</option><option>本人</option></select></div><div class="control"><label>面接日時</label><input type="datetime-local" value="2026-10-27T13:00"></div></div></div></section><section class="panel"><div class="panel-head"><h2>③ 採否判定</h2><button data-fold="result">折りたたむ</button></div><div class="panel-body" id="result"><div class="choices" id="resultChoices"><button data-result="採用">採用</button><button data-result="不採用">不採用</button><button data-result="辞退">辞退</button></div><div class="control" style="margin-top:14px"><label>面接メモ</label><textarea placeholder="面接時の所感・引継ぎ事項など"></textarea></div></div></section></div><div class="stack"><section class="panel"><div class="panel-head"><h2>④ 入店情報</h2><button data-fold="onboard">折りたたむ</button></div><div class="panel-body" id="onboard"><p class="note" id="onboardNote">採用を選択すると入力できます。</p><fieldset id="onboardFields" disabled style="border:0;padding:0;margin:0"><div class="control"><label>源氏名</label><input placeholder="源氏名を入力"></div><div class="control"><label>従事する業務内容</label><select><option>従業員業務</option><option>その他</option></select></div><div class="control"><label>国籍</label><select><option>日本</option><option>その他</option></select></div></fieldset></div></section><section class="panel"><div class="panel-head"><h2>⑤ 従業者名簿・出力</h2><button data-fold="pdf">折りたたむ</button></div><div class="panel-body" id="pdf"><button disabled style="width:100%">従業者名簿PDF（試作では無効）</button><p class="note">本番では既存の名簿出力機能を維持します。</p></div></section><section class="panel"><div class="panel-head"><h2>⑥ 保存状態</h2></div><div class="panel-body"><div class="fields"><div class="field"><label>応募者情報</label><strong>保存済み（例）</strong></div><div class="field"><label>面接紐付け</label><strong>保存済み（例）</strong></div><div class="field"><label>採否判定</label><strong id="resultState">未選択</strong></div><div class="field"><label>入店情報</label><strong>未入力</strong></div></div></div></section></div></div><footer class="foot"><span class="note">※ 保存ボタンはプレビュー用。データベースには送信しません。</span><div class="row"><button id="reset">試作内容をリセット</button><button class="primary" id="save">変更を保存（試作）</button></div></footer></main><script>let dirty=false;const state=document.getElementById('saveState');function mark(){dirty=true;state.textContent='未保存の変更あり';state.style.background='#fff2d9';state.style.color='#946100'}document.querySelectorAll('input,select,textarea').forEach(e=>e.addEventListener('input',mark));document.querySelectorAll('[data-fold]').forEach(b=>b.onclick=()=>{const el=document.getElementById(b.dataset.fold);el.classList.toggle('hidden');b.textContent=el.classList.contains('hidden')?'展開する':'折りたたむ'});document.getElementById('editApplicant').onclick=()=>{const edit=document.getElementById('applicantEdit'),view=document.getElementById('applicantView');edit.classList.toggle('hidden');view.classList.toggle('hidden');document.getElementById('editApplicant').textContent=edit.classList.contains('hidden')?'編集する':'閲覧に戻す'};document.querySelectorAll('[data-result]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-result]').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');const v=b.dataset.result;document.getElementById('summaryResult').textContent=v;document.getElementById('resultState').textContent=v;document.getElementById('onboardFields').disabled=v!=='採用';document.getElementById('onboardNote').textContent=v==='採用'?'採用後の登録項目です。':'採用を選択すると入力できます。';mark()});document.getElementById('save').onclick=()=>{dirty=false;state.textContent='プレビュー上で保存済み';state.style.background='#e6f5ee';state.style.color='#168253'};document.getElementById('reset').onclick=()=>location.reload();</script></body></html>
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Interview Sheet 試作｜MATTAN KOUGYOU | 面接予約管理（新規）</title>
+<style>
+:root{--sidebar:254px;--header:64px;--top:260px;--line:#d8dee7;--ink:#17283e}*{box-sizing:border-box}body{margin:0;font-family:Arial,"Noto Sans JP",sans-serif;color:var(--ink);background:#fff}button{font:inherit;cursor:pointer}button:disabled{cursor:not-allowed}.header{height:var(--header);position:fixed;top:0;left:0;right:0;z-index:10;background:#111;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 18px}.brand{border:0;background:transparent;color:white;text-align:center;line-height:1.35;font-size:17px}.header-actions{display:flex;gap:12px}.header-actions button{background:#8bb7a0;color:white;border:0;border-radius:8px;padding:11px 18px}.header-actions button:disabled{opacity:.55}.calendar{position:fixed;top:var(--header);left:0;width:var(--sidebar);height:var(--top);border-right:2px solid var(--line);border-bottom:2px solid var(--line);padding:10px;background:#fff;z-index:8}.cal-head{display:flex;align-items:center;justify-content:space-between;gap:4px;font-weight:700}.cal-head button{border:0;background:#eef1f6;border-radius:5px;padding:6px}.week,.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;margin-top:7px}.week span{text-align:center;font-size:10px}.days button{height:25px;border:0;border-radius:3px;background:#f0f2f6;color:#243754;font-weight:600;font-size:12px;padding:0}.days button.weekend{color:#c44758}.days button.today{outline:2px solid #df9d38}.days button.selected{background:#254b7d;color:white}.days button:disabled{background:#e6e6e6;color:#aaa}.days button.empty{visibility:hidden}.chart{position:fixed;top:var(--header);left:var(--sidebar);right:0;height:var(--top);border-bottom:2px solid var(--line);background:#fff;padding:10px 14px;z-index:8;display:flex;flex-direction:column;gap:8px}.chart-title{display:flex;justify-content:space-between;align-items:center;font-size:17px;font-weight:700}.chart-title small{font-size:12px;color:#64748b}.chart-scroll{overflow-x:auto;overflow-y:auto;flex:1}.chart-grid{display:grid;grid-template-columns:72px repeat(28,minmax(28px,1fr));min-width:900px;gap:2px;align-items:center}.time-label{font-size:10px;text-align:center;color:#536477}.chart-grid .time-divider{position:relative}.chart-grid .time-divider::before{content:'';position:absolute;left:-2px;top:0;bottom:0;border-left:2px solid #D65C63;pointer-events:none;z-index:2}.chart-grid .time-label.time-divider::before{top:0;bottom:-3px}.staff-label{font-size:12px;font-weight:bold;white-space:nowrap}.slot{height:29px;border:0;border-radius:3px;background:#78a8dc;padding:0}.slot.blocked{background:#d4d8df}.slot.booked{background:#d57c83}.slot.chosen{outline:3px solid #163d6a;outline-offset:-2px}.legend{display:flex;gap:14px;align-items:center;font-size:11px}.legend i{display:inline-block;width:12px;height:12px;margin-right:4px;vertical-align:middle}.sidebar{position:fixed;left:0;top:calc(var(--header) + var(--top));bottom:0;width:var(--sidebar);border-right:2px solid var(--line);padding:12px 0;overflow:auto;background:#fff}.nav{display:flex;flex-direction:column;gap:8px}.nav button{width:100%;border:0;border-radius:24px;padding:9px 8px;color:white;background:#36b8ee;font-size:20px}.nav button:nth-child(1){background:#75d64e}.nav button:nth-child(4){background:#08be6b}.nav button:nth-child(5){background:#ff4242}.nav button:nth-child(6){background:#111}.nav button:nth-child(7){background:#009fb5}.nav .space{height:16px}.nav button.active{outline:3px solid #182f4e;outline-offset:-3px}.main{position:fixed;top:calc(var(--header) + var(--top));left:var(--sidebar);right:0;bottom:0;overflow:hidden;padding:10px 18px}.main-panel{min-height:100%;background:#fff;padding:12px 16px}.main-panel h1{font-size:22px;font-weight:600;margin:0}.list-head,.today-head{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:36px;padding:0 0 12px;border-bottom:1px solid #e5eaf0}.pager{display:flex;align-items:center;gap:9px}.pager button{border:1px solid #ccd2db;border-radius:5px;background:#fff;padding:5px 11px}.pager button:disabled{opacity:.4}.applicant-list{display:grid;grid-template-rows:repeat(8,minmax(0,1fr));gap:6px;padding-top:8px;height:calc(100dvh - var(--header) - var(--top) - 110px);min-height:0}.applicant{display:grid;grid-template-columns:46px minmax(0,1fr);align-items:center;gap:14px;min-height:0;padding:7px 12px;border:1px solid #dfe2e8;border-radius:8px;background:white}.avatar{width:42px;height:42px;border-radius:50%;background:#e9edf2;display:grid;place-items:center;color:#788392;font-size:11px}.applicant-info{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px}.identity{display:flex;flex-direction:column;gap:4px;min-width:0}.identity strong{font-size:15px}.identity small{font-size:12px;color:#536177}.detail{font-size:12px;color:#536177}.card-actions{display:grid;grid-template-columns:repeat(4,76px);gap:4px}.card-actions button{width:76px;height:32px;border:1px solid #ccd2da;border-radius:6px;background:#e5e7eb;color:#667080;font-size:10px}.list-note{font-size:12px;color:#788392;margin-top:12px}@media(max-width:1000px){.applicant-info{grid-template-columns:1fr}.card-actions{justify-content:start}}@media(max-width:580px){.applicant{grid-template-columns:42px minmax(0,1fr);padding:4px;gap:5px}.avatar{width:40px;height:40px}.card-actions{grid-template-columns:repeat(4,minmax(0,1fr));width:100%}.card-actions button{width:100%;font-size:9px}}.placeholder{text-align:center;color:#677181;margin-top:65px;font-size:14px}.status{font-size:12px;color:#637083}@media(max-width:850px){:root{--sidebar:190px;--top:248px}.nav button{font-size:15px}.main{padding:12px}.chart{padding:8px}.header-actions button{padding:9px}.brand{font-size:13px}}@media(max-width:550px){:root{--sidebar:150px;--header:60px;--top:245px}.calendar{padding:6px}.days{gap:2px}.days button{font-size:10px;height:24px}.nav button{font-size:13px}.main{padding:8px}.main-panel{padding:8px}.main-panel h1{font-size:17px}.chart-title{font-size:13px}.header-actions{gap:5px}.header-actions button{font-size:11px;padding:8px}.chart-grid{min-width:850px}}
+
+/* Visual refinement: typography and unassigned UI colors; preserve status colors */
+:root{--ink:#253245;--line:#e3e8ef}
+body{font-family:"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;font-size:13px;letter-spacing:.015em;background:#fff;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;letter-spacing:inherit}
+.header{background:#1e293b;border-bottom:1px solid #344155}
+.brand{font-family:inherit;font-size:13px;font-weight:700;letter-spacing:.075em;text-align:left;line-height:1.5}
+.header-actions button{background:#e8eef5;color:#26364b;border:1px solid #cbd5e1;border-radius:6px;font-size:12px;font-weight:600}
+.header-actions button:disabled{background:#344155;color:#9caabc;border-color:#46556b}
+.calendar,.chart,.sidebar,.main-panel{background:#fff}
+.calendar{border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.cal-head{font-size:13px;color:#26364b}
+.cal-head button{background:#f1f4f8;color:#475569}
+.week span{font-weight:700;color:#64748b}
+.days button{background:#f5f7fa;color:#334155;font-weight:500}
+.days button.selected{background:#334e70;color:#fff}
+.chart{border-bottom:1px solid var(--line)}
+.chart-title{font-size:15px;color:#26364b}
+.chart-title small{font-weight:500}
+.sidebar{border-right:1px solid var(--line);padding:14px 10px}
+.nav{gap:3px}
+.nav button,.nav button:nth-child(1),.nav button:nth-child(4),.nav button:nth-child(5),.nav button:nth-child(6),.nav button:nth-child(7){background:transparent;color:#48576a;border:1px solid transparent;border-radius:6px;text-align:left;font-size:13px;font-weight:600;padding:11px 13px;line-height:1.3;transition:background .12s}
+.nav button:first-child{color:#16803e}
+.nav button:hover{background:#f2f5f9}
+.nav button.active,.nav button:nth-child(1).active,.nav button:nth-child(4).active,.nav button:nth-child(5).active,.nav button:nth-child(6).active,.nav button:nth-child(7).active{background:#edf2f8;color:#1e3b5b;border-color:#dce5ef;outline:none}
+.nav button:first-child.active{background:#edf8f0;color:#147c39;border-color:#d2ead9}
+.nav .space{height:12px}
+.main{background:#fff}
+.main-panel{padding:10px 12px}
+.main-panel h1{font-size:18px;font-weight:700;color:#27364a;letter-spacing:.025em}
+.list-head{border-bottom:1px solid #e5eaf0}
+.pager button{color:#45546a;border-color:#dbe2ea;background:#f8fafc}
+.applicant{background:#fff;border-color:#e3e8ef;border-radius:6px;box-shadow:none}
+.identity strong{font-size:13px;font-weight:700;color:#29394e}
+.identity small,.detail{font-size:11px;color:#64748b}
+.avatar{background:#f0f3f7;color:#7b899c}
+.list-note{color:#94a3b8}
+@media(max-width:850px){.nav button,.nav button:nth-child(1),.nav button:nth-child(4),.nav button:nth-child(5),.nav button:nth-child(6),.nav button:nth-child(7){font-size:12px;padding:10px 8px}}
+.today-head h1,.list-head h1{margin:0;font-size:18px;font-weight:700;color:#27364a;letter-spacing:.025em}.today-date{color:#64748b;font-size:12px}.today-empty{padding:35px 12px;color:#64748b;text-align:center;border:1px solid #e3e8ef;border-radius:6px;margin-top:12px}.today-panel[hidden],.shared-panel[hidden]{display:none!important}.brand{padding:8px 12px;border-radius:6px;font-size:18px;transition:background .15s}.brand:hover,.brand:focus-visible{background:#34465f;outline:none}.chart-title{justify-content:flex-start;gap:22px}.chart-date{font-size:15px;font-weight:700;color:#26364b}.chart-date.saturday{color:#4875a9}.chart-date.holiday{color:#b45353}.nav button[data-page="不届き者"],.nav button[data-page="来世期待"]{color:#b45353}.nav button[data-page="集計頁"]{color:#4875a9}.nav button[data-page="不届き者"].active,.nav button[data-page="来世期待"].active{background:#fcf1f1;color:#b45353;border-color:#f1d9d9}.nav button[data-page="集計頁"].active{background:#eff5fc;color:#4875a9;border-color:#d9e6f4}.today-test-note{margin-top:12px;font-size:11px;color:#8a6671}.today-test-list{display:grid;gap:6px;margin-top:0;padding-top:8px}.today-test-card{display:grid;grid-template-columns:85px minmax(0,1fr) 110px;align-items:center;gap:12px;padding:13px 16px;border:1px solid #e3e8ef;border-left:4px solid #94a3b8;border-radius:6px}.today-test-card>strong{font-size:16px}.today-test-card>div{display:flex;flex-direction:column;gap:5px}.today-test-card small{color:#64748b;font-size:11px}.today-test-card>span{justify-self:end;font-size:12px;font-weight:700}.today-test-card.pending{background:#f9fafb}.today-test-card.sent{background:#f5f9fe;border-left-color:#4875a9}.today-test-card.sent>span{color:#4875a9}.today-test-card.confirmed{background:#f5fbf6;border-left-color:#16803e}.today-test-card.confirmed>span{color:#16803e}@media(max-width:650px){.today-test-card{grid-template-columns:65px 1fr;padding:9px;gap:7px}.today-test-card>span{grid-column:2;justify-self:start}}.nav button{display:flex!important;align-items:center;gap:11px;font-size:16px!important;padding:12px 11px!important;white-space:nowrap}.nav-icon{width:20px;height:20px;flex:none}.nav button[data-page="今日の予定"]{color:#475569}.nav button[data-page="今日の予定"].active{background:#edf2f8;color:#1e3b5b;border-color:#dce5ef}@media(max-width:850px){.nav button{font-size:14px!important;gap:7px;padding:11px 6px!important}.nav-icon{width:18px;height:18px}}@media(max-width:550px){.nav button{font-size:12px!important;gap:5px;padding:10px 3px!important}.nav-icon{width:16px;height:16px}}.applicant-list{grid-template-rows:repeat(8,minmax(0,1fr))}.applicant{display:grid;grid-template-columns:56px 108px 220px minmax(80px,1fr) 316px;align-items:center;gap:10px;padding:4px 9px;min-width:0}.avatar{width:56px;height:56px;flex:none;font-size:10px}.identity{min-width:0}.identity strong{font-size:13px}.shop-label{display:inline-block;width:max-content;max-width:100%;padding:3px 6px;border:1px solid #e8b8be;border-radius:4px;background:#fcebef;color:#a04457!important;font-size:10px!important}.interview-datetime{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 10px;border:1px solid #bdd5ef;background:#edf5fe;border-radius:6px;color:#16456f;font-size:12px;white-space:nowrap}.interview-datetime strong{font-size:12px}.interview-datetime span{font-size:11px}.history-labels{display:flex;gap:5px;flex-wrap:wrap;align-items:center;min-width:0}.history-tag{padding:4px 6px;border:1px solid #e8b8be;border-radius:4px;background:#fff5f5;color:#b45353;font-size:10px;white-space:nowrap}.card-actions{grid-template-columns:repeat(4,76px);gap:4px}.card-actions button{width:76px;height:32px}.empty-card{opacity:.4}@media(max-width:1250px){.applicant{grid-template-columns:52px 90px 205px minmax(50px,1fr) 316px;gap:6px}.avatar{width:52px;height:52px}}@media(max-width:1050px){.applicant{grid-template-columns:48px minmax(70px,1fr) 190px 316px;gap:6px}.avatar{width:48px;height:48px}.history-labels{grid-column:3;grid-row:2}.applicant{grid-template-rows:auto auto}.card-actions{grid-column:4;grid-row:1 / span 2}}@media(max-width:700px){.applicant{grid-template-columns:42px minmax(65px,1fr) 175px;gap:4px;padding:3px}.avatar{width:42px;height:42px}.interview-datetime{padding:5px;flex-wrap:wrap;white-space:normal}.card-actions{grid-column:2 / span 2;grid-row:2;justify-self:end}.history-labels{grid-column:3;grid-row:1}.card-actions button{width:76px}}
+/* Interview card layout test — scoped, no production data writes */
+.applicant-list{grid-template-rows:none!important;grid-auto-rows:minmax(82px,auto);height:auto!important;min-height:0!important;align-content:start}
+.applicant,.today-test-card{display:flex!important;align-items:center;gap:10px;min-width:0;min-height:82px;padding:8px 10px;border:1px solid #d8e0e9;border-left:4px solid #94a3b8;border-radius:7px;background:#fff;overflow-x:auto}
+.applicant.confirmed,.today-test-card.confirmed{background:#effaf3;border-left-color:#42a77a;border-color:#42a77a}
+.applicant.sent,.today-test-card.sent{background:#f0f6fc;border-left-color:#568db9}
+.applicant .avatar,.today-test-card .avatar{width:64px;height:64px;min-width:64px;border-radius:50%;background:#e6edf4;display:grid;place-items:center;font-size:10px;color:#71859a}
+.applicant .identity,.today-test-card .identity{width:128px;min-width:128px;display:flex;flex-direction:column;gap:5px}
+.applicant .interview-datetime,.today-test-card .interview-datetime{width:150px;min-width:150px;display:flex;flex-direction:column;gap:5px;align-items:center;background:#eaf2fa;border:1px solid #b7cfe8;border-radius:6px;padding:8px 3px;color:#245a91;font-size:14px}
+.applicant .confirmation-controls,.today-test-card .confirmation-controls{display:grid;grid-template-columns:120px;gap:4px;flex:none}
+.confirmation-controls button{height:36px;border-radius:6px;border:1px solid #3973a5;background:linear-gradient(#79a7d1,#568db9);box-shadow:inset 0 1px #ffffff70,0 2px 3px #00000020;color:#fff;font-size:12px;font-weight:700}
+.confirmation-controls button.sent-btn{background:#e5e7eb;color:#64748b;border-color:#cbd5e1;box-shadow:none}
+.confirmation-controls button.ok-btn{background:#e8f6ef;border-color:#42a77a;color:#26865d}
+.confirmation-controls button.ok-btn.is-ok{background:linear-gradient(#69bf94,#42a77a);color:#fff}
+.applicant .history-labels,.today-test-card .history-labels{width:250px;min-width:0;max-width:250px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px}
+.history-labels:empty{display:none!important}
+.history-labels .history-tag{display:block;box-sizing:border-box;width:250px;min-width:250px;font-size:11px;border-radius:4px;padding:4px 7px;background:#eee8f8;color:#8060a3;white-space:nowrap}
+.history-labels .history-tag.cancel{background:#fce8ee;color:#b65c75}.history-labels .history-tag.no-show{background:#fbe1e4;color:#a53b4b}
+.applicant .card-actions,.today-test-card .card-actions{margin-left:auto;display:grid!important;grid-template-columns:repeat(2,90px)!important;gap:5px;width:185px;min-width:185px;flex:none}
+.card-actions button{width:90px!important;height:36px!important;border-radius:6px!important;border:1px solid #ffffff66!important;color:#fff!important;font-size:12px!important;font-weight:700;background:linear-gradient(#ffffff24,#00000016),var(--btn-color)!important;box-shadow:inset 0 1px #ffffff70,0 2px 3px #00000025;cursor:pointer}
+.card-actions button.pressed{outline:2px solid #253245;outline-offset:-2px;filter:brightness(.92)}
+
+
+/* Increased type sizes without changing the surrounding page layout */
+.applicant .identity strong,.today-test-card .identity strong{font-size:16px}
+.applicant .shop-label,.today-test-card .shop-label{font-size:12px!important}
+.applicant .interview-datetime span,.today-test-card .interview-datetime span{font-size:12px}
+.applicant,.today-test-card{gap:10px;min-height:88px}
+
+/* Applicant detail view — two-column layout, independent scrolling */
+.applicant-detail{width:100%;min-width:0}.applicant-detail[hidden]{display:none!important}.detail-header{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #dbe4ef;padding-bottom:12px}.detail-header h1{font-size:18px;color:#253245;margin:0}.detail-header button{border:1px solid #c7d5e5;border-radius:6px;background:#f2f6fb;color:#24415e;font-size:12px;font-weight:700;padding:9px 14px;cursor:pointer}.detail-summary{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;padding:14px 0}.detail-person{display:flex;align-items:center;gap:14px;min-width:0;padding:12px}.detail-person strong{font-size:17px;color:#253245}.detail-person #detailShop{font-size:16px;font-weight:700;margin-top:6px;display:table;padding:3px 8px;border:1px solid;border-radius:5px;max-width:max-content}.detail-person small{font-size:11px;color:#64748b;display:block;margin-top:5px}.detail-avatar{width:60px;height:60px;min-width:60px;border-radius:50%;background:#e6edf4;color:#71859a;display:grid;place-items:center;font-size:11px}.detail-current{display:flex;flex-direction:column;justify-content:center;gap:5px;border:1px solid #c9d9e9;background:#eef4fa;border-radius:7px;padding:12px 16px;color:#245a91}.detail-current small{color:#64748b;font-size:11px}.detail-current strong{font-size:16px}.detail-current span{font-size:12px}.detail-confirm-ok{color:#26865d!important;font-weight:700}.detail-columns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}.detail-section{min-width:0;border:1px solid #dbe4ef;border-radius:8px;padding:12px;background:#fff}.detail-section h2{font-size:14px;color:#253245;border-bottom:1px solid #e3e8ef;padding:0 0 10px;margin:0 0 10px}.detail-scroll{height:clamp(280px,calc(100dvh - 570px),620px);min-height:280px;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:8px}.detail-entry{background:#f3f6fa;border:1px solid #dfe6ee;border-radius:6px;padding:10px;font-size:12px;color:#29394e;white-space:pre-wrap;overflow-wrap:anywhere}.detail-entry time{display:block;color:#64748b;font-size:11px;margin-bottom:5px}.detail-entry strong{display:block;margin-bottom:5px}.detail-entry.changed{background:#eee8f8;border-color:#e1d4f0}.detail-entry.cancel{background:#fce8ee;border-color:#efc9d3}.detail-entry.no-show{background:#fbe1e4;border-color:#ecc3c9}.detail-entry.registered{background:#eaf2fa;border-color:#c9d9e9}.detail-empty{color:#94a3b8;font-size:12px;padding:14px 5px}.applicant .avatar,.applicant .identity strong{cursor:pointer}.applicant .identity strong:hover{text-decoration:underline}@media(max-width:700px){.detail-summary,.detail-columns{grid-template-columns:1fr}.detail-scroll{height:300px}.detail-person{padding:5px}}
+/* Desktop applicant detail: fit history panels inside the visible viewport */
+@media(min-width:701px){.main-panel:has(.applicant-detail:not([hidden])){height:100%;min-height:0;overflow:hidden;display:flex;flex-direction:column}.applicant-detail:not([hidden]){height:100%;min-height:0;display:flex;flex-direction:column}.applicant-detail:not([hidden]) .detail-header,.applicant-detail:not([hidden]) .detail-summary{flex-shrink:0}.applicant-detail:not([hidden]) .detail-columns{flex:1;min-height:0;overflow:hidden}.applicant-detail:not([hidden]) .detail-section{min-height:0;display:flex;flex-direction:column;overflow:hidden}.applicant-detail:not([hidden]) .detail-scroll{height:auto;min-height:0;max-height:none;flex:1;overflow-y:auto}}
+
+\n/* Enforce exclusive visibility of list and detail views */\n#todayPanel[hidden],#sharedPanel[hidden],#registrationPanel[hidden],#applicantDetail[hidden]{display:none!important}\n.applicant .confirmation-controls button:disabled,.applicant .card-actions button:disabled,.today-test-card .confirmation-controls button:disabled,.today-test-card .card-actions button:disabled{background:#e3e5e9!important;background-image:none!important;border:1px solid #d5d9df!important;color:#8c949f!important;opacity:1!important;cursor:not-allowed!important;box-shadow:none!important;filter:none!important;text-shadow:none!important;outline:none!important}
+.nav .nav-group-space{height:39px;flex:none}
+/* Confirmation buttons are active only in today's list; keep dimensions unchanged. */
+#sharedPanel .confirmation-controls button:disabled{background:#e3e5e9!important;background-image:none!important;border-color:#d5d9df!important;color:#8c949f!important;box-shadow:none!important;filter:none!important;opacity:1!important;cursor:not-allowed!important}
+/* LINE notification uses consistent green in both navigation areas. */
+.nav button[data-page="LINE通知"]{color:#16803e!important}
+.nav button[data-page="LINE通知"].active{background:#edf8f0!important;color:#147c39!important;border-color:#d2ead9!important}
+.header-actions #headerLineInbox{background:#edf8f0!important;color:#147c39!important;border:1px solid #b9dfc6!important}
+.header-actions #headerLineInbox:hover{background:#dff2e5!important}.header-actions #headerLineInbox{display:inline-flex;align-items:center;gap:5px}.header-bell{width:14px;height:14px;flex:none}
+.live-line-card .avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover}.live-line-preview{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:#52647b}.live-line-card .card-actions button:disabled{background:#e3e5e9!important;background-image:none!important;border-color:#d5d9df!important;color:#8c949f!important;box-shadow:none!important}
+/* Interview cards: history badges above first line of latest incoming LINE. */
+.unified-applicant-card .history-labels.live-line-content{display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:center!important;gap:4px!important;min-width:0!important;overflow:hidden!important}
+.unified-applicant-card .live-line-history{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;gap:4px!important;min-width:0!important;overflow:hidden!important}
+.unified-applicant-card .live-line-history .history-tag{width:auto!important;max-width:100%!important;flex:0 1 auto!important;white-space:nowrap!important}
+.unified-applicant-card .live-line-preview{display:block!important;min-width:0!important;max-width:100%!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;line-height:1.4!important}
+/* Live LINE cards: preview and history share the existing center column; test cards untouched. */
+.live-line-card .history-labels.live-line-content{width:auto;max-width:none;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:8px}
+.live-line-card .live-line-preview{min-width:0;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.live-line-card .live-line-history{min-width:0;display:flex;flex-direction:column;gap:3px;overflow:hidden}
+.live-line-card .live-line-history .history-tag{width:100%;min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:2px 5px;font-size:10px}
+.live-line-card .interview-datetime.live-date-pending{background:#fff5e8!important;border-color:#e8c38f!important;color:#99601d!important}
+.live-line-card .interview-datetime.live-date-pending strong,.live-line-card .interview-datetime.live-date-pending span{color:#99601d!important}
+.live-line-card .interview-datetime.live-date-pending span{font-size:9px}
+.line-test-card{border-left:3px solid #c08a28!important;background:#fffdf6!important}.line-test-card .identity strong{color:#936018!important}.line-test-card .card-actions button:not(:disabled){filter:none!important;cursor:pointer!important}.line-test-card .card-actions button:not(:disabled):nth-child(1){background:#568db9!important;color:white!important}.line-test-card .card-actions button:not(:disabled):nth-child(2){background:#d99a54!important;color:white!important}.line-test-card .card-actions button:not(:disabled):nth-child(3){background:#cd7580!important;color:white!important}.line-test-card .card-actions button:not(:disabled):nth-child(4){background:#a65a68!important;color:white!important}
+/* LINE inbox: history on the LINE-send row; latest message on the confirmation row.
+   Preserve existing card, action-button and confirmation-button dimensions. */
+.live-line-card .history-labels.live-line-content{flex:1;width:auto;max-width:none;min-width:0;align-self:stretch;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:1fr 1fr;gap:4px;align-items:center}
+.live-line-card .live-line-history{grid-row:1;display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:5px;min-width:0;overflow:hidden}
+.live-line-card .live-line-history .history-tag{box-sizing:border-box;width:auto;min-width:0;max-width:none;flex:none;padding:3px 8px;font-size:12px;line-height:1.25;white-space:nowrap}
+.live-line-card .live-line-preview{grid-row:2;display:block;min-width:0;max-width:100%;font-size:13px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Compact interview date box on LINE notification cards only. */
+.live-line-card .interview-datetime{width:170px;min-width:170px;box-sizing:border-box;align-self:center;justify-content:center;gap:3px;padding:5px 5px;min-height:0}
+.live-line-card .interview-datetime strong{font-size:14px;line-height:1.3}
+.live-line-card .interview-datetime span,.live-line-card .interview-datetime.live-date-pending span{font-size:11px!important;line-height:1.35;white-space:nowrap;letter-spacing:-.25px}
+/* Keep LINE interview date box content-height, not stretched by card row. */
+.live-line-card .interview-datetime{flex:none!important;height:auto!important;min-height:0!important;max-height:none!important;align-self:center!important;padding:3px 5px!important;gap:1px!important;line-height:1.2!important}
+.live-line-card .interview-datetime strong{line-height:1.2!important}
+.live-line-card .interview-datetime span{line-height:1.2!important}
+/* Staff theme on labels only; slot availability and status colors stay unchanged. */
+.staff-label{border:1px solid transparent;border-radius:4px;padding:4px 2px;text-align:center}
+.applicant .interview-datetime span[style*="background"],.live-line-card .interview-datetime span[style*="background"]{border:1px solid transparent;border-radius:3px;padding:1px 4px}
+/* Chart: available slots use staff colors; booked slots share vivid yellow. */
+.chart-grid .slot:not(.blocked):not(.booked){border:1px solid transparent}
+.chart-grid .slot.blocked{background:#d4d8df!important;border-color:#d4d8df!important;color:#64748b!important}
+.chart-grid .slot.booked{background:#FACC15!important;border:1px solid #A16207!important;color:#422006!important}
+.chart-grid .slot.chosen{outline:3px solid #163d6a;outline-offset:-2px}
+/* Date box: fill the useful vertical space without changing applicant row height. */
+.live-line-card .interview-datetime{height:58px!important;min-height:58px!important;max-height:58px!important;align-self:center!important;justify-content:center!important;gap:4px!important;padding:6px 5px!important}
+.live-line-card .interview-datetime strong{line-height:1.25!important}
+.live-line-card .interview-datetime span{line-height:1.25!important}
+/* Common card presentation: all lists use the approved LINE card dimensions. */
+.unified-applicant-card .history-labels.live-line-content{flex:1;width:auto;max-width:none;min-width:0;align-self:stretch;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:1fr 1fr;gap:4px;align-items:center}
+.unified-applicant-card .live-line-history{grid-row:1;display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:5px;min-width:0;overflow:hidden}
+.unified-applicant-card .live-line-history .history-tag{box-sizing:border-box;width:auto;min-width:0;max-width:none;flex:none;padding:3px 8px;font-size:12px;line-height:1.25;white-space:nowrap}
+.unified-applicant-card .live-line-preview{grid-row:2;display:block;min-width:0;max-width:100%;font-size:13px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.unified-applicant-card .interview-datetime{width:170px;min-width:170px;box-sizing:border-box;flex:none;height:58px!important;min-height:58px!important;max-height:58px!important;align-self:center!important;justify-content:center!important;gap:4px!important;padding:6px 5px!important}
+.unified-applicant-card .interview-datetime strong{font-size:14px;line-height:1.25!important}
+.unified-applicant-card .interview-datetime span{font-size:11px!important;line-height:1.25!important;white-space:nowrap}
+.inbox-login-button{margin-left:10px;padding:7px 12px;border:1px solid #91b6d5;border-radius:5px;background:#eaf3fb;color:#18466d;font-size:12px;font-weight:700}
+/* Interview registration: central panel only. Fixed sidebar/calendar/chart untouched. */
+.registration-layout{display:grid;grid-template-columns:minmax(0,3fr) minmax(280px,2fr);gap:14px;margin-top:16px;min-height:460px;height:calc(100vh - 420px);max-height:760px}
+.registration-left,.registration-right{border:1px solid #d8dee7;border-radius:7px;padding:14px;min-width:0;display:flex;flex-direction:column;gap:12px}
+.registration-meta{display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:nowrap}
+.registration-avatar{width:48px;height:48px;min-width:48px;border-radius:50%;background:#e7eaf0;display:grid;place-items:center;font-size:10px;overflow:hidden}
+.registration-avatar img{width:100%;height:100%;object-fit:cover}
+.registration-meta .identity{display:flex;flex-direction:column;gap:5px;flex:1;min-width:0}.registration-meta .identity strong{font-size:14px}.registration-meta .shop-label{align-self:flex-start;font-size:11px}.registration-info{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}.registration-info small{font-size:10px;color:#64748b;white-space:nowrap}.registration-info strong{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.registration-history-toggle{flex:none;border:1px solid #e6b5ca;border-radius:5px;background:#f8e9ef;color:#9c456d;padding:7px;font-size:11px}
+.registration-past{padding:9px;background:#f8f2f5;border-radius:5px;font-size:12px}.registration-past[hidden]{display:none}
+.registration-subtitle{font-size:14px;margin:0;font-weight:700}.registration-messages{flex:1;min-height:170px;overflow-y:auto;background:#f5f7fa;border-radius:6px;padding:12px;display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.registration-message{background:#fff;padding:9px 12px;border-radius:10px;font-size:12px;max-width:85%;white-space:pre-wrap;overflow-wrap:anywhere}.registration-message.outgoing{align-self:flex-end;background:#dff1e5}
+.registration-form{display:flex;flex-direction:column;gap:11px;flex:1}.registration-form label{display:flex;flex-direction:column;gap:5px;font-size:12px;font-weight:600}.registration-form input,.registration-form select{width:100%;min-height:36px;padding:7px;border:1px solid #cbd5e1;border-radius:5px;background:#fff}.registration-preview{align-self:flex-start;padding:9px 14px;border:1px solid #8ba8c7;border-radius:6px;background:#eaf2fb}
+@media(max-width:850px){.registration-layout{grid-template-columns:minmax(0,1fr);height:auto;max-height:none}.registration-left{min-height:350px}.registration-messages{height:240px;flex:none}.registration-meta{flex-wrap:wrap}}
+
+.live-line-card .interview-datetime.outcome-hired{background:#e4f4e9!important;border-color:#95cba7!important;color:#287447!important}
+.live-line-card .interview-datetime.outcome-rejected{background:#fce9ea!important;border-color:#e7a4ab!important;color:#a43e4a!important}
+.live-line-card .interview-datetime.outcome-withdrawn{background:#f1ebfa!important;border-color:#c6b2e4!important;color:#73549a!important}
+.live-line-card .interview-datetime[class*='outcome-'] strong,.live-line-card .interview-datetime[class*='outcome-'] span{color:inherit!important}
+.live-line-card .history-tag.cancel{background:#edf0f4!important;border:1px solid #aab3c0!important;color:#526071!important}
+
+/* Outcome colors apply to both live LINE cards and shared interview-list cards. */
+.unified-applicant-card .interview-datetime.outcome-hired{background:#e4f4e9!important;border-color:#95cba7!important;color:#287447!important}
+.unified-applicant-card .interview-datetime.outcome-rejected{background:#fce9ea!important;border-color:#e7a4ab!important;color:#a43e4a!important}
+.unified-applicant-card .interview-datetime.outcome-withdrawn{background:#f1ebfa!important;border-color:#c6b2e4!important;color:#73549a!important}
+.unified-applicant-card .interview-datetime[class*="outcome-"] strong,.unified-applicant-card .interview-datetime[class*="outcome-"] span{color:inherit!important}
+/* Real interview cards: constrain LINE profile images to the avatar cell. */
+.unified-applicant-card .avatar{position:relative;overflow:hidden;flex:none}
+.unified-applicant-card .avatar>img{display:block!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;min-width:0!important;min-height:0!important;object-fit:cover!important;object-position:center!important;border-radius:50%!important;position:static!important;}
+.unified-applicant-card{overflow:hidden!important}
+
+/* Live confirmation states, without changing card dimensions. */
+.unified-applicant-card.confirmation-pending{background:#fff0f3!important;border-color:#d9778c!important;border-left:4px solid #d9778c!important}
+.unified-applicant-card.sent{background:#eaf3fa!important;border-color:#568db9!important;border-left:4px solid #568db9!important}
+.unified-applicant-card.confirmed{background:#e9f6ef!important;border-color:#399768!important;border-left:4px solid #399768!important}
+#nav button[data-page]{position:relative}
+#nav .nav-trailing{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:10px;white-space:nowrap}
+#nav .nav-count{font-variant-numeric:tabular-nums}
+
+/* Prominent counts and unread LINE arrival indication (sidebar only). */
+#nav button[data-page="今日の予定"] .nav-count-emphasis,#nav button[data-page="LINE通知"] .nav-count-emphasis{display:inline-flex;align-items:center;justify-content:center;min-width:23px;height:23px;padding:0 5px;border-radius:12px;background:#dce9f7;color:#244f82;font-size:12px;font-weight:800}
+#nav button[data-page="LINE通知"] .nav-count-emphasis{background:#d6f0e0;color:#147347}#nav button[data-page="LINE通知"].nav-new-alert .nav-count-emphasis{background:#ffd9e2;color:#bd2545}
+#nav .nav-new-count{border-radius:9px;padding:3px 5px;background:#d33451;color:#fff;font-size:10px;font-weight:800;white-space:nowrap}
+#nav button.nav-new-alert{animation:lineUnreadPulse 1.2s ease-in-out infinite!important;border:2px solid #d33451!important}
+@keyframes lineUnreadPulse{0%,100%{background:#fff0f3;box-shadow:inset 0 0 0 1px #ef8398}50%{background:#ffd5de;box-shadow:inset 0 0 0 2px #d33451}}
+@media(prefers-reduced-motion:reduce){#nav button.nav-new-alert{animation:none!important;background:#ffe3e9!important}}
+
+#chartGrid .slot.interview-booked{background:#f2c66e!important;border:1px solid #d59a27!important;opacity:1!important;cursor:not-allowed}#chartGrid .slot.interview-booked::after{content:'●';font-size:9px;color:#8a5700}
+</style><style id="sheet-preview-layout">.main-panel> :not(.sheet-preview-host){display:none!important}.main-panel{height:100%;min-height:0;padding:0!important;overflow:hidden!important}.sheet-preview-host{display:block;width:100%;height:100%;min-height:0}.sheet-preview-host iframe{display:block;width:100%;height:100%;border:0;background:#eef3f9}.nav button[data-page="集計頁"]+ .nav-group-space + #interviewSheetPreviewLink{background:#eaf2fc;border-color:#d2e2f6;color:#275c9b}.main{min-height:0!important;overflow:hidden!important}@media(max-width:850px){.sheet-preview-host iframe{min-height:100%}}</style></head><body>
+<header class="header"><button class="brand" id="home">⌂ TOP</button><div class="header-actions"><button id="headerLineInbox" type="button"><svg class="header-bell" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>LINE通知</button><button disabled title="面接登録画面は次工程で実装">面接登録</button><button id="sound">通知設定</button></div></header>
+<section class="calendar" aria-label="月間カレンダー"><div class="cal-head"><button id="prev" aria-label="前月">◀</button><span id="month"></span><button id="next" aria-label="翌月">▶</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="days" id="days"></div></section>
+<section class="chart" aria-label="担当者タイムチャート"><div class="chart-title"><span>担当者タイムチャート</span><span id="selectedDate" class="chart-date"></span></div><div class="chart-scroll"><div class="chart-grid" id="chartGrid"></div></div><div class="legend"><span><i style="background:linear-gradient(90deg,#E9E4F3 25%,#E4EFFB 25% 50%,#F9E5ED 50% 75%,#E5F2ED 75%)"></i>選択可能</span><span><i style="background:#d4d8df"></i>選択不可</span><span><i style="background:#FACC15;border:1px solid #A16207"></i>面接予約済み</span><span class="status" id="slotStatus">対応可能時間は個人ページの設定を参照します</span></div></section>
+<aside class="sidebar"><nav class="nav" id="nav"><button data-page="今日の予定"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18M8 14h3M8 17h6"/></svg><span>今日の予定</span></button><button data-page="LINE通知"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg><span>LINE通知</span></button><div class="nav-group-space" aria-hidden="true"></div><button data-page="明日以降"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18M9 15h6m-3-3v6"/></svg><span>明日以降</span></button><button data-page="日程調整"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l4 2"/></svg><span>日程調整</span></button><button data-page="面接済み"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="19" rx="2"/><path d="M9 3v3h6V3M8 14l3 3 5-6"/></svg><span>面接済み</span></button><div class="nav-group-space" aria-hidden="true"></div><button data-page="不届き者"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 16a9 9 0 1 1 14 0v3H5zM9 19v2m6-2v2"/><circle cx="9" cy="13" r="1"/><circle cx="15" cy="13" r="1"/><path d="m12 15-1 2h2z"/></svg><span>不届き者</span></button><button data-page="来世期待"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="3" rx="5" ry="2"/><circle cx="12" cy="11" r="4"/><path d="M8 16c-3-3-6-2-6 1 0 2 3 4 7 3m7-4c3-3 6-2 6 1 0 2-3 4-7 3"/></svg><span>来世期待</span></button><div class="nav-group-space" aria-hidden="true"></div><button data-page="集計頁"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V11h4v10M10 21V7h4v14M16 21V3h4v18M2 21h20"/></svg><span>集計頁</span></button><div class="nav-group-space" aria-hidden="true"></div><button type="button" id="interviewSheetPreviewLink" onclick="window.location.href='../interview-sheet-preview/'"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><span>Interview Sheet</span></button></nav></aside>
+<main class="main"><section class="main-panel"><div class="sheet-preview-host"><iframe src="./sheet.html" title="Interview Sheet 試作" loading="eager"></iframe></div><div class="today-panel" id="todayPanel"><div class="today-head"><h1 id="todayDate"></h1></div><div class="today-test-list" id="todayTestList"></div></div><div id="registrationPanel" class="shared-panel" hidden></div><div class="shared-panel" id="sharedPanel" hidden><div class="list-head"><h1 id="pageTitle">LINE通知</h1><div class="pager"><button id="pagePrev" aria-label="前のページ">◀</button><span id="pageIndicator">1 / 1</span><button id="pageNext" aria-label="次のページ">▶</button></div></div><div id="applicantList" class="applicant-list"></div><p class="list-note" id="listNote"></p></div><div class="applicant-detail" id="applicantDetail" hidden><div class="detail-header"><h1>応募者詳細</h1><button type="button" id="detailBack">一覧へ戻る</button></div><div class="detail-summary"><div class="detail-person"><div class="detail-avatar" id="detailAvatar">LINE</div><div><strong id="detailName"></strong><div id="detailShop"></div></div></div><div class="detail-current"><div id="detailReason" hidden style="margin-bottom:9px;padding-bottom:9px;border-bottom:1px solid #c9d9e9"><strong id="detailReasonTitle" style="display:block;font-size:13px;margin-bottom:5px"></strong><span id="detailReasonValues" style="display:block;line-height:1.7;white-space:normal"></span></div><small>現在の面接状況</small><strong id="detailDate"></strong><span id="detailStaff"></span><span id="detailConfirm"></span></div></div><div class="detail-columns"><section class="detail-section"><h2>LINE受信履歴</h2><div class="detail-scroll" id="detailLine"></div></section><section class="detail-section"><h2>面接・対応履歴</h2><div class="detail-scroll" id="detailHistory"></div></section></div></div></section></main>
+<script>
+'use strict';
+const COLOR_THEME={
+ shops:{
+ 'Grand Luxe':{bg:'#E9E4F3',fg:'#674C92',border:'#C5B5DD'},
+ 'LUXY OSAKA':{bg:'#E4EFFB',fg:'#32679E',border:'#A9C8EA'},
+ '薔薇と紳士':{bg:'#F9E5ED',fg:'#A34870',border:'#E9B3C8'},
+ 'Un Secret':{bg:'#E5F2ED',fg:'#317A60',border:'#A9D6C3'},
+ 'BUSTY OSAKA':{bg:'#FFF0DF',fg:'#9B612A',border:'#EBC79B'}
+ },
+ staff:{'社長':'Grand Luxe','オオタ':'LUXY OSAKA','オオタくん':'LUXY OSAKA','村上':'薔薇と紳士','お祭り':'Un Secret'}
+};
+function applyTheme(el,theme){if(!theme)return;el.style.setProperty('background',theme.bg,'important');el.style.setProperty('color',theme.fg,'important');el.style.setProperty('border-color',theme.border,'important')}
+function applyShopTheme(el,shop){applyTheme(el,COLOR_THEME.shops[shop==='LUXY'?'LUXY OSAKA':shop])}
+function applyStaffTheme(el,staff){const key=COLOR_THEME.staff[staff];if(key)applyTheme(el,COLOR_THEME.shops[key])}
+let registrationSelectionSync=null;const now=new Date();now.setHours(0,0,0,0);let monthView=new Date(now.getFullYear(),now.getMonth(),1),selected=new Date(now),chosen=null;
+const commonPages=['LINE通知','明日以降','日程調整','面接済み','不届き者','来世期待'];let currentPage='LINE通知',pageNumber=1;const applicantData=Object.fromEntries(commonPages.map(k=>[k,[]]));const testState=new Map();const testExamples=[{name:'あき',shop:'薔薇と紳士',date:'2026-10-27 15:00',staff:'村上',history:[{type:'日程変更',scheduledAt:'2026-10-26 15:00'},{type:'キャンセル',scheduledAt:'2026-10-24 19:00'}]},{name:'noa',shop:'Grand Luxe',date:'2026-10-27 16:00',staff:'オオタ',history:[]},{name:'170♥',shop:'薔薇と紳士',date:'2026-10-27 17:30',staff:'社長',history:[{type:'無断トビ',scheduledAt:'2026-10-20 14:30'}]},{name:'テスト応募者',shop:'Un Secret',date:'2026-10-27 19:00',staff:'社長',history:[{type:'日程変更',scheduledAt:'2026-10-26 19:00'},{type:'無断トビ',scheduledAt:'2026-10-21 18:00'}]}];
+/* Read-only LINE inbox adapter. Do not replace the eight test cards until migration is approved. */
+const lineInboxReadOnly={status:'idle',events:[],links:[],profiles:{},applicants:[],error:''};
+const LINE_SHOPS={rose:'薔薇と紳士',grandluxe:'Grand Luxe',luxy:'LUXY',unsecret:'Un Secret',us:'Un Secret',busty:'BUSTY OSAKA'};
+function normalizeLineInbox(data){
+ const grouped=new Map(),links=new Map();
+ const interviews=new Map((data.interviews||[]).map(x=>[String(x.id),x]));
+ const formStatus=new Map((data.formStatus||[]).map(x=>[String(x.interview_id),String(x.status||'')]));
+ const staff=new Map((data.staff||[]).map(x=>[String(x.user_id),x.display_name]));
+ const history=new Map();
+ for(const h of data.history||[]){const k=String(h.interview_id);if(!history.has(k))history.set(k,[]);history.get(k).push(h)}
+ for(const link of data.links||[]){
+  if(!link.account_id||!link.line_user_id)continue;
+  const key=String(link.account_id)+':'+String(link.line_user_id);
+  if(!links.has(key))links.set(key,[]);
+  links.get(key).push(link)
+ }
+ for(const event of data.events||[]){
+  if(!event.account_id||!event.line_user_id)continue;
+  const account=String(event.account_id),user=String(event.line_user_id),key=account+':'+user;
+  if(!grouped.has(key))grouped.set(key,{accountId:account,lineUserId:user,shop:LINE_SHOPS[account]||account,messages:[]});
+  grouped.get(key).messages.push({text:String(event.message_text??('['+(event.message_type||'メッセージ')+']')),receivedAt:String(event.received_at||'')});
+ }
+ const inactive=new Set(['キャンセル','無断トビ','トビ（キャンセル）','返信なし']);
+ return [...grouped.values()].map(item=>{
+  item.messages.sort((a,b)=>b.receivedAt.localeCompare(a.receivedAt));
+  const key=item.accountId+':'+item.lineUserId,all=links.get(key)||[];
+  const linked=all.map(l=>({link:l,interview:interviews.get(String(l.interview_id))})).filter(x=>x.interview);
+  linked.sort((a,b)=>String(b.interview.interview_date||'').localeCompare(String(a.interview.interview_date||''))||String(b.interview.interview_time||'').localeCompare(String(a.interview.interview_time||'')));
+  const active=linked.find(x=>!inactive.has(x.interview.status));
+  const selected=active||linked[0],link=selected?.link||all[0]||{},profile=data.profiles?.[key]||{};
+  const past=linked.flatMap(x=>{
+   const i=x.interview,events=(history.get(String(i.id))||[]).map(h=>({type:h.event_type||'変更',scheduledAt:[h.original_date,h.original_time].filter(Boolean).join(' '),updatedAt:h.recorded_at||''}));
+   if(inactive.has(i.status)&&!events.some(e=>e.type===i.status))events.push({type:i.status,scheduledAt:[i.interview_date,i.interview_time].filter(Boolean).join(' '),updatedAt:i.updated_at||''});
+   return events
+  }).filter(e=>e.scheduledAt).sort((a,b)=>String(b.updatedAt).localeCompare(String(a.updatedAt)));
+  const date=active?[active.interview.interview_date,active.interview.interview_time].filter(Boolean).join(' '):'';
+  const outcome=active?(formStatus.get(String(active.interview.id))||String(active.interview.status||'')):'';
+  const assignee=active?(staff.get(String(active.interview.interviewer_user_id))||CHART_STAFF_SOURCE.find(x=>x.id===active.interview.interviewer_user_id)?.name||'担当者未登録'):'';
+  return {...item,name:profile.displayName||link.line_display_name||'Unknown',picture:profile.pictureUrl||link.line_picture_url||'',interviewId:active?.interview.id??null,date,staff:assignee,outcome,history:past,lastReceived:item.messages[0]?.receivedAt||''};
+ }).sort((a,b)=>b.lastReceived.localeCompare(a.lastReceived));
+}
+async function refreshLineInboxReadOnly(){
+ const token=localStorage.getItem('interview_staff_session_v2')||sessionStorage.getItem('interview_staff_session_v2');
+ if(!token){lineInboxReadOnly.status='login-required';lineInboxReadOnly.error='session_missing';if(currentPage==='LINE通知'&&!$('sharedPanel').hidden&&$('applicantDetail').hidden)renderList();return false}
+ lineInboxReadOnly.status='loading';
+ try{
+  const response=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access',{
+   method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',
+   body:JSON.stringify({action:'inbox',token})
+  });
+  const data=await response.json();
+  if(response.status===401){lineInboxReadOnly.status='login-required';lineInboxReadOnly.error='unauthorized';lineInboxReadOnly.applicants=[];if(currentPage==='LINE通知'&&!$('sharedPanel').hidden&&$('applicantDetail').hidden)renderList();return false}
+  if(!response.ok)throw new Error(data.error||'inbox_request_failed');
+  lineInboxReadOnly.events=Array.isArray(data.events)?data.events:[];
+  lineInboxReadOnly.links=Array.isArray(data.links)?data.links:[];
+  lineInboxReadOnly.profiles=data.profiles&&typeof data.profiles==='object'?data.profiles:{};
+  lineInboxReadOnly.applicants=normalizeLineInbox(data);lineInboxReadOnly.error='';lineInboxReadOnly.status='ready';syncLineNewCount(currentPage==='LINE通知');updateSidebarCounts();
+  if(liveInterviewLists.status==='ready'&&liveInterviewLists.rows.length){const inboxByLine=new Map(lineInboxReadOnly.applicants.map(x=>[String(x.accountId)+':'+String(x.lineUserId),x]));const pictures=new Map(lineInboxReadOnly.applicants.filter(x=>x.picture).map(x=>[String(x.accountId)+':'+String(x.lineUserId),x.picture]));let changed=false;for(const row of liveInterviewLists.rows){const lineKey=String(row.accountId)+':'+String(row.lineUserId),picture=pictures.get(lineKey),incoming=inboxByLine.get(lineKey)?.messages||[];if(picture&&row.picture!==picture){row.picture=picture;changed=true}if(row.messages?.[0]?.receivedAt!==incoming[0]?.receivedAt){row.messages=incoming;changed=true}}if(changed){if(!$('todayPanel').hidden)renderTodayTest();else if(!$('sharedPanel').hidden&&currentPage!=='LINE通知')renderList()}}
+  window.dispatchEvent(new Event('interview-new-line-data-ready'));if(currentPage==='LINE通知'&&!$('sharedPanel').hidden&&$('applicantDetail').hidden)renderList();
+  return true;
+ }catch(error){lineInboxReadOnly.status='error';lineInboxReadOnly.error=String(error.message||error);console.warn('LINE読み取り接続',error);if(currentPage==='LINE通知'&&!$('sharedPanel').hidden&&$('applicantDetail').hidden)renderList();return false}
+}
+async function loginLineInbox(){
+ const password=window.prompt('面接管理のパスワードを入力してください');
+ if(password===null||!password)return;
+ const note=$('listNote');note.textContent='認証を確認しています…';
+ try{
+  const response=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({action:'login',password})});
+  const data=await response.json();
+  if(!response.ok||!data.token)throw new Error(data.error||'login_failed');
+  localStorage.setItem('interview_staff_session_v2',data.token);
+  sessionStorage.removeItem('interview_staff_session_v2');
+  lineInboxReadOnly.status='idle';lineInboxReadOnly.error='';
+  await refreshLineInboxReadOnly();
+ }catch(error){
+  lineInboxReadOnly.status='login-required';lineInboxReadOnly.error=String(error.message||error);
+  renderList();
+ }
+}
+window.interviewNewLineReadOnly={refresh:refreshLineInboxReadOnly,status:()=>lineInboxReadOnly.status,summary:()=>({events:lineInboxReadOnly.events.length,links:lineInboxReadOnly.links.length,profiles:Object.keys(lineInboxReadOnly.profiles).length,applicants:lineInboxReadOnly.applicants.length}),applicants:()=>lineInboxReadOnly.applicants.map(a=>({...a,messages:a.messages.map(m=>({...m}))}))};
+let detailReturn=null;
+function detailEntry(parent,title,content,kind='',time=''){const el=document.createElement('div');el.className='detail-entry '+kind;if(time){const t=document.createElement('time');t.textContent=time;el.append(t)}const heading=document.createElement('strong');heading.textContent=title;el.append(heading);const body=document.createElement('div');body.textContent=content;el.append(body);parent.append(el)}
+function updateDetailReasons(record){
+ const reasonBox=$('detailReason'),title=$('detailReasonTitle'),values=$('detailReasonValues');
+ const rejected=Array.isArray(record.rejectionReasons)?record.rejectionReasons.filter(Boolean):[];
+ const afterlife=afterlifeList.items.find(x=>String(x.account_id)===String(record.accountId)&&String(x.line_user_id)===String(record.lineUserId));
+ const reasons=rejected.length?rejected:Array.isArray(afterlife?.reasons)?afterlife.reasons:[];
+ reasonBox.hidden=!reasons.length;title.textContent=rejected.length?'不採用理由':'来世期待理由';values.textContent=reasons.join(' ／ ');
+}
+function openApplicantDetail(record,key){if(!$('applicantDetail').hidden)return;const detailAvatar=$('detailAvatar');detailAvatar.replaceChildren();if(record.picture&&/^https:\/\//.test(record.picture)){const img=document.createElement('img');img.src=record.picture;img.alt='LINEアイコン';img.referrerPolicy='no-referrer';img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%';img.onerror=()=>{detailAvatar.textContent='LINE'};detailAvatar.append(img)}else detailAvatar.textContent='LINE';detailReturn={home:!$('todayPanel').hidden,page:currentPage,number:pageNumber,scroll:window.scrollY};$('todayPanel').hidden=true;$('sharedPanel').hidden=true;$('applicantDetail').hidden=false;$('detailName').textContent=record.name||'Unknown';$('detailShop').textContent=record.shop||'';applyShopTheme($('detailShop'),record.shop||'');updateDetailReasons(record);const isUnscheduled=['日程未定','日程調整中','キャンセル'].includes(record.status);$('detailDate').textContent=isUnscheduled?'日程未定':(record.date||'面接予定なし');$('detailStaff').textContent=isUnscheduled?'':(record.staff?'担当：'+record.staff:'');const state=testState.get(key)||{};$('detailConfirm').textContent=state.ok?'確認OK':state.sent?'送信済み':'未確認';$('detailConfirm').className=state.ok?'detail-confirm-ok':'';const line=$('detailLine');line.replaceChildren();const inboxMatch=lineInboxReadOnly.applicants.find(a=>String(a.accountId)===String(record.accountId)&&String(a.lineUserId)===String(record.lineUserId));const messages=(record.messages&&record.messages.length?record.messages:inboxMatch?.messages)||[];if(messages.length){for(const msg of messages){detailEntry(line,'受信メッセージ',msg.text||'', '',msg.receivedAt||'')}}else{const empty=document.createElement('p');empty.className='detail-empty';empty.textContent='LINE受信履歴は未連携です';line.append(empty)}const history=$('detailHistory');history.replaceChildren();const entries=(record.history||[]).filter(e=>e&&typeof e==='object'&&!Array.isArray(e)&&e.scheduledAt).slice().sort((a,b)=>(b.updatedAt||b.scheduledAt).localeCompare(a.updatedAt||a.scheduledAt));detailEntry(history,'面接登録',record.date+'　'+(record.shop||'')+'　担当：'+(record.staff||''),'registered');for(const e of entries){const type=e.type==='変更'?'日程変更':e.type==='キャン'?'キャンセル':e.type;const kind=type==='日程変更'?'changed':type==='キャンセル'?'cancel':type==='無断トビ'?'no-show':'';const content=type==='日程変更'?'変更前：'+e.scheduledAt+(e.newScheduledAt?' → 変更後：'+e.newScheduledAt:''): '対象：'+e.scheduledAt;detailEntry(history,type,content,kind,e.updatedAt||'')}window.scrollTo(0,0)}
+function closeApplicantDetail(){if(!detailReturn)return;const back=detailReturn;$('applicantDetail').hidden=true;if(back.home){$('todayPanel').hidden=false;$('sharedPanel').hidden=true}else{currentPage=back.page;pageNumber=back.number;$('todayPanel').hidden=true;$('sharedPanel').hidden=false;renderList()}detailReturn=null;window.scrollTo(0,back.scroll)}
+/* Per-list test controls. Disabled buttons retain their dimensions. */
+const LIST_BUTTON_POLICY={
+ 'LINE通知':['register','future'],
+ '今日の予定':['send','ok','change','cancel'],
+ '明日以降':['change','cancel','future'],
+ '日程調整':['change'],
+ '面接済み':[],
+ '不届き者':['change'],
+ '来世期待':['change']
+};
+function allowListButton(page,id){return (LIST_BUTTON_POLICY[page]||[]).includes(id)}
+/* Shared visual structure for LINE and all test-list applicant cards. */
+function makeCardInformation(record){
+ const history=document.createElement('div');history.className='history-labels live-line-content';
+ const tags=document.createElement('div');tags.className='live-line-history';
+ const allEntries=(record.history||[]).map(e=>Array.isArray(e)?{type:e[0],scheduledAt:e[1]}:e).filter(e=>e&&e.type&&e.scheduledAt).sort((a,b)=>(b.updatedAt||b.scheduledAt).localeCompare(a.updatedAt||a.scheduledAt));const counts={'日程変更':0,'キャンセル':0,'無断トビ':0};
+ const countedEvents=new Map();for(const entry of allEntries){const type=entry.type==='変更'?'日程変更':entry.type==='キャン'?'キャンセル':entry.type;if(!Object.prototype.hasOwnProperty.call(counts,type))continue;const key=type+'|'+entry.scheduledAt;const at=Date.parse(entry.updatedAt||'');const prior=countedEvents.get(key);if(Number.isFinite(at)&&Number.isFinite(prior)&&Math.abs(at-prior)<2000)continue;counts[type]++;countedEvents.set(key,at);}
+ for(const type of ['日程変更','キャンセル','無断トビ']){if(!counts[type])continue;const tag=document.createElement('span');tag.className='history-tag'+(type==='キャンセル'?' cancel':type==='無断トビ'?' no-show':'');tag.textContent=type+'　'+counts[type]+'回';tag.title=type+'：'+counts[type]+'回';tags.append(tag)}
+ const preview=document.createElement('span');preview.className='live-line-preview';preview.textContent=String(record.messages?.[0]?.text||'').split(/\r?\n/)[0];preview.title=record.messages?.[0]?.text||'';
+ history.append(tags,preview);return history
+}
+function makeTestCard(record,key){const state=testState.get(key)||{sent:false,ok:false,selected:''};testState.set(key,state);const card=document.createElement('article');card.className='applicant unified-applicant-card'+(state.ok?' confirmed':state.sent?' sent':'');const avatar=document.createElement('div');avatar.className='avatar';avatar.textContent='LINE';const identity=document.createElement('div');identity.className='identity';const name=document.createElement('strong');name.textContent=record.name;const store=document.createElement('small');store.className='shop-label';store.textContent=key.startsWith('不届き者:')?'不届き者':record.shop;identity.append(name,store);applyShopTheme(store,record.shop);avatar.tabIndex=0;name.tabIndex=0;avatar.setAttribute('role','button');name.setAttribute('role','button');avatar.setAttribute('aria-label','応募者詳細を開く');name.setAttribute('aria-label','応募者詳細を開く');for(const el of [avatar,name]){el.onclick=()=>openApplicantDetail(record,key);el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openApplicantDetail(record,key)}}}const date=document.createElement('div');date.className='interview-datetime';const when=document.createElement('strong');when.textContent=record.date;const staff=document.createElement('span');staff.textContent='担当：'+record.staff;date.append(when,staff);applyStaffTheme(staff,record.staff);if(!record.date){when.textContent='日程未定';date.classList.add('live-date-pending')}const confirmations=document.createElement('div');confirmations.className='confirmation-controls';const send=document.createElement('button');send.textContent=state.sent?'送信済み':'LINE送信';send.className=state.sent?'sent-btn':'';send.disabled=!allowListButton(key.startsWith('today:')?'今日の予定':currentPage,'send');send.onclick=()=>{state.sent=!state.sent;send.textContent=state.sent?'送信済み':'LINE送信';send.classList.toggle('sent-btn',state.sent);card.classList.toggle('sent',state.sent&&!state.ok)};const ok=document.createElement('button');ok.textContent='確認OK';ok.className='ok-btn'+(state.ok?' is-ok':'');ok.disabled=!allowListButton(key.startsWith('today:')?'今日の予定':currentPage,'ok');ok.onclick=()=>{state.ok=!state.ok;ok.classList.toggle('is-ok',state.ok);card.classList.toggle('confirmed',state.ok);card.classList.toggle('sent',state.sent&&!state.ok)};confirmations.append(send,ok);const history=makeCardInformation(record);
+const actions=document.createElement('div');actions.className='card-actions';for(const [id,label,color] of [['register','面接登録','#568DB9'],['change','日程変更','#D99A54'],['cancel','キャンセル','#CD7580'],['future','来世期待','#A65A68']]){const b=document.createElement('button');b.textContent=label;b.style.setProperty('--btn-color',color);b.disabled=!allowListButton(key.startsWith('today:')?'今日の予定':currentPage,id);b.classList.toggle('pressed',state.selected===id);b.onclick=()=>{state.selected=id;actions.querySelectorAll('button').forEach(x=>x.classList.toggle('pressed',x===b))};actions.append(b)}card.append(avatar,identity,date,confirmations,history,actions);return card}
+function openRescheduleChoice(record){
+ document.getElementById('reschedule-choice-modal')?.remove();
+ const origin=currentPage==='今日の予定'?'今日の予定':currentPage;
+ const overlay=document.createElement('div');overlay.id='reschedule-choice-modal';overlay.setAttribute('role','presentation');overlay.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.38);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+ const dialog=document.createElement('section');dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');dialog.setAttribute('aria-label','日程変更');dialog.style.cssText='width:min(360px,100%);background:#fff;border-radius:12px;box-shadow:0 18px 55px rgba(0,0,0,.24);padding:20px;color:#1e293b';
+ const heading=document.createElement('h2');heading.textContent='日程変更';heading.style.cssText='margin:0 0 10px;font-size:17px';
+ const details=document.createElement('p');details.textContent=[record.name,record.shop,record.date,'担当：'+record.staff].filter(Boolean).join(' ／ ');details.style.cssText='font-size:12px;line-height:1.6;color:#64748b;margin:0 0 18px;overflow-wrap:anywhere';
+ const choices=document.createElement('div');choices.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:10px';
+ const close=()=>{document.removeEventListener('keydown',onKey);overlay.remove()};
+ const onKey=e=>{if(e.key==='Escape')close()};document.addEventListener('keydown',onKey);
+ overlay.onclick=e=>{if(e.target===overlay)close()};
+ for(const [label,color,bg] of [['変更','#d99a54','#fff8ef'],['未定','#d9778c','#fff0f4'],['修正','#568db9','#eff6fc'],['戻る','#8b95a3','#f5f6f8']]){const button=document.createElement('button');button.type='button';button.textContent=label;button.style.cssText='min-height:44px;padding:12px;border-radius:7px;border:1px solid '+color+';background:'+bg+';color:'+color+';font-weight:700;cursor:pointer';button.onclick=()=>{close();if(label==='戻る')return;if(label==='未定')return markInterviewPending(record,origin);openPendingActionPage('面接登録',record,label,origin)};choices.append(button)}
+ dialog.append(heading,details,choices);overlay.append(dialog);document.body.append(overlay);choices.querySelector('button')?.focus();
+}
+async function markInterviewPending(record,origin){
+ if(!confirm(record.name+' の面接を日程未定に変更しますか？'))return;
+ const token=localStorage.getItem('interview_staff_session_v2')||sessionStorage.getItem('interview_staff_session_v2');if(!token){alert('再ログインしてください');return}
+ try{const res=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'reschedule_linked_interview',token,mode:'未定',interview_id:record.interviewId,account_id:record.accountId,line_user_id:record.lineUserId})});const data=await res.json();if(!res.ok||!data.ok)throw Error(data.error||'保存できません');await refreshInterviewLists();showCommon('日程調整')}catch(e){alert('日程未定への変更に失敗しました：'+e.message)}
+}
+function openPendingActionPage(label,record,mode='登録',returnPage=null){
+ const panel=$('registrationPanel');if(!panel)return;
+ panel.replaceChildren();panel.hidden=false;$('sharedPanel').hidden=true;$('todayPanel').hidden=true;$('applicantDetail').hidden=true;
+ const wrap=document.createElement('section');wrap.className='main-panel';
+ const titleRow=document.createElement('div');titleRow.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%';
+ const heading=document.createElement('h1');heading.textContent=label;heading.style.margin='0';
+ const titleBack=document.createElement('button');titleBack.type='button';titleBack.textContent='戻る';titleBack.style.cssText='padding:7px 16px;border:1px solid #cbd5e1;border-radius:6px;background:#f8fafc;color:#17283e;cursor:pointer;flex:none';
+ titleBack.onclick=()=>returnPage==='今日の予定'?showHome():showCommon(returnPage||'LINE通知');titleRow.append(heading,titleBack);wrap.append(titleRow);
+ if(label!=='面接登録'){panel.append(wrap);return openLegacyPendingAction(label,record,panel,wrap);}
+ const layout=document.createElement('div');layout.className='registration-layout';
+ const left=document.createElement('section');left.className='registration-left';
+ const meta=document.createElement('div');meta.className='registration-meta';
+ const avatar=document.createElement('div');avatar.className='registration-avatar';
+ if(record.picture&&/^https:\/\//.test(record.picture)){const img=document.createElement('img');img.src=record.picture;img.alt='LINEアイコン';img.referrerPolicy='no-referrer';avatar.append(img)}else avatar.textContent='LINE';
+ const info=(caption,value)=>{const el=document.createElement('div');el.className='registration-info';const c=document.createElement('small');c.textContent=caption;const v=document.createElement('strong');v.textContent=value||'—';el.append(c,v);return el};
+ const identity=document.createElement('div');identity.className='identity';const displayName=document.createElement('strong');displayName.textContent=record.name||'Unknown';const store=document.createElement('small');store.className='shop-label';store.textContent=record.shop||'—';applyShopTheme(store,record.shop);identity.append(displayName,store);meta.append(avatar,identity);
+ const history=document.createElement('button');history.type='button';history.className='registration-history-toggle';history.textContent='過去履歴';
+ meta.append(history);left.append(meta);
+ const past=document.createElement('div');past.className='registration-past';past.hidden=true;past.textContent='過去履歴の詳細はデータ連携後に表示します。';history.onclick=()=>{past.hidden=!past.hidden};left.append(past);
+ const historyTitle=document.createElement('h2');historyTitle.textContent='LINE履歴';historyTitle.className='registration-subtitle';left.append(historyTitle);
+ const messages=document.createElement('div');messages.className='registration-messages';messages.setAttribute('aria-label','LINEメッセージ履歴');
+ const inboxMatch=lineInboxReadOnly.applicants.find(a=>a.accountId===record.accountId&&a.lineUserId===record.lineUserId);const raw=record.messages?.length?record.messages:(inboxMatch?.messages||record.lineMessages||record.messageHistory);
+ if(Array.isArray(raw)&&raw.length){raw.forEach(item=>{const bubble=document.createElement('div');bubble.className='registration-message'+((item.direction==='outbound'||item.sender==='staff')?' outgoing':'');bubble.textContent=item.text||item.message||'';messages.append(bubble)})}
+ else {const empty=document.createElement('p');empty.className='status';empty.textContent='LINE履歴を読み込み可能なデータがありません。';messages.append(empty)}
+ left.append(messages);
+ const right=document.createElement('section');right.className='registration-right';
+ const rightTitle=document.createElement('h2');rightTitle.className='registration-subtitle';rightTitle.textContent=mode==='登録'?'登録内容':mode+'内容';right.append(rightTitle);
+ const form=document.createElement('form');form.className='registration-form';
+ const field=(title,type,value,required=false)=>{const lab=document.createElement('label');lab.textContent=title;const input=document.createElement('input');input.type=type;input.value=value||'';input.required=required;lab.append(input);form.append(lab);return input};
+ const shop=field('店舗名','text',record.shop||'',true);shop.readOnly=true;
+ const name=field('応募者名','text',record.name==='Unknown'?'':record.name||'',true);
+ const date=field('面接日','text','',true);date.readOnly=true;date.placeholder='上部カレンダーから選択';
+ const time=field('面接開始時間','text','',true);time.readOnly=true;time.placeholder='上部タイムチャートから選択';
+ const syncChosen=()=>{date.value=dateKey(selected);time.value=chosen?chosen.match(/\d{2}:\d{2}/)?.[0]||'':'';staff.value=chosen?chosen.replace(/\s+\d{2}:\d{2}$/,''):''};registrationSelectionSync=syncChosen;
+ const lab=document.createElement('label');lab.textContent='担当者';const staff=document.createElement('select');staff.required=true;
+ for(const v of ['','社長','オオタ','村上','お祭り']){const opt=document.createElement('option');opt.value=v;opt.textContent=v||'担当者を選択';staff.append(opt)}lab.append(staff);form.append(lab);syncChosen();
+ const note=document.createElement('p');note.className='status';note.textContent='日時は上部カレンダーとタイムチャートから選択してください。';
+ const preview=document.createElement('button');preview.type='submit';preview.textContent=mode==='登録'?'面接登録':mode+'を確定';preview.className='registration-preview';
+ form.append(note,preview);let saving=false;form.onsubmit=async e=>{e.preventDefault();if(saving)return;
+  const selectedStaff=CHART_STAFF_SOURCE.find(x=>x.name===staff.value);
+  if(!chosen||!selectedStaff||!date.value||!time.value||chosen!==staff.value+' '+time.value){note.textContent='上部タイムチャートで担当者と時間を選択してください。';return}
+  if(!record.accountId||!record.lineUserId){note.textContent='LINE応募者との紐付け情報がありません。保存できません。';return}
+  const token=localStorage.getItem('interview_staff_session_v2')||sessionStorage.getItem('interview_staff_session_v2');
+  if(!token){note.textContent='認証が必要です。LINE通知一覧でログインしてください。';return}
+  saving=true;preview.disabled=true;note.textContent='面接を登録しています…';
+  try{
+   const response=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({action:mode==='登録'?'create_linked_interview':'reschedule_linked_interview',mode,interview_id:record.interviewId,token,account_id:record.accountId,line_user_id:record.lineUserId,line_display_name:name.value,shop:shop.value,interview_date:date.value,interview_time:time.value,interviewer_user_id:selectedStaff.id})});
+   const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'登録に失敗しました');
+   registrationSelectionSync=null;await refreshLineInboxReadOnly();await refreshInterviewLists();await refreshChartAvailability();
+   if(date.value===dateKey(new Date()))showHome();else showCommon('明日以降');
+  }catch(error){note.textContent='保存できませんでした：'+String(error.message||error);preview.disabled=false;saving=false}
+ };
+ right.append(form);layout.append(left,right);wrap.append(layout);panel.append(wrap);
+}
+function openLegacyPendingAction(label,record,panel,wrap){
+ const form=document.createElement('form');form.style.cssText='display:grid;gap:12px;max-width:540px;margin-top:16px';
+ const lab=document.createElement('label');lab.textContent='理由・メモ';lab.style.cssText='display:grid;gap:5px;font-size:13px;font-weight:600';
+ const reason=document.createElement('textarea');reason.rows=3;lab.append(reason);form.append(lab);
+ const note=document.createElement('p');note.className='status';note.textContent='現在は入力内容の確認までです。データベースへの登録・移動は行いません。';
+ const preview=document.createElement('button');preview.type='submit';preview.textContent='入力内容を確認';
+ form.append(note,preview);form.onsubmit=e=>{e.preventDefault();note.textContent='理由・メモ：'+(reason.value||'未入力')+'（未保存）'};
+ wrap.append(form);panel.append(wrap);
+}
+function openAfterlifeReasonChoice(record){
+ document.getElementById('afterlife-reason-choice')?.remove();
+ const reasons=['報酬条件NG','年齢条件NG','デブ・ガリNG','勤務場所NG','業種業態NG','コミュ障害NG','過去履歴NG','業者FUCK'];
+ const overlay=document.createElement('div');overlay.id='afterlife-reason-choice';overlay.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.42);z-index:10020;display:flex;align-items:center;justify-content:center;padding:16px';
+ const dialog=document.createElement('section');dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');dialog.setAttribute('aria-label','来世期待の理由選択');dialog.style.cssText='width:min(460px,100%);background:#fff;border-radius:12px;padding:20px;color:#1e293b;box-shadow:0 18px 55px rgba(0,0,0,.24)';
+ const heading=document.createElement('h2');heading.textContent='来世期待 — 理由選択';heading.style.cssText='font-size:17px;margin:0 0 7px';const applicant=document.createElement('p');applicant.textContent=[record.name,record.shop].filter(Boolean).join(' ／ ');applicant.style.cssText='font-size:12px;color:#64748b;margin:0 0 12px';
+ const help=document.createElement('p');help.textContent='該当する項目を選択してください（複数選択可）';help.style.cssText='font-size:12px;margin:0 0 12px';
+ const choices=document.createElement('div');choices.style.cssText='display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px';const checked=new Set();
+ const confirmButton=document.createElement('button');confirmButton.type='button';confirmButton.textContent='選択内容を確認';confirmButton.disabled=true;confirmButton.style.cssText='padding:10px 12px;border:0;border-radius:7px;background:#A65A68;color:#fff;font-weight:700;cursor:pointer';
+ for(const reason of reasons){const label=document.createElement('label');label.style.cssText='display:flex;align-items:center;gap:7px;border:1px solid #d9dfe7;border-radius:7px;padding:10px 8px;font-size:12px;cursor:pointer;min-width:0';const input=document.createElement('input');input.type='checkbox';input.value=reason;input.style.cssText='accent-color:#A65A68;flex:none';const text=document.createElement('span');text.textContent=reason;label.append(input,text);input.onchange=()=>{if(input.checked)checked.add(reason);else checked.delete(reason);confirmButton.disabled=checked.size===0;label.style.borderColor=input.checked?'#A65A68':'#d9dfe7';label.style.background=input.checked?'#fcf1f3':'#fff'};choices.append(label)}
+ const actions=document.createElement('div');actions.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px';const back=document.createElement('button');back.type='button';back.textContent='戻る';back.style.cssText='padding:10px;border:1px solid #cbd5e1;border-radius:7px;background:#f8fafc;color:#475569;cursor:pointer';
+ const close=()=>{document.removeEventListener('keydown',onKey);overlay.remove()};const onKey=e=>{if(e.key==='Escape')close()};document.addEventListener('keydown',onKey);overlay.onclick=e=>{if(e.target===overlay)close()};back.onclick=close;
+ confirmButton.onclick=async()=>{if(!checked.size)return;const selected=reasons.filter(x=>checked.has(x));if(!confirm('来世期待に登録しますか？\\n理由：'+selected.join('、')))return;const token=localStorage.getItem('interview_staff_session_v2')||sessionStorage.getItem('interview_staff_session_v2');if(!token){alert('ログインし直してください');return}if(!record.accountId||!record.lineUserId){alert('LINE連携情報がないため登録できません');return}confirmButton.disabled=true;back.disabled=true;confirmButton.textContent='保存中…';try{const response=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-afterlife',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token,account_id:record.accountId,line_user_id:record.lineUserId,display_name:record.name,picture_url:record.picture||null,reasons:selected})});const result=await response.json();if(!response.ok||!result.ok)throw Error(result.error||'保存エラー');close();await refreshAfterlifeList();alert('来世期待に保存しました')}catch(error){alert('保存できませんでした：'+error.message);confirmButton.disabled=false}finally{back.disabled=false;confirmButton.textContent='選択内容を確認'}};
+ actions.append(back,confirmButton);dialog.append(heading,applicant,help,choices,actions);overlay.append(dialog);document.body.append(overlay);
+}
+function openTodayCancelChoice(record,button){
+ document.getElementById('today-cancel-choice')?.remove();
+ const overlay=document.createElement('div');overlay.id='today-cancel-choice';overlay.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:10010;display:flex;align-items:center;justify-content:center;padding:16px';
+ const dialog=document.createElement('section');dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');dialog.setAttribute('aria-label','キャンセル理由を選択');dialog.style.cssText='width:min(360px,100%);background:#fff;border-radius:12px;padding:20px;box-shadow:0 18px 55px rgba(0,0,0,.24)';
+ const heading=document.createElement('h2');heading.textContent='キャンセル理由を選択';heading.style.cssText='font-size:17px;margin:0 0 8px';const info=document.createElement('p');info.textContent=record.name+' ／ '+record.date;info.style.cssText='font-size:12px;color:#64748b;margin:0 0 16px';
+ const actions=document.createElement('div');actions.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px';let busy=false;
+ const close=()=>{if(!busy){document.removeEventListener('keydown',onKey);overlay.remove()}};const onKey=e=>{if(e.key==='Escape')close()};document.addEventListener('keydown',onKey);overlay.onclick=e=>{if(e.target===overlay)close()};
+ for(const [kind,description,color] of [['キャンセル','日程調整へ移動','#CD7580'],['無断トビ','不届き者へ移動','#A65A68']]){const b=document.createElement('button');b.type='button';b.style.cssText='padding:12px 5px;border:1px solid '+color+';border-radius:7px;background:#fff;color:'+color+';font-weight:700;cursor:pointer';b.textContent=kind; b.title=description;b.onclick=async()=>{if(busy)return;if(!confirm(kind+'として確定しますか？\\n'+description+'・履歴に記録します。'))return;busy=true;actions.querySelectorAll('button').forEach(x=>x.disabled=true);try{const token=localStorage.getItem('interview_staff_session_v2')||sessionStorage.getItem('interview_staff_session_v2');if(!token)throw Error('再ログインしてください');const response=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-today-classify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token,interview_id:record.interviewId,account_id:record.accountId,line_user_id:record.lineUserId,kind})});const data=await response.json();if(!response.ok||!data.ok)throw Error(data.error||'保存失敗');busy=false;close();await refreshLineInboxReadOnly();await refreshInterviewLists();if(kind==='キャンセル')showCommon('日程調整');else showCommon('不届き者')}catch(e){busy=false;actions.querySelectorAll('button').forEach(x=>x.disabled=false);alert('保存できませんでした：'+e.message)}};actions.append(b)}
+ const back=document.createElement('button');back.type='button';back.textContent='戻る';back.style.cssText='margin-top:12px;width:100%;padding:8px;background:#f1f5f9;border:1px solid #cbd5e1;border-radius:7px';back.onclick=close;dialog.append(heading,info,actions,back);overlay.append(dialog);document.body.append(overlay);
+}
+const pendingCancelRequests=new Set();
+async function cancelLiveInterview(record,button){
+ if(pendingCancelRequests.has(String(record.interviewId)))return;
+ if(!record.interviewId||!record.accountId||!record.lineUserId){alert('面接とLINEアカウントの紐付けが確認できないため操作できません。');return}
+ if(!confirm(record.name+' の面接をキャンセルしますか？\\n元の面接日時は履歴に保存されます。'))return;
+ const token=localStorage.getItem('interview_staff_session_v2')||sessionStorage.getItem('interview_staff_session_v2');
+ if(!token){alert('再ログインしてください。');return}
+ pendingCancelRequests.add(String(record.interviewId));button.disabled=true;
+ try{const response=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'cancel_linked_interview',token,interview_id:record.interviewId,account_id:record.accountId,line_user_id:record.lineUserId})});const data=await response.json();if(!response.ok)throw Error(data.error||'cancel_failed');await refreshLineInboxReadOnly();await refreshInterviewLists();}
+ catch(error){alert('キャンセルの保存に失敗しました：'+error.message);button.disabled=false}
+ finally{pendingCancelRequests.delete(String(record.interviewId))}
+}
+function makeLiveLineCard(record){
+ const card=document.createElement('article');card.className='applicant live-line-card unified-applicant-card';
+ const avatar=document.createElement('div');avatar.className='avatar';
+ if(record.picture&&/^https:\/\//.test(record.picture)){const img=document.createElement('img');img.src=record.picture;img.alt='LINEアイコン';img.referrerPolicy='no-referrer';avatar.append(img)}else avatar.textContent='LINE';
+ const identity=document.createElement('div');identity.className='identity';
+ const name=document.createElement('strong');name.textContent=record.name;
+ const store=document.createElement('small');store.className='shop-label';store.textContent=record.shop;identity.append(name,store);applyShopTheme(store,record.shop);
+ for(const el of [avatar,name]){el.tabIndex=0;el.setAttribute('role','button');el.onclick=()=>openApplicantDetail(record,'live:'+record.accountId+':'+record.lineUserId);el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();el.click()}}}
+ const date=document.createElement('div');date.className='interview-datetime';const last=document.createElement('strong');
+ const caption=document.createElement('span');
+ if(['採用','不採用','辞退'].includes(record.outcome)){last.textContent=record.outcome;caption.textContent=[record.date,record.staff?'担当：'+record.staff:''].filter(Boolean).join(' ／ ');date.classList.add('outcome-'+({'採用':'hired','不採用':'rejected','辞退':'withdrawn'}[record.outcome]))}
+ else if(record.date&&record.staff){last.textContent=record.date;caption.textContent='担当：'+record.staff}
+ else{last.textContent='日程未定';caption.textContent=record.lastReceived?'最終LINE：'+new Date(record.lastReceived).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'}):'最終LINE受信なし';date.classList.add('live-date-pending')}
+ date.append(last,caption);if(record.staff&&!['採用','不採用','辞退'].includes(record.outcome))applyStaffTheme(caption,record.staff);
+ const controls=document.createElement('div');controls.className='confirmation-controls';
+ for(const label of ['LINE送信','確認OK']){const b=document.createElement('button');b.textContent=label;b.disabled=true;controls.append(b)}
+ const history=makeCardInformation(record);
+ const actions=document.createElement('div');actions.className='card-actions';
+ for(const [label,color] of [['面接登録','#568DB9'],['日程変更','#D99A54'],['キャンセル','#CD7580'],['来世期待','#A65A68']]){const b=document.createElement('button');b.textContent=label;b.style.setProperty('--btn-color',color);b.disabled=!(label==='面接登録'||label==='来世期待')||(label==='面接登録'&&Boolean(record.interviewId));if(!b.disabled){b.title='操作画面を開きます';b.onclick=()=>label==='キャンセル'?(currentPage==='今日の予定'?openTodayCancelChoice(record,b):cancelLiveInterview(record,b)):label==='日程変更'?openRescheduleChoice(record):label==='面接登録'?openPendingActionPage('面接登録',record,'登録',currentPage):openAfterlifeReasonChoice(record)}else b.title=label==='面接登録'&&record.interviewId?'面接登録済み':'実データの操作連携は未完了です';actions.append(b)}
+ card.append(avatar,identity,date,controls,history,actions);return card
+}
+const afterlifeList={status:'idle',items:[],error:''};
+async function refreshAfterlifeList(){
+ const token=localStorage.getItem('interview_staff_session_v2')||sessionStorage.getItem('interview_staff_session_v2');
+ if(!token){afterlifeList.status='login-required';return false}
+ try{const response=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-afterlife',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({action:'list',token})});const data=await response.json();if(!response.ok||!data.ok)throw Error(data.error||'list_failed');afterlifeList.items=data.items||[];afterlifeList.status='ready';afterlifeList.error='';if(currentPage==='来世期待')renderList();else updateSidebarCounts();return true}catch(e){afterlifeList.status='error';afterlifeList.error=e.message;if(currentPage==='来世期待')renderList();return false}
+}
+function makeAfterlifeCard(item){
+ const card=document.createElement('article');card.className='applicant live-line-card unified-applicant-card';
+ const avatar=document.createElement('div');avatar.className='avatar';if(item.picture_url&&/^https:\/\//.test(item.picture_url)){const img=document.createElement('img');img.src=item.picture_url;img.alt='LINEアイコン';img.referrerPolicy='no-referrer';avatar.append(img)}else avatar.textContent='LINE';
+ const identity=document.createElement('div');identity.className='identity';const name=document.createElement('strong');name.textContent=item.display_name||'応募者名未登録';const store=document.createElement('small');store.className='shop-label';store.textContent=LINE_SHOPS[item.account_id]||item.account_id;applyShopTheme(store,store.textContent);identity.append(name,store);
+ const detail=document.createElement('div');detail.className='interview-datetime';const title=document.createElement('strong');title.textContent='来世期待';const reason=document.createElement('span');reason.textContent=(item.reasons||[]).join(' ／ ');detail.append(title,reason);
+ const date=document.createElement('div');date.className='card-history';date.textContent=item.registered_at?'登録：'+new Date(item.registered_at).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'}):'';
+ card.append(avatar,identity,detail,date);for(const el of [avatar,name]){el.tabIndex=0;el.setAttribute('role','button');el.onclick=()=>{const record=lineInboxReadOnly.applicants.find(x=>x.accountId===item.account_id&&x.lineUserId===item.line_user_id);if(record)openApplicantDetail(record,'live:'+record.accountId+':'+record.lineUserId)}}
+ return card
+}
+const liveInterviewLists={status:'idle',rows:[],error:''};
+async function refreshInterviewLists(){
+ const token=localStorage.getItem('interview_staff_session_v2')||sessionStorage.getItem('interview_staff_session_v2');
+ if(!token){liveInterviewLists.status='login-required';return false}
+ try{const response=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({action:'interview_lists',token})});const data=await response.json();if(!response.ok)throw Error(data.error||'list_failed');
+ const lineApplicantLookup=new Map(lineInboxReadOnly.applicants.map(x=>[String(x.accountId)+':'+String(x.lineUserId),x]));const profileLookup=new Map(lineInboxReadOnly.applicants.map(x=>[String(x.accountId)+':'+String(x.lineUserId),x.picture]));const links=new Map((data.links||[]).map(x=>[String(x.interview_id),x]));const forms=new Map((data.forms||[]).map(x=>[String(x.id),x]));const formLinks=new Map((data.formLinks||[]).map(x=>[String(x.interview_id),forms.get(String(x.interview_applicant_id))]));const staff=new Map((data.staff||[]).map(x=>[String(x.user_id),x.display_name]));const histories=new Map();for(const h of data.history||[]){const id=String(h.interview_id);if(!histories.has(id))histories.set(id,[]);histories.get(id).push({type:h.event_type,scheduledAt:[h.original_date,h.original_time].filter(Boolean).join(' '),updatedAt:h.recorded_at||''})}
+ liveInterviewLists.rows=(data.interviews||[]).map(x=>{const link=links.get(String(x.id)),form=formLinks.get(String(x.id)),status=form?.status||x.status;return {interviewId:x.id,name:form?.name||link?.line_display_name||'応募者名未登録',shop:x.shop,date:[x.interview_date,x.interview_time].filter(Boolean).join(' '),staff:staff.get(String(x.interviewer_user_id))||CHART_STAFF_SOURCE.find(v=>v.id===x.interviewer_user_id)?.name||'担当者未登録',status,updatedAt:x.updated_at||'',confirmed:!!x.confirmed,confirmationLineSent:!!x.confirmation_line_sent,history:lineApplicantLookup.get(String(link?.account_id)+':'+String(link?.line_user_id))?.history?.length?lineApplicantLookup.get(String(link?.account_id)+':'+String(link?.line_user_id)).history:(histories.get(String(x.id))||[]),accountId:link?.account_id,lineUserId:link?.line_user_id,picture:profileLookup.get(String(link?.account_id)+':'+String(link?.line_user_id))||link?.line_picture_url||'',messages:lineInboxReadOnly.applicants.find(a=>String(a.accountId)===String(link?.account_id)&&String(a.lineUserId)===String(link?.line_user_id))?.messages||[]}});liveInterviewLists.status='ready';liveInterviewLists.error='';updateSidebarCounts();renderChart();
+ if(!$('todayPanel').hidden)renderTodayTest();else if(!$('sharedPanel').hidden&&currentPage!=='LINE通知')renderList();return true;
+ }catch(e){liveInterviewLists.status='error';liveInterviewLists.error=e.message;if(!$('todayPanel').hidden)renderTodayTest();else if(!$('sharedPanel').hidden&&currentPage!=='LINE通知')renderList();return false}
+}
+const UNSCHEDULED_EXPIRY_MS=7*24*60*60*1000;
+function isExpiredUnscheduled(record){
+ if(!['日程未定','日程調整中'].includes(record.status))return false;
+ const timestamp=Date.parse(record.updatedAt||'');
+ return Number.isFinite(timestamp)&&Date.now()-timestamp>=UNSCHEDULED_EXPIRY_MS;
+}
+function recordsForLivePage(page){
+ const today=dateKey(new Date());
+ return liveInterviewLists.rows.filter(r=>{
+  const day=r.date.slice(0,10),done=['来店済み','採用','不採用','辞退','在籍','入店'].includes(r.status);
+  const closed=['キャンセル','無断トビ','トビ（キャンセル）','返信なし'].includes(r.status);
+  const unscheduled=['日程未定','日程調整中'].includes(r.status);
+  const expired=isExpiredUnscheduled(r);
+  if(page==='今日の予定')return day===today&&!done&&!closed&&!unscheduled;
+  if(page==='明日以降')return day>today&&!done&&!closed&&!unscheduled;
+  if(page==='面接済み')return done;
+  if(page==='日程調整'||page==='日程変更')return unscheduled&&!expired&&!done;
+  if(page==='不届き者')return expired||['無断トビ','トビ（キャンセル）'].includes(r.status);
+  return false;
+ }).sort((a,b)=>page==='明日以降'?a.date.localeCompare(b.date):b.date.localeCompare(a.date));
+}
+async function saveLiveConfirmation(record,kind,button){if(!record.interviewId)return;const token=localStorage.getItem('interview_staff_session_v2')||sessionStorage.getItem('interview_staff_session_v2');if(!token){alert('面接管理にログインしてください');return}button.disabled=true;try{const res=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'set_interview_confirmation',token,interview_id:record.interviewId,kind})});const data=await res.json();if(!res.ok||!data.ok)throw Error(data.error||'保存に失敗しました');record.confirmationLineSent=!!data.interview.confirmation_line_sent;record.confirmed=!!data.interview.confirmed;await refreshInterviewLists()}catch(e){button.disabled=false;alert('確認状態を保存できませんでした：'+e.message)}}
+const LINE_SEEN_KEY='interview_new_line_seen_at_v1';let lineNewCount=0;
+function syncLineNewCount(markSeen=false){const events=lineInboxReadOnly.events||[];const latest=events.reduce((max,e)=>String(e.received_at||'')>max?String(e.received_at||''):max,'');if(!latest){lineNewCount=0;return}let seen=localStorage.getItem(LINE_SEEN_KEY);if(!seen||markSeen){seen=latest;localStorage.setItem(LINE_SEEN_KEY,seen)}lineNewCount=events.filter(e=>String(e.received_at||'')>seen).length}
+function updateSidebarCounts(){document.querySelectorAll('#nav button[data-page]').forEach(b=>{const page=b.dataset.page;let count=null;if(page==='LINE通知'){if(lineInboxReadOnly.status==='ready')count=lineInboxReadOnly.applicants.length}else if(page==='来世期待'){if(afterlifeList.status==='ready')count=afterlifeList.items.length}else if(['今日の予定','明日以降','日程調整','面接済み','不届き者'].includes(page)&&liveInterviewLists.status==='ready')count=recordsForLivePage(page).length;let trailing=b.querySelector('.nav-trailing');if(!trailing){trailing=document.createElement('span');trailing.className='nav-trailing';const n=document.createElement('span');n.className='nav-count';const arrow=document.createElement('span');arrow.textContent='▶';trailing.append(n,arrow);b.append(trailing)}const badge=trailing.querySelector('.nav-count');badge.textContent=page==='LINE通知'?(lineNewCount>0?String(lineNewCount):'0'):(count===null?'—':String(count));badge.classList.toggle('nav-count-emphasis',page==='今日の予定'||page==='LINE通知');const fresh=page==='LINE通知'&&lineNewCount>0&&currentPage!=='LINE通知';b.classList.toggle('nav-new-alert',fresh);let newBadge=trailing.querySelector('.nav-new-count');if(newBadge)newBadge.remove()})}
+function makeRealInterviewCard(record){const card=makeTestCard(record,'real:'+record.interviewId);const avatar=card.querySelector('.avatar');if(avatar&&record.picture&&/^https:\/\//.test(record.picture)){avatar.replaceChildren();const img=document.createElement('img');img.src=record.picture;img.alt='LINEアイコン';img.referrerPolicy='no-referrer';img.onerror=()=>{avatar.textContent='LINE'};avatar.append(img)}const box=card.querySelector('.interview-datetime');if(box&&isExpiredUnscheduled(record)){box.querySelector('strong').textContent='日程未確定（7日経過）';box.classList.add('live-date-pending')}else if(box&&record.status==='日程未定'){box.querySelector('strong').textContent='日程未定';box.classList.add('live-date-pending')}if(box&&['採用','不採用','辞退'].includes(record.status)){box.querySelector('strong').textContent=record.status;box.classList.add('outcome-'+({'採用':'hired','不採用':'rejected','辞退':'withdrawn'}[record.status]));}const isTodayConfirmation=currentPage==='今日の予定';card.classList.toggle('confirmed',isTodayConfirmation&&!!record.confirmed);card.classList.toggle('sent',isTodayConfirmation&&!!record.confirmationLineSent&&!record.confirmed);card.classList.toggle('confirmation-pending',isTodayConfirmation&&!record.confirmed&&!record.confirmationLineSent);
+const confirmationButtons=[...card.querySelectorAll('.confirmation-controls button')];confirmationButtons.forEach((b,i)=>{const enabled=currentPage==='今日の予定'&&!record.confirmed&&(i===1||!record.confirmationLineSent);b.disabled=!enabled;b.title=enabled?'確認状態を保存':'操作済み、または本日の面接以外';if(i===0){b.textContent=record.confirmationLineSent?'送信済み':'LINE送信';b.classList.toggle('sent-btn',!!record.confirmationLineSent)}if(i===1)b.classList.toggle('is-ok',!!record.confirmed);b.onclick=enabled?()=>saveLiveConfirmation(record,i===0?'sent':'ok',b):null});card.querySelectorAll('.card-actions button').forEach(b=>{const label=b.textContent;if((['明日以降','今日の予定'].includes(currentPage)||currentPage==='日程調整'&&label==='日程変更')&&['日程変更','キャンセル','来世期待'].includes(label)){b.disabled=false;b.title=label==='キャンセル'?'面接をキャンセルして履歴に保存':'操作画面を開く';b.onclick=()=>label==='キャンセル'?(currentPage==='今日の予定'?openTodayCancelChoice(record,b):cancelLiveInterview(record,b)):label==='日程変更'?openRescheduleChoice(record):label==='面接登録'?openPendingActionPage('面接登録',record,'登録',currentPage):openAfterlifeReasonChoice(record)}else{b.disabled=true;b.title='この一覧では操作できません'}});return card}
+function renderList(){
+ updateSidebarCounts();const list=$('applicantList');list.replaceChildren();$('pageTitle').textContent=currentPage;
+ if(currentPage==='来世期待'){const records=afterlifeList.items,total=Math.max(1,Math.ceil(records.length/8));pageNumber=Math.min(Math.max(1,pageNumber),total);$('pageIndicator').textContent=pageNumber+' / '+total;$('pagePrev').disabled=pageNumber===1;$('pageNext').disabled=pageNumber===total;records.slice((pageNumber-1)*8,pageNumber*8).forEach(item=>list.append(makeAfterlifeCard(item)));$('listNote').textContent=afterlifeList.status==='error'?'来世期待の取得に失敗しました：'+afterlifeList.error:afterlifeList.status==='login-required'?'面接管理の認証が必要です':records.length?'':'来世期待の登録はありません';return}
+ if(currentPage==='LINE通知'){
+  const records=lineInboxReadOnly.applicants,total=Math.max(1,Math.ceil(records.length/8));pageNumber=Math.min(Math.max(1,pageNumber),total);
+  $('pageIndicator').textContent=pageNumber+' / '+total;$('pagePrev').disabled=pageNumber===1;$('pageNext').disabled=pageNumber===total;
+  records.slice((pageNumber-1)*8,pageNumber*8).forEach(record=>list.append(makeLiveLineCard(record)));
+  const labels={idle:'LINE受信データを準備しています',loading:'LINE受信データを更新中',ready:records.length?'':'LINE受信データは0件です',error:'LINE受信データの取得に失敗しました。接続または認証状態をご確認ください。', 'login-required':'面接管理の認証が必要です。'};
+  const note=$('listNote');note.replaceChildren();note.append(document.createTextNode(labels[lineInboxReadOnly.status]||''));
+  if(lineInboxReadOnly.status==='login-required'){const button=document.createElement('button');button.type='button';button.textContent='面接管理にログイン';button.className='inbox-login-button';button.onclick=loginLineInbox;note.append(' ',button)}
+  return;
+ }
+ const records=recordsForLivePage(currentPage);
+ const total=Math.max(1,Math.ceil(records.length/8));pageNumber=Math.min(Math.max(1,pageNumber),total);$('pageIndicator').textContent=pageNumber+' / '+total;$('pagePrev').disabled=pageNumber===1;$('pageNext').disabled=pageNumber===total;records.slice((pageNumber-1)*8,pageNumber*8).forEach((record,i)=>list.append(makeRealInterviewCard(record)));$('listNote').textContent=liveInterviewLists.status==='error'?'実データの取得に失敗しました：'+liveInterviewLists.error:liveInterviewLists.status==='login-required'?'面接管理の認証が必要です':records.length?'':'該当する面接データはありません';
+}
+function renderTodayTest(){updateSidebarCounts();const el=$('todayTestList');el.replaceChildren();const records=recordsForLivePage('今日の予定');records.forEach(record=>el.append(makeRealInterviewCard(record)));if(!records.length){const note=document.createElement('p');note.className='status';note.textContent=liveInterviewLists.status==='error'?'実データの取得に失敗しました':liveInterviewLists.status==='login-required'?'面接管理の認証が必要です':'本日の面接予定はありません';el.append(note)}}
+function showHome(){ currentPage='今日の予定';refreshInterviewLists(); $('registrationPanel').hidden=true;registrationSelectionSync=null;$('applicantDetail').hidden=true;detailReturn=null;$('todayPanel').hidden=false;$('sharedPanel').hidden=true;document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('active',x.dataset.page==='今日の予定'));$('todayDate').textContent=dateKey(now)}function showCommon(page){if(page==='来世期待')refreshAfterlifeList();if(page==='LINE通知'){syncLineNewCount(true);updateSidebarCounts()}else refreshInterviewLists();$('registrationPanel').hidden=true;registrationSelectionSync=null;$('applicantDetail').hidden=true;detailReturn=null;currentPage=page;pageNumber=1;$('todayPanel').hidden=true;$('sharedPanel').hidden=false;renderList()}const $=id=>document.getElementById(id),dateKey=d=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+function renderCalendar(){const y=monthView.getFullYear(),m=monthView.getMonth();$('month').textContent=y+'年 '+String(m+1).padStart(2,'0')+'月';const days=$('days');days.replaceChildren();const offset=new Date(y,m,1).getDay(),count=new Date(y,m+1,0).getDate();for(let i=0;i<offset;i++){const b=document.createElement('button');b.className='empty';b.disabled=true;days.append(b)}for(let d=1;d<=count;d++){const day=new Date(y,m,d),b=document.createElement('button');b.textContent=d;b.className=[day.getDay()===0||day.getDay()===6?'weekend':'',dateKey(day)===dateKey(now)?'today':'',dateKey(day)===dateKey(selected)?'selected':''].join(' ');b.disabled=day<now;b.onclick=()=>{selected=day;chosen=null;if(registrationSelectionSync)registrationSelectionSync();renderCalendar();refreshChartAvailability()};days.append(b)}}
+function holiday(d){const y=d.getFullYear(),m=d.getMonth()+1,n=d.getDate(),nth=(mo,k)=>1+(8-new Date(y,mo-1,1).getDay())%7+7*(k-1);const spring=Math.floor(20.8431+.242194*(y-1980)-Math.floor((y-1980)/4)),autumn=Math.floor(23.2488+.242194*(y-1980)-Math.floor((y-1980)/4));const base=new Set(['1-1','2-11','2-23','4-29','5-3','5-4','5-5','8-11','11-3','11-23','3-'+spring,'9-'+autumn,'1-'+nth(1,2),'7-'+nth(7,3),'9-'+nth(9,3),'10-'+nth(10,2)]),days=new Set(),len=Math.round((new Date(y+1,0,1)-new Date(y,0,1))/86400000);for(let i=0;i<len;i++){const t=new Date(y,0,i+1);if(base.has((t.getMonth()+1)+'-'+t.getDate()))days.add(i)}for(const i of [...days]){if(new Date(y,0,i+1).getDay()===0){let j=i+1;while(days.has(j))j++;days.add(j)}}for(let i=1;i<len-1;i++){if(!days.has(i)&&days.has(i-1)&&days.has(i+1))days.add(i)}return days.has(Math.round((d-new Date(y,0,1))/86400000))}
+const CHART_STAFF_SOURCE=[{name:'社長',shop:'Grand Luxe',id:'9bcf0e46-f443-4c8b-8f43-2d99f0cabbc6'},{name:'オオタ',shop:'LUXY',id:'745f4373-dc35-4cf3-ab06-577d54d6694e'},{name:'村上',shop:'薔薇と紳士',id:'72ad8e71-100a-4cb4-8a63-813154b62f99'},{name:'お祭り',shop:'Un Secret',id:'46536af1-b940-47ec-9199-82646072a82f'}];
+const CHART_API='https://vjjnkflbfsjihwzjsjpr.supabase.co/rest/v1/rpc/interview_available_staff';
+const CHART_KEY='sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos';
+let chartAvailability=new Map(),chartLoadedDate='',chartRequest=0,chartLoading=false,chartError='',chartLastFetch=0;
+async function refreshChartAvailability(){
+ const date=dateKey(selected),request=++chartRequest;chartAvailability=new Map();chartLoadedDate='';chartLoading=true;chartError='';chosen=null;renderChart();
+ const tasks=[];for(const staff of CHART_STAFF_SOURCE)for(let i=0;i<28;i++)tasks.push({staff,i});
+ const results=[];let cursor=0;
+ try{
+  async function worker(){
+   while(cursor<tasks.length){
+    if(request!==chartRequest)return;
+    const {staff,i}=tasks[cursor++],startMinutes=600+i*30;
+    const start=String(Math.floor(startMinutes/60)).padStart(2,'0')+':'+String(startMinutes%60).padStart(2,'0');
+    const endMinutes=startMinutes+30,end=String(Math.floor(endMinutes/60)).padStart(2,'0')+':'+String(endMinutes%60).padStart(2,'0');
+    const response=await fetch(CHART_API,{method:'POST',headers:{'Content-Type':'application/json','apikey':CHART_KEY,'Authorization':'Bearer '+CHART_KEY},body:JSON.stringify({p_shop:staff.shop,p_date:date,p_start:start,p_end:end}),cache:'no-store'});
+    if(!response.ok)throw Error('availability HTTP '+response.status);
+    const rows=await response.json();
+    if(!Array.isArray(rows))throw Error('availability response invalid');
+    results.push([staff.name+':'+i,rows.some(row=>String(row.interviewer_user_id)===staff.id)]);
+   }
+  }
+  await Promise.all(Array.from({length:8},()=>worker()));
+  if(request!==chartRequest||date!==dateKey(selected))return;
+  chartAvailability=new Map(results);chartLoadedDate=date;chartLastFetch=Date.now();chartLoading=false;renderChart();
+ }catch(error){
+  if(request!==chartRequest)return;
+  console.warn('対応可能時間の取得に失敗しました',error);
+  chartLoadedDate='';chartLoading=false;chartError='対応可能時間の取得に失敗しました。再読み込みしてください。';renderChart();
+ }
+}
+function chartBookedSlot(staff,day,hour,minute){const slot=hour*60+minute;return (liveInterviewLists.rows||[]).find(r=>{if(r.staff!==staff||String(r.date||'').slice(0,10)!==day)return false;if(['キャンセル','無断トビ','トビ（キャンセル）','返信なし','日程未定','日程調整中','採用','不採用','辞退'].includes(r.status))return false;const time=String(r.date||'').match(/(?:^|\s)(\d{1,2}):(\d{2})/);if(!time)return false;const start=Number(time[1])*60+Number(time[2]);return slot>=start&&slot<start+(staff==='村上'?90:60)})}
+function chartStartSlotAvailable(staff,day,index){
+ const duration=staff==='村上'?90:60;
+ const start=600+index*30;
+ for(let offset=0;offset<duration;offset+=30){
+  const part=index+offset/30;
+  if(part>=28||chartAvailability.get(staff+':'+part)!==true)return false;
+  const minutes=start+offset;
+  if(chartBookedSlot(staff,day,Math.floor(minutes/60),minutes%60))return false;
+ }
+ return true;
+}
+function renderChart(){ $('selectedDate').textContent=dateKey(selected);$('selectedDate').className='chart-date '+(selected.getDay()===0||holiday(selected)?'holiday':selected.getDay()===6?'saturday':'');const grid=$('chartGrid');grid.replaceChildren();$('slotStatus').textContent=chartLoading?'対応可能時間を読み込み中です':chartError||(chartLoadedDate===dateKey(selected)?'対応可能時間を反映済み':'対応可能時間を確認しています');const corner=document.createElement('span');grid.append(corner);for(let i=0;i<28;i++){const t=document.createElement('span');t.className='time-label'+([4,10,16,22].includes(i)?' time-divider':'');t.textContent=String(10+Math.floor(i/2)).padStart(2,'0')+':'+(i%2?'30':'00');grid.append(t)}for(const staff of ['社長','オオタ','村上','お祭り']){const label=document.createElement('span');label.className='staff-label';label.textContent=staff;applyStaffTheme(label,staff);grid.append(label);for(let i=0;i<28;i++){const hour=10+Math.floor(i/2),minute=i%2?30:0;const b=document.createElement('button');const current=new Date(),todayKey=dateKey(current),slotMinutes=hour*60+minute;const passed=dateKey(selected)<todayKey||(dateKey(selected)===todayKey&&slotMinutes<=current.getHours()*60+current.getMinutes());const availabilityKnown=chartLoadedDate===dateKey(selected);const allowed=availabilityKnown&&chartStartSlotAvailable(staff,dateKey(selected),i);const booked=chartBookedSlot(staff,dateKey(selected),hour,minute);b.className='slot'+((passed||(availabilityKnown&&!allowed))?' blocked':'')+(booked?' interview-booked':'')+([4,10,16,22].includes(i)?' time-divider':'');if(!booked&&!passed&&(!availabilityKnown||allowed))applyStaffTheme(b,staff);b.disabled=!!booked||passed||!availabilityKnown||!allowed;b.title=booked?'面接予定：'+booked.name+' / '+staff+' '+String(hour).padStart(2,'0')+':'+String(minute).padStart(2,'0'):staff+' '+String(hour).padStart(2,'0')+':'+String(minute).padStart(2,'0');if(!b.disabled&&chosen===b.title)b.classList.add('chosen');b.onclick=()=>{chosen=b.title;if(registrationSelectionSync)registrationSelectionSync();$('slotStatus').textContent='選択：'+dateKey(selected)+' '+chosen;renderChart()};grid.append(b)}}}
+$('prev').onclick=()=>{monthView=new Date(monthView.getFullYear(),monthView.getMonth()-1,1);renderCalendar()};$('next').onclick=()=>{monthView=new Date(monthView.getFullYear(),monthView.getMonth()+1,1);renderCalendar()};
+$('nav').onclick=e=>{const b=e.target.closest('button[data-page]');if(!b)return;if(b.dataset.page==='今日の予定'){showHome();return}document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('active',x===b));showCommon(b.dataset.page);if(b.dataset.page==='LINE通知')refreshLineInboxReadOnly()};
+$('headerLineInbox').onclick=()=>{document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('active',x.dataset.page==='LINE通知'));showCommon('LINE通知');refreshLineInboxReadOnly()};
+$('home').onclick=()=>{showHome();selected=new Date(now);monthView=new Date(now.getFullYear(),now.getMonth(),1);renderCalendar();refreshChartAvailability()};
+$('sound').onclick=async()=>{try{const C=window.AudioContext||window.webkitAudioContext;if(!C)throw Error('非対応');const ctx=new C();await ctx.resume();const osc=ctx.createOscillator(),gain=ctx.createGain();osc.frequency.value=880;gain.gain.value=.08;osc.connect(gain);gain.connect(ctx.destination);osc.start();osc.stop(ctx.currentTime+.2);osc.onended=()=>ctx.close();alert('通知テスト音を再生しました。聞こえない場合はPCの音量・ブラウザ設定を確認してください。')}catch(e){alert('通知音の再生に失敗しました：'+e.message)}};
+$('detailBack').onclick=closeApplicantDetail;
+$('pagePrev').onclick=()=>{pageNumber--;renderList()};$('pageNext').onclick=()=>{pageNumber++;renderList()};renderCalendar();refreshChartAvailability();renderList();renderTodayTest();showHome();
+refreshLineInboxReadOnly();setInterval(()=>{if(!document.hidden&&chartLoadedDate===dateKey(selected)&&Date.now()-chartLastFetch>=60000)refreshChartAvailability();else if(!document.hidden)renderChart();if(!document.hidden&&liveInterviewLists.status==='ready'){updateSidebarCounts();if(currentPage==='日程調整'||currentPage==='不届き者')renderList()}},30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&Date.now()-chartLastFetch>=60000)refreshChartAvailability()});setInterval(()=>{if(!document.hidden&&lineInboxReadOnly.status!=='loading'&&lineInboxReadOnly.status!=='login-required')refreshLineInboxReadOnly()},30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&lineInboxReadOnly.status!=='login-required')refreshLineInboxReadOnly()});
+</script></body></html>
