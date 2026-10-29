@@ -392,12 +392,12 @@ function openPendingActionPage(label,record,mode='登録',returnPage=null){
  const form=document.createElement('form');form.className='registration-form';
  const field=(title,type,value,required=false)=>{const lab=document.createElement('label');lab.textContent=title;const input=document.createElement('input');input.type=type;input.value=value||'';input.required=required;lab.append(input);form.append(lab);return input};
  const shop=field('店舗名','text',record.shop||'',true);shop.readOnly=true;
- const name=field('応募者名','text',record.name==='Unknown'?'':record.name||'',true);
+ const name=field('応募者名','text',record.name==='Unknown'?'':record.name||'',true);name.readOnly=true;
  const date=field('面接日','text','',true);date.readOnly=true;date.placeholder='上部カレンダーから選択';
  const time=field('面接開始時間','text','',true);time.readOnly=true;time.placeholder='上部タイムチャートから選択';
  const syncChosen=()=>{date.value=dateKey(selected);time.value=chosen?chosen.match(/\d{2}:\d{2}/)?.[0]||'':'';staff.value=chosen?chosen.replace(/\s+\d{2}:\d{2}$/,''):''};registrationSelectionSync=syncChosen;
- const lab=document.createElement('label');lab.textContent='担当者';const staff=document.createElement('select');staff.required=true;
- for(const v of ['','社長','オオタ','村上','お祭り']){const opt=document.createElement('option');opt.value=v;opt.textContent=v||'担当者を選択';staff.append(opt)}lab.append(staff);form.append(lab);syncChosen();
+ const lab=document.createElement('label');lab.textContent='担当者';const staff=document.createElement('input');staff.type='text';staff.readOnly=true;staff.required=true;
+ staff.placeholder='上部タイムチャートから選択';lab.append(staff);form.append(lab);syncChosen();
  const note=document.createElement('p');note.className='status';note.textContent='日時は上部カレンダーとタイムチャートから選択してください。';
  const preview=document.createElement('button');preview.type='submit';preview.textContent=mode==='登録'?'面接登録':mode+'を確定';preview.className='registration-preview';
  form.append(note,preview);let saving=false;form.onsubmit=async e=>{e.preventDefault();if(saving)return;
