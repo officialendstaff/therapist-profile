@@ -1,3 +1,4 @@
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {createClient} from "npm:@supabase/supabase-js@2";
 const headers={"Access-Control-Allow-Origin":"https://officialendstaff.github.io","Access-Control-Allow-Headers":"authorization,apikey,content-type","Access-Control-Allow-Methods":"POST,OPTIONS","Content-Type":"application/json","Cache-Control":"no-store"};
 const response=(body:unknown,status=200)=>new Response(JSON.stringify(body),{status,headers});
@@ -67,7 +68,7 @@ if(action==="afterlife_list"){
 if(action==="afterlife_save"){
  const account=String(body.account_id||""),user=String(body.line_user_id||"");
  const allowedAccounts=["rose","grandluxe","luxy","unsecret","us"];
- const allowedReasons=["報酬条件NG","年齢条件NG","デブ・ガリNG","勤務場所NG","業種業態NG","コミュ障害NG","過去履歴NG","業者FUCK"];
+ const allowedReasons=["報酬条件NG","年齢条件NG","デブ・ガリNG","勤務場所NG","業種業態NG","コミュ障害NG","過去履歴NG","その他"];
  const reasons=Array.isArray(body.reasons)?[...new Set(body.reasons)]:[];
  if(!allowedAccounts.includes(account)||!/^U[a-f0-9]{32}$/i.test(user)||reasons.length<1||reasons.length>8||reasons.some(x=>!allowedReasons.includes(x)))return response({error:"invalid_afterlife"},400);
  const name=String(body.display_name||"").slice(0,100),pic=typeof body.picture_url==="string"&&body.picture_url.startsWith("https://")?body.picture_url.slice(0,1024):null;
@@ -82,6 +83,7 @@ if(action==="afterlife_remove"){
  if(error)return response({error:"afterlife_remove_failed"},503);
  return response({ok:true});
 }
+if(action==="set_interview_arrival"){const id=Number(body.interview_id),kind=String(body.kind||"");if(!Number.isSafeInteger(id)||id<1||!["arrived","no_show"].includes(kind))return response({error:"invalid_arrival"},400);const {data:existing,error:readError}=await db.from("staff_interviews").select("id,status").eq("id",id).maybeSingle();if(readError||!existing)return response({error:"interview_not_found"},404);if(["来店済み","採用","不採用","辞退","無断トビ","キャンセル","トビ（キャンセル）"].includes(existing.status))return response({error:"already_finalized"},409);const status=kind==="arrived"?"来店済み":"無断トビ";const {data:updated,error:updateError}=await db.from("staff_interviews").update({status,updated_at:new Date().toISOString()}).eq("id",id).eq("status",existing.status).select("id,status").maybeSingle();if(updateError||!updated)return response({error:"arrival_save_failed"},409);return response({ok:true,interview:updated})}
 if(action==="set_interview_confirmation"){
  const id=Number(body.interview_id),kind=String(body.kind||"");if(!Number.isSafeInteger(id)||id<1||!["sent","ok"].includes(kind))return response({error:"invalid_confirmation"},400);
  const {data:existing,error:readError}=await db.from("staff_interviews").select("id,status,confirmed,confirmation_line_sent").eq("id",id).maybeSingle();if(readError||!existing)return response({error:"interview_not_found"},404);
