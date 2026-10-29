@@ -19,7 +19,7 @@ function say(message,key){
  return true;
 }
 window.interviewVoiceAlert={
- play:function(type,key){return say(type==='line'?'新着通知がありまっせ！新着通知がありまっせ！':type==='interview'?'２時間前だよ！２時間前だよ！':'はよー見なはれ！はよー見なはれ！',key||type)},
+ play:function(type,key){return say(type==='line'?'新着通知がありまっせ！新着通知がありまっせ！':type==='interview'?'面接確認は取れましたん？面接確認は取れましたん？':'はよー見なはれ！はよー見なはれ！',key||type)},
  stop:function(){if(window.speechSynthesis)window.speechSynthesis.cancel();lastUtterance=null},
  reset:function(){lastKey='';lastSpokenAt=0}
 };
