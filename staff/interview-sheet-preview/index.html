@@ -733,8 +733,8 @@ window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===
  open.onclick=()=>dialog.classList.add('open');document.getElementById('adminAuthCancel').onclick=()=>dialog.classList.remove('open');
  async function update(){const {data:{user}}=await auth.auth.getUser();let profile=null;if(user){const {data,error}=await auth.rpc('interview_my_profile');if(!error)profile=Array.isArray(data)?data[0]:data}const permitted=['president','ota','owner','festival'].includes(profile?.profile_key);window.interviewAdminAuthorized=!!permitted;open.textContent=permitted?'管理者：'+profile.display_name:'管理者ログイン';logout.hidden=!permitted;return permitted}
  document.getElementById('adminAuthForm').onsubmit=async e=>{e.preventDefault();message.textContent='認証しています…';const form=e.currentTarget;const {error}=await auth.auth.signInWithPassword({email:form.elements.email.value.trim(),password:form.elements.password.value});if(error){message.textContent='IDまたはPASSが正しくありません。';return}if(!await update()){await auth.auth.signOut({scope:'local'});message.textContent='管理者アカウントではありません。';return}message.textContent='';form.reset();dialog.classList.remove('open')};
- logout.onclick=async()=>{await auth.auth.signOut({scope:'local'});await update();dialog.classList.remove('open')};
- update();
+ logout.onclick=async()=>{await auth.auth.signOut({scope:'local'});await update();dialog.classList.add('open')};
+ dialog.classList.add('open');update().then(ok=>{if(ok)dialog.classList.remove('open')});
 })();
 </script>
 <script id="today-top-startup-fallback">(function(){function top(){const p=document.querySelector('.main-panel');if(!p)return;p.classList.remove('sheet-mode');const nav=document.querySelector('#nav button[data-page="今日の予定"]');document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b===nav));const today=document.getElementById('todayPanel'),shared=document.getElementById('sharedPanel');if(today)today.hidden=false;if(shared)shared.hidden=true;}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',top,{once:true});else top();})();</script></body></html>
