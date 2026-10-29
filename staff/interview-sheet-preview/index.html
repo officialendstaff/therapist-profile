@@ -377,7 +377,7 @@ function showDecisionPopup(record,kind){
    if(kind==='採用'){payload.shop=shop.value;payload.stage_name=stage.value.trim();payload.hire_date=date.value;if(!payload.stage_name){appNotice('源氏名を入力してください');return}}
    if(kind==='不採用'){payload.reasons=[...checks.querySelectorAll('input:checked')].map(x=>x.value);if(!payload.reasons.length){appNotice('不採用理由を選択してください');return}}
    if(kind==='辞退'){payload.note=note.value.trim();if(!payload.note){appNotice('辞退理由を入力してください');return}}
-   if(!await appDialog(kind+'で確定しますか？','confirm'))return;
+   if(!window.confirm(kind+'で確定しますか？'))return;
    const token=localStorage.getItem('interview_staff_session_v2')||sessionStorage.getItem('interview_staff_session_v2');
    if(!token){appNotice('再ログインしてください');return}
    save.disabled=true;
