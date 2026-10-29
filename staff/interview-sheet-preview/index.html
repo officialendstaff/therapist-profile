@@ -713,8 +713,8 @@ window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===
 </script><script src="./voice-alert.js?v=13e4384"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 #adminAuthOpen{position:fixed;right:12px;bottom:12px;z-index:900;border:1px solid #9bb3ce;background:#fff;color:#244765;padding:9px 14px;border-radius:8px;font-size:12px;font-weight:700}
-#adminAuthDialog{position:fixed;inset:0;z-index:990;background:#10223a99;display:none;align-items:center;justify-content:center;padding:18px}
-#adminAuthDialog.open{display:flex}
+#adminAuthDialog{position:fixed;inset:0;z-index:2147483646;background:#10223a99;display:none;align-items:center;justify-content:center;padding:18px}
+#adminAuthDialog.open{display:flex}body.interview-admin-locked>header,body.interview-admin-locked>.calendar,body.interview-admin-locked>.main-panel,body.interview-admin-locked>.sidebar{pointer-events:none}
 #adminAuthDialog .auth-card{background:white;border-radius:12px;width:min(420px,100%);padding:24px;box-shadow:0 15px 45px #0003}
 #adminAuthDialog input{width:100%;padding:12px;margin:5px 0 14px;border:1px solid #ccd5e1;border-radius:6px}
 #adminAuthDialog button{padding:11px 16px;border-radius:6px;border:1px solid #b6c5d6}
@@ -730,11 +730,11 @@ window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===
  const url='https://vjjnkflbfsjihwzjsjpr.supabase.co',key='sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos';
  const auth=supabase.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,storage:window.sessionStorage,storageKey:'mattan-recruit-auth'}});
  const dialog=document.getElementById('adminAuthDialog'),open=document.getElementById('adminAuthOpen'),message=document.getElementById('adminAuthMessage'),logout=document.getElementById('adminAuthLogout');
- open.onclick=()=>dialog.classList.add('open');document.getElementById('adminAuthCancel').onclick=()=>dialog.classList.remove('open');
- async function update(){const {data:{user}}=await auth.auth.getUser();let profile=null;if(user){const {data,error}=await auth.rpc('interview_my_profile');if(!error)profile=Array.isArray(data)?data[0]:data}const permitted=['president','ota','owner','festival'].includes(profile?.profile_key);window.interviewAdminAuthorized=!!permitted;open.textContent=permitted?'管理者：'+profile.display_name:'管理者ログイン';logout.hidden=!permitted;return permitted}
+ open.onclick=()=>dialog.classList.add('open');document.getElementById('adminAuthCancel').onclick=()=>{if(window.interviewAdminAuthorized)dialog.classList.remove('open');else message.textContent='管理者ログインが必要です。'};
+ async function update(){const {data:{user}}=await auth.auth.getUser();let profile=null;if(user){const {data,error}=await auth.rpc('interview_my_profile');if(!error)profile=Array.isArray(data)?data[0]:data}const permitted=['president','ota','owner','festival'].includes(profile?.profile_key);window.interviewAdminAuthorized=!!permitted;open.textContent=permitted?'管理者：'+profile.display_name:'管理者ログイン';logout.hidden=!permitted;document.body.classList.toggle('interview-admin-locked',!permitted);return permitted}
  document.getElementById('adminAuthForm').onsubmit=async e=>{e.preventDefault();message.textContent='認証しています…';const form=e.currentTarget;const {error}=await auth.auth.signInWithPassword({email:form.elements.email.value.trim(),password:form.elements.password.value});if(error){message.textContent='IDまたはPASSが正しくありません。';return}if(!await update()){await auth.auth.signOut({scope:'local'});message.textContent='管理者アカウントではありません。';return}message.textContent='';form.reset();dialog.classList.remove('open')};
  logout.onclick=async()=>{await auth.auth.signOut({scope:'local'});await update();dialog.classList.add('open')};
- dialog.classList.add('open');update().then(ok=>{if(ok)dialog.classList.remove('open')});
+ document.body.classList.add('interview-admin-locked');dialog.classList.add('open');update().then(ok=>{if(ok)dialog.classList.remove('open')}).catch(()=>{message.textContent='認証状態を確認できませんでした。再度ログインしてください。'});
 })();
 </script>
 <script id="today-top-startup-fallback">(function(){function top(){const p=document.querySelector('.main-panel');if(!p)return;p.classList.remove('sheet-mode');const nav=document.querySelector('#nav button[data-page="今日の予定"]');document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b===nav));const today=document.getElementById('todayPanel'),shared=document.getElementById('sharedPanel');if(today)today.hidden=false;if(shared)shared.hidden=true;}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',top,{once:true});else top();})();</script></body></html>
