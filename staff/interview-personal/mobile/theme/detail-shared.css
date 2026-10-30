@@ -1,0 +1,237 @@
+/* Visual themes for management pages embedded from the two themed personal TOPs.
+ * Explicitly opt-in via html[data-personal-theme], only for personalMobile=1.
+ * No change to colors marking interview status, button enablement, or data flow.
+ */
+html[data-personal-theme="owner"]{
+ --personal-accent:#ba3a6b;
+ --personal-accent-dark:#731a42;
+ --personal-accent-soft:#fff0f6;
+ --personal-accent-line:#eac1d0;
+ --personal-page:#faeef3;
+ --personal-surface:#fffafb;
+ --personal-ink:#402b3d;
+ --personal-head:linear-gradient(123deg,#50182e 0%,#9a315b 59%,#d76f97 100%);
+ --personal-glow:rgba(142,37,85,.15);
+ --personal-art:
+  radial-gradient(ellipse at 91% 7%,rgba(248,186,212,.24),transparent 48%),
+  linear-gradient(147deg,#fdf5f9 0%,#f8eaf1 52%,#fdf8fa 100%);
+}
+html[data-personal-theme="festival"]{
+ --personal-accent:#ac668a;
+ --personal-accent-dark:#694069;
+ --personal-accent-soft:#fbf0f5;
+ --personal-accent-line:#ead4df;
+ --personal-page:#f8eef4;
+ --personal-surface:#fffdfa;
+ --personal-ink:#372f4e;
+ --personal-head:
+  url("/therapist-profile/staff/interview-personal/mobile/theme/festival-header.svg") right center / cover no-repeat,
+  linear-gradient(110deg,#fae6e7,#e1cbe8);
+ --personal-glow:rgba(143,88,137,.16);
+ --personal-art:
+  url("/therapist-profile/staff/interview-personal/mobile/theme/festival-background.svg") center / cover no-repeat,
+  linear-gradient(140deg,#fff6f5,#f1e7f3);
+}
+html[data-personal-theme]{
+ color-scheme:light;
+ --personal-grad-border:linear-gradient(90deg,var(--personal-accent),rgba(255,255,255,.9),var(--personal-accent));
+}
+html[data-personal-theme] body{
+ color:var(--personal-ink)!important;
+ background:var(--personal-art)!important;
+}
+html[data-personal-theme] body.personal-mobile-embedded>.header{
+ background:var(--personal-head)!important;
+ border-bottom:2px solid var(--personal-accent-line)!important;
+ box-shadow:0 3px 12px var(--personal-glow)!important;
+}
+html[data-personal-theme] body.personal-mobile-embedded>.header .brand{
+ color:var(--personal-ink);
+}
+html[data-personal-theme="owner"] body.personal-mobile-embedded>.header .brand,
+html[data-personal-theme="owner"] body.personal-mobile-embedded>.header .header-actions button{
+ color:#fff9fc!important;
+}
+html[data-personal-theme] .main{
+ background:var(--personal-art)!important;
+}
+html[data-personal-theme] .main-panel:not(.sheet-mode){
+ background:transparent!important;
+ padding:12px!important;
+}
+html[data-personal-theme] .main-panel.sheet-mode{
+ background:var(--personal-page)!important;
+}
+html[data-personal-theme] .today-head,
+html[data-personal-theme] .list-head,
+html[data-personal-theme] #storeMetricsHeader{
+ background:linear-gradient(115deg,var(--personal-accent-soft),#fff 96%)!important;
+ border:1px solid var(--personal-accent-line)!important;
+ border-left:4px solid var(--personal-accent)!important;
+ border-radius:10px!important;
+ box-shadow:0 2px 8px var(--personal-glow)!important;
+ padding:10px 12px!important;
+ margin-bottom:9px!important;
+ color:var(--personal-ink)!important;
+}
+html[data-personal-theme] .today-head h1,
+html[data-personal-theme] .list-head h1,
+html[data-personal-theme] #storeMetricsHeader h1{
+ color:var(--personal-accent-dark)!important;
+}
+html[data-personal-theme] .pager button,
+html[data-personal-theme] .list-head select,
+html[data-personal-theme] #storeMetricsHeader button,
+html[data-personal-theme] #storeMetricsHeader select{
+ border-color:var(--personal-accent-line)!important;
+ border-radius:7px!important;
+ color:var(--personal-accent-dark)!important;
+ background:#fff!important;
+}
+html[data-personal-theme] .pager button:not(:disabled):hover{
+ background:var(--personal-accent-soft)!important;
+}
+html[data-personal-theme] .applicant,
+html[data-personal-theme] .today-test-card{
+ border-radius:10px!important;
+ border-color:var(--personal-accent-line)!important;
+ box-shadow:0 2px 8px var(--personal-glow)!important;
+}
+html[data-personal-theme] .applicant .avatar{
+ color:var(--personal-accent-dark)!important;
+ background:var(--personal-accent-soft)!important;
+}
+html[data-personal-theme] .applicant .identity strong{
+ color:var(--personal-ink)!important;
+}
+html[data-personal-theme] .applicant:hover,
+html[data-personal-theme] .applicant:focus-within{
+ box-shadow:0 3px 12px var(--personal-glow)!important;
+}
+html[data-personal-theme] .applicant-detail{
+ background:transparent!important;
+}
+html[data-personal-theme] .detail-header{
+ padding:11px 12px!important;
+ margin-bottom:10px!important;
+ background:var(--personal-accent-soft)!important;
+ border:1px solid var(--personal-accent-line)!important;
+ border-left:4px solid var(--personal-accent)!important;
+ border-radius:9px!important;
+}
+html[data-personal-theme] .detail-header h1,
+html[data-personal-theme] .detail-section h2{
+ color:var(--personal-accent-dark)!important;
+}
+html[data-personal-theme] .detail-section{
+ background:var(--personal-surface)!important;
+ border-color:var(--personal-accent-line)!important;
+ border-radius:10px!important;
+ box-shadow:0 2px 7px var(--personal-glow)!important;
+}
+html[data-personal-theme] .detail-entry{
+ border-radius:8px!important;
+ border-color:var(--personal-accent-line)!important;
+}
+html[data-personal-theme] .detail-header button{
+ background:var(--personal-accent-soft)!important;
+ color:var(--personal-accent-dark)!important;
+ border-color:var(--personal-accent-line)!important;
+}
+html[data-personal-theme] .sidebar{
+ background:var(--personal-art)!important;
+ border-color:var(--personal-accent-line)!important;
+}
+html[data-personal-theme] .nav button.active{
+ background:var(--personal-accent-soft)!important;
+ color:var(--personal-accent-dark)!important;
+ border-color:var(--personal-accent-line)!important;
+}
+html[data-personal-theme] .mpCard,
+html[data-personal-theme] .mpRight .mpCard,
+html[data-personal-theme] #storeMetricsBody{
+ border-radius:10px!important;
+ border-color:var(--personal-accent-line)!important;
+ box-shadow:0 2px 9px var(--personal-glow)!important;
+}
+html[data-personal-theme] .mpCard h2{
+ color:var(--personal-accent-dark)!important;
+}
+html[data-personal-theme] .mpCalendar button.selected,
+html[data-personal-theme] .mpCalendar button.focused{
+ border-color:var(--personal-accent)!important;
+ outline-color:var(--personal-accent)!important;
+}
+/* Nested Interview Sheet iframe: themed panels, but keep outcome/status colors. */
+html[data-personal-theme] #layout{
+ background:var(--personal-art)!important;
+}
+html[data-personal-theme] #layout>.left,
+html[data-personal-theme] #sheetDetailPane{
+ background:var(--personal-surface)!important;
+ border-color:var(--personal-accent-line)!important;
+}
+html[data-personal-theme] #layout>.left>.head,
+html[data-personal-theme] #sheetDetailPane>.head{
+ background:var(--personal-head)!important;
+ color:#fff!important;
+ border-bottom:2px solid var(--personal-accent-line)!important;
+}
+html[data-personal-theme="festival"] #layout>.left>.head,
+html[data-personal-theme="festival"] #sheetDetailPane>.head{
+ color:#52344f!important;
+}
+html[data-personal-theme] #layout>.left>.head strong,
+html[data-personal-theme] #sheetDetailPane>.head strong{
+ color:inherit!important;
+}
+html[data-personal-theme] #layout>.left .body,
+html[data-personal-theme] #detail{
+ background:var(--personal-art)!important;
+}
+html[data-personal-theme] .sheet-list-card{
+ border-radius:10px!important;
+ border-width:1px!important;
+ box-shadow:0 2px 8px var(--personal-glow)!important;
+}
+/* Preserve the existing decision state fills and borders of each applicant. */
+html[data-personal-theme] .sheet-list-card:hover{
+ box-shadow:0 4px 14px var(--personal-glow)!important;
+}
+html[data-personal-theme] #detail .section{
+ border-color:var(--personal-accent-line)!important;
+ background:var(--personal-surface)!important;
+ border-radius:10px!important;
+ box-shadow:0 2px 9px var(--personal-glow)!important;
+}
+html[data-personal-theme] #detail .section h3{
+ color:var(--personal-accent-dark)!important;
+ background:linear-gradient(115deg,var(--personal-accent-soft),#fff)!important;
+ border-bottom:1px solid var(--personal-accent-line)!important;
+}
+html[data-personal-theme] #detail .experience-entry,
+html[data-personal-theme] #detail .field{
+ border-color:var(--personal-accent-line)!important;
+}
+html[data-personal-theme] #personalSheetBack{
+ color:var(--personal-accent-dark)!important;
+ border-color:var(--personal-accent-line)!important;
+ background:#ffffffeb!important;
+}
+html[data-personal-theme] #sheetListPager button,
+html[data-personal-theme] #sheetDetailTools button{
+ border-color:var(--personal-accent-line)!important;
+ color:var(--personal-accent-dark)!important;
+}
+html[data-personal-theme] #sheetListPager button:hover,
+html[data-personal-theme] #sheetDetailTools button:hover{
+ background:var(--personal-accent-soft)!important;
+}
+/* Controls keep 16px text minimum on iOS to avoid zoom. */
+@media(max-width:900px){
+ html[data-personal-theme] input,
+ html[data-personal-theme] select,
+ html[data-personal-theme] textarea{
+  font-size:16px!important;
+ }
+}
