@@ -124,3 +124,99 @@ body[data-personal-mobile-view="home"] #personalMobileTop{
  #personalMobileTop .personal-mobile-icon svg{width:32px;height:32px}
  #personalMobileTop .personal-mobile-label{font-size:19px!important}
 }
+
+/* Keep navigation, availability, login and notification controls visually matched. */
+body[data-personal-mobile-view="app"] #personalMobileViewer{
+ background:#f8eef4!important;
+}
+body[data-personal-mobile-view="app"] .personal-mobile-subheader,
+body[data-personal-mobile-view="blocks"] #personalMobileBlockBar{
+ background:url('/therapist-profile/staff/interview-personal/mobile/theme/festival-header.svg') right / cover no-repeat,linear-gradient(112deg,#fbe9ed,#e6d6ed)!important;
+ color:#412c50!important;
+ border-bottom:2px solid #ead2df;
+ box-shadow:0 4px 14px #ac628720;
+}
+body[data-personal-mobile-view="app"] .personal-mobile-subheader strong,
+body[data-personal-mobile-view="blocks"] #personalMobileBlockBar strong{
+ color:#412c50!important;
+}
+body[data-personal-mobile-view="app"] .personal-mobile-subheader button,
+body[data-personal-mobile-view="blocks"] #personalMobileBlockBar button{
+ border-color:#ead2df!important;
+ background:#fff2f7!important;
+ color:#72496f!important;
+ border-radius:9px!important;
+ box-shadow:0 2px 6px #ac628722;
+}
+body[data-personal-mobile-view="app"] #personalMobileFrame{
+ background:#f8eef4!important;
+}
+body[data-personal-mobile-view="blocks"]{
+ background:linear-gradient(140deg,#fffaf8,#efe3f1)!important;color:#72496f!important;
+}
+body[data-personal-mobile-view="blocks"] #schedule{
+ box-sizing:border-box;
+ background:transparent!important;
+}
+body[data-personal-mobile-view="blocks"] #schedule>.card{
+ border:1px solid #ead2df!important;
+ border-radius:14px!important;
+ background:linear-gradient(145deg,#fff,#fff2f7)!important;
+ box-shadow:0 3px 14px #ac628719!important;
+}
+body[data-personal-mobile-view="blocks"] #mobileBlocks{
+ padding:13px!important;
+ background:linear-gradient(145deg,#fff,#fff2f7)!important;
+ border:1px solid #ead2df!important;
+ border-radius:12px!important;
+}
+body[data-personal-mobile-view="blocks"] #mobileBlocks>h3{
+ color:#72496f!important;font-size:17px!important;
+ border-bottom:1px solid #ead2df;padding-bottom:11px!important;
+}
+body[data-personal-mobile-view="blocks"] #mobileBlocks button{
+ border:1px solid #ead2df!important;
+ border-radius:8px!important;
+ background:#fff!important;color:#72496f!important;
+}
+body[data-personal-mobile-view="blocks"] #mobileBlocks button:focus-visible{
+ outline:2px solid #ac6287!important;outline-offset:2px;
+}
+body[data-personal-mobile-view="blocks"] #mobileBlocks input,
+body[data-personal-mobile-view="blocks"] #mobileBlocks select{
+ accent-color:#ac6287;border-color:#ead2df!important;
+}
+body[data-personal-mobile-view="blocks"] #blockCalendarGrid{
+ background:#fff!important;border:1px solid #ead2df!important;
+ border-radius:11px!important;padding:8px!important;
+}
+#personalMobileTop #personalMobileNotificationSettings .personal-mobile-notification-panel{
+ border:1px solid #ead2df!important;
+ background:linear-gradient(145deg,#fff,#fff2f7)!important;
+}
+#personalMobileTop #personalMobileNotificationSettings .personal-mobile-notification-heading strong{
+ color:#72496f!important;
+}
+#personalMobileTop #personalMobileNotificationSettings button{
+ border-color:#ead2df!important;
+ background:#fff!important;color:#72496f!important;
+}
+#personalMobileTop #personalMobileNotificationSettings #personalPushEnable{
+ background:url('/therapist-profile/staff/interview-personal/mobile/theme/festival-header.svg') right / cover no-repeat,linear-gradient(112deg,#fbe9ed,#e6d6ed)!important;
+ color:#412c50!important;
+}
+@media(max-width:900px){
+ #gate.gate{
+  background:linear-gradient(140deg,#fffaf8,#efe3f1)!important;
+ }
+ #gate .card{
+  border-color:#ead2df!important;
+  box-shadow:0 12px 32px #ac628718!important;
+ }
+ #gate .personal-login-brand strong{
+  color:#72496f!important;
+ }
+ #gate button#mobileLoginBtn{
+  background:#ac6287!important;
+ }
+}
