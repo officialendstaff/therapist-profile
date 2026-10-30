@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300" preserveAspectRatio="xMidYMid slice">
+<defs>
+ <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff5d7"/><stop offset=".47" stop-color="#e4bc78"/><stop offset="1" stop-color="#b87954"/></linearGradient>
+ <linearGradient id="lantern" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff9ed"/><stop offset=".54" stop-color="#f6b9a7"/><stop offset="1" stop-color="#c76c79"/></linearGradient>
+ <radialGradient id="halo"><stop stop-color="#ffdbac" stop-opacity=".55"/><stop offset="1" stop-color="#ffe6ca" stop-opacity="0"/></radialGradient>
+ <g id="flower"><circle r="5" fill="#e2a6b4"/><path d="M0 -5 C-10 -16 -16 -4 -7 0 C-16 5 -7 16 0 6 C7 16 16 5 7 0 C16 -4 10 -16 0 -5" fill="#db748f"/><circle r="3.1" fill="#ffecc9"/><circle cx="-1" cy="-1" r=".75" fill="#b56e53"/></g>
+ <g id="petal"><path d="M0 0 Q7 -9 15 -7 Q12 6 0 0Z" fill="#da799a"/></g>
+</defs>
+<g opacity=".65" stroke="url(#gold)" stroke-width="2" fill="none">
+ <path d="M0 43 Q55 20 96 45 T198 43"/><path d="M0 51 Q55 28 96 53 T198 51"/>
+ <path d="M400 47 Q500 17 590 36 T760 20" opacity=".55"/>
+ <path d="M570 253 Q680 238 746 255 T960 246" opacity=".6"/>
+</g>
+<path d="M750 15c35 13 52 3 74 19s64 8 96-6" stroke="#d7a062" stroke-width="2" fill="none" opacity=".4"/>
+<circle cx="862" cy="67" r="125" fill="url(#halo)"/>
+<circle cx="973" cy="14" r="100" fill="url(#halo)"/>
+<g transform="translate(885 -52)" stroke="#ad7465" stroke-width="2">
+ <path d="M0 0v58" stroke="#b68366" stroke-width="3"/>
+ <rect x="-37" y="51" width="74" height="8" rx="4" fill="#c78b60"/>
+ <path d="M-36 60Q0 29 36 60L31 149Q0 161 -31 149Z" fill="url(#lantern)"/>
+ <path d="M-27 68v74M-13 58v94M0 53v103M13 58v94M27 68v74" fill="none" stroke="#e7a07d" opacity=".65"/>
+ <path d="M-35 148Q0 159 35 148" stroke="#9d526e" stroke-width="5" fill="none"/>
+ <circle r="13" transform="translate(0 103)" fill="#ffe9d3" opacity=".7" stroke="none"/>
+ <path d="M-14 162Q0 174 14 162" fill="none" stroke="#9c5770" stroke-width="5"/>
+</g>
+<g transform="translate(990 -75) scale(.85)" stroke="#ad7465" stroke-width="2">
+ <path d="M0 0v70" stroke="#b68366" stroke-width="3"/>
+ <rect x="-37" y="63" width="74" height="8" rx="4" fill="#c78b60"/>
+ <path d="M-36 71Q0 40 36 71L31 160Q0 172 -31 160Z" fill="url(#lantern)"/>
+ <path d="M-27 78v74M-13 69v94M0 64v103M13 69v94M27 78v74" fill="none" stroke="#e7a07d" opacity=".65"/>
+ <path d="M-35 159Q0 170 35 159" stroke="#9d526e" stroke-width="5" fill="none"/>
+</g>
+<g opacity=".45" fill="none" stroke="#a36ea3" stroke-width="2">
+ <circle cx="957" cy="205" r="35"/><circle cx="957" cy="205" r="45"/><circle cx="957" cy="205" r="55"/>
+ <path d="M740 300Q760 260 780 300M770 300Q790 260 810 300M800 300Q820 260 840 300" />
+</g>
+<use href="#flower" transform="translate(710 65) scale(2)" opacity=".6"/>
+<use href="#flower" transform="translate(595 185) scale(1.4)" opacity=".48"/>
+<use href="#flower" transform="translate(975 238) scale(1.5)" opacity=".55"/>
+<use href="#petal" transform="translate(820 189) rotate(32)"/><use href="#petal" transform="translate(790 143) rotate(-23) scale(.7)"/>
+<use href="#petal" transform="translate(640 100) rotate(75) scale(.6)"/>
+</svg>
