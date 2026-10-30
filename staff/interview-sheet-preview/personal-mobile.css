@@ -1,0 +1,112 @@
+/* Responsive management page when opened from an interviewer's mobile TOP.
+   This is opt-in: normal desktop / recruitment routes are untouched. */
+@media(max-width:900px){
+ body.personal-mobile-embedded{--sidebar:0px;--top:0px;--header:0px;overflow:hidden!important}
+ body.personal-mobile-embedded>.header,
+ body.personal-mobile-embedded>.calendar,
+ body.personal-mobile-embedded>.chart,
+ body.personal-mobile-embedded>.sidebar{display:none!important}
+ body.personal-mobile-embedded .main{
+  position:fixed!important;inset:0!important;top:0!important;left:0!important;right:0!important;bottom:0!important;
+  overflow-x:hidden!important;overflow-y:auto!important;width:100%!important;padding:0!important;
+  overscroll-behavior:contain;
+ }
+ body.personal-mobile-embedded .main-panel:not(.sheet-mode){
+  box-sizing:border-box;width:100%!important;max-width:100%;min-width:0;
+  min-height:100%!important;height:auto!important;overflow:visible!important;
+  padding:10px!important;
+ }
+ body.personal-mobile-embedded .main-panel.sheet-mode{
+  height:100%!important;min-height:0!important;padding:0!important;overflow:hidden!important
+ }
+ body.personal-mobile-embedded .sheet-preview-host,
+ body.personal-mobile-embedded .sheet-preview-host iframe{width:100%!important;height:100%!important;min-height:0!important}
+ body.personal-mobile-embedded .today-panel,
+ body.personal-mobile-embedded .shared-panel,
+ body.personal-mobile-embedded .applicant-detail,
+ body.personal-mobile-embedded #storeMetrics{width:100%!important;max-width:100%;min-width:0}
+ body.personal-mobile-embedded #storeMetrics{height:auto!important;overflow:visible!important}
+ body.personal-mobile-embedded #storeMetricsBody{height:auto!important;overflow:visible!important}
+ body.personal-mobile-embedded .today-head,
+ body.personal-mobile-embedded .list-head{
+  display:flex!important;flex-wrap:wrap;align-items:center;
+  gap:8px!important;padding:4px 0 10px!important;min-height:0!important;
+ }
+ body.personal-mobile-embedded .today-head h1,
+ body.personal-mobile-embedded .list-head h1{font-size:17px!important;flex:1 1 100%}
+ body.personal-mobile-embedded .pager{
+  margin-left:auto;max-width:100%;display:flex;flex-wrap:wrap;justify-content:flex-end;
+  gap:5px!important
+ }
+ body.personal-mobile-embedded .pager select{
+  max-width:100%;min-width:100px;height:32px;padding:4px;
+ }
+ body.personal-mobile-embedded .pager button{padding:5px 10px!important;min-width:32px}
+ body.personal-mobile-embedded .applicant-list,
+ body.personal-mobile-embedded .today-test-list{
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:none!important;grid-auto-rows:auto!important;
+  height:auto!important;min-height:0!important;width:100%!important;
+  gap:9px!important;padding:8px 0!important;
+ }
+ body.personal-mobile-embedded .applicant,
+ body.personal-mobile-embedded .today-test-card{
+  box-sizing:border-box;display:grid!important;width:100%!important;min-width:0!important;
+  max-width:100%;grid-template-columns:46px minmax(0,1fr)!important;
+  gap:7px 9px!important;align-items:center;overflow:hidden!important;
+  padding:9px!important;border-radius:9px!important;
+ }
+ body.personal-mobile-embedded .applicant .avatar,
+ body.personal-mobile-embedded .today-test-card .avatar{
+  grid-column:1;grid-row:1;width:44px!important;height:44px!important;min-width:44px!important;
+ }
+ body.personal-mobile-embedded .applicant .identity,
+ body.personal-mobile-embedded .today-test-card .identity{
+  grid-column:2;grid-row:1;width:100%!important;min-width:0!important;
+ }
+ body.personal-mobile-embedded .applicant .identity strong,
+ body.personal-mobile-embedded .today-test-card .identity strong{
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;
+ }
+ body.personal-mobile-embedded .applicant .interview-datetime,
+ body.personal-mobile-embedded .today-test-card .interview-datetime{
+  grid-column:1/-1;grid-row:auto;width:100%!important;min-width:0!important;
+  padding:7px!important;white-space:normal!important;
+ }
+ body.personal-mobile-embedded .applicant .confirmation-controls,
+ body.personal-mobile-embedded .today-test-card .confirmation-controls{
+  grid-column:1/-1;grid-row:auto;display:grid!important;
+  width:100%!important;min-width:0!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:5px!important;
+ }
+ body.personal-mobile-embedded .applicant .confirmation-controls button,
+ body.personal-mobile-embedded .today-test-card .confirmation-controls button{
+  min-width:0!important;width:100%!important;max-width:100%!important;
+ }
+ body.personal-mobile-embedded .applicant .card-history,
+ body.personal-mobile-embedded .applicant .history-labels,
+ body.personal-mobile-embedded .today-test-card .card-history,
+ body.personal-mobile-embedded .today-test-card .history-labels{
+  grid-column:1/-1;grid-row:auto;min-width:0;width:100%;overflow-wrap:anywhere
+ }
+ body.personal-mobile-embedded .applicant .card-actions,
+ body.personal-mobile-embedded .today-test-card .card-actions{
+  grid-column:1/-1;grid-row:auto;display:grid!important;max-width:100%;
+  width:100%!important;min-width:0!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:4px!important;
+ }
+ body.personal-mobile-embedded .applicant .card-actions button,
+ body.personal-mobile-embedded .today-test-card .card-actions button{
+  min-width:0!important;width:100%!important;max-width:100%!important;
+  height:32px!important;line-height:1.2;font-size:10px!important;padding:2px!important;
+ }
+ body.personal-mobile-embedded .detail-summary,
+ body.personal-mobile-embedded .detail-columns{
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  gap:10px!important
+ }
+ body.personal-mobile-embedded .detail-section{min-width:0;max-width:100%}
+ body.personal-mobile-embedded .detail-scroll{max-height:none!important;overflow:visible!important}
+ body.personal-mobile-embedded .list-note{overflow-wrap:anywhere}
+ body.personal-mobile-embedded #storeMetricsHeader{position:sticky;top:0;z-index:3;background:#fff}
+}
