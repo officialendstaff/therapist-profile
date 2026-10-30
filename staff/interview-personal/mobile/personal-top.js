@@ -58,7 +58,7 @@
   if(!items.some(item=>item.key===key))return;
   viewer.querySelector('#personalMobileViewTitle').textContent=key;
   document.body.dataset.personalMobileView='app';
-  frame.src='../../interview-sheet-preview/?personalMobile=1&page='+encodeURIComponent(key);
+  frame.src='/therapist-profile/staff/interview-sheet-preview/?personalMobile=1&page='+encodeURIComponent(key);
  }
  function updateBadges(){
   const userId=typeof personalViewer!=='undefined'?personalViewer?.userId:null;
