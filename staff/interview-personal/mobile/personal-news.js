@@ -21,11 +21,11 @@
  dialog.className='personal-mobile-news-dialog';
  dialog.setAttribute('aria-labelledby','personalNewsHeading');
  dialog.innerHTML='<div class="personal-news-shell">'+
- '<header class="personal-news-heading"><div><small>L GROUP MANAGEMENT</small><h2 id="personalNewsHeading">お知らせ・改修履歴</h2><p id="personalNewsUpdated" class="personal-news-updated"></p></div>'+
+ '<header class="personal-news-heading"><div><small>L GROUP MANAGEMENT</small><h2 id="personalNewsHeading">L GROUP 面接管理システム 更新のお知らせ</h2><p id="personalNewsUpdated" class="personal-news-updated"></p></div>'+
  '<button type="button" class="personal-news-close" aria-label="閉じる">×</button></header>'+
  '<div class="personal-news-scroll" tabindex="0"><p id="personalNewsStatus" class="personal-news-status" role="status">改修内容を読み込んでいます…</p>'+
  '<div id="personalNewsEntries" class="personal-news-entries"></div></div>'+
- '<footer class="personal-news-footer"><span>個人ページの更新内容</span><button type="button" class="personal-news-done">閉じる</button></footer>'+
+ '<footer class="personal-news-footer"><span>L GROUP MANAGEMENT</span><button type="button" class="personal-news-done">閉じる</button></footer>'+
  '</div>';
  top.appendChild(dialog);
 
@@ -45,55 +45,60 @@
   const [year,month,day]=String(value).split('-');
   return year+'年'+Number(month)+'月'+Number(day)+'日';
  }
+ function appendFormatted(target,source){
+  const text=String(source||'');
+  const pattern=/\*\*([^*]+)\*\*/g;
+  let cursor=0,match;
+  while((match=pattern.exec(text))!==null){
+   if(match.index>cursor)target.append(document.createTextNode(text.slice(cursor,match.index)));
+   const bold=document.createElement('strong');
+   bold.textContent=match[1];
+   target.append(bold);
+   cursor=match.index+match[0].length;
+  }
+  if(cursor<text.length)target.append(document.createTextNode(text.slice(cursor)));
+ }
  function render(data){
   entries.replaceChildren();
-  const records=Array.isArray(data?.entries)?data.entries.slice(0,20):[];
-  updated.textContent=data?.updatedAt?'最終更新：'+formatDate(data.updatedAt):'';
-  if(!records.length){
-   status.textContent='現在、掲載中の改修情報はありません。';
+  const blocks=Array.isArray(data?.blocks)?data.blocks:[];
+  updated.textContent=data?.updatedAt?formatDate(data.updatedAt):'';
+  if(!blocks.length){
+   status.textContent='現在、掲載中のお知らせはありません。';
    status.hidden=false;
    return;
   }
-  records.forEach((item,index)=>{
-   const entry=document.createElement('article');
-   entry.className='personal-news-entry';
-   const meta=document.createElement('div');
-   meta.className='personal-news-entry-meta';
-   const date=document.createElement('time');
-   date.textContent=formatDate(item.date);
-   if(/^\d{4}-\d{2}-\d{2}$/.test(String(item.date||'')))date.dateTime=item.date;
-   meta.appendChild(date);
-   if(index===0){
-    const latest=document.createElement('span');
-    latest.className='personal-news-latest';
-    latest.textContent='最新';
-    meta.appendChild(latest);
-   }
-   const heading=document.createElement('h3');
-   heading.textContent=String(item.title||'改修内容');
-   entry.append(meta,heading);
-   if(Array.isArray(item.details)&&item.details.length){
-    const list=document.createElement('ul');
-    item.details.slice(0,8).forEach(line=>{
+  for(const block of blocks){
+   const type=String(block?.type||'');
+   let item;
+   if(type==='hr'){
+    item=document.createElement('hr');
+    item.className='personal-news-divider';
+   }else if(type==='ul'||type==='ol'){
+    item=document.createElement(type);
+    item.className='personal-news-notice-list';
+    for(const line of (Array.isArray(block.items)?block.items:[])){
      const li=document.createElement('li');
-     li.textContent=String(line);
-     list.append(li);
-    });
-    entry.append(list);
-   }
-   entries.append(entry);
-  });
+     appendFormatted(li,line);
+     item.append(li);
+    }
+   }else if(['p','note','h2','subheading','signature'].includes(type)){
+    item=document.createElement(type==='h2'?'h2':type==='subheading'?'h3':'p');
+    item.className='personal-news-notice-'+type;
+    appendFormatted(item,block.text);
+   }else continue;
+   entries.append(item);
+  }
   status.hidden=true;
  }
  async function load(){
   status.hidden=false;
   status.textContent='改修内容を読み込んでいます…';
   try{
-   const url='/therapist-profile/staff/interview-personal/mobile/release-notes.json?v=20261030a';
+   const url='/therapist-profile/staff/interview-personal/mobile/release-notes.json?v=20261030b';
    const response=await fetch(url,{cache:'no-store',credentials:'same-origin'});
    if(!response.ok)throw Error('HTTP '+response.status);
    const data=await response.json();
-   if(!data||!Array.isArray(data.entries))throw Error('Invalid release notes');
+   if(!data||!Array.isArray(data.blocks))throw Error('Invalid release notes');
    render(data);
   }catch(error){
    console.warn('お知らせの取得に失敗しました:',error);
