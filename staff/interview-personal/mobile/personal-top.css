@@ -1,6 +1,6 @@
-/* Shared mobile-only TOP for the four interviewer profile pages. */
+/* Shared responsive TOP for the four interviewer profile pages. */
 #personalMobileTop,#personalMobileViewer,#personalMobileBlockBar{display:none}
-@media(max-width:900px){
+@media(min-width:0px){
  html:has(body[data-personal-mobile-view="home"]),
  html:has(body[data-personal-mobile-view="app"]),
  body[data-personal-mobile-view="home"],
@@ -119,4 +119,43 @@
  #personalMobileTop .personal-mobile-icon{height:22px}
  #personalMobileTop .personal-mobile-icon svg{width:21px;height:21px}
  #personalMobileTop .personal-mobile-label{font-size:10px}
+}
+
+/* Desktop is the same 2-column x 4-row TOP, centered at a usable width.
+   Detailed management views retain the available full-screen workspace. */
+@media(min-width:901px){
+ body[data-personal-mobile-view="home"]{background:#f3f6fa!important}
+ #personalMobileTop{
+  left:50%;right:auto;transform:translateX(-50%);
+  width:min(100vw,920px);max-width:920px;
+  padding:23px 20px 24px;
+ }
+ #personalMobileTop .personal-mobile-header{min-height:68px;margin-bottom:14px}
+ #personalMobileTop .personal-mobile-eyebrow{font-size:11px}
+ #personalMobileTop .personal-mobile-name{font-size:25px}
+ #personalMobileTop .personal-mobile-grid{gap:12px}
+ #personalMobileTop .personal-mobile-action{gap:11px;border-radius:16px;cursor:pointer}
+ #personalMobileTop .personal-mobile-icon{width:38px;height:38px}
+ #personalMobileTop .personal-mobile-icon svg{width:35px;height:35px}
+ #personalMobileTop .personal-mobile-label{font-size:19px}
+ #personalMobileViewer{padding-bottom:0}
+ .personal-mobile-subheader{min-height:57px}
+ .personal-mobile-subheader strong{font-size:18px}
+ body[data-personal-mobile-view="blocks"] #schedule{
+  display:block!important;max-width:1180px;margin:0 auto;
+ }
+ body[data-personal-mobile-view="blocks"] #schedule>.card{
+  width:100%;margin:0 auto;max-width:1180px;
+ }
+}
+/* Keep the unavailability back button visible; the bar is appended after
+   the legacy panels and cannot reliably be sticky in document order. */
+@media(min-width:0px){
+ body[data-personal-mobile-view="blocks"]{
+  padding-top:calc(env(safe-area-inset-top,0px) + 65px)!important;
+ }
+ body[data-personal-mobile-view="blocks"] #personalMobileBlockBar{
+  position:fixed!important;top:0;left:0;right:0;
+  width:100%;height:auto;box-sizing:border-box;
+ }
 }
