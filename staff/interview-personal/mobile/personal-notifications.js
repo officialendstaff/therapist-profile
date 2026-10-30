@@ -166,7 +166,7 @@ const refresh=top.querySelector('.personal-mobile-refresh');
 const tools=document.createElement('div');tools.className='personal-mobile-header-tools';
 const settings=document.createElement('button');
 settings.type='button';settings.className='personal-mobile-settings';settings.setAttribute('aria-label','通知設定');settings.title='通知設定';
-settings.textContent='♬';tools.append(settings);
+settings.textContent='🔔';tools.append(settings);
 if(refresh)tools.append(refresh);
 header?.append(tools);
 const modal=document.createElement('div');
@@ -215,6 +215,7 @@ async function registerPush(){
  status.textContent='この端末を通知先に登録しました。';
 }
 settings.addEventListener('click',()=>{unlockAudio();modal.hidden=false;notificationStatus()});
+refresh?.addEventListener('click',()=>{void pollLines();void pollSheets();void pollToday()});
 modal.querySelector('[data-notification-close]').addEventListener('click',()=>modal.hidden=true);
 toggle.addEventListener('click',()=>{soundEnabled=!soundEnabled;localStorage.setItem(SOUND_KEY,soundEnabled?'on':'off');if(soundEnabled)unlockAudio();soundLabel()});
 modal.querySelector('#personalSoundTest').addEventListener('click',async()=>{unlockAudio();await audioContext?.resume();playSound(true)});
@@ -249,6 +250,7 @@ function begin(){
 }
 new MutationObserver(begin).observe(document.getElementById('gate'),{attributes:true,attributeFilter:['style']});
 window.addEventListener('pageshow',begin);
+navigator.serviceWorker?.addEventListener('message',event=>{if(event.data?.type==='personal-mobile-push-open'){void pollLines();void pollSheets();void pollToday()}});
 window.addEventListener('focus',()=>{begin();void pollLines();void pollSheets();void pollToday()});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){begin();void pollLines();void pollSheets();void pollToday()}});
 setInterval(()=>{if(!authorized()||document.hidden)return;void pollLines();void pollSheets();update()},30000);
