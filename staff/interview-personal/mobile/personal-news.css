@@ -140,3 +140,39 @@
  #personalMobileTop .personal-news-heading{padding:16px 14px}
  #personalMobileTop .personal-news-scroll{padding:12px}
 }
+
+
+/* Full L GROUP renewal notice — document typography inside the existing modal. */
+#personalMobileTop .personal-news-heading h2{font-size:clamp(16px,4.1vw,20px);line-height:1.42;max-width:390px}
+#personalMobileTop .personal-news-entries{display:block}
+#personalMobileTop .personal-news-notice-p,
+#personalMobileTop .personal-news-notice-note{
+ font-size:13px;line-height:1.85;color:#35445a;margin:0 0 12px;overflow-wrap:anywhere;
+}
+#personalMobileTop .personal-news-notice-note{color:#697389;font-size:12px}
+#personalMobileTop .personal-news-notice-h2{
+ font-size:15px;line-height:1.55;font-weight:850;color:#233951;
+ padding:12px 0 7px;margin:18px 0 9px;
+ border-bottom:1px solid #dce5ed;
+}
+#personalMobileTop .personal-news-notice-subheading{
+ font-size:13px;line-height:1.5;color:#294767;
+ margin:14px 0 8px;font-weight:850;
+}
+#personalMobileTop .personal-news-notice-list{
+ margin:4px 0 14px;padding:0 0 0 23px;
+ font-size:13px;line-height:1.75;color:#35445a;
+}
+#personalMobileTop .personal-news-notice-list li{
+ padding-left:1px;overflow-wrap:anywhere;margin:0 0 7px;
+}
+#personalMobileTop .personal-news-notice-list strong,
+#personalMobileTop .personal-news-notice-p strong{font-weight:850;color:#223f62}
+#personalMobileTop .personal-news-notice-hr,
+#personalMobileTop .personal-news-divider{border:0;border-top:1px solid #dce5ec;margin:18px 0}
+#personalMobileTop .personal-news-notice-signature{
+ margin:3px 0;font-size:12px;color:#65748b;text-align:center;line-height:1.65;
+}
+#personalMobileTop .personal-news-notice-signature strong{
+ color:var(--news-accent);letter-spacing:.08em;
+}
