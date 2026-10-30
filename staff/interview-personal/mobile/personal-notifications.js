@@ -17,7 +17,7 @@ const badge=key=>top.querySelector('[data-personal-menu="'+key+'"] .personal-mob
 const dateJP=()=>new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Tokyo'});
 const authorized=()=>document.getElementById('gate')?.style.display==='none';
 let lineEvents=[],lineLoaded=false,linesLoading=false,sheetLoading=false,started=false;
-let audioContext=null,lastSoundAt=0,soundAcknowledged='',lastSignature='';
+let audioContext=null,lastSoundAt=0,soundAcknowledged='',lastSignature='',ackTodaySignature='';
 let soundEnabled=localStorage.getItem(SOUND_KEY)!=='off';
 let lastReadError='';
 function currentSheets(){return Array.isArray(window.interviewApplicants)?window.interviewApplicants:[]}
@@ -65,10 +65,12 @@ function update(){
   const start=Date.parse(String(x.interview_date)+'T'+time+':00+09:00');
   return Number.isFinite(start)&&start>Date.now()&&start-Date.now()<=7200000;
  });
+ const dueItems=due.map(e=>'today:'+String(e.id)+':'+String(e.interview_date)+':'+String(e.interview_time));
+ const dueSignature=dueItems.slice().sort().join('|');
  const signature=[
   ...unseenLines().map(e=>'line:'+String(e.id||e.line_event_id||e.received_at)),
   ...unseenSheets().map(e=>'sheet:'+String(e.id)),
-  ...due.map(e=>'today:'+String(e.id)+':'+String(e.interview_date)+':'+String(e.interview_time))
+  ...(dueSignature===ackTodaySignature?[]:dueItems)
  ].sort().join('|');
  if(signature!==lastSignature)lastSignature=signature;
  if(signature&&signature!==soundAcknowledged)playSound();
@@ -126,6 +128,13 @@ async function pollToday(){
  catch(e){console.warn('TOP 今日の予定:',e)}
 }
 function acknowledge(key){
+ if(key==='今日の予定'){
+  const now=Date.now();
+  ackTodaySignature=currentToday().filter(x=>{
+   const start=Date.parse(String(x.interview_date)+'T'+String(x.interview_time||'').slice(0,5)+':00+09:00');
+   return Number.isFinite(start)&&start>now&&start-now<=7200000;
+  }).map(x=>'today:'+String(x.id)+':'+String(x.interview_date)+':'+String(x.interview_time)).sort().join('|');
+ }
  if(key==='LINE通知'){
   const latest=lineEvents.reduce((m,e)=>String(e.received_at||'')>m?String(e.received_at):m,'');
   if(latest)localStorage.setItem(LINE_KEY,latest);
@@ -137,7 +146,7 @@ function acknowledge(key){
   localStorage.setItem('interviewSheetReadIds',JSON.stringify([...ids].slice(-2000)));
   if(typeof updateInterviewSheetAlert==='function')updateInterviewSheetAlert();
  }
- soundAcknowledged=lastSignature;
+ soundAcknowledged='';
  lastSoundAt=0;update();
 }
 function unlockAudio(){
