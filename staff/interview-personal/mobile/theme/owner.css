@@ -122,3 +122,99 @@ body[data-personal-mobile-view="home"] #personalMobileTop{
  #personalMobileTop .personal-mobile-icon svg{width:32px;height:32px}
  #personalMobileTop .personal-mobile-label{font-size:19px!important}
 }
+
+/* Keep navigation, availability, login and notification controls visually matched. */
+body[data-personal-mobile-view="app"] #personalMobileViewer{
+ background:#f9eaf0!important;
+}
+body[data-personal-mobile-view="app"] .personal-mobile-subheader,
+body[data-personal-mobile-view="blocks"] #personalMobileBlockBar{
+ background:linear-gradient(120deg,#53142e 0%,#9b325d 58%,#d56b96 100%)!important;
+ color:#fff8fc!important;
+ border-bottom:2px solid #eec4d3;
+ box-shadow:0 4px 14px #9c2b5620;
+}
+body[data-personal-mobile-view="app"] .personal-mobile-subheader strong,
+body[data-personal-mobile-view="blocks"] #personalMobileBlockBar strong{
+ color:#fff8fc!important;
+}
+body[data-personal-mobile-view="app"] .personal-mobile-subheader button,
+body[data-personal-mobile-view="blocks"] #personalMobileBlockBar button{
+ border-color:#eec4d3!important;
+ background:#fff0f6!important;
+ color:#6e2143!important;
+ border-radius:9px!important;
+ box-shadow:0 2px 6px #9c2b5622;
+}
+body[data-personal-mobile-view="app"] #personalMobileFrame{
+ background:#f9eaf0!important;
+}
+body[data-personal-mobile-view="blocks"]{
+ background:linear-gradient(140deg,#fff8fb,#f2dce7)!important;color:#6e2143!important;
+}
+body[data-personal-mobile-view="blocks"] #schedule{
+ box-sizing:border-box;
+ background:transparent!important;
+}
+body[data-personal-mobile-view="blocks"] #schedule>.card{
+ border:1px solid #eec4d3!important;
+ border-radius:14px!important;
+ background:linear-gradient(145deg,#fff,#fff0f6)!important;
+ box-shadow:0 3px 14px #9c2b5619!important;
+}
+body[data-personal-mobile-view="blocks"] #mobileBlocks{
+ padding:13px!important;
+ background:linear-gradient(145deg,#fff,#fff0f6)!important;
+ border:1px solid #eec4d3!important;
+ border-radius:12px!important;
+}
+body[data-personal-mobile-view="blocks"] #mobileBlocks>h3{
+ color:#6e2143!important;font-size:17px!important;
+ border-bottom:1px solid #eec4d3;padding-bottom:11px!important;
+}
+body[data-personal-mobile-view="blocks"] #mobileBlocks button{
+ border:1px solid #eec4d3!important;
+ border-radius:8px!important;
+ background:#fff!important;color:#6e2143!important;
+}
+body[data-personal-mobile-view="blocks"] #mobileBlocks button:focus-visible{
+ outline:2px solid #9c2b56!important;outline-offset:2px;
+}
+body[data-personal-mobile-view="blocks"] #mobileBlocks input,
+body[data-personal-mobile-view="blocks"] #mobileBlocks select{
+ accent-color:#9c2b56;border-color:#eec4d3!important;
+}
+body[data-personal-mobile-view="blocks"] #blockCalendarGrid{
+ background:#fff!important;border:1px solid #eec4d3!important;
+ border-radius:11px!important;padding:8px!important;
+}
+#personalMobileTop #personalMobileNotificationSettings .personal-mobile-notification-panel{
+ border:1px solid #eec4d3!important;
+ background:linear-gradient(145deg,#fff,#fff0f6)!important;
+}
+#personalMobileTop #personalMobileNotificationSettings .personal-mobile-notification-heading strong{
+ color:#6e2143!important;
+}
+#personalMobileTop #personalMobileNotificationSettings button{
+ border-color:#eec4d3!important;
+ background:#fff!important;color:#6e2143!important;
+}
+#personalMobileTop #personalMobileNotificationSettings #personalPushEnable{
+ background:linear-gradient(120deg,#53142e 0%,#9b325d 58%,#d56b96 100%)!important;
+ color:#fff8fc!important;
+}
+@media(max-width:900px){
+ #gate.gate{
+  background:linear-gradient(140deg,#fff8fb,#f2dce7)!important;
+ }
+ #gate .card{
+  border-color:#eec4d3!important;
+  box-shadow:0 12px 32px #9c2b5618!important;
+ }
+ #gate .personal-login-brand strong{
+  color:#6e2143!important;
+ }
+ #gate button#mobileLoginBtn{
+  background:#9c2b56!important;
+ }
+}
