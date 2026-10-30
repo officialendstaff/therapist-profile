@@ -1,0 +1,23 @@
+{
+  "name": "L GROUP お祭り 面接管理",
+  "short_name": "お祭り 面接",
+  "start_url": "/therapist-profile/staff/interview-personal/festival/",
+  "scope": "/therapist-profile/staff/interview-personal/festival/",
+  "display": "standalone",
+  "background_color": "#f3f6fa",
+  "theme_color": "#f3f6fa",
+  "icons": [
+    {
+      "src": "/therapist-profile/staff/mobile/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/therapist-profile/staff/mobile/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
