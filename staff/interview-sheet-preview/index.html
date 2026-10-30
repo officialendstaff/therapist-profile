@@ -758,6 +758,10 @@ addMediaPie('問い合わせ',mediaNow,lineReady);
 addMediaPie('面接実施',attendedMedia,storeMetricsSheetsStatus==='ready');
 pie.append(pieRow);chart.append(pie);
 const compare=panel('');
+const priorSheets=storeMetricsSheets.filter(x=>attendanceStatuses.has(x.status)&&String(x.month||'')===previousKey&&matchShop(x.shop));
+const priorMedia=new Map();for(const x of priorSheets)for(const name of sheetMediaNames(x.source))priorMedia.set(name,(priorMedia.get(name)||0)+1);
+const currentAttendanceAvailable=storeMetricsSheetsStatus==='ready'&&attendedSheets.length>0;
+const priorAttendanceAvailable=storeMetricsSheetsStatus==='ready'&&priorSheets.length>0;
 const labels=[...new Set([...mediaNow.keys(),...mediaPrev.keys()])].sort((a,b)=>(mediaNow.get(b)||0)-(mediaNow.get(a)||0)).slice(0,12);const mediaColorByName=new Map([...mediaNow].map(([name])=>[name,mediaColor(name)]));
 if(lineReady&&labels.length){
 const legend=document.createElement('div');legend.style.cssText='display:flex;gap:18px;font-size:13px;font-weight:700;margin:10px 0';
