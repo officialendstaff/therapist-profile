@@ -656,7 +656,19 @@ const applicants=allApplicants.filter(a=>firstDate(a).slice(0,7)===month);
 const allInterviews=liveInterviewLists.rows.filter(r=>matchShop(r.shop));
 const interviews=allInterviews.filter(r=>String(r.date||'').slice(0,7)===month);
 const lineReady=lineInboxReadOnly.status==='ready'&&shop!=='BUSTY OSAKA',interviewReady=liveInterviewLists.status==='ready';
-const metrics=[['LINE応募者',lineReady?applicants.length:'—'],['面接予約',interviewReady?interviews.length:'—'],['面接実施',interviewReady?interviews.filter(r=>['来店済み','採用','不採用','辞退','在籍','入店'].includes(r.status)).length:'—'],['採用',interviewReady?interviews.filter(r=>['採用','在籍','入店'].includes(r.status)).length:'—'],['キャンセル',interviewReady?interviews.filter(r=>r.status==='キャンセル').length:'—'],['無断トビ',interviewReady?interviews.filter(r=>['無断トビ','トビ（キャンセル）'].includes(r.status)).length:'—']];
+const attendedStatuses=['来店済み','採用','不採用','辞退','在籍','入店'];
+const attendedCount=interviews.filter(r=>attendedStatuses.includes(r.status)).length;
+const hiredCount=interviews.filter(r=>['採用','在籍','入店'].includes(r.status)).length;
+const rejectedCount=interviews.filter(r=>r.status==='不採用').length;
+const cancelledCount=interviews.filter(r=>['キャンセル','無断トビ','トビ（キャンセル）'].includes(r.status)).length;
+const applicantKeys=new Set();
+for(const a of applicants)applicantKeys.add('line:'+String(a.accountId)+':'+String(a.lineUserId));
+if(interviewReady)for(const r of interviews){
+  if(r.lineUserId&&r.accountId)applicantKeys.add('line:'+String(r.accountId)+':'+String(r.lineUserId));
+  else applicantKeys.add('manual:'+String(r.interviewId));
+}
+const applicantCount=(lineReady&&interviewReady)?applicantKeys.size:null;
+const metrics=[['応募数',applicantCount===null?'—':applicantCount],['面接実施',interviewReady?attendedCount:'—'],['面接割合',applicantCount===null||!interviewReady?'—':applicantCount?Math.round(attendedCount/applicantCount*100)+'%':'0%'],['採用数',interviewReady?hiredCount:'—'],['不採用数',interviewReady?rejectedCount:'—'],['キャンセル',interviewReady?cancelledCount:'—']]
 const top=document.createElement('div');top.style.cssText='display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px';
 for(const [name,value] of metrics){const cell=document.createElement('div');cell.style.cssText='padding:12px;border:1px solid #d6e1ec;border-radius:7px;background:#f4f7fb';const label=document.createElement('div');label.textContent=name;label.style.cssText='font-size:11px;color:#5b6e85';const num=document.createElement('strong');num.textContent=value;num.style.cssText='font-size:23px';cell.append(label,num);top.append(cell)}root.append(top);
 const note=document.createElement('p');note.style.cssText='font-size:11px;color:#64748b';note.textContent=shop==='BUSTY OSAKA'?'BUSTY OSAKA：LINE未連携':'';if(note.textContent)root.append(note);
