@@ -256,7 +256,16 @@ button{font-family:inherit;letter-spacing:inherit}
 .decision-footer button{padding:9px 20px;border:1px solid #b9cbe0;border-radius:5px;background:#f1f5f9;color:#234}
 .decision-footer button.primary{background:#2868a3;color:white;border-color:#2868a3}
 @media(max-width:850px){.detail-current{padding-right:12px;padding-bottom:50px}.detail-decision-actions{top:auto;bottom:9px;transform:none;left:12px;right:auto}.decision-popup{width:min(520px,95vw)}}
-.brand{display:flex;align-items:center;gap:9px;text-align:left;font-weight:700;white-space:nowrap}.brand img{width:46px;height:46px;object-fit:contain;border-radius:8px}.brand #homeLabel{font-size:17px}.header-actions #adminAuthOpen.header-account-control{position:static;bottom:auto;right:auto;transform:none;background:#e8edf5;color:#263c58;border:0;border-radius:5px;padding:8px 12px;font-size:12px;height:auto}.manual-applicant-avatar{display:flex!important;flex-direction:column;align-items:center;justify-content:center;background:#e5e7eb!important;color:#475569!important;border:1px solid #94a3b8!important}.manual-applicant-symbol{font-size:17px;line-height:1}.manual-applicant-label{font-size:9px;line-height:1.3;font-weight:700}</style><style>.nav .admin-menu-pending{color:#65758a;cursor:not-allowed}.nav .admin-menu-note{margin-left:auto;font-size:9px;color:#8894a4}.nav .admin-menu-pending:hover{background:transparent}</style><style>#listShopFilter{height:29px;min-width:145px;max-width:190px;border:1px solid #cbd8e8;border-radius:5px;background:#fff;color:#26384d;font-size:12px;padding:3px 6px;margin-right:9px}#listShopFilter[hidden]{display:none!important}</style><link rel="stylesheet" href="./personal-mobile.css?v=20261030a"></head><body>
+.brand{display:flex;align-items:center;gap:9px;text-align:left;font-weight:700;white-space:nowrap}.brand img{width:46px;height:46px;object-fit:contain;border-radius:8px}.brand #homeLabel{font-size:17px}.header-actions #adminAuthOpen.header-account-control{position:static;bottom:auto;right:auto;transform:none;background:#e8edf5;color:#263c58;border:0;border-radius:5px;padding:8px 12px;font-size:12px;height:auto}.manual-applicant-avatar{display:flex!important;flex-direction:column;align-items:center;justify-content:center;background:#e5e7eb!important;color:#475569!important;border:1px solid #94a3b8!important}.manual-applicant-symbol{font-size:17px;line-height:1}.manual-applicant-label{font-size:9px;line-height:1.3;font-weight:700}</style><style>.nav .admin-menu-pending{color:#65758a;cursor:not-allowed}.nav .admin-menu-note{margin-left:auto;font-size:9px;color:#8894a4}.nav .admin-menu-pending:hover{background:transparent}</style><style>#listShopFilter{height:29px;min-width:145px;max-width:190px;border:1px solid #cbd8e8;border-radius:5px;background:#fff;color:#26384d;font-size:12px;padding:3px 6px;margin-right:9px}#listShopFilter[hidden]{display:none!important}</style><link rel="stylesheet" href="./personal-mobile.css?v=20261030a"><script>
+if(new URLSearchParams(location.search).get('personalMobile')==='1'&&window.parent!==window){
+ document.documentElement.classList.add('personal-mobile-embed');
+}
+</script><style>
+html.personal-mobile-embed #adminAuthDialog,
+html.personal-mobile-embed #adminAuthOpen{display:none!important}
+html.personal-mobile-embed:not(.personal-mobile-ready) .main{visibility:hidden!important}
+html.personal-mobile-embed.personal-mobile-ready .main{visibility:visible!important}
+</style></head><body>
 <header class="header"><button class="brand" id="home"><img id="homeAvatar" src="./icons/recruit-180.png" alt="" onerror="this.style.display='none'"><span id="homeLabel">TOP</span></button><div class="header-actions"><button id="headerLineInbox" type="button"><svg class="header-bell" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>LINE通知</button><button id="manualInterviewOpen" type="button">面接登録</button><button id="sound">通知設定</button></div></header>
 <section class="calendar" aria-label="月間カレンダー"><div class="cal-head"><button id="prev" aria-label="前月">◀</button><span id="month"></span><button id="next" aria-label="翌月">▶</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="days" id="days"></div></section>
 <section class="chart" aria-label="担当者タイムチャート"><div class="chart-title"><span>担当者タイムチャート</span><span id="selectedDate" class="chart-date"></span></div><div class="chart-scroll"><div class="chart-grid" id="chartGrid"></div></div><div class="legend"><span><i style="background:linear-gradient(90deg,#E9E4F3 25%,#E4EFFB 25% 50%,#F9E5ED 50% 75%,#E5F2ED 75%)"></i>選択可能</span><span><i style="background:#d4d8df"></i>選択不可</span><span><i style="background:#FACC15;border:1px solid #A16207"></i>面接予約済み</span><span class="status" id="slotStatus">対応可能時間は個人ページの設定を参照します</span></div></section>
@@ -940,6 +949,37 @@ window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===
  const el=id=>document.getElementById(id),dialog=el('adminAuthDialog'),open=el('adminAuthOpen'),message=el('adminAuthMessage'),logout=el('adminAuthLogout'),form=el('adminAuthForm');
  document.querySelector('.header-actions')?.appendChild(open);open.classList.add('header-account-control');
  let mode='admin',role=null;
+ const mobileEmbedded=new URLSearchParams(location.search).get('personalMobile')==='1'&&window.parent!==window;
+ // The iframe remains independently authenticated by Supabase. Copy an existing
+ // same-origin parent session only if WebKit has isolated this frame's storage.
+ function restoreParentSession(){
+  if(!mobileEmbedded)return;
+  try{
+   if(window.parent.location.origin!==location.origin)return;
+   const parentSession=window.parent.sessionStorage.getItem('mattan-recruit-auth');
+   if(parentSession&&!sessionStorage.getItem('mattan-recruit-auth')){
+    sessionStorage.setItem('mattan-recruit-auth',parentSession);
+   }
+  }catch(error){console.warn('Personal TOP session access:',error)}
+ }
+ function showEmbeddedAuthError(){
+  if(!mobileEmbedded)return;
+  dialog.classList.remove('open');
+  document.documentElement.classList.add('personal-mobile-ready');
+  const old=document.getElementById('personalMobileAuthError');
+  if(old)return;
+  const pane=document.createElement('section');
+  pane.id='personalMobileAuthError';
+  pane.setAttribute('role','alert');
+  pane.style.cssText='position:fixed;inset:0;z-index:2147483646;background:#f3f6fa;color:#24344a;padding:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;font-size:14px';
+  const title=document.createElement('strong');title.style.fontSize='17px';title.textContent='面接管理の認証を確認できませんでした';
+  const description=document.createElement('p');description.style.maxWidth='340px';description.textContent='再ログインはスマホTOPで行ってください。ログイン済みの場合は、通信状態を確認して再度開いてください。';
+  const button=document.createElement('button');button.type='button';button.textContent='スマホTOPに戻る';
+  button.style.cssText='padding:12px 20px;background:#315d8f;color:white;border:0;border-radius:8px';
+  button.addEventListener('click',()=>window.parent.postMessage({type:'personal-mobile-back'},location.origin));
+  pane.append(title,description,button);document.body.append(pane);
+ }
+ restoreParentSession();
  // Only a directly opened mobile management page redirects administrators to
  // their own personal TOP. Embedded views and staff accounts stay in place.
  function redirectMobileAdmin(profileKey){
@@ -955,11 +995,20 @@ window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===
  function apply(next,name,profileKey){const avatar=document.getElementById('homeAvatar'),label=document.getElementById('homeLabel');const names={owner:'村上',president:'社長',ota:'オオタ',festival:'お祭り'};const key=profileKey||'';window.interviewCurrentProfileKey=next==='admin'?key:null;label.textContent=next==='admin'?(names[key]||name||'管理者')+' TOP':'TOP';avatar.src=next==='admin'&&key==='owner'?'./icons/murakami-512.png':'./icons/recruit-180.png';avatar.style.display='block';role=next;window.interviewAdminAuthorized=next==='admin';window.interviewStaffAuthorized=next==='staff';document.body.classList.toggle('interview-admin-locked',!next);open.textContent=next?'アカウント':'ログイン';open.style.display='';logout.hidden=!next;document.querySelectorAll('#nav button').forEach(b=>{if(b.dataset.page==='Interview Sheet'||b.dataset.page==='集計頁')b.hidden=next==='staff'});if(next==='staff'&&document.querySelector('.main-panel')?.classList.contains('sheet-mode')){document.querySelector('.main-panel').classList.remove('sheet-mode');document.getElementById('home')?.click()}}
  async function exchangeAdminToken(){const {data:{session}}=await auth.auth.getSession();if(!session?.access_token)throw Error('管理者セッションがありません');const res=await fetch(staffApi,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},cache:'no-store',body:JSON.stringify({action:'admin_exchange'})});const data=await res.json();if(!res.ok||!data.token)throw Error('データ接続の認証に失敗しました');sessionStorage.setItem('interview_staff_session_v2',data.token);localStorage.removeItem('interview_staff_session_v2');void Promise.allSettled([refreshInterviewLists(),refreshLineInboxReadOnly(),loadRealInterviewSheets()]);return data.token}
  async function adminProfile(){const {data:{user}}=await auth.auth.getUser();if(!user)return null;const {data,error}=await auth.rpc('interview_my_profile');if(error)return null;const profile=Array.isArray(data)?data[0]:data;return ['president','ota','owner','festival'].includes(profile?.profile_key)?profile:null}
- async function restore(){const p=await adminProfile();if(p){try{await exchangeAdminToken();if(redirectMobileAdmin(p.profile_key))return true;apply('admin',p.display_name,p.profile_key);return true}catch(e){console.error('管理者データ認証',e);apply(null);message.textContent='データ接続の認証に失敗しました。再ログインしてください。';return false}}const token=sessionStorage.getItem('interview_staff_session_v2');if(token){try{const res=await fetch(staffApi,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify',token})});if(res.ok){apply('staff');return true}}catch(e){}sessionStorage.removeItem('interview_staff_session_v2')}apply(null);return false}
+ async function restore(){const p=await adminProfile();if(p){try{await exchangeAdminToken();if(redirectMobileAdmin(p.profile_key))return true;apply('admin',p.display_name,p.profile_key);return true}catch(e){console.error('管理者データ認証',e);apply(null);message.textContent='データ接続の認証に失敗しました。再ログインしてください。';return false}}if(mobileEmbedded)return false;const token=sessionStorage.getItem('interview_staff_session_v2');if(token){try{const res=await fetch(staffApi,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify',token})});if(res.ok){apply('staff');return true}}catch(e){}sessionStorage.removeItem('interview_staff_session_v2')}apply(null);return false}
  open.onclick=()=>dialog.classList.add('open');el('adminAuthCancel').onclick=()=>{if(role)dialog.classList.remove('open');else message.textContent='ログインが必要です。'};
  form.onsubmit=async e=>{e.preventDefault();message.textContent='認証しています…';el('authSubmit').disabled=true;try{if(mode==='admin'){const {error}=await auth.auth.signInWithPassword({email:form.elements.email.value.trim(),password:form.elements.password.value});if(error)throw Error('IDまたはPASSが正しくありません。');const p=await adminProfile();if(!p){await auth.auth.signOut({scope:'local'});throw Error('管理者アカウントではありません。')}await exchangeAdminToken();if(redirectMobileAdmin(p.profile_key))return;apply('admin',p.display_name,p.profile_key)}else{const res=await fetch(staffApi,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'login',password:form.elements.staffPassword.value})});const data=await res.json();if(!res.ok||!data.token)throw Error('スタッフ共通PASSが正しくありません。');sessionStorage.setItem('interview_staff_session_v2',data.token);apply('staff')}message.textContent='';form.reset();dialog.classList.remove('open')}catch(err){message.textContent=err.message||'ログインできませんでした。'}finally{el('authSubmit').disabled=false}};
  logout.onclick=async()=>{if(role==='admin')await auth.auth.signOut({scope:'local'});sessionStorage.removeItem('interview_staff_session_v2');localStorage.removeItem('interview_staff_session_v2');apply(null);dialog.classList.add('open')};
- document.body.classList.add('interview-admin-locked');restore().then(ok=>{dialog.classList.toggle('open',!ok)}).catch(()=>{message.textContent='認証状態を確認できませんでした。';dialog.classList.add('open')});
+ document.body.classList.add('interview-admin-locked');
+ restore().then(ok=>{
+  if(mobileEmbedded){if(!ok)showEmbeddedAuthError();return}
+  dialog.classList.toggle('open',!ok);
+ }).catch(error=>{
+  console.error('面接管理の認証復元:',error);
+  message.textContent='認証状態を確認できませんでした。';
+  if(mobileEmbedded)showEmbeddedAuthError();
+  else dialog.classList.add('open');
+ });
 })();
 </script>
 <script id="today-top-startup-fallback">(function(){function top(){const p=document.querySelector('.main-panel');if(!p)return;p.classList.remove('sheet-mode');const nav=document.querySelector('#nav button[data-page="今日の予定"]');document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b===nav));const today=document.getElementById('todayPanel'),shared=document.getElementById('sharedPanel');if(today)today.hidden=false;if(shared)shared.hidden=true;}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',top,{once:true});else top();})();</script><script id="personal-mobile-embed-route">
@@ -977,6 +1026,7 @@ window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===
   const link=Array.from(document.querySelectorAll('#nav button[data-page]')).find(btn=>btn.dataset.page===page);
   if(!link)return false;
   link.click();
+  document.documentElement.classList.add('personal-mobile-ready');
   return true;
  }
  function initialize(){
