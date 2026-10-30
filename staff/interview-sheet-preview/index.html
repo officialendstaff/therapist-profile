@@ -765,7 +765,7 @@ const priorAttendanceAvailable=storeMetricsSheetsStatus==='ready'&&priorSheets.l
 const labels=[...new Set([...mediaNow.keys(),...mediaPrev.keys(),...attendedMedia.keys(),...priorMedia.keys()])].sort((a,b)=>(mediaNow.get(b)||0)-(mediaNow.get(a)||0)||a.localeCompare(b,'ja'));const mediaColorByName=new Map([...mediaNow].map(([name])=>[name,mediaColor(name)]));
 if((lineReady||storeMetricsSheetsStatus==='ready')&&labels.length){
 const legend=document.createElement('div');legend.style.cssText='display:flex;gap:18px;font-size:13px;font-weight:700;margin:10px 0';
-for(const [name,color] of [['今月（媒体カラー）','#168CF2'],['先月（グレー）','#AEB7C5']]){const item=document.createElement('span');item.style.cssText='display:inline-flex;align-items:center;gap:6px';const square=document.createElement('span');square.style.cssText='width:13px;height:13px;background:'+color;item.append(square,document.createTextNode(name));legend.append(item)}legend.insertAdjacentText('beforeend','　太い棒：問い合わせ／細い棒：面接実施');compare.append(legend);
+for(const [name,color] of [['今月','#168CF2'],['先月','#AEB7C5']]){const item=document.createElement('span');item.style.cssText='display:inline-flex;align-items:center;gap:6px';const square=document.createElement('span');square.style.cssText='width:13px;height:13px;background:'+color;item.append(square,document.createTextNode(name));legend.append(item)}legend.insertAdjacentText('beforeend','　太：問い合わせ／細：面接実施');compare.append(legend);
 const max=Math.max(1,...labels.flatMap(k=>[mediaNow.get(k)||0,mediaPrev.get(k)||0,attendedMedia.get(k)||0,priorMedia.get(k)||0]));
 const graph=document.createElement('div');graph.style.cssText='display:flex;gap:5px;height:265px;align-items:stretch;border-bottom:1px solid #cbd5e1;padding-top:12px';
 for(const name of labels){
