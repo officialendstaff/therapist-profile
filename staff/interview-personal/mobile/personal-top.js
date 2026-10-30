@@ -61,20 +61,7 @@
   frame.src='/therapist-profile/staff/interview-sheet-preview/?personalMobile=1&page='+encodeURIComponent(key)+'&v=20261030c';
  }
  function updateBadges(){
-  const userId=typeof personalViewer!=='undefined'?personalViewer?.userId:null;
-  if(userId){
-   const today=new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Tokyo'});
-   const rows=Array.isArray(window.scheduleInterviewRows)?window.scheduleInterviewRows:[];
-   const count=rows.filter(x=>String(x.interviewer_user_id)===String(userId)&&String(x.interview_date)===today&&['面接予定','日程変更'].includes(x.status)).length;
-   const badge=top.querySelector('[data-personal-menu="今日の予定"] .personal-mobile-count');
-   badge.textContent=String(count);badge.hidden=count===0;
-  }
-  const sheet=document.getElementById('mobileSheetAlert');
-  const sheetCount=document.getElementById('mobileSheetCount');
-  const matched=(sheetCount?.textContent||'').match(/\d+/);
-  const count=sheet&&sheet.style.display!=='none'&&matched?Number(matched[0]):0;
-  const badge=top.querySelector('[data-personal-menu="Interview Sheet"] .personal-mobile-count');
-  badge.textContent=String(count);badge.hidden=count===0;
+  if(typeof window.personalMobileNotificationsUpdate==='function')window.personalMobileNotificationsUpdate();
  }
  function sync(){
   if(!mobile()||!authorized()){
