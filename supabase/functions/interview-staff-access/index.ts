@@ -11,6 +11,20 @@ const url=Deno.env.get("SUPABASE_URL"),service=Deno.env.get("SUPABASE_SERVICE_RO
 const db=createClient(url,service,{auth:{persistSession:false,autoRefreshToken:false}});
 let body:any;try{body=await req.json()}catch{return response({error:"invalid"},400)}
 const action=body?.action;
+if(action==="admin_exchange"){
+ const bearer=req.headers.get("authorization")||"";
+ const jwt=bearer.match(/^Bearer (.+)$/i)?.[1];
+ if(!jwt)return response({error:"unauthorized"},401);
+ const {data:{user},error:userError}=await db.auth.getUser(jwt);
+ if(userError||!user)return response({error:"unauthorized"},401);
+ const {data:assignment,error:assignmentError}=await db.from("interview_staff_assignments").select("profile_key").eq("user_id",user.id).maybeSingle();
+ if(assignmentError||!["president","ota","owner","festival"].includes(String(assignment?.profile_key||"")))return response({error:"forbidden"},403);
+ const token=hex(crypto.getRandomValues(new Uint8Array(32)));
+ const expires=new Date(Date.now()+8*60*60*1000).toISOString();
+ const {error:sessionError}=await db.from("interview_access_sessions").insert({token_digest:await digest(token),expires_at:expires});
+ if(sessionError)return response({error:"session"},503);
+ return response({token,expires_at:expires});
+}
 if(action==="login"){
 const password=body?.password;if(typeof password!=="string"||password.length>128)return response({error:"invalid"},400);
 const ip=req.headers.get("cf-connecting-ip")||req.headers.get("x-forwarded-for")?.split(",")[0]||"unknown";
