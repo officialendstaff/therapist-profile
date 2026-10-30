@@ -741,7 +741,7 @@ function addMediaPie(title,counts,ready){
  let running=0;const stops=segments.map(([name,n])=>{const from=running;running+=100*n/total;return mediaColor(name)+' '+from+'% '+running+'%'});
  const holder=document.createElement('div');holder.style.cssText='position:relative;display:flex;align-items:center;justify-content:center;width:100%;min-width:0';
  const circle=document.createElement('div');
- circle.style.cssText='width:250px;max-width:100%;height:auto;aspect-ratio:1;flex-shrink:0;border-radius:50%;cursor:crosshair;background:radial-gradient(ellipse at 28% 20%,rgba(255,255,255,.55),rgba(255,255,255,.16) 33%,transparent 59%),radial-gradient(ellipse at 76% 83%,rgba(0,0,0,.16),transparent 51%),conic-gradient('+stops.join(',')+');box-shadow:inset 0 2px 4px rgba(255,255,255,.45),inset -4px -5px 10px rgba(0,0,0,.09)';
+ circle.style.cssText='width:265px;max-width:100%;height:auto;aspect-ratio:1;flex-shrink:0;border-radius:50%;cursor:crosshair;background:radial-gradient(ellipse at 28% 20%,rgba(255,255,255,.55),rgba(255,255,255,.16) 33%,transparent 59%),radial-gradient(ellipse at 76% 83%,rgba(0,0,0,.16),transparent 51%),conic-gradient('+stops.join(',')+');box-shadow:inset 0 2px 4px rgba(255,255,255,.45),inset -4px -5px 10px rgba(0,0,0,.09)';
  circle.setAttribute('role','img');circle.setAttribute('aria-label',title);
  const tooltip=document.createElement('div');
  tooltip.style.cssText='position:absolute;z-index:30;display:none;bottom:12px;left:50%;transform:translateX(-50%);pointer-events:none;padding:7px 10px;border-radius:6px;background:rgba(20,38,63,.94);color:white;font-weight:700;font-size:12px;white-space:nowrap;box-shadow:0 4px 15px rgba(0,0,0,.2)';
