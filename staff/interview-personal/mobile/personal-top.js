@@ -1,4 +1,4 @@
-/* Shared mobile TOP / navigation for owner, president, ota and festival. */
+/* Shared responsive TOP / navigation for owner, president, ota and festival. */
 (function(){
  'use strict';
  const profile=window.__interviewPersonal?.profile;
@@ -34,11 +34,10 @@
  const blockBar=document.createElement('div');blockBar.id='personalMobileBlockBar';blockBar.innerHTML='<button type="button" data-personal-back>‹ TOP</button><strong>対応不可の設定</strong>';
  document.body.append(top,viewer,blockBar);
  const gate=document.getElementById('gate'),frame=viewer.querySelector('iframe');
- const mobile=()=>window.matchMedia('(max-width:900px)').matches;
  const authorized=()=>gate?.style.display==='none';
  function clearFrame(){if(frame.getAttribute('src'))frame.setAttribute('src','about:blank')}
  function showHome(){
-  if(!mobile()||!authorized())return;
+  if(!authorized())return;
   clearFrame();
   try{if(typeof openSpSection==='function')openSpSection('home')}catch(error){console.warn('TOP return',error)}
   document.body.dataset.personalMobileView='home';
@@ -46,7 +45,7 @@
   updateBadges();
  }
  function openPage(key){
-  if(!mobile()||!authorized())return;
+  if(!authorized())return;
   if(key==='対応不可'){
    clearFrame();
    document.body.dataset.personalMobileView='blocks';
@@ -64,7 +63,7 @@
   if(typeof window.personalMobileNotificationsUpdate==='function')window.personalMobileNotificationsUpdate();
  }
  function sync(){
-  if(!mobile()||!authorized()){
+  if(!authorized()){
    if(document.body.dataset.personalMobileView==='app')clearFrame();
    document.body.removeAttribute('data-personal-mobile-view');
    return;
