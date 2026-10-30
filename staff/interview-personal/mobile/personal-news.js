@@ -6,6 +6,7 @@
  const controls=top?.querySelector('.personal-mobile-header-tools');
  const bell=controls?.querySelector('.personal-mobile-settings');
  if(!top||!controls||!bell)return;
+ top.dataset.personalTheme=window.__interviewPersonal?.profile||'';
 
  const button=document.createElement('button');
  button.type='button';
