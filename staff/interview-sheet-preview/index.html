@@ -727,21 +727,21 @@ const attendedMedia=new Map();
 for(const sheet of attendedSheets)for(const name of sheetMediaNames(sheet.source))attendedMedia.set(name,(attendedMedia.get(name)||0)+1);
 const pie=panel('');
 const pieRow=document.createElement('div');
-pieRow.style.cssText='display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:center;justify-items:center;width:100%;height:100%';
+pieRow.style.cssText='display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;align-items:center;justify-items:center;width:100%;height:100%';
 function addMediaPie(title,counts,ready){
- const widget=document.createElement('div');widget.style.cssText='display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;width:100%;min-width:0;height:100%';
+ const widget=document.createElement('div');widget.style.cssText='display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;width:100%;min-width:0;height:100%';
  const heading=document.createElement('div');heading.textContent=title;heading.style.cssText='font-size:13px;font-weight:700;color:#24354c;text-align:center';widget.append(heading);
  const total=[...counts.values()].reduce((a,b)=>a+b,0);
  if(!ready||!total){
   const empty=document.createElement('div');empty.textContent=!ready?(storeMetricsSheetsStatus==='error'?'面接データ取得失敗':storeMetricsSheetsStatus==='login-required'?'ログインが必要です':'データ取得中'):'該当データなし';
-  empty.style.cssText='display:grid;place-items:center;width:min(100%,218px);aspect-ratio:1;border-radius:50%;background:#f0f3f7;color:#64748b;font-size:12px';
+  empty.style.cssText='display:grid;place-items:center;width:250px;max-width:100%;aspect-ratio:1;border-radius:50%;background:#f0f3f7;color:#64748b;font-size:12px';
   widget.append(empty);pieRow.append(widget);return;
  }
  const segments=[...counts.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],'ja'));
  let running=0;const stops=segments.map(([name,n])=>{const from=running;running+=100*n/total;return mediaColor(name)+' '+from+'% '+running+'%'});
- const holder=document.createElement('div');holder.style.cssText='position:relative;display:grid;place-items:center;width:100%';
+ const holder=document.createElement('div');holder.style.cssText='position:relative;display:flex;align-items:center;justify-content:center;width:100%;min-width:0';
  const circle=document.createElement('div');
- circle.style.cssText='width:min(100%,218px);aspect-ratio:1;border-radius:50%;cursor:crosshair;background:radial-gradient(ellipse at 28% 20%,rgba(255,255,255,.55),rgba(255,255,255,.16) 33%,transparent 59%),radial-gradient(ellipse at 76% 83%,rgba(0,0,0,.16),transparent 51%),conic-gradient('+stops.join(',')+');box-shadow:inset 0 2px 4px rgba(255,255,255,.45),inset -4px -5px 10px rgba(0,0,0,.09)';
+ circle.style.cssText='width:250px;max-width:100%;height:auto;aspect-ratio:1;flex-shrink:0;border-radius:50%;cursor:crosshair;background:radial-gradient(ellipse at 28% 20%,rgba(255,255,255,.55),rgba(255,255,255,.16) 33%,transparent 59%),radial-gradient(ellipse at 76% 83%,rgba(0,0,0,.16),transparent 51%),conic-gradient('+stops.join(',')+');box-shadow:inset 0 2px 4px rgba(255,255,255,.45),inset -4px -5px 10px rgba(0,0,0,.09)';
  circle.setAttribute('role','img');circle.setAttribute('aria-label',title);
  const tooltip=document.createElement('div');
  tooltip.style.cssText='position:absolute;z-index:30;display:none;bottom:12px;left:50%;transform:translateX(-50%);pointer-events:none;padding:7px 10px;border-radius:6px;background:rgba(20,38,63,.94);color:white;font-weight:700;font-size:12px;white-space:nowrap;box-shadow:0 4px 15px rgba(0,0,0,.2)';
