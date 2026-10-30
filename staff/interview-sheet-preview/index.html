@@ -643,7 +643,20 @@ function renderTodayTest(){updateSidebarCounts();const el=$('todayTestList');el.
 
 function bindStoreMetrics(){const shop=document.getElementById('storeMetricsShop'),month=document.getElementById('storeMetricsMonth');if(shop&&!shop.dataset.bound){shop.addEventListener('change',renderStoreMetrics);month.addEventListener('change',renderStoreMetrics);for(const [id,delta] of [['storeMetricsPrev',-1],['storeMetricsNext',1]])document.getElementById(id).addEventListener('click',()=>{const [y,m]=month.value.split('-').map(Number);const d=new Date(y,m-1+delta,1);const next=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');const current=dateKey(new Date()).slice(0,7);month.value=next>current?current:next;renderStoreMetrics()});for(const year of [2025,2026])document.getElementById('storeMetrics'+year).addEventListener('click',()=>{month.value=year===new Date().getFullYear()?dateKey(new Date()).slice(0,7):year+'-12';renderStoreMetrics()});shop.dataset.bound='1'}}
 let storeMetricsHistoricalMonthly=[];
-function showStoreMetrics(){bindStoreMetrics();currentPage='集計頁';$('todayPanel').hidden=true;$('sharedPanel').hidden=true;$('applicantDetail').hidden=true;$('registrationPanel').hidden=true;$('storeMetrics').hidden=false;document.querySelector('.main-panel').classList.remove('sheet-mode');document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.page==='集計頁'));if(!$('storeMetricsMonth').value)$('storeMetricsMonth').value=dateKey(new Date()).slice(0,7);renderStoreMetrics();refreshLineInboxReadOnly().then(()=>renderStoreMetrics());refreshInterviewLists().then(()=>renderStoreMetrics())}
+let storeMetricsSheets=[];
+let storeMetricsSheetsStatus='idle';
+async function refreshStoreMetricsSheets(){
+ const token=sessionStorage.getItem('interview_staff_session_v2')||localStorage.getItem('interview_staff_session_v2');
+ if(!token){storeMetricsSheetsStatus='login-required';return false}
+ storeMetricsSheetsStatus='loading';
+ try{
+  const res=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({action:'metrics_sheets',token})});
+  const data=await res.json();if(!res.ok||!Array.isArray(data.sheets))throw Error(data.error||'metrics_sheet_fetch_failed');
+  storeMetricsSheets=data.sheets;storeMetricsSheetsStatus='ready';return true;
+ }catch(e){storeMetricsSheetsStatus='error';return false}
+}
+
+function showStoreMetrics(){bindStoreMetrics();currentPage='集計頁';$('todayPanel').hidden=true;$('sharedPanel').hidden=true;$('applicantDetail').hidden=true;$('registrationPanel').hidden=true;$('storeMetrics').hidden=false;document.querySelector('.main-panel').classList.remove('sheet-mode');document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.page==='集計頁'));if(!$('storeMetricsMonth').value)$('storeMetricsMonth').value=dateKey(new Date()).slice(0,7);renderStoreMetrics();refreshLineInboxReadOnly().then(()=>renderStoreMetrics());refreshInterviewLists().then(()=>renderStoreMetrics());refreshStoreMetricsSheets().then(()=>{if(!$('storeMetrics').hidden)renderStoreMetrics()})}
 function renderStoreMetrics(){
 const root=$('storeMetricsBody');if(!root)return;root.replaceChildren();
 const shop=$('storeMetricsShop').value;const todayMonth=dateKey(new Date()).slice(0,7);if($('storeMetricsMonth').value>todayMonth)$('storeMetricsMonth').value=todayMonth;const month=$('storeMetricsMonth').value;
