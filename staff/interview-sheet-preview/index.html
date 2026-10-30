@@ -1020,6 +1020,12 @@ window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===
  const routes={'LINE通知':'LINE通知','今日の予定':'今日の予定','Interview Sheet':'Interview Sheet','面接済み':'面接済み','明日以降':'明日以降','日程調整':'日程調整','店舗数値':'集計頁'};
  const page=routes[requested];
  if(!page)return;
+ // Only mobile Interview Sheet uses a fresh dedicated version of its inner view.
+ // Keep the PC iframe URL and all other management pages unchanged.
+ if(requested==='Interview Sheet'){
+  const sheetFrame=document.querySelector('.sheet-preview-host iframe');
+  if(sheetFrame)sheetFrame.src='./sheet.html?v=20261030d';
+ }
  function activate(){
   if(document.body.classList.contains('interview-admin-locked'))return false;
   if(!window.interviewAdminAuthorized)return false;
