@@ -733,7 +733,7 @@ function addMediaPie(title,counts,ready){
  const heading=document.createElement('div');heading.textContent=title;heading.style.cssText='font-size:13px;font-weight:700;color:#24354c;text-align:center';widget.append(heading);
  const total=[...counts.values()].reduce((a,b)=>a+b,0);
  if(!ready||!total){
-  const empty=document.createElement('div');empty.textContent=!ready?'データ取得中':'該当データなし';
+  const empty=document.createElement('div');empty.textContent=!ready?(storeMetricsSheetsStatus==='error'?'面接データ取得失敗':storeMetricsSheetsStatus==='login-required'?'ログインが必要です':'データ取得中'):'該当データなし';
   empty.style.cssText='display:grid;place-items:center;width:min(100%,218px);aspect-ratio:1;border-radius:50%;background:#f0f3f7;color:#64748b;font-size:12px';
   widget.append(empty);pieRow.append(widget);return;
  }
