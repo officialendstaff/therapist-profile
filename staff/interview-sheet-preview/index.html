@@ -185,6 +185,10 @@ button{font-family:inherit;letter-spacing:inherit}
 
 /* Store metrics: dedicated narrow-screen dashboard; desktop remains unchanged */
 @media(max-width:700px){
+ body:has(#storeMetrics:not([hidden])) .header-actions{display:none!important}
+ body:has(#storeMetrics:not([hidden])) .header{justify-content:flex-start!important}
+ body:has(#storeMetrics:not([hidden])) .header .brand{max-width:100%;white-space:nowrap}
+
  body:has(#storeMetrics:not([hidden])) .calendar,
  body:has(#storeMetrics:not([hidden])) .chart,
  body:has(#storeMetrics:not([hidden])) .sidebar{display:none!important}
