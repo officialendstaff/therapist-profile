@@ -58,7 +58,7 @@
   if(!items.some(item=>item.key===key))return;
   viewer.querySelector('#personalMobileViewTitle').textContent=key;
   document.body.dataset.personalMobileView='app';
-  frame.src='/therapist-profile/staff/interview-sheet-preview/?personalMobile=1&page='+encodeURIComponent(key);
+  frame.src='/therapist-profile/staff/interview-sheet-preview/?personalMobile=1&page='+encodeURIComponent(key)+'&v=20261030c';
  }
  function updateBadges(){
   const userId=typeof personalViewer!=='undefined'?personalViewer?.userId:null;
@@ -102,6 +102,10 @@
   const node=document.getElementById(id);
   if(node)countObserver.observe(node,{subtree:true,childList:true,characterData:true,attributes:id==='mobileSheetAlert'});
  }
+ window.addEventListener('message',event=>{
+  if(event.origin!==location.origin||event.source!==frame.contentWindow)return;
+  if(event.data?.type==='personal-mobile-back')showHome();
+ });
  window.addEventListener('resize',sync);
  window.addEventListener('pageshow',sync);
  sync();
