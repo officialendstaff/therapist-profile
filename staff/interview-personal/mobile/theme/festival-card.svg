@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 230" preserveAspectRatio="xMidYMid slice">
+<defs><g id="wave" fill="none" stroke="#e8b7bc" stroke-width="2.1">
+<path d="M0 25Q20 0 40 25T80 25T120 25T160 25"/>
+<path d="M0 38Q20 13 40 38T80 38T120 38T160 38"/>
+<path d="M0 51Q20 26 40 51T80 51T120 51T160 51"/></g>
+<g id="b"><path d="M0-8C-5-16-14-6-7 0C-14 6-5 16 0 8C5 16 14 6 7 0C14-6 5-16 0-8Z" fill="#e6aab6"/><circle r="2" fill="#fff0d6"/></g></defs>
+<g opacity=".38"><use href="#wave" x="-60" y="190"/><use href="#wave" x="270" y="8" transform="rotate(8 320 20)"/></g>
+<use href="#b" transform="translate(325 20) scale(1.35)" opacity=".33"/>
+<use href="#b" transform="translate(28 195) scale(1.6)" opacity=".22"/>
+<path d="M300 0Q345 38 380 18" stroke="#ead2bd" stroke-width="2" opacity=".4" fill="none"/>
+</svg>
