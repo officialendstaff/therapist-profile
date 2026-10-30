@@ -1,6 +1,6 @@
 {
-  "name": "L GROUP オオタ 面接管理",
-  "short_name": "オオタ 面接",
+  "name": "L GROUP | RECRUIT MANAGEMENT",
+  "short_name": "L RECRUIT",
   "start_url": "/therapist-profile/staff/interview-personal/ota/",
   "scope": "/therapist-profile/staff/interview-personal/ota/",
   "display": "standalone",
@@ -8,14 +8,14 @@
   "theme_color": "#f3f6fa",
   "icons": [
     {
-      "src": "/therapist-profile/staff/mobile/icon-192.png",
-      "sizes": "192x192",
+      "src": "/therapist-profile/staff/interview-sheet-preview/icons/recruit-180.png?v=20261030",
+      "sizes": "180x180",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/therapist-profile/staff/mobile/icon-512.png",
-      "sizes": "512x512",
+      "src": "/therapist-profile/staff/interview-sheet-preview/icons/recruit-1024.png?v=20261030",
+      "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "any"
     }
