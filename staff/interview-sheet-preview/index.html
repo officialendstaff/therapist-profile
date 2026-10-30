@@ -909,6 +909,18 @@ window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===
 #adminAuthDialog input{width:100%;padding:12px;margin:5px 0 14px;border:1px solid #ccd5e1;border-radius:6px}
 #adminAuthDialog button{padding:11px 16px;border-radius:6px;border:1px solid #b6c5d6}
 #adminAuthDialog button[type=submit]{background:#225b91;color:white}
+@media(max-width:900px){
+ #adminAuthDialog{padding:12px;overflow-y:auto}
+ #adminAuthDialog .auth-card{box-sizing:border-box;width:min(100%,380px);max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);overflow-y:auto;padding:18px}
+ #adminAuthDialog label{font-size:14px}
+ #adminAuthDialog input{box-sizing:border-box;width:100%;font-size:16px!important;line-height:1.35;min-height:44px}
+ #adminAuthDialog button{min-height:42px}
+ body.interview-admin-locked:not(.personal-mobile-embedded)>.header,
+ body.interview-admin-locked:not(.personal-mobile-embedded)>.calendar,
+ body.interview-admin-locked:not(.personal-mobile-embedded)>.chart,
+ body.interview-admin-locked:not(.personal-mobile-embedded)>.sidebar,
+ body.interview-admin-locked:not(.personal-mobile-embedded)>.main{visibility:hidden}
+}
 </style>
 <button id="adminAuthOpen" type="button">ログイン</button>
 <div id="adminAuthDialog" role="dialog" aria-modal="true" aria-label="面接管理ログイン"><div class="auth-card">
@@ -928,16 +940,26 @@ window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===
  const el=id=>document.getElementById(id),dialog=el('adminAuthDialog'),open=el('adminAuthOpen'),message=el('adminAuthMessage'),logout=el('adminAuthLogout'),form=el('adminAuthForm');
  document.querySelector('.header-actions')?.appendChild(open);open.classList.add('header-account-control');
  let mode='admin',role=null;
+ // Only a directly opened mobile management page redirects administrators to
+ // their own personal TOP. Embedded views and staff accounts stay in place.
+ function redirectMobileAdmin(profileKey){
+  if(!window.matchMedia('(max-width:900px)').matches)return false;
+  if(window.self!==window.top)return false;
+  if(new URLSearchParams(location.search).get('personalMobile')==='1')return false;
+  if(!['owner','president','ota','festival'].includes(profileKey))return false;
+  location.replace('/therapist-profile/staff/interview-personal/'+profileKey+'/');
+  return true;
+ }
  function choose(next){mode=next;const staff=mode==='staff';el('adminEmailRow').hidden=staff;el('adminPasswordRow').hidden=staff;el('staffPasswordRow').hidden=!staff;form.elements.email.disabled=staff;form.elements.password.disabled=staff;form.elements.staffPassword.disabled=!staff;el('authHelp').textContent=staff?'スタッフ共通PASSでログインしてください。':'個人面接管理ページと同じID・PASSを使用します。';el('chooseAdmin').style.background=staff?'#fff':'#d9e9f9';el('chooseStaff').style.background=staff?'#d9e9f9':'#fff';message.textContent=''}
  el('chooseAdmin').onclick=()=>choose('admin');el('chooseStaff').onclick=()=>choose('staff');choose('admin');
  function apply(next,name,profileKey){const avatar=document.getElementById('homeAvatar'),label=document.getElementById('homeLabel');const names={owner:'村上',president:'社長',ota:'オオタ',festival:'お祭り'};const key=profileKey||'';window.interviewCurrentProfileKey=next==='admin'?key:null;label.textContent=next==='admin'?(names[key]||name||'管理者')+' TOP':'TOP';avatar.src=next==='admin'&&key==='owner'?'./icons/murakami-512.png':'./icons/recruit-180.png';avatar.style.display='block';role=next;window.interviewAdminAuthorized=next==='admin';window.interviewStaffAuthorized=next==='staff';document.body.classList.toggle('interview-admin-locked',!next);open.textContent=next?'アカウント':'ログイン';open.style.display='';logout.hidden=!next;document.querySelectorAll('#nav button').forEach(b=>{if(b.dataset.page==='Interview Sheet'||b.dataset.page==='集計頁')b.hidden=next==='staff'});if(next==='staff'&&document.querySelector('.main-panel')?.classList.contains('sheet-mode')){document.querySelector('.main-panel').classList.remove('sheet-mode');document.getElementById('home')?.click()}}
  async function exchangeAdminToken(){const {data:{session}}=await auth.auth.getSession();if(!session?.access_token)throw Error('管理者セッションがありません');const res=await fetch(staffApi,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},cache:'no-store',body:JSON.stringify({action:'admin_exchange'})});const data=await res.json();if(!res.ok||!data.token)throw Error('データ接続の認証に失敗しました');sessionStorage.setItem('interview_staff_session_v2',data.token);localStorage.removeItem('interview_staff_session_v2');void Promise.allSettled([refreshInterviewLists(),refreshLineInboxReadOnly(),loadRealInterviewSheets()]);return data.token}
  async function adminProfile(){const {data:{user}}=await auth.auth.getUser();if(!user)return null;const {data,error}=await auth.rpc('interview_my_profile');if(error)return null;const profile=Array.isArray(data)?data[0]:data;return ['president','ota','owner','festival'].includes(profile?.profile_key)?profile:null}
- async function restore(){const p=await adminProfile();if(p){try{await exchangeAdminToken();apply('admin',p.display_name,p.profile_key);return true}catch(e){console.error('管理者データ認証',e);apply(null);message.textContent='データ接続の認証に失敗しました。再ログインしてください。';return false}}const token=sessionStorage.getItem('interview_staff_session_v2');if(token){try{const res=await fetch(staffApi,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify',token})});if(res.ok){apply('staff');return true}}catch(e){}sessionStorage.removeItem('interview_staff_session_v2')}apply(null);return false}
+ async function restore(){const p=await adminProfile();if(p){try{await exchangeAdminToken();if(redirectMobileAdmin(p.profile_key))return true;apply('admin',p.display_name,p.profile_key);return true}catch(e){console.error('管理者データ認証',e);apply(null);message.textContent='データ接続の認証に失敗しました。再ログインしてください。';return false}}const token=sessionStorage.getItem('interview_staff_session_v2');if(token){try{const res=await fetch(staffApi,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify',token})});if(res.ok){apply('staff');return true}}catch(e){}sessionStorage.removeItem('interview_staff_session_v2')}apply(null);return false}
  open.onclick=()=>dialog.classList.add('open');el('adminAuthCancel').onclick=()=>{if(role)dialog.classList.remove('open');else message.textContent='ログインが必要です。'};
- form.onsubmit=async e=>{e.preventDefault();message.textContent='認証しています…';el('authSubmit').disabled=true;try{if(mode==='admin'){const {error}=await auth.auth.signInWithPassword({email:form.elements.email.value.trim(),password:form.elements.password.value});if(error)throw Error('IDまたはPASSが正しくありません。');const p=await adminProfile();if(!p){await auth.auth.signOut({scope:'local'});throw Error('管理者アカウントではありません。')}await exchangeAdminToken();apply('admin',p.display_name,p.profile_key)}else{const res=await fetch(staffApi,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'login',password:form.elements.staffPassword.value})});const data=await res.json();if(!res.ok||!data.token)throw Error('スタッフ共通PASSが正しくありません。');sessionStorage.setItem('interview_staff_session_v2',data.token);apply('staff')}message.textContent='';form.reset();dialog.classList.remove('open')}catch(err){message.textContent=err.message||'ログインできませんでした。'}finally{el('authSubmit').disabled=false}};
+ form.onsubmit=async e=>{e.preventDefault();message.textContent='認証しています…';el('authSubmit').disabled=true;try{if(mode==='admin'){const {error}=await auth.auth.signInWithPassword({email:form.elements.email.value.trim(),password:form.elements.password.value});if(error)throw Error('IDまたはPASSが正しくありません。');const p=await adminProfile();if(!p){await auth.auth.signOut({scope:'local'});throw Error('管理者アカウントではありません。')}await exchangeAdminToken();if(redirectMobileAdmin(p.profile_key))return;apply('admin',p.display_name,p.profile_key)}else{const res=await fetch(staffApi,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'login',password:form.elements.staffPassword.value})});const data=await res.json();if(!res.ok||!data.token)throw Error('スタッフ共通PASSが正しくありません。');sessionStorage.setItem('interview_staff_session_v2',data.token);apply('staff')}message.textContent='';form.reset();dialog.classList.remove('open')}catch(err){message.textContent=err.message||'ログインできませんでした。'}finally{el('authSubmit').disabled=false}};
  logout.onclick=async()=>{if(role==='admin')await auth.auth.signOut({scope:'local'});sessionStorage.removeItem('interview_staff_session_v2');localStorage.removeItem('interview_staff_session_v2');apply(null);dialog.classList.add('open')};
- document.body.classList.add('interview-admin-locked');dialog.classList.add('open');restore().then(ok=>{if(ok)dialog.classList.remove('open')}).catch(()=>{message.textContent='認証状態を確認できませんでした。'});
+ document.body.classList.add('interview-admin-locked');restore().then(ok=>{dialog.classList.toggle('open',!ok)}).catch(()=>{message.textContent='認証状態を確認できませんでした。';dialog.classList.add('open')});
 })();
 </script>
 <script id="today-top-startup-fallback">(function(){function top(){const p=document.querySelector('.main-panel');if(!p)return;p.classList.remove('sheet-mode');const nav=document.querySelector('#nav button[data-page="今日の予定"]');document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b===nav));const today=document.getElementById('todayPanel'),shared=document.getElementById('sharedPanel');if(today)today.hidden=false;if(shared)shared.hidden=true;}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',top,{once:true});else top();})();</script><script id="personal-mobile-embed-route">
