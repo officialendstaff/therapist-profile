@@ -725,7 +725,7 @@ const attendanceStatuses=new Set(['来店済み','採用','不採用','在籍','
 const attendedSheets=storeMetricsSheets.filter(x=>attendanceStatuses.has(x.status)&&String(x.month||'')===month&&matchShop(x.shop));
 const attendedMedia=new Map();
 for(const sheet of attendedSheets)for(const name of sheetMediaNames(sheet.source))attendedMedia.set(name,(attendedMedia.get(name)||0)+1);
-const pie=panel('');
+const pie=panel('');pie.style.padding='8px';
 const pieRow=document.createElement('div');
 pieRow.style.cssText='display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;align-items:center;justify-items:center;width:100%;height:100%';
 function addMediaPie(title,counts,ready){
