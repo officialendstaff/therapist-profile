@@ -778,12 +778,14 @@ function addMediaPie(title,counts,ready){
  circle.setAttribute('role','img');circle.setAttribute('aria-label',title);
  const tooltip=document.createElement('div');
  tooltip.style.cssText='position:absolute;z-index:30;display:none;bottom:12px;left:50%;transform:translateX(-50%);pointer-events:none;padding:7px 10px;border-radius:6px;background:rgba(20,38,63,.94);color:white;font-weight:700;font-size:12px;white-space:nowrap;box-shadow:0 4px 15px rgba(0,0,0,.2)';
- circle.addEventListener('mousemove',event=>{
+ const showPieDetails=event=>{
   const rect=circle.getBoundingClientRect(),x=event.clientX-rect.left-rect.width/2,y=event.clientY-rect.top-rect.height/2;
   if(Math.hypot(x,y)>rect.width/2){tooltip.style.display='none';return}
   const angle=(Math.atan2(x,-y)*180/Math.PI+360)%360;let cumulative=0;
   for(const [name,count] of segments){cumulative+=360*count/total;if(angle<cumulative){tooltip.textContent=name+' '+count+'件（'+Math.round(count/total*100)+'%）';tooltip.style.display='block';break}}
- });
+ };
+ circle.addEventListener('mousemove',showPieDetails);
+ circle.addEventListener('click',showPieDetails);
  circle.addEventListener('mouseleave',()=>{tooltip.style.display='none'});
  holder.append(circle,tooltip);widget.append(holder);pieRow.append(widget);
 }
