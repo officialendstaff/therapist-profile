@@ -701,14 +701,15 @@ bars(right,Array.from({length:24},(_,i)=>String(i)),[{name:'初回LINE問い合�
 const mediaNames=['エステ魂','メンズエステワーク','エステラブワーク','リラクジョブ','エステクイーン','Richセラピ','エステアイ','メンエスリクルート','バニラ','02','X','その他'];
 const colors=['#AEB7C5','#168CF2','#F59B48','#9D69E5','#18B7A5','#F36A9C','#526CE0','#F1C04D','#38A8DC','#76B66D','#D77A58','#6E7D91','#B885D4'];
 function mediaOf(a){const texts=(a.messages||[]).map(m=>String(m.text||''));const values=[];for(const t of texts){const match=t.match(/(?:ご覧になった求人広告|求人媒体|応募媒体|見た媒体|広告媒体|媒体名)\s*[：:\s]*([^\n\r]+)/);if(match)values.push(match[1].trim())}if(!values.length){for(const t of texts){const lines=t.split(/[\n\r]/).map(x=>x.trim());for(const line of lines){if(mediaNames.some(n=>line===n||line===n+'から'||line===n+'です'))values.push(line)}}}if(!values.length)return ['記載なし'];const result=new Set();for(const v of values){let found=false;for(const name of mediaNames){if(name==='X'?/^(?:X|旧Twitter|Twitter)(?:から|です)?$/i.test(v):name==='02'?/^(?:02|ゼロツー)(?:から|です)?$/.test(v):v.includes(name)){result.add(name);found=true}}if(!found){const clean=v.replace(/[。！!]+$/,'').trim();if(/当店の事務所|地下鉄|日本橋駅|徒歩|面接は日本橋/.test(clean))continue;result.add(clean==='その他'?'その他':clean&&clean.length<=25?'その他（'+clean+'）':'記載なし')}}return [...result]}
-function mediaCounts(list){const counts=new Map();for(const a of list)for(const name of mediaOf(a))counts.set(name,(counts.get(name)||0)+1);return counts}
+function normalizedRecruitMedia(name){return /^(?:その他[（(])?オフィシャル\s*HP[）)]?$/.test(String(name).trim())?'HP':name}
+function mediaCounts(list){const counts=new Map();for(const a of list)for(const rawName of mediaOf(a)){const name=normalizedRecruitMedia(rawName);counts.set(name,(counts.get(name)||0)+1)}return counts}
 const mediaNow=mediaCounts(applicants),previous=new Date(yr,mo-2,1),previousKey=previous.getFullYear()+'-'+String(previous.getMonth()+1).padStart(2,'0');
 const mediaPrev=mediaCounts(allApplicants.filter(a=>firstDate(a).slice(0,7)===previousKey));
 const mediaColors={
  '記載なし':'#AEB7C5','リラクジョブ':'#168CF2','バニラ':'#F59B48',
  'エステ魂':'#935BDA','メンズエステワーク':'#1FB7A4','エステラブワーク':'#F36A9C',
  'エステクイーン':'#526CE0','Richセラピ':'#F1C04D','エステアイ':'#38A8DC',
- 'メンエスリクルート':'#76B66D','02':'#D77A58','X':'#6E7D91','その他':'#B885D4'
+ 'メンエスリクルート':'#76B66D','HP':'#2699C8','02':'#D77A58','X':'#6E7D91','その他':'#B885D4'
 };
 function mediaColor(name){
  if(Object.prototype.hasOwnProperty.call(mediaColors,name))return mediaColors[name];
@@ -720,7 +721,7 @@ function sheetMediaNames(value){
  if(!raw)return ['記載なし'];
  const names=raw.split(/[、,，／\/\n]+/).map(x=>x.trim()).filter(Boolean);
  if(!names.length)return ['記載なし'];
- return [...new Set(names.map(name=>mediaNames.includes(name)||name==='記載なし'||/^その他[（(].+[）)]$/.test(name)?name:'その他（'+name+'）'))];
+ return [...new Set(names.map(name=>normalizedRecruitMedia(mediaNames.includes(name)||name==='記載なし'||/^その他[（(].+[）)]$/.test(name)?name:'その他（'+name+'）')))];
 }
 const attendanceStatuses=new Set(['来店済み','採用','不採用','在籍','入店','辞退']);
 const attendedSheets=storeMetricsSheets.filter(x=>attendanceStatuses.has(x.status)&&String(x.month||'')===month&&matchShop(x.shop));
