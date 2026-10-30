@@ -57,7 +57,7 @@
   if(!items.some(item=>item.key===key))return;
   viewer.querySelector('#personalMobileViewTitle').textContent=key;
   document.body.dataset.personalMobileView='app';
-  frame.src='/therapist-profile/staff/interview-sheet-preview/?personalMobile=1&page='+encodeURIComponent(key)+'&v=20261030c';
+  frame.src='/therapist-profile/staff/interview-sheet-preview/?personalMobile=1&page='+encodeURIComponent(key)+'&v=20261030theme2'+((profile==='owner'||profile==='festival')?'&theme='+profile:'');
  }
  function updateBadges(){
   if(typeof window.personalMobileNotificationsUpdate==='function')window.personalMobileNotificationsUpdate();
