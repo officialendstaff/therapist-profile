@@ -1,0 +1,142 @@
+/* Announcement button and release notes dialog. All four personal pages share it. */
+#personalMobileTop{
+ --news-accent:#3f739e;
+ --news-heading-a:#1c334d;
+ --news-heading-b:#557da4;
+ --news-soft:#eaf2fa;
+}
+#personalMobileTop[data-personal-theme="owner"]{
+ --news-accent:#b33767;
+ --news-heading-a:#57172e;
+ --news-heading-b:#cc658c;
+ --news-soft:#fff1f6;
+}
+#personalMobileTop[data-personal-theme="festival"]{
+ --news-accent:#a26287;
+ --news-heading-a:#773858;
+ --news-heading-b:#c68bb7;
+ --news-soft:#fff0f5;
+}
+#personalMobileTop .personal-mobile-news-trigger{
+ display:grid;place-items:center;flex:none;
+ position:relative;min-width:38px;min-height:38px;
+ padding:0;touch-action:manipulation;
+}
+#personalMobileTop .personal-mobile-news-trigger svg{
+ display:block;width:23px;height:23px;
+ fill:none;stroke:currentColor;
+}
+#personalMobileTop .personal-mobile-news-trigger:focus-visible{
+ outline:3px solid var(--news-accent);outline-offset:2px;
+}
+#personalMobileTop .personal-mobile-news-dialog{
+ position:fixed;inset:0;margin:auto;
+ box-sizing:border-box;width:min(92vw,510px);max-width:510px;
+ max-height:min(84dvh,740px);
+ overflow:hidden;padding:0;border:1px solid #e2dce5;
+ border-radius:16px;color:#243549;background:#fff;
+ box-shadow:0 20px 55px #10182845;
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+}
+#personalMobileTop .personal-mobile-news-dialog:not([open]){display:none}
+#personalMobileTop .personal-mobile-news-dialog::backdrop{
+ background:rgba(20,24,40,.58);
+ backdrop-filter:blur(4px);
+ -webkit-backdrop-filter:blur(4px);
+}
+#personalMobileTop .personal-news-shell{
+ display:flex;flex-direction:column;min-width:0;
+ max-height:min(84dvh,740px);
+}
+#personalMobileTop .personal-news-heading{
+ display:flex;justify-content:space-between;align-items:flex-start;gap:14px;
+ flex:0 0 auto;box-sizing:border-box;padding:19px 19px 16px;
+ background:linear-gradient(125deg,var(--news-heading-a),var(--news-heading-b));
+ color:#fff;
+}
+#personalMobileTop .personal-news-heading small{
+ display:block;font-size:10px;letter-spacing:.16em;
+ font-weight:700;color:#fffdebd6;
+}
+#personalMobileTop .personal-news-heading h2{
+ font-size:19px;font-weight:800;line-height:1.35;
+ color:white;margin:6px 0 0;
+}
+#personalMobileTop .personal-news-updated{
+ font-size:11px;color:#fffdf0d9;margin:7px 0 0;
+}
+#personalMobileTop .personal-news-close{
+ display:grid;place-items:center;
+ width:35px;height:35px;min-width:35px;
+ border-radius:9px;border:1px solid #ffffff5e;
+ background:#ffffff24;color:white;font-size:25px;line-height:1;
+ cursor:pointer;padding:0;
+}
+#personalMobileTop .personal-news-scroll{
+ flex:1 1 auto;min-height:0;overflow-y:auto;
+ overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+ padding:16px 18px 20px;background:#f9fafc;
+}
+#personalMobileTop .personal-news-status{
+ font-size:13px;line-height:1.6;color:#617187;padding:8px 0;margin:0;
+}
+#personalMobileTop .personal-news-status[hidden]{display:none!important}
+#personalMobileTop .personal-news-entries{
+ display:flex;flex-direction:column;gap:10px;
+}
+#personalMobileTop .personal-news-entry{
+ box-sizing:border-box;background:#fff;border:1px solid #e4e8f0;
+ border-left:3px solid var(--news-accent);
+ border-radius:10px;padding:12px 13px 12px 14px;
+ box-shadow:0 2px 6px #18263b0a;
+}
+#personalMobileTop .personal-news-entry-meta{
+ display:flex;align-items:center;gap:8px;margin:0 0 7px;
+}
+#personalMobileTop .personal-news-entry-meta time{
+ font-size:11px;color:#76859a;letter-spacing:.035em;
+}
+#personalMobileTop .personal-news-latest{
+ border-radius:999px;padding:2px 8px;
+ font-size:10px;font-weight:800;
+ color:var(--news-accent);background:var(--news-soft);
+}
+#personalMobileTop .personal-news-entry h3{
+ margin:0 0 6px;font-size:14px;line-height:1.45;
+ font-weight:800;color:#24374d;
+}
+#personalMobileTop .personal-news-entry ul{
+ margin:6px 0 0;padding:0 0 0 1.25em;
+ color:#4c5b6f;font-size:12px;line-height:1.7;
+}
+#personalMobileTop .personal-news-entry li+li{margin-top:3px}
+#personalMobileTop .personal-news-footer{
+ flex:0 0 auto;display:flex;justify-content:space-between;
+ align-items:center;gap:12px;padding:10px 18px;
+ border-top:1px solid #e1e8f0;background:#fff;
+}
+#personalMobileTop .personal-news-footer span{
+ color:#728399;font-size:11px;
+}
+#personalMobileTop .personal-news-done{
+ min-width:82px;min-height:37px;padding:7px 15px;
+ border:0;border-radius:8px;
+ background:var(--news-accent);color:#fff;
+ font-size:13px;font-weight:800;cursor:pointer;
+}
+@media(min-width:901px){
+ #personalMobileTop .personal-mobile-news-trigger{
+  min-width:42px;min-height:42px;
+ }
+}
+@media(max-width:375px){
+ #personalMobileTop .personal-mobile-header-tools{gap:5px!important}
+ #personalMobileTop .personal-mobile-news-trigger,
+ #personalMobileTop .personal-mobile-header-tools .personal-mobile-settings,
+ #personalMobileTop .personal-mobile-header-tools .personal-mobile-refresh{
+  width:34px;height:34px;min-width:34px;min-height:34px;
+ }
+ #personalMobileTop .personal-mobile-name{font-size:17px!important}
+ #personalMobileTop .personal-news-heading{padding:16px 14px}
+ #personalMobileTop .personal-news-scroll{padding:12px}
+}
