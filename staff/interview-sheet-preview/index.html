@@ -680,7 +680,7 @@ if(interviewReady)for(const r of interviews){
   if(r.lineUserId&&r.accountId)applicantKeys.add('line:'+String(r.accountId)+':'+String(r.lineUserId));
   else applicantKeys.add('manual:'+String(r.interviewId));
 }
-const applicantCount=(lineReady&&interviewReady)?applicantKeys.size:null;
+const historyThisMonth=storeMetricsHistoricalMonthly.filter(x=>String(x.month||'').slice(0,7)===month&&(shop==='all'||x.account_id===selectedAccount));const applicantCount=month<'2026-10'&&historyThisMonth.length?historyThisMonth.reduce((n,x)=>n+(Number(x.estimated_count)||0),0):(lineReady&&interviewReady)?applicantKeys.size:null;const measuredInterviews=interviewReady&&(month>='2026-10'||interviews.length>0);
 const metrics=[['応募数',applicantCount===null?'—':applicantCount],['面接実施',interviewReady?attendedCount:'—'],['面接割合',applicantCount===null||!interviewReady?'—':applicantCount?Math.round(attendedCount/applicantCount*100)+'%':'0%'],['採用数',interviewReady?hiredCount:'—'],['不採用数',interviewReady?rejectedCount:'—'],['キャンセル',interviewReady?cancelledCount:'—']]
 const top=document.createElement('div');top.style.cssText='display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px';
 for(const [name,value] of metrics){const cell=document.createElement('div');cell.style.cssText='padding:12px;border:1px solid #d6e1ec;border-radius:7px;background:#f4f7fb';const label=document.createElement('div');label.textContent=name;label.style.cssText='font-size:11px;color:#5b6e85';const num=document.createElement('strong');num.textContent=value;num.style.cssText='font-size:23px';cell.append(label,num);top.append(cell)}root.append(top);
