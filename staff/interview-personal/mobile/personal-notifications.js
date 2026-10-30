@@ -254,7 +254,7 @@ for(const id of ['mobileSheetCount','mobileSheetAlert','scheduleToday']){
  if(node)watch.observe(node,{childList:true,characterData:true,subtree:true});
 }
 function begin(){
- if(started||!authorized()||!window.matchMedia('(max-width:900px)').matches)return;
+ if(started||!authorized())return;
  started=true;void pollLines();void pollSheets();void pollToday();update();
 }
 new MutationObserver(begin).observe(document.getElementById('gate'),{attributes:true,attributeFilter:['style']});
