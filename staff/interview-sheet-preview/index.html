@@ -648,7 +648,7 @@ const CHART_API='https://vjjnkflbfsjihwzjsjpr.supabase.co/rest/v1/rpc/interview_
 const CHART_KEY='sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos';
 let chartAvailability=new Map(),chartLoadedDate='',chartRequest=0,chartLoading=false,chartError='',chartLastFetch=0;
 async function refreshChartAvailability(){
- const date=dateKey(selected),request=++chartRequest;chartAvailability=new Map();chartLoadedDate='';chartLoading=true;chartError='';chosen=null;renderChart();
+ const date=dateKey(selected),request=++chartRequest;const previousChoice=chosen;chartAvailability=new Map();chartLoadedDate='';chartLoading=true;chartError='';renderChart();
  const tasks=[];for(const staff of CHART_STAFF_SOURCE)for(let i=0;i<28;i++)tasks.push({staff,i});
  const results=[];let cursor=0;
  try{
@@ -667,7 +667,7 @@ async function refreshChartAvailability(){
   }
   await Promise.all(Array.from({length:8},()=>worker()));
   if(request!==chartRequest||date!==dateKey(selected))return;
-  chartAvailability=new Map(results);chartLoadedDate=date;chartLastFetch=Date.now();chartLoading=false;renderChart();
+  chartAvailability=new Map(results);chartLoadedDate=date;chartLastFetch=Date.now();chartLoading=false;if(previousChoice&&chosen===previousChoice){const match=previousChoice.match(/^(社長|オオタ|村上|お祭り) (\d{2}):(\d{2})$/);if(!match||!chartStartSlotAvailable(match[1],date,(Number(match[2])-10)*2+Number(match[3])/30))chosen=null;}if(registrationSelectionSync)registrationSelectionSync();renderChart();
  }catch(error){
   if(request!==chartRequest)return;
   console.warn('対応可能時間の取得に失敗しました',error);
