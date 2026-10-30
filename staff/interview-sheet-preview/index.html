@@ -256,7 +256,7 @@ button{font-family:inherit;letter-spacing:inherit}
 .decision-footer button{padding:9px 20px;border:1px solid #b9cbe0;border-radius:5px;background:#f1f5f9;color:#234}
 .decision-footer button.primary{background:#2868a3;color:white;border-color:#2868a3}
 @media(max-width:850px){.detail-current{padding-right:12px;padding-bottom:50px}.detail-decision-actions{top:auto;bottom:9px;transform:none;left:12px;right:auto}.decision-popup{width:min(520px,95vw)}}
-.brand{display:flex;align-items:center;gap:9px;text-align:left;font-weight:700;white-space:nowrap}.brand img{width:46px;height:46px;object-fit:contain;border-radius:8px}.brand #homeLabel{font-size:17px}.header-actions #adminAuthOpen.header-account-control{position:static;bottom:auto;right:auto;transform:none;background:#e8edf5;color:#263c58;border:0;border-radius:5px;padding:8px 12px;font-size:12px;height:auto}.manual-applicant-avatar{display:flex!important;flex-direction:column;align-items:center;justify-content:center;background:#e5e7eb!important;color:#475569!important;border:1px solid #94a3b8!important}.manual-applicant-symbol{font-size:17px;line-height:1}.manual-applicant-label{font-size:9px;line-height:1.3;font-weight:700}</style><style>.nav .admin-menu-pending{color:#65758a;cursor:not-allowed}.nav .admin-menu-note{margin-left:auto;font-size:9px;color:#8894a4}.nav .admin-menu-pending:hover{background:transparent}</style><style>#listShopFilter{height:29px;min-width:145px;max-width:190px;border:1px solid #cbd8e8;border-radius:5px;background:#fff;color:#26384d;font-size:12px;padding:3px 6px;margin-right:9px}#listShopFilter[hidden]{display:none!important}</style></head><body>
+.brand{display:flex;align-items:center;gap:9px;text-align:left;font-weight:700;white-space:nowrap}.brand img{width:46px;height:46px;object-fit:contain;border-radius:8px}.brand #homeLabel{font-size:17px}.header-actions #adminAuthOpen.header-account-control{position:static;bottom:auto;right:auto;transform:none;background:#e8edf5;color:#263c58;border:0;border-radius:5px;padding:8px 12px;font-size:12px;height:auto}.manual-applicant-avatar{display:flex!important;flex-direction:column;align-items:center;justify-content:center;background:#e5e7eb!important;color:#475569!important;border:1px solid #94a3b8!important}.manual-applicant-symbol{font-size:17px;line-height:1}.manual-applicant-label{font-size:9px;line-height:1.3;font-weight:700}</style><style>.nav .admin-menu-pending{color:#65758a;cursor:not-allowed}.nav .admin-menu-note{margin-left:auto;font-size:9px;color:#8894a4}.nav .admin-menu-pending:hover{background:transparent}</style><style>#listShopFilter{height:29px;min-width:145px;max-width:190px;border:1px solid #cbd8e8;border-radius:5px;background:#fff;color:#26384d;font-size:12px;padding:3px 6px;margin-right:9px}#listShopFilter[hidden]{display:none!important}</style><link rel="stylesheet" href="./personal-mobile.css?v=20261030a"></head><body>
 <header class="header"><button class="brand" id="home"><img id="homeAvatar" src="./icons/recruit-180.png" alt="" onerror="this.style.display='none'"><span id="homeLabel">TOP</span></button><div class="header-actions"><button id="headerLineInbox" type="button"><svg class="header-bell" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>LINE通知</button><button id="manualInterviewOpen" type="button">面接登録</button><button id="sound">通知設定</button></div></header>
 <section class="calendar" aria-label="月間カレンダー"><div class="cal-head"><button id="prev" aria-label="前月">◀</button><span id="month"></span><button id="next" aria-label="翌月">▶</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="days" id="days"></div></section>
 <section class="chart" aria-label="担当者タイムチャート"><div class="chart-title"><span>担当者タイムチャート</span><span id="selectedDate" class="chart-date"></span></div><div class="chart-scroll"><div class="chart-grid" id="chartGrid"></div></div><div class="legend"><span><i style="background:linear-gradient(90deg,#E9E4F3 25%,#E4EFFB 25% 50%,#F9E5ED 50% 75%,#E5F2ED 75%)"></i>選択可能</span><span><i style="background:#d4d8df"></i>選択不可</span><span><i style="background:#FACC15;border:1px solid #A16207"></i>面接予約済み</span><span class="status" id="slotStatus">対応可能時間は個人ページの設定を参照します</span></div></section>
@@ -940,4 +940,31 @@ window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===
  document.body.classList.add('interview-admin-locked');dialog.classList.add('open');restore().then(ok=>{if(ok)dialog.classList.remove('open')}).catch(()=>{message.textContent='認証状態を確認できませんでした。'});
 })();
 </script>
-<script id="today-top-startup-fallback">(function(){function top(){const p=document.querySelector('.main-panel');if(!p)return;p.classList.remove('sheet-mode');const nav=document.querySelector('#nav button[data-page="今日の予定"]');document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b===nav));const today=document.getElementById('todayPanel'),shared=document.getElementById('sharedPanel');if(today)today.hidden=false;if(shared)shared.hidden=true;}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',top,{once:true});else top();})();</script></body></html>
+<script id="today-top-startup-fallback">(function(){function top(){const p=document.querySelector('.main-panel');if(!p)return;p.classList.remove('sheet-mode');const nav=document.querySelector('#nav button[data-page="今日の予定"]');document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b===nav));const today=document.getElementById('todayPanel'),shared=document.getElementById('sharedPanel');if(today)today.hidden=false;if(shared)shared.hidden=true;}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',top,{once:true});else top();})();</script><script id="personal-mobile-embed-route">
+(function(){
+ const params=new URLSearchParams(location.search);
+ if(params.get('personalMobile')!=='1')return;
+ document.body.classList.add('personal-mobile-embedded');
+ const requested=params.get('page')||'今日の予定';
+ const routes={'LINE通知':'LINE通知','今日の予定':'今日の予定','Interview Sheet':'Interview Sheet','面接済み':'面接済み','明日以降':'明日以降','日程調整':'日程調整','店舗数値':'集計頁'};
+ const page=routes[requested];
+ if(!page)return;
+ function activate(){
+  if(document.body.classList.contains('interview-admin-locked'))return false;
+  if(!window.interviewAdminAuthorized)return false;
+  const link=Array.from(document.querySelectorAll('#nav button[data-page]')).find(btn=>btn.dataset.page===page);
+  if(!link)return false;
+  link.click();
+  return true;
+ }
+ function initialize(){
+  if(activate())return;
+  const observer=new MutationObserver(()=>{if(activate())observer.disconnect()});
+  observer.observe(document.body,{attributes:true,attributeFilter:['class']});
+  const cleanup=()=>observer.disconnect();
+  window.addEventListener('pagehide',cleanup,{once:true});
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initialize,{once:true});
+ else initialize();
+})();
+</script></body></html>
