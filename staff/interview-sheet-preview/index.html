@@ -1101,7 +1101,7 @@ const attendedMediaRaw=new Map();
 for(const sheet of attendedSheets)for(const name of sheetMediaNames(sheet.source))attendedMediaRaw.set(name,(attendedMediaRaw.get(name)||0)+1);
 const attendedMedia=groupedMediaCounts(attendedMediaRaw);
 const pie=panel('');pie.style.padding='8px';
-if(month>='2026-10'){const mediaNote=document.createElement('div');mediaNote.textContent='媒体別の内訳：LINEから確認できたデータのみ（10月30日までの確定基準値の内訳は含まれません）';mediaNote.style.cssText='color:#65748b;font-size:10px;line-height:1.4;padding:0 4px 5px';pie.append(mediaNote)}
+
 const pieRow=document.createElement('div');pieRow.className='store-metrics-pies';
 pieRow.style.cssText='display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;align-items:center;justify-items:center;width:100%;height:100%';
 function addMediaPie(title,counts,ready,rawCounts){
@@ -1136,7 +1136,7 @@ addMediaPie('問い合わせ',mediaNow,lineReady,mediaNowRaw);
 addMediaPie('面接実施',attendedMedia,storeMetricsSheetsStatus==='ready',attendedMediaRaw);
 pie.append(pieRow);chart.append(pie);
 const compare=panel('');
-if(month>='2026-10'){const detailNote=document.createElement('div');detailNote.textContent='媒体別：LINE履歴で確認できた分のみ。上部の問い合わせ数とは集計対象が異なります。';detailNote.style.cssText='font-size:10px;color:#65748b;margin:0 0 4px';compare.append(detailNote)}
+
 const priorSheets=storeMetricsSheets.filter(x=>attendanceStatuses.has(x.status)&&String(x.month||'')===previousKey&&matchShop(x.shop));
 const priorMediaRaw=new Map();for(const x of priorSheets)for(const name of sheetMediaNames(x.source))priorMediaRaw.set(name,(priorMediaRaw.get(name)||0)+1);
 const priorMedia=groupedMediaCounts(priorMediaRaw);
