@@ -309,3 +309,41 @@ body[data-personal-mobile-view="blocks"]{
  right:4px!important;
  bottom:0!important;
 }
+
+
+/* PRESIDENT ACE IMAGE LAYER FIX 2026-10-31: no purple flash or overlaid gradient. */
+:root{--president-ace:url("/therapist-profile/staff/interview-personal/mobile/president-assets/ace.webp")}
+body[data-personal-mobile-view="app"] #personalMobileViewer{
+ background-color:#fff2f8!important;
+ background-image:var(--president-ace)!important;
+ background-position:right bottom!important;
+ background-size:auto 67vh!important;
+ background-repeat:no-repeat!important;
+}
+body[data-personal-mobile-view="app"] #personalMobileFrame{
+ background:#fff2f8!important;
+}
+html[data-personal-theme="president"]{
+ --personal-art:#fff2f8;
+}
+html[data-personal-theme="president"] body.personal-mobile-embedded{
+ background:#fff2f8!important;
+}
+html[data-personal-theme="president"] body.personal-mobile-embedded .main{
+ background-color:#fff2f8!important;
+ background-image:var(--president-ace)!important;
+ background-size:auto 67vh!important;
+ background-position:right bottom!important;
+ background-repeat:no-repeat!important;
+ background-attachment:scroll!important;
+}
+html[data-personal-theme="president"] body.personal-mobile-embedded .main-panel:not(.sheet-mode){
+ background:transparent!important;
+}
+html.personal-sheet-mobile[data-personal-theme="president"] #layout{
+ background-color:#fff2f8!important;
+ background-image:var(--president-ace)!important;
+ background-size:auto 67vh!important;
+ background-position:right bottom!important;
+ background-repeat:no-repeat!important;
+}
