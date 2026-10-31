@@ -85,7 +85,7 @@
   chooseOwnerDetailHeaderArt();
    choosePresidentDetailHeaderArt(key);
   document.body.dataset.personalMobileView='app';
-  frame.src='/therapist-profile/staff/interview-sheet-preview/?personalMobile=1&page='+encodeURIComponent(key)+'&v=20261031presidentart1'+((profile==='owner'||profile==='festival'||profile==='president')?'&theme='+profile:'');
+  frame.src='/therapist-profile/staff/interview-sheet-preview/?personalMobile=1&page='+encodeURIComponent(key)+'&v='+(profile==='president'?'20261031presidentnight1':'20261031presidentart1')+((profile==='owner'||profile==='festival'||profile==='president')?'&theme='+profile:'');
  }
  function updateBadges(){
   if(typeof window.personalMobileNotificationsUpdate==='function')window.personalMobileNotificationsUpdate();
