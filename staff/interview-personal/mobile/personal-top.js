@@ -27,11 +27,11 @@
  const svg=key=>'<svg viewBox="0 0 24 24" aria-hidden="true">'+symbols[key]+'</svg>';
  const top=document.createElement('section');top.id='personalMobileTop';top.setAttribute('aria-label','面接管理 TOP');
  top.innerHTML='<div class="personal-mobile-header"><div><small class="personal-mobile-eyebrow">L GROUP MANAGEMENT</small><strong class="personal-mobile-name">'+(profile==='owner'?'末端厩舎':names[profile]+'｜面接管理')+'</strong></div><button type="button" class="personal-mobile-refresh" aria-label="最新情報に更新">↻</button></div><div class="personal-mobile-grid">'+
- items.map(item=>'<button type="button" class="personal-mobile-action" data-personal-menu="'+item.key+'" style="--action-color:'+item.color+'"><span class="personal-mobile-icon">'+svg(item.icon)+'</span><span class="personal-mobile-label">'+(profile==='owner'&&item.key==='Interview Sheet'?'Interview':item.key)+'</span><span class="personal-mobile-count" hidden></span></button>').join('')+
+ items.map(item=>'<button type="button" class="personal-mobile-action" data-personal-menu="'+item.key+'" style="--action-color:'+item.color+'"><span class="personal-mobile-icon">'+svg(item.icon)+'</span><span class="personal-mobile-label">'+((profile==='owner'||profile==='president')&&item.key==='Interview Sheet'?'Interview':item.key)+'</span><span class="personal-mobile-count" hidden></span></button>').join('')+
  '</div>';
  const viewer=document.createElement('section');viewer.id='personalMobileViewer';viewer.setAttribute('aria-label','面接管理 詳細');
  viewer.innerHTML='<div class="personal-mobile-subheader"><button type="button" data-personal-back>‹ TOP</button><strong id="personalMobileViewTitle"></strong></div><iframe id="personalMobileFrame" title="面接管理の詳細画面" loading="eager"></iframe>';
- const blockBar=document.createElement('div');blockBar.id='personalMobileBlockBar';blockBar.innerHTML='<button type="button" data-personal-back>‹ TOP</button><strong>'+(profile==='owner'?'対応不可':'対応不可の設定')+'</strong>';
+ const blockBar=document.createElement('div');blockBar.id='personalMobileBlockBar';blockBar.innerHTML='<button type="button" data-personal-back>‹ TOP</button><strong>'+((profile==='owner'||profile==='president')?'対応不可':'対応不可の設定')+'</strong>';
  document.body.append(top,viewer,blockBar);
  const gate=document.getElementById('gate'),frame=viewer.querySelector('iframe');
  // Only Murakami's detail header rotates through the eight supplied artworks.
@@ -75,7 +75,7 @@
   viewer.querySelector('#personalMobileViewTitle').textContent=key;
   chooseOwnerDetailHeaderArt();
   document.body.dataset.personalMobileView='app';
-  frame.src='/therapist-profile/staff/interview-sheet-preview/?personalMobile=1&page='+encodeURIComponent(key)+'&v=20261030theme2'+((profile==='owner'||profile==='festival')?'&theme='+profile:'');
+  frame.src='/therapist-profile/staff/interview-sheet-preview/?personalMobile=1&page='+encodeURIComponent(key)+'&v=20261030theme2'+((profile==='owner'||profile==='festival'||profile==='president')?'&theme='+profile:'');
  }
  function updateBadges(){
   if(typeof window.personalMobileNotificationsUpdate==='function')window.personalMobileNotificationsUpdate();
