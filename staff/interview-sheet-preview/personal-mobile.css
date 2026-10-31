@@ -110,21 +110,3 @@
  body.personal-mobile-embedded .list-note{overflow-wrap:anywhere}
  body.personal-mobile-embedded #storeMetricsHeader{position:sticky;top:0;z-index:3;background:#fff}
 }
-
-/* Fixed collage background for Murakami/owner only. Other administrators and TOP unchanged. */
-@media(max-width:900px){
- html[data-personal-theme="owner"] body.personal-mobile-embedded{
-  background-color:#edf5e7!important;
-  background-image:linear-gradient(rgba(245,250,241,.84),rgba(245,250,241,.84)),url("/therapist-profile/staff/interview-personal/mobile/makibao-detail-collage.webp")!important;
-  background-size:cover, min(100vw,760px) auto!important;
-  background-position:center,center top!important;
-  background-repeat:no-repeat,repeat-y!important;
- }
- html[data-personal-theme="owner"] body.personal-mobile-embedded .main,
- html[data-personal-theme="owner"] body.personal-mobile-embedded .main-panel:not(.sheet-mode){
-  background:transparent!important;
- }
- html[data-personal-theme="owner"] body.personal-mobile-embedded .main-panel.sheet-mode{
-  background:rgba(247,250,245,.9)!important;
- }
-}
