@@ -401,3 +401,10 @@ body[data-personal-mobile-view="blocks"] #personalMobileBlockBar button{
  z-index:6!important;
  align-self:flex-start!important;
 }
+
+/* Owner mobile header: controls first, title below, illustration at right. */
+#personalMobileTop .personal-mobile-header{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;gap:9px!important;padding:18px 14px 16px!important;min-height:150px!important}
+#personalMobileTop .personal-mobile-header-tools{order:0!important;align-self:flex-start!important;margin:0!important;z-index:6!important}
+#personalMobileTop .personal-mobile-header>div:first-child{order:1!important;width:calc(100% - 115px)!important;max-width:calc(100% - 115px)!important;z-index:3!important}
+#personalMobileTop .personal-mobile-header::before{width:115px!important;height:80%!important;right:0!important;bottom:0!important;z-index:1!important}
+@media(max-width:390px){#personalMobileTop .personal-mobile-header>div:first-child{width:calc(100% - 100px)!important;max-width:calc(100% - 100px)!important}#personalMobileTop .personal-mobile-header::before{width:100px!important;height:70%!important}}
