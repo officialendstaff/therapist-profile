@@ -430,3 +430,49 @@ body[data-personal-mobile-view="app"] .personal-mobile-subheader>*,
 body[data-personal-mobile-view="blocks"] #personalMobileBlockBar>*{
  position:relative;z-index:1;
 }
+
+/* Approved 2026-10-31 owner TOP refinements: text outline, badge pin, hero art. */
+#personalMobileTop .personal-mobile-label{
+ color:#194b32!important;
+ -webkit-text-stroke:3px #fff!important;
+ paint-order:stroke fill!important;
+ text-shadow:0 1px 2px rgba(0,0,0,.28)!important;
+ position:relative!important;
+ z-index:4!important;
+}
+#personalMobileTop .personal-mobile-action{
+ position:relative!important;
+}
+#personalMobileTop .personal-mobile-count{
+ position:absolute!important;
+ top:7px!important;right:8px!important;
+ left:auto!important;bottom:auto!important;
+ margin:0!important;transform:none!important;
+ min-width:24px!important;height:24px!important;
+ padding:1px 6px!important;
+ border-radius:999px!important;
+ background:#cf303d!important;color:#fff!important;
+ border:2px solid #fff!important;
+ font-size:11px!important;font-weight:800!important;
+ text-shadow:none!important;z-index:8!important;
+}
+#personalMobileTop .personal-mobile-header::before{
+ background-image:url("../makibao-03.png")!important;
+ background-repeat:no-repeat!important;
+ background-position:right bottom!important;
+ background-size:contain!important;
+ width:clamp(190px,56vw,440px)!important;
+ height:100%!important;
+ top:auto!important;right:0!important;bottom:0!important;
+ opacity:1!important;z-index:1!important;
+}
+#personalMobileTop .personal-mobile-header-tools,
+#personalMobileTop .personal-mobile-header>div:first-child{
+ position:relative!important;z-index:4!important;
+}
+@media(max-width:390px){
+ #personalMobileTop .personal-mobile-header::before{
+  width:clamp(190px,56vw,240px)!important;
+  height:100%!important;
+ }
+}
