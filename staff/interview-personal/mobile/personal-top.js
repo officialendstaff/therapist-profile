@@ -31,7 +31,7 @@
  '</div>';
  const viewer=document.createElement('section');viewer.id='personalMobileViewer';viewer.setAttribute('aria-label','面接管理 詳細');
  viewer.innerHTML='<div class="personal-mobile-subheader"><button type="button" data-personal-back>‹ TOP</button><strong id="personalMobileViewTitle"></strong></div><iframe id="personalMobileFrame" title="面接管理の詳細画面" loading="eager"></iframe>';
- const blockBar=document.createElement('div');blockBar.id='personalMobileBlockBar';blockBar.innerHTML='<button type="button" data-personal-back>‹ TOP</button><strong>対応不可の設定</strong>';
+ const blockBar=document.createElement('div');blockBar.id='personalMobileBlockBar';blockBar.innerHTML='<button type="button" data-personal-back>‹ TOP</button><strong>'+(profile==='owner'?'対応不可':'対応不可の設定')+'</strong>';
  document.body.append(top,viewer,blockBar);
  const gate=document.getElementById('gate'),frame=viewer.querySelector('iframe');
  // Only Murakami's detail header rotates through the eight supplied artworks.
@@ -46,6 +46,7 @@
   const chosen=choices[Math.floor(Math.random()*choices.length)];
   const imagePath='/therapist-profile/staff/interview-personal/mobile/'+chosen;
   viewer.style.setProperty('--owner-detail-header-art','url("'+imagePath+'")');
+  blockBar.style.setProperty('--owner-detail-header-art','url("'+imagePath+'")');
   try{sessionStorage.setItem(ownerHeaderArtKey,chosen)}catch{}
  }
 
@@ -63,6 +64,7 @@
   if(!authorized())return;
   if(key==='対応不可'){
    clearFrame();
+   chooseOwnerDetailHeaderArt();
    document.body.dataset.personalMobileView='blocks';
    if(typeof tab==='function')tab('schedule',null);
    if(typeof openSpSection==='function')openSpSection('blocks');
