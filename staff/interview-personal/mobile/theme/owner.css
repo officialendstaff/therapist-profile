@@ -580,3 +580,11 @@ body[data-personal-mobile-view="blocks"] #personalMobileBlockBar>*{
  left:0!important;right:auto!important;
  background-position:left bottom!important;
 }
+
+/* Murakami detail headers: randomize ONLY the artwork in the existing right-hand position. */
+body[data-personal-mobile-view="app"] #personalMobileViewer .personal-mobile-subheader::after{
+ background-image:var(--owner-detail-header-art,url("../makibao-02.png"))!important;
+ background-position:right bottom!important;
+ background-size:contain!important;
+ background-repeat:no-repeat!important;
+}
