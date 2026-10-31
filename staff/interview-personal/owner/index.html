@@ -118,7 +118,29 @@ html:has(#gate:not([hidden])){overflow-x:clip!important}
 #scheduleToday .spInterviewDetails{flex:1;min-width:0}#scheduleToday .spInterviewDetails summary{display:flex;align-items:center;gap:10px}
 .spModernClock{width:55px;flex:none;font-weight:800;font-size:15px}.spModernPerson{display:flex;align-items:center;gap:9px;flex:1;min-width:0}.spModernPerson strong{display:block;font-size:14px}.spModernPerson small{display:block;font-size:11px;margin-top:4px}
 .spModernStatus{flex:none;text-align:right;font-size:11px}.spModernStatus small{display:block;margin-top:7px;color:#334155}
-</style><style id="spPersonalFix20261026">.spAssigneeNoWrap{white-space:nowrap!important;display:inline-block}.spModernMain small{overflow-wrap:normal}.spDashOneLine{font-size:clamp(10px,2.8vw,13px);white-space:nowrap;overflow-x:auto;overflow-y:hidden;padding:9px 7px!important;margin:5px 0!important;scrollbar-width:thin}.spModernCard .spModernMain{min-width:0}.spModernCard .spModernMain small{line-height:1.5}</style><link rel="stylesheet" href="/therapist-profile/staff/interview-personal/mobile/personal-top.css?v=20261030pc2"><link rel="stylesheet" href="/therapist-profile/staff/interview-personal/mobile/personal-notifications.css?v=20261030pc1"><link rel="stylesheet" href="/therapist-profile/staff/interview-personal/mobile/personal-news.css?v=20261030news2"><link rel="stylesheet" href="/therapist-profile/staff/interview-personal/mobile/personal-login.css?v=20261030fix1"><link rel="stylesheet" href="/therapist-profile/staff/interview-personal/mobile/theme/owner.css?v=20261030theme2"></head><body>
+</style><style id="spPersonalFix20261026">.spAssigneeNoWrap{white-space:nowrap!important;display:inline-block}.spModernMain small{overflow-wrap:normal}.spDashOneLine{font-size:clamp(10px,2.8vw,13px);white-space:nowrap;overflow-x:auto;overflow-y:hidden;padding:9px 7px!important;margin:5px 0!important;scrollbar-width:thin}.spModernCard .spModernMain{min-width:0}.spModernCard .spModernMain small{line-height:1.5}</style><link rel="stylesheet" href="/therapist-profile/staff/interview-personal/mobile/personal-top.css?v=20261030pc2"><link rel="stylesheet" href="/therapist-profile/staff/interview-personal/mobile/personal-notifications.css?v=20261030pc1"><link rel="stylesheet" href="/therapist-profile/staff/interview-personal/mobile/personal-news.css?v=20261030news2"><link rel="stylesheet" href="/therapist-profile/staff/interview-personal/mobile/personal-login.css?v=20261030fix1"><link rel="stylesheet" href="/therapist-profile/staff/interview-personal/mobile/theme/owner.css?v=20261030theme2"><style id="murakami-makibao-theme">
+/* Murakami-only: cheerful manga horse-racing motif; preserve operational status colors */
+:root{--racing-turf:#237b48;--racing-dark:#123e2c;--racing-cream:#fffdf2;--racing-yellow:#f5ce52;--racing-ink:#25372d}
+body{background:repeating-linear-gradient(135deg,#eaf5e9 0,#eaf5e9 22px,#e4f0e1 22px,#e4f0e1 44px);color:var(--racing-ink)}
+.head{background:linear-gradient(145deg,#134b32,#237b48 65%,#31975b);border-bottom:5px solid var(--racing-yellow);box-shadow:0 4px 0 #16462e}
+.head b{color:#fffdf0;text-shadow:2px 2px 0 #0d3726;letter-spacing:.025em}
+.head small{color:#e2f5dd}
+.mainmenu button,.mainmenu a{background:#fffdf2;color:#17462e;border:2px solid #174e33;border-radius:14px;box-shadow:3px 3px 0 #174e33;font-weight:900}
+.mainmenu span{color:#44715a}
+.mainmenu button.is-current{background:#f5ce52!important;color:#203c2b!important;border-color:#174e33!important;box-shadow:3px 3px 0 #174e33!important}
+.mainmenu button.is-current span{color:#31513b!important}
+.quicklinks a{background:#e6f3df;color:#1d5638;border:2px solid #27613d;border-radius:10px;box-shadow:2px 2px 0 #27613d}
+.panel>.card,.panel .card{border:2px solid #6b9e78;border-radius:15px;box-shadow:3px 4px 0 #d1e4c9;background:#fffef8}
+.panel h2,.panel h3{color:#1b6240}
+.btn:not(.is-current){border:2px solid #174e33;background:#2e8650;color:white;box-shadow:2px 3px 0 #174e33}
+.nav{background:#fffdf2;border-top:4px solid #267646;box-shadow:0 -3px 0 #f5ce52}
+.nav button{background:#fffdf2;color:#24513a}
+.nav button.active{color:#17683d;background:#e3f5d9}
+.gate{background:repeating-linear-gradient(135deg,#eaf5e9 0,#eaf5e9 22px,#e4f0e1 22px,#e4f0e1 44px)}
+.gate .card{border:3px solid #237b48;box-shadow:5px 5px 0 #f5ce52}
+.gate .btn{background:#237b48}
+@media(prefers-reduced-motion:no-preference){.mainmenu button:active,.mainmenu a:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #174e33}}
+</style></head><body>
 <div class="gate" id="gate"><div class="card"><h2 class="personal-login-legacy-title">末端 MOBILE</h2><div class="personal-login-brand"><small>L GROUP MANAGEMENT</small><strong>RECRUIT MANAGEMENT</strong><p>管理者ログイン</p></div><p class="note personal-login-legacy-desc">求人・面接管理専用</p><label for="email">メールアドレス</label><input id="email" type="email" name="username" autocomplete="username" inputmode="email"><label for="password">パスワード</label><input id="password" type="password" name="current-password" autocomplete="current-password"><button class="btn" id="mobileLoginBtn" type="button" onclick="window.mobileLoginNow()">ログイン</button><div id="loginDiag" style="font-size:12px;margin-top:8px;color:#73522f">診断版 2026-10-15 B</div><div class="msg" id="authMsg" role="status" aria-live="polite"></div></div></div>
 
 <header class="spTopBar"><div class="spTopLine"><div class="spTopTitle"><small>L GROUP MANAGEMENT</small><strong>面接管理</strong></div><button type="button" class="spRefresh" onclick="loadSchedule();loadInterviewSheets()" aria-label="情報を更新">↻</button><button type="button" class="spRecruit" onclick="openRecruitManagement()">求人管理 ↗</button></div></header><section class="panel active" id="schedule"><div class="card"><span id="scheduleLamp" style="display:none!important" aria-hidden="true"></span>
