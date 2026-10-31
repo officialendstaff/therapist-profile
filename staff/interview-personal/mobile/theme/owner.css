@@ -688,3 +688,29 @@ body[data-personal-mobile-view="app"] #personalMobileViewer .personal-mobile-sub
  #gate.gate label{margin:8px 0 4px!important}
  #gate.gate button#mobileLoginBtn{margin-top:14px!important}
 }
+
+/* Owner-only unavailable-hours page: same fixed collage as other detail pages. */
+@media(max-width:900px){
+ body[data-personal-mobile-view="blocks"]{
+  background-color:#eaf3e6!important;
+  background-image:linear-gradient(rgba(245,250,241,.62),rgba(245,250,241,.62)),
+   url("/therapist-profile/staff/interview-personal/mobile/makibao-detail-collage.webp")!important;
+  background-position:center,center top!important;
+  background-size:cover,min(100vw,760px) auto!important;
+  background-repeat:no-repeat,repeat-y!important;
+  color:#21452f!important;
+ }
+ body[data-personal-mobile-view="blocks"] #schedule{background:transparent!important}
+ body[data-personal-mobile-view="blocks"] #schedule>.card{
+  background:rgba(255,253,246,.9)!important;
+  border-color:#a7c991!important;
+ }
+ body[data-personal-mobile-view="blocks"] #mobileBlocks{
+  background:rgba(255,253,246,.95)!important;
+  border-color:#a7c991!important;
+ }
+ body[data-personal-mobile-view="blocks"] #mobileBlocks>h3{
+  color:#174d32!important;
+  border-color:#c6dabf!important;
+ }
+}
