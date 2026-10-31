@@ -234,3 +234,27 @@ html.personal-sheet-mobile[data-personal-theme="president"] #sheetDetailPane>.he
  background:linear-gradient(115deg,#200d25,#591b42 76%,#90305e)!important;
  border-bottom:3px solid #f17db8!important;color:#fff!important;
 }
+
+
+/* FIX 2026-10-31: The list/detail header must occupy a flex row.
+   Previously it was fixed at top:0, while the iframe also began at y=0,
+   hiding the search/shop filter and pager behind the header on mobile. */
+body[data-personal-mobile-view="app"] #personalMobileViewer{
+ display:flex!important;
+ flex-direction:column!important;
+}
+body[data-personal-mobile-view="app"] #personalMobileViewer > .personal-mobile-subheader{
+ position:relative!important;
+ inset:auto!important;
+ flex:0 0 auto!important;
+ width:100%!important;
+ max-width:100%!important;
+ box-sizing:border-box!important;
+}
+body[data-personal-mobile-view="app"] #personalMobileViewer > #personalMobileFrame{
+ display:block!important;
+ flex:1 1 0%!important;
+ min-height:0!important;
+ height:auto!important;
+ width:100%!important;
+}
