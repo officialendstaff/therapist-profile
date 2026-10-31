@@ -296,3 +296,31 @@ html[data-personal-theme] #sheetDetailTools button:hover{
   background:rgba(255,255,255,.88)!important;
  }
 }
+
+
+/* Murakami embedded Interview Sheet: fixed collage under the scrollable list. */
+@media(max-width:900px){
+ html.personal-sheet-mobile[data-personal-theme="owner"]{
+  --personal-art:transparent;
+ }
+ html.personal-sheet-mobile[data-personal-theme="owner"] body{
+  background:#eaf3e6!important;
+ }
+ html.personal-sheet-mobile[data-personal-theme="owner"] #layout{
+  background-color:#eaf3e6!important;
+  background-image:
+   linear-gradient(rgba(245,250,241,.62),rgba(245,250,241,.62)),
+   url("/therapist-profile/staff/interview-personal/mobile/makibao-detail-collage.webp")!important;
+  background-size:cover,min(100vw,760px) auto!important;
+  background-position:center,center top!important;
+  background-repeat:no-repeat,repeat-y!important;
+ }
+ html.personal-sheet-mobile[data-personal-theme="owner"] #layout>.left,
+ html.personal-sheet-mobile[data-personal-theme="owner"] #sheetDetailPane{
+  background:rgba(255,253,246,.12)!important;
+ }
+ html.personal-sheet-mobile[data-personal-theme="owner"] #layout>.left .body,
+ html.personal-sheet-mobile[data-personal-theme="owner"] #detail{
+  background:transparent!important;
+ }
+}
