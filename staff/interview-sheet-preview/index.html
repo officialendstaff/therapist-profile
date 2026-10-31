@@ -781,6 +781,29 @@ const mediaColors={
  'エステクイーン':'#526CE0','Richセラピ':'#F1C04D','エステアイ':'#38A8DC',
  'メンエスリクルート':'#76B66D','HP':'#2699C8','02':'#D77A58','X':'#6E7D91','その他':'#B885D4'
 };
+/* Media chart labels: abbreviations only; full keys retained for counts/colors/tooltips. */
+const mediaChartShortLabels={
+ 'エステ魂':'魂',
+ 'メンズエステワーク':'ワーク',
+ 'エステラブワーク':'ラブワ',
+ 'リラクジョブ':'リラクジ',
+ 'エステクイーン':'クイーン',
+ 'Richセラピ':'Rich',
+ 'エステアイ':'アイ',
+ 'メンエスリクルート':'リクルー',
+ 'バニラ':'バニラ',
+ '02':'02',
+ 'X':'X',
+ 'その他':'その他',
+ 'HP':'HP',
+ 'オフィシャルHP':'HP',
+ '記載なし':'記載なし'
+};
+function mediaChartLabel(name){
+ const full=String(name||'');
+ if(full.startsWith('その他（')||full.startsWith('その他('))return 'その他';
+ return mediaChartShortLabels[full]||full;
+}
 function mediaColor(name){
  if(Object.prototype.hasOwnProperty.call(mediaColors,name))return mediaColors[name];
  let code=0;for(const ch of String(name))code=(code*31+ch.charCodeAt(0))>>>0;
@@ -858,7 +881,7 @@ const inquiries=document.createElement('span');inquiries.textContent=count;inqui
 const attended=document.createElement('span');attended.textContent=known?done:'—';attended.style.cssText='font-size:13px;line-height:15px;font-weight:800;color:'+(known?'#D32940':'#8793A3');
 figures.append(inquiries,attended);holder.append(figures)}
 holder.title=name+' '+period+'｜問い合わせ '+count+'件｜面接実施 '+(known?done+'件':'データなし');pair.append(holder)}
-const label=document.createElement('div');label.textContent=name;label.title=name;label.style.cssText='font-size:10px;font-weight:700;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;margin-top:7px';
+const label=document.createElement('div');label.textContent=mediaChartLabel(name);label.title=name;label.style.cssText='font-size:10px;font-weight:700;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;margin-top:7px';
 col.append(pair,label);graph.append(col)}compare.append(graph)
 }else{const empty=document.createElement('p');empty.textContent=lineReady?'媒体情報なし':'LINEデータ未取得';compare.append(empty)}
 chart.append(compare);root.append(chart);
