@@ -34,6 +34,21 @@
  const blockBar=document.createElement('div');blockBar.id='personalMobileBlockBar';blockBar.innerHTML='<button type="button" data-personal-back>‹ TOP</button><strong>対応不可の設定</strong>';
  document.body.append(top,viewer,blockBar);
  const gate=document.getElementById('gate'),frame=viewer.querySelector('iframe');
+ // Only Murakami's detail header rotates through the eight supplied artworks.
+ // These are the same artwork assets already used in his eight TOP cards.
+ const ownerHeaderArtNames=['makibao-04.png','makibao-05.png','makibao-06.png','makibao-07.png','makibao-08.png','makibao-09.png','makibao-10.png','makibao-01.png'];
+ const ownerHeaderArtKey='murakami_last_detail_header_art';
+ function chooseOwnerDetailHeaderArt(){
+  if(profile!=='owner')return;
+  let previous='';
+  try{previous=sessionStorage.getItem(ownerHeaderArtKey)||''}catch{}
+  const choices=ownerHeaderArtNames.filter(name=>name!==previous);
+  const chosen=choices[Math.floor(Math.random()*choices.length)];
+  const imagePath='/therapist-profile/staff/interview-personal/mobile/'+chosen;
+  viewer.style.setProperty('--owner-detail-header-art','url("'+imagePath+'")');
+  try{sessionStorage.setItem(ownerHeaderArtKey,chosen)}catch{}
+ }
+
  const authorized=()=>gate?.style.display==='none';
  function clearFrame(){if(frame.getAttribute('src'))frame.setAttribute('src','about:blank')}
  function showHome(){
@@ -56,6 +71,7 @@
   }
   if(!items.some(item=>item.key===key))return;
   viewer.querySelector('#personalMobileViewTitle').textContent=key;
+  chooseOwnerDetailHeaderArt();
   document.body.dataset.personalMobileView='app';
   frame.src='/therapist-profile/staff/interview-sheet-preview/?personalMobile=1&page='+encodeURIComponent(key)+'&v=20261030theme2'+((profile==='owner'||profile==='festival')?'&theme='+profile:'');
  }
