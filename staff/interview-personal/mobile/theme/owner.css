@@ -588,3 +588,103 @@ body[data-personal-mobile-view="app"] #personalMobileViewer .personal-mobile-sub
  background-size:contain!important;
  background-repeat:no-repeat!important;
 }
+
+
+/* 2026-10-31 Murakami-only sign-in screen. Styling only; keep auth inputs and handlers intact. */
+@media(max-width:900px){
+ #gate.gate{
+  --owner-login-hero:clamp(124px,23dvh,186px);
+  position:fixed!important;inset:0!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  width:100vw!important;max-width:100vw!important;
+  height:100vh!important;height:100dvh!important;
+  box-sizing:border-box!important;
+  overflow-x:hidden!important;overflow-y:auto!important;
+  padding:calc(env(safe-area-inset-top,0px) + 12px) 16px calc(env(safe-area-inset-bottom,0px) + 12px)!important;
+  color:#183f2b!important;
+  background:
+   radial-gradient(ellipse at 50% 18%,rgba(58,158,88,.5),transparent 52%),
+   repeating-linear-gradient(145deg,rgba(255,255,255,.045) 0 20px,transparent 20px 40px),
+   linear-gradient(160deg,#103c28 0%,#17603b 55%,#0f3527 100%)!important;
+ }
+ #gate.gate[style*="display:none"],#gate.gate[style*="display: none"]{display:none!important}
+ #gate.gate>.card{
+  position:relative!important;isolation:isolate!important;
+  width:100%!important;max-width:400px!important;
+  min-width:0!important;margin:auto!important;
+  box-sizing:border-box!important;overflow:hidden!important;
+  padding:calc(var(--owner-login-hero) + 19px) 22px 22px!important;
+  border:3px solid #174f34!important;border-radius:22px!important;
+  background:#fffdf2!important;
+  box-shadow:5px 6px 0 #f2cb4f,0 17px 42px rgba(0,0,0,.26)!important;
+ }
+ #gate.gate>.card::before{
+  content:"";position:absolute;z-index:-1;top:0;left:0;right:0;
+  height:var(--owner-login-hero);
+  background:linear-gradient(130deg,#104a30 0%,#218049 65%,#319557 100%);
+  border-bottom:5px solid #f4d34e;
+  pointer-events:none;
+ }
+ #gate.gate>.card::after{
+  content:"";position:absolute;z-index:0;right:8px;top:6px;
+  width:91%;height:calc(var(--owner-login-hero) - 8px);
+  background:url("../makibao-03.png") center bottom/contain no-repeat;
+  pointer-events:none;
+ }
+ #gate.gate .personal-login-brand{
+  display:block!important;position:relative;z-index:1;
+  text-align:center!important;margin:0 0 16px!important;
+ }
+ #gate.gate .personal-login-brand small{
+  display:block;color:#34815a!important;
+  font-size:10px!important;font-weight:850!important;
+  letter-spacing:.22em!important;
+ }
+ #gate.gate .personal-login-brand strong{
+  display:block;color:#145034!important;
+  font-size:clamp(27px,8vw,35px)!important;line-height:1.15!important;
+  font-weight:950!important;letter-spacing:.06em!important;
+  margin:6px 0 7px!important;
+  -webkit-text-stroke:2px #fff!important;
+  paint-order:stroke fill;
+  text-shadow:1px 2px 0 #e3dca4!important;
+ }
+ #gate.gate .personal-login-brand p{
+  color:#517561!important;font-size:11px!important;
+  font-weight:800;letter-spacing:.15em;margin:0!important;
+ }
+ #gate.gate label{
+  color:#284f3a!important;font-size:12px!important;
+  margin:11px 0 6px!important;
+ }
+ #gate.gate input#email,#gate.gate input#password{
+  width:100%!important;min-height:47px!important;max-width:100%!important;
+  background:#fff!important;color:#163d2b!important;
+  border:1.5px solid #a6c7ad!important;border-radius:9px!important;
+  font-size:16px!important;padding:10px 12px!important;
+  box-shadow:inset 0 1px 2px rgba(20,70,43,.05);
+ }
+ #gate.gate input#email:focus-visible,#gate.gate input#password:focus-visible{
+  outline:3px solid rgba(240,201,69,.75)!important;outline-offset:1px!important;
+ }
+ #gate.gate button#mobileLoginBtn{
+  width:100%!important;min-height:48px!important;
+  background:#f4d34e!important;color:#174630!important;
+  border:2px solid #175037!important;border-radius:10px!important;
+  margin:20px 0 0!important;font-size:16px!important;
+  font-weight:900!important;box-shadow:2px 3px 0 #17603b!important;
+  text-shadow:none!important;
+ }
+ #gate.gate button#mobileLoginBtn:active{transform:translateY(2px);box-shadow:none!important}
+ #gate.gate button#mobileLoginBtn:disabled{opacity:.6!important;cursor:wait}
+ #gate.gate #authMsg{color:#ad3142!important;font-size:12px!important;line-height:1.55!important}
+ #gate.gate #loginDiag{display:none!important}
+}
+@media(max-width:900px) and (max-height:710px){
+ #gate.gate{--owner-login-hero:114px;padding:8px 14px!important}
+ #gate.gate>.card{padding:calc(var(--owner-login-hero) + 11px) 18px 14px!important}
+ #gate.gate .personal-login-brand{margin-bottom:8px!important}
+ #gate.gate .personal-login-brand strong{font-size:27px!important}
+ #gate.gate label{margin:8px 0 4px!important}
+ #gate.gate button#mobileLoginBtn{margin-top:14px!important}
+}
