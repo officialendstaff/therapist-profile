@@ -408,3 +408,25 @@ body[data-personal-mobile-view="blocks"] #personalMobileBlockBar button{
 #personalMobileTop .personal-mobile-header>div:first-child{order:1!important;width:calc(100% - 115px)!important;max-width:calc(100% - 115px)!important;z-index:3!important}
 #personalMobileTop .personal-mobile-header::before{width:115px!important;height:80%!important;right:0!important;bottom:0!important;z-index:1!important}
 @media(max-width:390px){#personalMobileTop .personal-mobile-header>div:first-child{width:calc(100% - 100px)!important;max-width:calc(100% - 100px)!important}#personalMobileTop .personal-mobile-header::before{width:100px!important;height:70%!important}}
+
+/* Owner detail headers, including the unavailability settings screen. */
+body[data-personal-mobile-view="app"] .personal-mobile-subheader,
+body[data-personal-mobile-view="blocks"] #personalMobileBlockBar{
+ position:relative!important;
+ isolation:isolate!important;
+ overflow:hidden!important;
+ padding-right:110px!important;
+ background:linear-gradient(120deg,#104b30,#25834b 68%,#3da762)!important;
+ border-bottom:4px solid #f4d34e!important;
+ color:#fffef0!important;
+}
+body[data-personal-mobile-view="app"] .personal-mobile-subheader::after,
+body[data-personal-mobile-view="blocks"] #personalMobileBlockBar::after{
+ content:"";position:absolute;right:5px;bottom:0;
+ width:95px;height:100%;pointer-events:none;z-index:0;
+ background:url("../makibao-02.png") right bottom/contain no-repeat;
+}
+body[data-personal-mobile-view="app"] .personal-mobile-subheader>*,
+body[data-personal-mobile-view="blocks"] #personalMobileBlockBar>*{
+ position:relative;z-index:1;
+}
