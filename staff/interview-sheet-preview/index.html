@@ -273,7 +273,127 @@ html.personal-mobile-embed #adminAuthOpen{display:none!important}
 html.personal-mobile-embed:not(.personal-mobile-ready) .main{visibility:hidden!important}
 html.personal-mobile-embed.personal-mobile-ready .main{visibility:visible!important}
 </style><style>
-#myPagePanel{height:100%;overflow:auto;padding:16px 20px;background:#fff;color:#24364b}#myPagePanel[hidden]{display:none!important}.mpGrid{display:grid;grid-template-columns:minmax(300px,1fr) minmax(300px,1fr);gap:12px;align-items:stretch}.mpRight{display:grid;grid-template-rows:1fr 1fr;gap:12px;min-height:0}.mpRight .mpCard{min-height:0;overflow:auto}.mpCalendar button.mpSunday,.mpCalendar button.mpHoliday{color:#c33b55;background:#fff2f4}.mpCalendar button.mpSaturday{color:#2863a3;background:#eef5ff}.mpCalendar button.focused{outline:2px solid #326ca6;outline-offset:-2px}.mpCalendar button.selected{background:#d9eaff;border:2px solid #568db9}.mpCalendar button:disabled{opacity:.65;cursor:default}.mpEntry{font-size:12px;padding:7px 3px}.mpCard h2{font-size:14px}.mpCard{border:1px solid #d7e2ee;border-radius:9px;padding:16px;background:#fff}.mpCard h2{font-size:15px;margin:0 0 12px}.mpCalendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}.mpCalendar button{min-height:42px;border:1px solid #d8e2ec;border-radius:5px;background:#f7f9fc;color:#24364b;cursor:pointer}.mpCalendar button.selected{background:#d9eaff;border:2px solid #568db9}.mpCalendar button.blocked{box-shadow:inset 0 -4px #d9778c}.mpCalendar button:disabled{opacity:.35;cursor:default}.mpRow{display:flex;gap:10px;align-items:center;margin:12px 0;flex-wrap:wrap}.mpRow select{padding:7px;border:1px solid #cbd5e1;border-radius:5px}.mpPrimary{background:#397cba;color:white;border:0;border-radius:6px;padding:10px 20px;cursor:pointer}.mpEntry{display:flex;align-items:center;justify-content:space-between;padding:10px;border-bottom:1px solid #e2e8f0}.mpEntry button{color:#b44358;border:1px solid #e7aab6;background:white;border-radius:5px;padding:5px 12px;cursor:pointer}.mpRight .mpEntry{font-size:14px;padding:9px 3px;min-height:42px}.mpRight .mpEntry span{font-size:14px;line-height:1.5}.mpRight .mpEntry button{font-size:14px;min-height:36px;padding:7px 15px;font-weight:500}.mpRight #mpEntries{font-size:14px}.mpDateActions{margin:6px 0 10px;gap:8px}.mpDateActions button{min-height:36px;padding:7px 14px;font-size:14px;border-radius:6px}.mpDateActions #mpClear{border:1px solid #b8c8da;background:#fff;color:#334155;cursor:pointer}.mpDateActions #mpClear:disabled{opacity:.45;cursor:default}.mpModeTime{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0}.mpModeTime>label{white-space:nowrap}.mpModeTime #mpTimeRow{display:flex!important;align-items:center;gap:8px;margin:0;min-height:36px}.mpModeTime #mpTimeRow label{white-space:nowrap}.mpModeTime #mpTimeRow select{min-width:70px}.mpRight .mpCard{overflow:auto}@media(max-width:850px){.mpGrid{grid-template-columns:1fr}.mpRight{grid-template-rows:auto auto}}
+#myPagePanel{height:100%;overflow:auto;padding:16px 20px;background:#fff;color:#24364b}#myPagePanel[hidden]{display:none!important}.mpGrid{display:grid;grid-template-columns:minmax(300px,1fr) minmax(300px,1fr);gap:12px;align-items:stretch}.mpRight{display:grid;grid-template-rows:1fr 1fr;gap:12px;min-height:0}.mpRight .mpCard{min-height:0;overflow:auto}.mpCalendar button.mpSunday,.mpCalendar button.mpHoliday{color:#c33b55;background:#fff2f4}.mpCalendar button.mpSaturday{color:#2863a3;background:#eef5ff}.mpCalendar button.focused{outline:2px solid #326ca6;outline-offset:-2px}.mpCalendar button.selected{background:#d9eaff;border:2px solid #568db9}.mpCalendar button:disabled{opacity:.65;cursor:default}.mpEntry{font-size:12px;padding:7px 3px}.mpCard h2{font-size:14px}.mpCard{border:1px solid #d7e2ee;border-radius:9px;padding:16px;background:#fff}.mpCard h2{font-size:15px;margin:0 0 12px}.mpCalendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}.mpCalendar button{min-height:42px;border:1px solid #d8e2ec;border-radius:5px;background:#f7f9fc;color:#24364b;cursor:pointer}.mpCalendar button.selected{background:#d9eaff;border:2px solid #568db9}.mpCalendar button.blocked{box-shadow:inset 0 -4px #d9778c}.mpCalendar button:disabled{opacity:.35;cursor:default}.mpRow{display:flex;gap:10px;align-items:center;margin:12px 0;flex-wrap:wrap}.mpRow select{padding:7px;border:1px solid #cbd5e1;border-radius:5px}.mpPrimary{background:#397cba;color:white;border:0;border-radius:6px;padding:10px 20px;cursor:pointer}.mpEntry{display:flex;align-items:center;justify-content:space-between;padding:10px;border-bottom:1px solid #e2e8f0}.mpEntry button{color:#b44358;border:1px solid #e7aab6;background:white;border-radius:5px;padding:5px 12px;cursor:pointer}.mpRight .mpEntry{font-size:14px;padding:9px 3px;min-height:42px}.mpRight .mpEntry span{font-size:14px;line-height:1.5}.mpRight .mpEntry button{font-size:14px;min-height:36px;padding:7px 15px;font-weight:500}.mpRight #mpEntries{font-size:14px}.mpDateActions{margin:6px 0 10px;gap:8px}.mpDateActions button{min-height:36px;padding:7px 14px;font-size:14px;border-radius:6px}.mpDateActions #mpClear{border:1px solid #b8c8da;background:#fff;color:#334155;cursor:pointer}.mpDateActions #mpClear:disabled{opacity:.45;cursor:default}.mpModeTime{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0}.mpModeTime>label{white-space:nowrap}.mpModeTime #mpTimeRow{display:flex;align-items:center;gap:8px;margin:0;min-height:34px}.mpModeTime #mpTimeRow label{white-space:nowrap}.mpModeTime #mpTimeRow select{min-width:70px}.mpRight .mpCard{overflow:auto}@media(max-width:850px){.mpGrid{grid-template-columns:1fr}.mpRight{grid-template-rows:auto auto}}
+/* Compact My Page: remove the 1fr forced-height panels and reserved empty rows. */
+#myPagePanel{
+ box-sizing:border-box;
+ height:100%;
+ min-height:0;
+ overflow-y:auto;
+ padding:12px 16px;
+ background:#f8fafc;
+}
+#myPagePanel>div:first-child{margin-bottom:9px!important;min-height:27px}
+#myPagePanel>div:first-child h1{font-size:17px!important}
+#myPagePanel .mpGrid{
+ display:grid;
+ grid-template-columns:minmax(0,1.04fr) minmax(0,.96fr);
+ align-items:start;
+ gap:10px;
+ height:auto;
+ min-height:0;
+}
+#myPagePanel .mpRight{
+ display:flex;
+ flex-direction:column;
+ gap:10px;
+ min-height:0;
+ height:auto;
+ align-content:start;
+}
+#myPagePanel .mpCard,
+#myPagePanel .mpRight .mpCard{
+ box-sizing:border-box;
+ min-height:0;
+ height:auto;
+ overflow:visible;
+ padding:12px 13px;
+ border-radius:9px;
+}
+#myPagePanel .mpCard h2{
+ margin:0 0 8px;
+ font-size:13px;
+ line-height:1.4;
+}
+#myPagePanel .mpRow{
+ margin:7px 0;
+ gap:8px;
+}
+#myPagePanel .mpCalendar{
+ gap:4px;
+}
+#myPagePanel .mpCalendar button{
+ min-height:34px;
+ padding:3px;
+ font-size:12px;
+}
+#myPagePanel .mpCalendar small{
+ font-size:11px;
+ padding:3px 0 2px;
+}
+#myPagePanel #mpSelectedLabel{
+ font-size:11px;
+ color:#64748b;
+ line-height:1.45;
+}
+#myPagePanel .mpDateActions{
+ margin:4px 0 8px;
+}
+#myPagePanel .mpDateActions button,
+#myPagePanel #mpSave{
+ min-height:34px;
+ padding:7px 13px;
+}
+#myPagePanel #mpEditor .mpModeTime{
+ gap:10px;
+ margin:7px 0;
+}
+#myPagePanel #mpEditor .mpModeTime>label{
+ font-size:12px;
+}
+#myPagePanel #mpTimeRow{
+ gap:7px;
+ min-height:0;
+}
+#myPagePanel #mpTimeRow select{
+ min-width:73px;
+ min-height:30px;
+ padding:4px 6px;
+}
+#myPagePanel #mpSummary{
+ margin:6px 0 7px;
+ font-size:11px!important;
+}
+#myPagePanel #mpStatus{
+ margin:7px 0 0;
+ font-size:11px!important;
+ min-height:0;
+}
+#myPagePanel #mpEntries{
+ font-size:12px;
+ min-height:30px;
+}
+#myPagePanel .mpEntry{
+ min-height:37px;
+ gap:8px;
+ padding:6px 0;
+ font-size:12px;
+}
+#myPagePanel .mpEntry span{font-size:12px;line-height:1.5}
+#myPagePanel .mpEntry button{
+ min-height:31px;
+ font-size:12px;
+ padding:5px 11px;
+}
+@media(max-width:850px){
+ #myPagePanel{height:auto;min-height:100%;padding:10px}
+ #myPagePanel .mpGrid{grid-template-columns:minmax(0,1fr);gap:9px}
+ #myPagePanel .mpRight{gap:9px}
+ #myPagePanel .mpCard{padding:12px}
+ #myPagePanel .mpCalendar button{min-height:38px}
+ #myPagePanel #mpEditor .mpModeTime{flex-wrap:wrap}
+}
+
 </style></head><body>
 <header class="header"><button class="brand" id="home"><img id="homeAvatar" src="./icons/recruit-180.png" alt="" onerror="this.style.display='none'"><span id="homeLabel">TOP</span></button><div class="header-actions"><button id="headerLineInbox" type="button"><svg class="header-bell" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>LINE通知</button><button id="manualInterviewOpen" type="button">面接登録</button><button id="sound">通知設定</button></div></header>
 <section class="calendar" aria-label="月間カレンダー"><div class="cal-head"><button id="prev" aria-label="前月">◀</button><span id="month"></span><button id="next" aria-label="翌月">▶</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="days" id="days"></div></section>
@@ -951,7 +1071,7 @@ function showHome(){document.getElementById('storeMetrics').hidden=true; current
 
 const mpState={month:new Date(new Date().getFullYear(),new Date().getMonth(),1),days:new Set(),rows:[],viewer:null,client:null,editing:false,focused:null};
 function mpDate(d){return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')}
-function mpRender(){const m=mpState.month,y=m.getFullYear(),mo=m.getMonth(),cal=document.getElementById('mpCalendar');document.getElementById('mpMonthLabel').textContent=y+'年'+(mo+1)+'月';cal.replaceChildren();for(const [i,day] of ['日','月','火','水','木','金','土'].entries()){const t=document.createElement('small');t.textContent=day;t.style.textAlign='center';t.style.color=i===0?'#c33b55':i===6?'#2863a3':'';cal.append(t)}for(let i=0;i<m.getDay();i++)cal.append(document.createElement('span'));const today=new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Tokyo'});for(let d=1;d<=new Date(y,mo+1,0).getDate();d++){const date=mpDate(new Date(y,mo,d)),dt=new Date(y,mo,d),b=document.createElement('button');b.textContent=d;const isPast=date<today;b.disabled=mpState.editing&&isPast;b.className=(mpState.days.has(date)?'selected ':'')+(mpState.rows.some(x=>x.block_date===date)?'blocked ':'')+(date===mpState.focused?'focused ':'')+(holiday(dt)?'mpHoliday':dt.getDay()===0?'mpSunday':dt.getDay()===6?'mpSaturday':'');b.onclick=()=>{if(mpState.editing){if(mpState.days.has(date))mpState.days.delete(date);else mpState.days.add(date)}else{mpState.focused=date;mpRenderEntries()}mpRender()};cal.append(b)}document.getElementById('mpEditor').hidden=false;document.getElementById('mpPickDates').hidden=false;document.getElementById('mpPickDates').textContent=mpState.editing?'日付選択中':'日付選択';document.getElementById('mpClear').disabled=!mpState.days.size;document.getElementById('mpSelectedLabel').textContent=mpState.editing?(mpState.days.size?mpState.days.size+'日選択中':'登録する日付を選択してください'):(mpState.focused?mpState.focused+' を表示中':'日付をタップすると登録済み設定を表示します');const mode=document.querySelector('input[name="mpMode"]:checked').value;document.getElementById('mpTimeRow').style.visibility=mode==='all'?'hidden':'visible';document.getElementById('mpEndWrap').style.visibility=mode==='range'?'visible':'hidden';document.getElementById('mpSummary').textContent=mpState.days.size+'日分 ｜ '+(mode==='all'?'終日':mode==='after'?document.getElementById('mpStart').value+'以降':document.getElementById('mpStart').value+'〜'+document.getElementById('mpEnd').value)}
+function mpRender(){const m=mpState.month,y=m.getFullYear(),mo=m.getMonth(),cal=document.getElementById('mpCalendar');document.getElementById('mpMonthLabel').textContent=y+'年'+(mo+1)+'月';cal.replaceChildren();for(const [i,day] of ['日','月','火','水','木','金','土'].entries()){const t=document.createElement('small');t.textContent=day;t.style.textAlign='center';t.style.color=i===0?'#c33b55':i===6?'#2863a3':'';cal.append(t)}for(let i=0;i<m.getDay();i++)cal.append(document.createElement('span'));const today=new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Tokyo'});for(let d=1;d<=new Date(y,mo+1,0).getDate();d++){const date=mpDate(new Date(y,mo,d)),dt=new Date(y,mo,d),b=document.createElement('button');b.textContent=d;const isPast=date<today;b.disabled=mpState.editing&&isPast;b.className=(mpState.days.has(date)?'selected ':'')+(mpState.rows.some(x=>x.block_date===date)?'blocked ':'')+(date===mpState.focused?'focused ':'')+(holiday(dt)?'mpHoliday':dt.getDay()===0?'mpSunday':dt.getDay()===6?'mpSaturday':'');b.onclick=()=>{if(mpState.editing){if(mpState.days.has(date))mpState.days.delete(date);else mpState.days.add(date)}else{mpState.focused=date;mpRenderEntries()}mpRender()};cal.append(b)}document.getElementById('mpEditor').hidden=false;document.getElementById('mpPickDates').hidden=false;document.getElementById('mpPickDates').textContent=mpState.editing?'日付選択中':'日付選択';document.getElementById('mpClear').disabled=!mpState.days.size;document.getElementById('mpSelectedLabel').textContent=mpState.editing?(mpState.days.size?mpState.days.size+'日選択中':'登録する日付を選択してください'):(mpState.focused?mpState.focused+' を表示中':'日付をタップすると登録済み設定を表示します');const mode=document.querySelector('input[name="mpMode"]:checked').value;document.getElementById('mpTimeRow').style.display=mode==='all'?'none':'flex';document.getElementById('mpEndWrap').style.display=mode==='range'?'':'none';document.getElementById('mpSummary').textContent=mpState.days.size+'日分 ｜ '+(mode==='all'?'終日':mode==='after'?document.getElementById('mpStart').value+'以降':document.getElementById('mpStart').value+'〜'+document.getElementById('mpEnd').value)}
 function mpRenderEntries(){const box=document.getElementById('mpEntries');box.replaceChildren();if(!mpState.focused){box.textContent='カレンダーの日付をタップしてください。';return}const rows=mpState.rows.filter(x=>x.block_date===mpState.focused);if(!rows.length){box.textContent=mpState.focused+'：対応不可の登録はありません。';return}for(const x of rows){const row=document.createElement('div');row.className='mpEntry';const span=document.createElement('span');span.textContent=x.block_date+' ｜ '+(x.all_day?'終日':String(x.start_time||'').slice(0,5)+'〜'+String(x.end_time||'').slice(0,5));const btn=document.createElement('button');btn.textContent='解除';btn.onclick=async()=>{if(!confirm('この対応不可設定を解除しますか？'))return;const r=await mpState.client.from('interview_staff_unavailability').delete().eq('id',x.id).eq('interviewer_user_id',mpState.viewer);if(r.error)alert(r.error.message);else{await mpLoad();if(typeof refreshChartAvailability==='function')refreshChartAvailability()}};row.append(span,btn);box.append(row)}}
 async function mpLoad(){const client=mpState.client;if(!client||!mpState.viewer)return;const {data,error}=await client.from('interview_staff_unavailability').select('*').eq('interviewer_user_id',mpState.viewer).order('block_date');if(error){document.getElementById('mpStatus').textContent='取得失敗：'+error.message;return}mpState.rows=data||[];mpRenderEntries();mpRender()}
 async function mpOpen(){const key=window.interviewCurrentProfileKey;if(!['owner','president','ota','festival'].includes(key)){appNotice('管理者アカウントでログインしてください。');return}const client=window.supabase?.createClient('https://vjjnkflbfsjihwzjsjpr.supabase.co','sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos',{auth:{persistSession:true,autoRefreshToken:true,storage:window.sessionStorage,storageKey:'mattan-recruit-auth'}});if(!client){appNotice('認証ライブラリを読み込めません。');return}const {data:{session}}=await client.auth.getSession();if(!session){appNotice('ログインしてください。');return}const {data:profile,error}=await client.rpc('interview_my_profile');const p=Array.isArray(profile)?profile[0]:profile;if(error||!p||p.profile_key!==key){appNotice('本人のアカウントでログインしてください。');return}mpState.client=client;mpState.viewer=session.user.id;document.getElementById('mpUserLabel').textContent=key==='owner'?'村上':key==='president'?'社長':key==='ota'?'オオタ':'お祭り';const panel=document.querySelector('.main-panel');panel.classList.remove('sheet-mode');panel.style.removeProperty('height');panel.style.removeProperty('overflow');for(const id of ['todayPanel','sharedPanel','registrationPanel','applicantDetail','storeMetrics'])document.getElementById(id).hidden=true;document.getElementById('myPagePanel').hidden=false;document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('active',x.dataset.page==='My Page'));await mpLoad()}
