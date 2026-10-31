@@ -1,0 +1,236 @@
+/* PRESIDENT — sakura night palette shared by TOP and authenticated views.
+   Visual-only, scoped to president paths and ?theme=president embeds.
+   Never override interview status/action colors or data behavior. */
+:root{
+ --president-ace:url("/therapist-profile/staff/interview-personal/mobile/president-assets/ace.webp");
+ --president-night:#170917;
+ --president-plum:#34102c;
+ --president-rose:#f45ba4;
+ --president-pink:#ff91c4;
+ --president-pale:#fff5fb;
+}
+/* TOP: same fixed eight-button layout, with the login's night/pink lighting. */
+body[data-personal-mobile-view="home"] #personalMobileTop{
+ background:
+  radial-gradient(circle at 72% 10%,rgba(252,94,177,.33) 0 8%,rgba(252,94,177,.09) 24%,transparent 40%),
+  radial-gradient(ellipse at 5% 75%,rgba(241,63,152,.21),transparent 46%),
+  linear-gradient(155deg,#120917 0%,#38152f 43%,#170c21 77%,#090b17 100%)!important;
+ color:#fff0f7!important;
+}
+body[data-personal-mobile-view="home"] #personalMobileTop::before{
+ background:
+  linear-gradient(165deg,transparent 35%,rgba(15,4,22,.22)),
+  var(--president-ace) 96% 100% / auto 64% no-repeat!important;
+ opacity:.12!important;
+}
+#personalMobileTop .personal-mobile-header{
+ background:
+  radial-gradient(circle at 70% 7%,rgba(255,135,194,.35),transparent 32%),
+  linear-gradient(120deg,#170b1e 0%,#541639 63%,#972c66 100%)!important;
+ border-bottom:4px solid #ff75b6!important;
+ box-shadow:0 7px 22px #0e061a94,0 0 18px #ef54a245!important;
+}
+#personalMobileTop .personal-mobile-header::after{
+ background:linear-gradient(90deg,#b32c70,#ff8dc8 47%,#ffdaef 67%,#b82f7b)!important;
+}
+#personalMobileTop .personal-mobile-eyebrow{color:#ffd0e6!important}
+#personalMobileTop .personal-mobile-name{
+ color:#fff6fb!important;
+ text-shadow:0 2px 8px #fc60aa7a,0 1px 2px #10050c!important;
+}
+#personalMobileTop .personal-mobile-refresh,
+#personalMobileTop .personal-mobile-settings{
+ color:#fff4fb!important;
+ background:linear-gradient(160deg,#ffffff2e,#f083bc13)!important;
+ border:1px solid #ffb3d899!important;
+ box-shadow:0 2px 8px #21081655,inset 0 1px 0 #ffffff30!important;
+}
+#personalMobileTop .personal-mobile-action{
+ background:
+  linear-gradient(150deg,rgba(70,24,53,.98),rgba(24,12,33,.96) 75%)!important;
+ border:1px solid #be588b!important;
+ box-shadow:inset 0 1px 0 #ffcae735,0 4px 14px #05030b70,0 0 0 1px #8d2f6740!important;
+ color:#fff9fc!important;
+}
+#personalMobileTop .personal-mobile-action::before{
+ opacity:.78!important;
+ filter:drop-shadow(0 2px 3px #1709184d);
+}
+#personalMobileTop .personal-mobile-action::after{
+ background:#3e1b32ed!important;
+ color:#ffd5e9!important;
+ border:1px solid #b75988!important;
+}
+#personalMobileTop .personal-mobile-action .personal-mobile-label{
+ color:#fff7fb!important;
+ text-shadow:1px 1px 2px #0b0715,-1px -1px 2px #0b0715,0 0 8px #0b0715!important;
+}
+#personalMobileTop .personal-mobile-action .personal-mobile-icon{
+ background:#fff0f5e8!important;
+ box-shadow:0 2px 9px #14091485,0 0 0 1px #ffc3ddad!important;
+}
+#personalMobileTop .personal-mobile-action:active{
+ background:linear-gradient(145deg,#70264c,#301429)!important;
+}
+#personalMobileTop .personal-mobile-action:focus-visible{
+ outline:2px solid #ffbad9!important;outline-offset:-3px!important;
+}
+/* Count badges remain visible and independent of operational status colors. */
+#personalMobileTop .personal-mobile-count{
+ color:#fff!important;background:#d72c77!important;
+ border:1px solid #ffc5df!important;
+ box-shadow:0 1px 6px #100510aa!important;
+}
+/* Common subheader for all lists, detail views and unavailability. */
+body[data-personal-mobile-view="app"] #personalMobileViewer{
+ background:#200e22!important;
+}
+body[data-personal-mobile-view="app"] .personal-mobile-subheader,
+body[data-personal-mobile-view="blocks"] #personalMobileBlockBar{
+ background:linear-gradient(115deg,#180b20,#531638 70%,#8a2a5f)!important;
+ border-bottom:4px solid #ff75b6!important;
+ box-shadow:0 3px 13px #210c2170!important;
+ color:#fff5fb!important;
+}
+body[data-personal-mobile-view="app"] .personal-mobile-subheader button,
+body[data-personal-mobile-view="blocks"] #personalMobileBlockBar button{
+ background:#ffffff24!important;border:1px solid #ffadd1!important;color:#fff5fb!important;
+}
+body[data-personal-mobile-view="app"] #personalMobileFrame{
+ background:#fff5fb!important;
+}
+/* Unavailability: fixed Ace backdrop, legible settings form. */
+body[data-personal-mobile-view="blocks"]{
+ background-color:#170c20!important;
+ background-image:
+  linear-gradient(160deg,rgba(22,9,27,.90),rgba(62,16,44,.87)),
+  var(--president-ace)!important;
+ background-position:center,right bottom!important;
+ background-size:cover,auto 66vh!important;
+ background-repeat:no-repeat!important;
+ background-attachment:fixed!important;
+}
+body[data-personal-mobile-view="blocks"] #schedule>.card{
+ background:transparent!important;
+}
+body[data-personal-mobile-view="blocks"] #mobileBlocks{
+ background:#fff7fceF!important;
+ border:1px solid #e99bbf!important;
+ box-shadow:0 6px 24px #10051477!important;
+ color:#342338!important;
+}
+body[data-personal-mobile-view="blocks"] #mobileBlocks>h3{
+ color:#8e205b!important;
+}
+body[data-personal-mobile-view="blocks"] #mobileBlocks button:not(:disabled){
+ border-color:#dca7c2!important;
+}
+body[data-personal-mobile-view="blocks"] #mobileBlocks input:focus-visible,
+body[data-personal-mobile-view="blocks"] #mobileBlocks select:focus-visible{
+ outline:2px solid #e957a0!important;
+}
+/* Scoped embedded list pages. Never touch the main recruiting dashboard. */
+html[data-personal-theme="president"]{
+ --personal-accent:#c33b82;
+ --personal-accent-dark:#8f1c59;
+ --personal-accent-soft:#fff1f8;
+ --personal-accent-line:#e9a9c8;
+ --personal-page:#fff5fb;
+ --personal-surface:#fffbfd;
+ --personal-ink:#392c3e;
+ --personal-head:linear-gradient(116deg,#1a0b20,#57183d 67%,#972b67);
+ --personal-glow:rgba(95,19,60,.15);
+ --personal-art:linear-gradient(150deg,#fceef5,#fff8fb 70%,#f6e4f0);
+}
+html[data-personal-theme="president"] body.personal-mobile-embedded{
+ background-color:#170a1d!important;
+ background-image:
+  linear-gradient(165deg,rgba(34,11,30,.95),rgba(65,18,49,.88)),
+  var(--president-ace)!important;
+ background-position:center,right bottom!important;
+ background-size:cover,auto 68vh!important;
+ background-repeat:no-repeat!important;
+ background-attachment:fixed!important;
+}
+html[data-personal-theme="president"] body.personal-mobile-embedded .main{
+ background:
+  linear-gradient(155deg,rgba(255,246,251,.98),rgba(253,238,246,.97)),
+  var(--president-ace) right bottom / auto 64vh no-repeat!important;
+}
+html[data-personal-theme="president"] body.personal-mobile-embedded .main-panel:not(.sheet-mode){
+ background:transparent!important;
+}
+html[data-personal-theme="president"] body.personal-mobile-embedded .main-panel.sheet-mode{
+ background:#fff5fb!important;
+}
+html[data-personal-theme="president"] .today-head,
+html[data-personal-theme="president"] .list-head,
+html[data-personal-theme="president"] #storeMetricsHeader{
+ background:linear-gradient(114deg,#241027,#5d1d43 75%,#923061)!important;
+ border:1px solid #c6639b!important;
+ border-left:4px solid #ff73b6!important;
+ color:#fff4fa!important;
+ box-shadow:0 3px 12px #260c2b3e!important;
+}
+html[data-personal-theme="president"] .today-head h1,
+html[data-personal-theme="president"] .list-head h1,
+html[data-personal-theme="president"] #storeMetricsHeader h1{
+ color:#fff8fd!important;
+ text-shadow:0 1px 3px #150816a6!important;
+}
+html[data-personal-theme="president"] .today-head small,
+html[data-personal-theme="president"] .list-head small,
+html[data-personal-theme="president"] #storeMetricsHeader small{
+ color:#ffe0ee!important;
+}
+html[data-personal-theme="president"] .today-head button,
+html[data-personal-theme="president"] .list-head button,
+html[data-personal-theme="president"] .list-head select,
+html[data-personal-theme="president"] #storeMetricsHeader button,
+html[data-personal-theme="president"] #storeMetricsHeader select{
+ border-color:#efb4d3!important;
+ background:#fff7fc!important;
+ color:#67254f!important;
+}
+/* Keep state-based card borders, fills and enabled/disabled action colors.
+   Change only neutral surfaces and non-status framing. */
+html[data-personal-theme="president"] .detail-header{
+ background:#fff2f9!important;
+ border-left-color:#c33b82!important;
+ color:#5a2544!important;
+}
+html[data-personal-theme="president"] .detail-section,
+html[data-personal-theme="president"] #storeMetricsBody,
+html[data-personal-theme="president"] .mpCard{
+ background:#fffafe!important;
+ border-color:#efc3da!important;
+ box-shadow:0 2px 10px #481e3a15!important;
+}
+html[data-personal-theme="president"] .detail-header h1,
+html[data-personal-theme="president"] .detail-section h2,
+html[data-personal-theme="president"] .mpCard h2{
+ color:#852357!important;
+}
+/* Nested Interview Sheet, same theme token; status chips remain untouched. */
+html.personal-sheet-mobile[data-personal-theme="president"] body{
+ background:#fff5fb!important;
+}
+html.personal-sheet-mobile[data-personal-theme="president"] #layout{
+ background:
+  linear-gradient(155deg,#fff5fbf7,#f6e6f0f5),
+  var(--president-ace) right bottom / auto 62vh no-repeat!important;
+}
+html.personal-sheet-mobile[data-personal-theme="president"] #layout>.left,
+html.personal-sheet-mobile[data-personal-theme="president"] #sheetDetailPane{
+ background:#fffaffea!important;
+ border-color:#e7bbd4!important;
+}
+html.personal-sheet-mobile[data-personal-theme="president"] #layout>.left .body,
+html.personal-sheet-mobile[data-personal-theme="president"] #detail{
+ background:transparent!important;
+}
+html.personal-sheet-mobile[data-personal-theme="president"] #layout>.left>.head,
+html.personal-sheet-mobile[data-personal-theme="president"] #sheetDetailPane>.head{
+ background:linear-gradient(115deg,#200d25,#591b42 76%,#90305e)!important;
+ border-bottom:3px solid #f17db8!important;color:#fff!important;
+}
