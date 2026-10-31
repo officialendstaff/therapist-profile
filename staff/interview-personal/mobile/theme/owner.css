@@ -322,3 +322,29 @@ body[data-personal-mobile-view="blocks"] #personalMobileBlockBar button{
   #personalMobileTop .personal-mobile-header{padding-right:110px!important}
   #personalMobileTop .personal-mobile-header::before{width:116px!important}
 }
+
+/* 2026-10-31: keep navigation chevrons above artwork and header controls clear. */
+#personalMobileTop .personal-mobile-action::after{
+ z-index:5!important;
+}
+#personalMobileTop .personal-mobile-header{
+ padding-right:clamp(102px,31vw,155px)!important;
+}
+#personalMobileTop .personal-mobile-header>div:first-child{
+ position:relative!important;z-index:3!important;
+}
+#personalMobileTop .personal-mobile-header-tools{
+ position:relative!important;z-index:5!important;
+ margin-right:clamp(102px,31vw,155px)!important;
+}
+#personalMobileTop .personal-mobile-header::before{
+ z-index:1!important;
+}
+@media(max-width:390px){
+ #personalMobileTop .personal-mobile-header{
+  padding-right:105px!important;
+ }
+ #personalMobileTop .personal-mobile-header-tools{
+  margin-right:105px!important;
+ }
+}
