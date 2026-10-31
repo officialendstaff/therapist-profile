@@ -44,13 +44,13 @@ body[data-personal-mobile-view="home"] #personalMobileTop::before{
  background-repeat:no-repeat!important;opacity:.93!important;
 }
 #personalMobileTop .personal-mobile-action:nth-child(1){--president-card-art:url("/therapist-profile/staff/interview-personal/mobile/president-assets/character-03.webp")}
-#personalMobileTop .personal-mobile-action:nth-child(2){--president-card-art:url("/therapist-profile/staff/interview-personal/mobile/president-assets/character-02.webp")}
+#personalMobileTop .personal-mobile-action:nth-child(2){--president-card-art:url("/therapist-profile/staff/interview-personal/mobile/president-assets/buttons-20261031/today.webp")}
 #personalMobileTop .personal-mobile-action:nth-child(3){--president-card-art:url("/therapist-profile/staff/interview-personal/mobile/president-assets/character-04.webp")}
 #personalMobileTop .personal-mobile-action:nth-child(4){--president-card-art:url("/therapist-profile/staff/interview-personal/mobile/president-assets/character-05.webp")}
-#personalMobileTop .personal-mobile-action:nth-child(5){--president-card-art:url("/therapist-profile/staff/interview-personal/mobile/president-assets/character-10.webp")}
-#personalMobileTop .personal-mobile-action:nth-child(6){--president-card-art:url("/therapist-profile/staff/interview-personal/mobile/president-assets/character-06.webp")}
-#personalMobileTop .personal-mobile-action:nth-child(7){--president-card-art:url("/therapist-profile/staff/interview-personal/mobile/president-assets/character-01.webp")}
-#personalMobileTop .personal-mobile-action:nth-child(8){--president-card-art:url("/therapist-profile/staff/interview-personal/mobile/president-assets/character-07.webp")}
+#personalMobileTop .personal-mobile-action:nth-child(5){--president-card-art:url("/therapist-profile/staff/interview-personal/mobile/president-assets/buttons-20261031/future.webp")}
+#personalMobileTop .personal-mobile-action:nth-child(6){--president-card-art:url("/therapist-profile/staff/interview-personal/mobile/president-assets/buttons-20261031/adjust.webp")}
+#personalMobileTop .personal-mobile-action:nth-child(7){--president-card-art:url("/therapist-profile/staff/interview-personal/mobile/president-assets/buttons-20261031/stats.webp")}
+#personalMobileTop .personal-mobile-action:nth-child(8){--president-card-art:url("/therapist-profile/staff/interview-personal/mobile/president-assets/buttons-20261031/blocks.webp")}
 #personalMobileTop .personal-mobile-action .personal-mobile-icon{
  z-index:4!important;border-radius:50%!important;
  background:#e9f3fde8!important;box-shadow:0 0 0 1px #bad6ed96!important;
