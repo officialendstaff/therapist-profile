@@ -366,3 +366,38 @@ body[data-personal-mobile-view="blocks"] #personalMobileBlockBar button{
  #personalMobileTop .personal-mobile-header{padding-right:12px!important}
  #personalMobileTop .personal-mobile-header::before{width:94px!important;height:58%!important}
 }
+
+/* 2026-10-31: character visibility correction; owner mobile TOP only. */
+#personalMobileTop .personal-mobile-action::before{
+ opacity:1!important;
+ width:58%!important;
+ height:100%!important;
+ right:0!important;
+ bottom:0!important;
+ background-position:right bottom!important;
+ background-size:contain!important;
+ z-index:0!important;
+}
+#personalMobileTop .personal-mobile-action::after{
+ z-index:6!important;
+}
+#personalMobileTop .personal-mobile-icon,
+#personalMobileTop .personal-mobile-label,
+#personalMobileTop .personal-mobile-count{
+ position:relative!important;
+ z-index:2!important;
+}
+#personalMobileTop .personal-mobile-header::before{
+ right:0!important;
+ bottom:0!important;
+ top:auto!important;
+ height:48%!important;
+ width:clamp(86px,26vw,125px)!important;
+ background-position:right bottom!important;
+ z-index:1!important;
+}
+#personalMobileTop .personal-mobile-header-tools{
+ position:relative!important;
+ z-index:6!important;
+ align-self:flex-start!important;
+}
