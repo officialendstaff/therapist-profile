@@ -476,3 +476,48 @@ body[data-personal-mobile-view="blocks"] #personalMobileBlockBar>*{
   height:100%!important;
  }
 }
+
+/* Individual artwork positioning: approved owner menu adjustments. */
+#personalMobileTop .personal-mobile-action:nth-child(2)::before{
+ left:0!important;right:auto!important;
+ width:72%!important;height:100%!important;
+ background-position:left bottom!important;
+}
+#personalMobileTop .personal-mobile-action:nth-child(3)::before{
+ width:92%!important;height:110%!important;
+ right:0!important;left:auto!important;
+ background-position:right bottom!important;
+}
+#personalMobileTop .personal-mobile-action:nth-child(5)::before{
+ width:86%!important;height:112%!important;
+ right:0!important;left:auto!important;
+ background-position:right bottom!important;
+}
+#personalMobileTop .personal-mobile-action:nth-child(6)::before{
+ width:90%!important;height:112%!important;
+ right:0!important;left:auto!important;
+ background-position:right bottom!important;
+}
+#personalMobileTop .personal-mobile-action:nth-child(7)::before{
+ width:72%!important;height:100%!important;
+ left:0!important;right:auto!important;
+ background-position:left bottom!important;
+}
+#personalMobileTop .personal-mobile-action:nth-child(8)::before{
+ width:88%!important;height:112%!important;
+ right:0!important;left:auto!important;
+ background-position:right bottom!important;
+}
+/* Fixed circular notification badge with stable centered numeral. */
+#personalMobileTop .personal-mobile-count{
+ box-sizing:border-box!important;
+ width:25px!important;height:25px!important;
+ min-width:25px!important;max-width:25px!important;
+ min-height:25px!important;max-height:25px!important;
+ padding:0!important;
+ border-radius:50%!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ line-height:1!important;
+ font-variant-numeric:tabular-nums!important;
+}
+#personalMobileTop .personal-mobile-count[hidden]{display:none!important}
