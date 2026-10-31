@@ -261,3 +261,22 @@ body[data-personal-mobile-view="app"] .personal-mobile-subheader button,
 body[data-personal-mobile-view="blocks"] #personalMobileBlockBar button{
  background:#fff8d6!important;color:#215638!important;border:2px solid #225b3c!important;
 }
+
+/* Character-led racing comic presentation; CSS-only until uploaded artwork is hosted. */
+#personalMobileTop .personal-mobile-header{padding-right:clamp(15px,17vw,135px)!important}
+#personalMobileTop .personal-mobile-header::before{
+ content:"マキバオー  ×  カスケード"!important;
+ position:absolute!important;left:auto!important;right:10px!important;top:50%!important;bottom:auto!important;
+ transform:translateY(-50%) rotate(-5deg)!important;width:clamp(75px,14vw,140px)!important;height:auto!important;
+ padding:10px 5px!important;text-align:center!important;
+ border:3px solid #163f2a!important;border-radius:12px!important;
+ background:#fff8d5!important;color:#204b31!important;
+ font-weight:1000!important;font-size:clamp(10px,1.7vw,16px)!important;
+ line-height:1.4!important;letter-spacing:-.04em!important;
+ box-shadow:3px 3px 0 #f5ce52!important;opacity:1!important;
+}
+#personalMobileTop .personal-mobile-action:nth-child(1){border-top:6px solid #f5ce52!important}
+#personalMobileTop .personal-mobile-action:nth-child(2){border-top:6px solid #56a3d4!important}
+#personalMobileTop .personal-mobile-action:nth-child(3){border-top:6px solid #e98d6c!important}
+#personalMobileTop .personal-mobile-action:nth-child(4){border-top:6px solid #a78acb!important}
+@media(max-width:390px){#personalMobileTop .personal-mobile-header{padding-right:95px!important}}
