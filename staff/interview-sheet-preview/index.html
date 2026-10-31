@@ -632,10 +632,21 @@ function formatLineReceivedMinute(value){const d=new Date(value);if(!Number.isFi
 function detailEntry(parent,title,content,kind='',time=''){const el=document.createElement('div');el.className='detail-entry '+kind;if(time){const t=document.createElement('time');t.textContent=parent.id==='detailLine'?formatLineReceivedMinute(time):time;el.append(t)}const heading=document.createElement('strong');heading.textContent=title;el.append(heading);const body=document.createElement('div');body.textContent=content;if(parent.id==='detailLine'){body.className='detail-message-body'}el.append(body);parent.append(el)}
 function updateDetailReasons(record){
  const reasonBox=$('detailReason'),title=$('detailReasonTitle'),values=$('detailReasonValues');
- const rejected=Array.isArray(record.rejectionReasons)?record.rejectionReasons.filter(Boolean):[];
+ const sheet=linkedSheetForInterview(record);
+ let sheetReasons=[];
+ if(sheet?.rejection_reason){
+  try{
+   const parsed=JSON.parse(sheet.rejection_reason);
+   sheetReasons=Array.isArray(parsed)?parsed.filter(x=>typeof x==='string'&&x.trim()):[String(parsed)].filter(Boolean);
+  }catch{sheetReasons=String(sheet.rejection_reason).split(',').map(x=>x.trim()).filter(Boolean)}
+ }
+ const rejected=sheetReasons.length?sheetReasons:Array.isArray(record.rejectionReasons)?record.rejectionReasons.filter(Boolean):[];
  const afterlife=afterlifeList.items.find(x=>String(x.account_id)===String(record.accountId)&&String(x.line_user_id)===String(record.lineUserId));
- const reasons=rejected.length?rejected:Array.isArray(afterlife?.reasons)?afterlife.reasons:[];
- reasonBox.hidden=!reasons.length;title.textContent=rejected.length?'不採用理由':'来世期待理由';values.textContent=reasons.join(' ／ ');
+ const isRejected=sheet?.status==='不採用'||rejected.length>0;
+ const reasons=isRejected?rejected:Array.isArray(afterlife?.reasons)?afterlife.reasons:[];
+ reasonBox.hidden=!reasons.length;
+ title.textContent=isRejected?'不採用理由':'来世期待理由';
+ values.textContent=reasons.join(' ／ ');
 }
 
 const INTERVIEW_REJECTION_OPTIONS=["条件合わず","掛け持ち希望","出稼ぎ希望","違法店在籍中","他店勧めた","一般職を勧めた","接客不向き","話すとイライラする","挙動不審","価値観うんこ","アバズレ","キチガイ","ブスが過ぎる","ババアが過ぎる","太が過ぎる","ガリが過ぎる","コキタナイ","売れる要素0%","わんちゃんあるかも","メンエス舐めんなよ","玄関で断れ","お祭り案件"];
@@ -681,7 +692,7 @@ function showDecisionPopup(record,kind){
    const token=sessionStorage.getItem('interview_staff_session_v2')||localStorage.getItem('interview_staff_session_v2');
    if(!token){appNotice('再ログインしてください');return}
    save.disabled=true;
-   try{const response=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-sheet-read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...payload,token})});const result=await response.json();if(!response.ok||!result.ok)throw Error(result.error||'保存失敗');await loadRealInterviewSheets();await refreshInterviewLists();overlay.remove();closeApplicantDetail();renderList();appNotice(kind+'を保存しました')}catch(e){appNotice('保存できませんでした：'+e.message);save.disabled=false}
+   try{const response=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-sheet-read',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...payload,token})});const result=await response.json();if(!response.ok||!result.ok)throw Error(result.error||'保存失敗');if(kind==='不採用'){let persisted=[];try{persisted=JSON.parse(result.sheet?.rejection_reason||'[]')}catch{}if(!Array.isArray(persisted)||persisted.length!==payload.reasons.length||payload.reasons.some(reason=>!persisted.includes(reason)))throw Error('不採用理由の保存を確認できませんでした')}await loadRealInterviewSheets();await refreshInterviewLists();overlay.remove();closeApplicantDetail();renderList();appNotice(kind+'を保存しました')}catch(e){appNotice('保存できませんでした：'+e.message);save.disabled=false}
   };
  }
  panel.append(footer);overlay.append(panel);document.body.append(overlay);
@@ -697,7 +708,7 @@ function renderDecisionControls(record){
   button.onclick=()=>showDecisionPopup(record,kind);actions.append(button);
  }
  host.append(actions);
- if(sheetDataState.status!=='ready'&&record.interviewId){loadRealInterviewSheets().then(()=>{if(!$('applicantDetail').hidden)renderDecisionControls(record)})}
+ if(sheetDataState.status!=='ready'&&record.interviewId){loadRealInterviewSheets().then(()=>{if(!$('applicantDetail').hidden){renderDecisionControls(record);updateDetailReasons(record)}})}
 }
 function openApplicantDetail(record,key){if(!$('applicantDetail').hidden)return;const detailAvatar=$('detailAvatar');detailAvatar.replaceChildren();if(record.picture&&/^https:\/\//.test(record.picture)){const img=document.createElement('img');img.src=record.picture;img.alt='LINEアイコン';img.referrerPolicy='no-referrer';img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:50%';img.onerror=()=>{detailAvatar.textContent='LINE'};detailAvatar.append(img)}else detailAvatar.textContent=record.isManual?'LINE外':'LINE';detailReturn={home:!$('todayPanel').hidden,page:currentPage,number:pageNumber,scroll:window.scrollY};$('todayPanel').hidden=true;$('sharedPanel').hidden=true;$('applicantDetail').hidden=false;$('detailName').textContent=record.name||'Unknown';$('detailShop').textContent=record.shop||'';applyShopTheme($('detailShop'),record.shop||'');updateDetailReasons(record);const isUnscheduled=['日程未定','日程調整中','キャンセル'].includes(record.status);$('detailDate').textContent=isUnscheduled?'日程未定':(record.date||'面接予定なし');$('detailStaff').textContent=isUnscheduled?'':(record.staff?'担当：'+record.staff:'');const arrival=String(record.status||'');const detailStatus=arrival==='無断トビ'?'無断トビ':(['面接来た','面接済み','来店','来店済み'].includes(arrival)?'面接来た':record.confirmed?'確認OK':'未確認');$('detailConfirm').textContent=detailStatus;$('detailConfirm').className=detailStatus==='確認OK'?'detail-confirm-ok':'';renderDecisionControls(record);const line=$('detailLine');line.replaceChildren();const inboxMatch=lineInboxReadOnly.applicants.find(a=>String(a.accountId)===String(record.accountId)&&String(a.lineUserId)===String(record.lineUserId));const messages=(record.messages&&record.messages.length?record.messages:inboxMatch?.messages)||[];if(messages.length){for(const msg of messages){detailEntry(line,'受信メッセージ',msg.text||'', '',msg.receivedAt||'')}}else{const empty=document.createElement('p');empty.className='detail-empty';empty.textContent='LINE受信履歴は未連携です';line.append(empty)}const history=$('detailHistory');history.replaceChildren();const entries=(record.history||[]).filter(e=>e&&typeof e==='object'&&!Array.isArray(e)&&e.scheduledAt).slice().sort((a,b)=>(b.updatedAt||b.scheduledAt).localeCompare(a.updatedAt||a.scheduledAt));detailEntry(history,'面接登録',record.date+'　'+(record.shop||'')+'　担当：'+(record.staff||''),'registered');for(const e of entries){const type=e.type==='変更'?'日程変更':e.type==='キャン'?'キャンセル':e.type;const kind=type==='日程変更'?'changed':type==='キャンセル'?'cancel':type==='無断トビ'?'no-show':'';const content=type==='日程変更'?'変更前：'+e.scheduledAt+(e.newScheduledAt?' → 変更後：'+e.newScheduledAt:''): '対象：'+e.scheduledAt;detailEntry(history,type,content,kind,e.updatedAt||'')}window.scrollTo(0,0)}
 function closeApplicantDetail(){if(!detailReturn)return;const back=detailReturn;$('applicantDetail').hidden=true;if(back.home){$('todayPanel').hidden=false;$('sharedPanel').hidden=true}else{currentPage=back.page;pageNumber=back.number;$('todayPanel').hidden=true;$('sharedPanel').hidden=false;renderList()}detailReturn=null;window.scrollTo(0,back.scroll)}
