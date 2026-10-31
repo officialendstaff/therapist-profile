@@ -31,7 +31,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&
 const invitationWinners=[
  {x_id:'@ikuikuikuku',icon_url:'https://unavatar.io/twitter/ikuikuikuku'},
  {x_id:'@mneslike',icon_url:'https://unavatar.io/twitter/mneslike'},
- {x_id:'@3RDkDlw357Guud2',icon_url:'https://unavatar.io/twitter/3RDkDlw357Guud2'}
+ {x_id:'@3RDkDIw357Guud2',icon_url:'https://unavatar.io/twitter/3RDkDIw357Guud2'}
 ];
 function safeWinnerImage(src){
  try{const u=new URL(String(src||''),location.href);return ['https:','http:'].includes(u.protocol)?u.href:''}catch(e){return ''}
