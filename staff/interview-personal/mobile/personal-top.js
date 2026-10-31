@@ -52,9 +52,12 @@
 
  function choosePresidentDetailHeaderArt(key){
   if(profile!=='president')return;
-  const art={'LINE通知':'03','今日の予定':'02','Interview Sheet':'04','面接済み':'05','明日以降':'10','日程調整':'06','店舗数値':'01','対応不可':'07'};
-  const imagePath='/therapist-profile/staff/interview-personal/mobile/president-assets/character-'+(art[key]||'08')+'.webp';
-  const value='url("'+imagePath+'")';
+  // Source the header artwork from the corresponding TOP button.
+  // Keeping one image declaration in president-art.css prevents mismatches.
+  const button=Array.from(top.querySelectorAll('.personal-mobile-action'))
+    .find(el=>el.dataset.personalMenu===key);
+  const chosen=button?window.getComputedStyle(button).getPropertyValue('--president-card-art').trim():'';
+  const value=chosen||'url("/therapist-profile/staff/interview-personal/mobile/president-assets/character-08.webp")';
   viewer.style.setProperty('--president-header-art',value);
   blockBar.style.setProperty('--president-header-art',value);
  }
