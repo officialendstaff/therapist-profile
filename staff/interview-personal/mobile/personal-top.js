@@ -2,7 +2,7 @@
 (function(){
  'use strict';
  const profile=window.__interviewPersonal?.profile;
- const names={owner:'村上',president:'社長',ota:'オオタ',festival:'お祭り'};
+ const names={owner:'村上',president:'PRESIDENT',ota:'オオタ',festival:'お祭り'};
  if(!names[profile])return;
  const symbols={
   line:'<path d="M20 11.5a8 8 0 0 1-8 8 9 9 0 0 1-4-.9L3 20l1.4-4A8.5 8.5 0 0 1 3.5 12a8.5 8.5 0 0 1 16.5-.5z"/><path d="M8 12h8M8 15h5"/>',
