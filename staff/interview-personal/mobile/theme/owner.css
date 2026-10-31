@@ -218,3 +218,46 @@ body[data-personal-mobile-view="blocks"] #blockCalendarGrid{
   background:#9c2b56!important;
  }
 }
+
+/* 2026-10-31: Murakami horse-racing manga theme, scoped to owner only. */
+body[data-personal-mobile-view="home"] #personalMobileTop{
+ background:repeating-linear-gradient(145deg,#e8f5df 0 24px,#def0d4 24px 48px)!important;color:#183f2b!important;
+}
+#personalMobileTop .personal-mobile-header{
+ background:linear-gradient(125deg,#104b30,#22844d 65%,#3da762)!important;
+ border:3px solid #143e29!important;border-bottom:6px solid #f4d34e!important;
+ box-shadow:5px 6px 0 #b3d7a2!important;border-radius:18px!important;
+}
+#personalMobileTop .personal-mobile-header::before{
+ background:repeating-linear-gradient(105deg,transparent 0 42px,rgba(255,255,255,.10) 42px 47px,transparent 47px 85px)!important;
+}
+#personalMobileTop .personal-mobile-header::after{background:#f4d34e!important;box-shadow:none!important}
+#personalMobileTop .personal-mobile-eyebrow{color:#e5f7d7!important}
+#personalMobileTop .personal-mobile-name{color:#fffef0!important;text-shadow:2px 2px 0 #0d3c26!important}
+#personalMobileTop .personal-mobile-settings,#personalMobileTop .personal-mobile-refresh{
+ background:#fff8d6!important;border:2px solid #153f2b!important;color:#20583a!important;box-shadow:2px 2px 0 #153f2b!important;
+}
+#personalMobileTop .personal-mobile-action{
+ background:linear-gradient(155deg,#fffef4,#eff9e8)!important;
+ border:2px solid #245d3a!important;border-radius:16px!important;
+ box-shadow:4px 4px 0 #8bbf8d!important;color:#1d4730!important;
+}
+#personalMobileTop .personal-mobile-action::before{background:linear-gradient(145deg,transparent 70%,rgba(248,214,77,.19) 70%)!important}
+#personalMobileTop .personal-mobile-action::after{
+ background:#f4d34e!important;border:2px solid #245d3a!important;color:#245d3a!important;box-shadow:none!important;
+}
+#personalMobileTop .personal-mobile-icon{
+ background:#e3f4d7!important;border:2px solid #398458!important;box-shadow:2px 2px 0 #b7d5a4!important;
+}
+#personalMobileTop .personal-mobile-icon svg{color:#237348!important}
+#personalMobileTop .personal-mobile-label{color:#1e4b30!important;text-shadow:none!important}
+#personalMobileTop .personal-mobile-action:active{background:#f6e9b6!important}
+body[data-personal-mobile-view="app"] #personalMobileViewer{background:#eff8e9!important}
+body[data-personal-mobile-view="app"] .personal-mobile-subheader,
+body[data-personal-mobile-view="blocks"] #personalMobileBlockBar{
+ background:linear-gradient(120deg,#154d31,#318c51)!important;border-bottom:4px solid #f4d34e!important;color:white!important;
+}
+body[data-personal-mobile-view="app"] .personal-mobile-subheader button,
+body[data-personal-mobile-view="blocks"] #personalMobileBlockBar button{
+ background:#fff8d6!important;color:#215638!important;border:2px solid #225b3c!important;
+}
