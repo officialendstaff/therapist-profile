@@ -26,7 +26,7 @@
  ];
  const svg=key=>'<svg viewBox="0 0 24 24" aria-hidden="true">'+symbols[key]+'</svg>';
  const top=document.createElement('section');top.id='personalMobileTop';top.setAttribute('aria-label','面接管理 TOP');
- top.innerHTML='<div class="personal-mobile-header"><div><small class="personal-mobile-eyebrow">L GROUP MANAGEMENT</small><strong class="personal-mobile-name">'+names[profile]+'｜面接管理</strong></div><button type="button" class="personal-mobile-refresh" aria-label="最新情報に更新">↻</button></div><div class="personal-mobile-grid">'+
+ top.innerHTML='<div class="personal-mobile-header"><div><small class="personal-mobile-eyebrow">L GROUP MANAGEMENT</small><strong class="personal-mobile-name">'+(profile==='owner'?'末端厩舎':names[profile]+'｜面接管理')+'</strong></div><button type="button" class="personal-mobile-refresh" aria-label="最新情報に更新">↻</button></div><div class="personal-mobile-grid">'+
  items.map(item=>'<button type="button" class="personal-mobile-action" data-personal-menu="'+item.key+'" style="--action-color:'+item.color+'"><span class="personal-mobile-icon">'+svg(item.icon)+'</span><span class="personal-mobile-label">'+item.key+'</span><span class="personal-mobile-count" hidden></span></button>').join('')+
  '</div>';
  const viewer=document.createElement('section');viewer.id='personalMobileViewer';viewer.setAttribute('aria-label','面接管理 詳細');
