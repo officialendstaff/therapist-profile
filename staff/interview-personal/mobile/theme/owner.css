@@ -521,3 +521,34 @@ body[data-personal-mobile-view="blocks"] #personalMobileBlockBar>*{
  font-variant-numeric:tabular-nums!important;
 }
 #personalMobileTop .personal-mobile-count[hidden]{display:none!important}
+
+/* Owner menu: consistent upper horizontal icon + label, artwork stays behind. */
+#personalMobileTop .personal-mobile-action{
+ display:flex!important;
+ flex-direction:row!important;
+ align-items:flex-start!important;
+ justify-content:flex-start!important;
+ gap:7px!important;
+ padding:12px 8px!important;
+}
+#personalMobileTop .personal-mobile-icon{
+ flex:0 0 34px!important;
+ width:34px!important;height:34px!important;
+ margin:0!important;
+ position:relative!important;z-index:4!important;
+}
+#personalMobileTop .personal-mobile-label{
+ flex:0 1 auto!important;
+ width:auto!important;
+ max-width:calc(100% - 44px)!important;
+ margin:0!important;
+ align-self:center!important;
+ text-align:left!important;
+ white-space:nowrap!important;
+ font-size:clamp(10px,2.9vw,14px)!important;
+ line-height:1.2!important;
+}
+#personalMobileTop .personal-mobile-count{
+ top:5px!important;right:5px!important;
+ z-index:9!important;
+}
