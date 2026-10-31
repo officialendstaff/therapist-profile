@@ -53,7 +53,7 @@
  function choosePresidentDetailHeaderArt(key){
   if(profile!=='president')return;
   const art={'LINE通知':'03','今日の予定':'02','Interview Sheet':'04','面接済み':'05','明日以降':'10','日程調整':'06','店舗数値':'01','対応不可':'07'};
-  const imagePath='/therapist-profile/staff/interview-personal/mobile/theme/president-assets/character-'+(art[key]||'08')+'.webp';
+  const imagePath='/therapist-profile/staff/interview-personal/mobile/president-assets/character-'+(art[key]||'08')+'.webp';
   const value='url("'+imagePath+'")';
   viewer.style.setProperty('--president-header-art',value);
   blockBar.style.setProperty('--president-header-art',value);
@@ -85,7 +85,7 @@
   chooseOwnerDetailHeaderArt();
    choosePresidentDetailHeaderArt(key);
   document.body.dataset.personalMobileView='app';
-  frame.src='/therapist-profile/staff/interview-sheet-preview/?personalMobile=1&page='+encodeURIComponent(key)+'&v=20261030theme2'+((profile==='owner'||profile==='festival'||profile==='president')?'&theme='+profile:'');
+  frame.src='/therapist-profile/staff/interview-sheet-preview/?personalMobile=1&page='+encodeURIComponent(key)+'&v=20261031presidentart1'+((profile==='owner'||profile==='festival'||profile==='president')?'&theme='+profile:'');
  }
  function updateBadges(){
   if(typeof window.personalMobileNotificationsUpdate==='function')window.personalMobileNotificationsUpdate();
