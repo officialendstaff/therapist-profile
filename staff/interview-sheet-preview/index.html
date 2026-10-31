@@ -771,10 +771,36 @@ bars(right,Array.from({length:24},(_,i)=>String(i)),[{name:'初回LINE問い合�
 const mediaNames=['エステ魂','メンズエステワーク','エステラブワーク','リラクジョブ','エステクイーン','Richセラピ','エステアイ','メンエスリクルート','バニラ','02','X','その他'];
 const colors=['#AEB7C5','#168CF2','#F59B48','#9D69E5','#18B7A5','#F36A9C','#526CE0','#F1C04D','#38A8DC','#76B66D','#D77A58','#6E7D91','#B885D4'];
 function mediaOf(a){const texts=(a.messages||[]).map(m=>String(m.text||''));const values=[];for(const t of texts){const match=t.match(/(?:ご覧になった求人広告|求人媒体|応募媒体|見た媒体|広告媒体|媒体名)\s*[：:\s]*([^\n\r]+)/);if(match)values.push(match[1].trim())}if(!values.length){for(const t of texts){const lines=t.split(/[\n\r]/).map(x=>x.trim());for(const line of lines){if(mediaNames.some(n=>line===n||line===n+'から'||line===n+'です'))values.push(line)}}}if(!values.length)return ['記載なし'];const result=new Set();for(const v of values){let found=false;for(const name of mediaNames){if(name==='X'?/^(?:X|旧Twitter|Twitter)(?:から|です)?$/i.test(v):name==='02'?/^(?:02|ゼロツー)(?:から|です)?$/.test(v):v.includes(name)){result.add(name);found=true}}if(!found){const clean=v.replace(/[。！!]+$/,'').trim();if(/当店の事務所|地下鉄|日本橋駅|徒歩|面接は日本橋/.test(clean))continue;result.add(clean==='その他'?'その他':clean&&clean.length<=25?'その他（'+clean+'）':'記載なし')}}return [...result]}
-function normalizedRecruitMedia(name){return /^(?:その他[（(])?オフィシャル\s*HP[）)]?$/.test(String(name).trim())?'HP':name}
+function normalizedRecruitMedia(name){
+ const original=String(name||'').trim();
+ const wrapped=original.match(/^その他[（(]([\s\S]*?)[）)]$/);
+ const detail=(wrapped?wrapped[1]:original).trim();
+ const compact=detail.normalize('NFKC').replace(/\s+/g,'');
+ if(!compact||/^(?:記載なし|未記入|未回答|未確認|無回答|不明|不詳|わからない|分からない|なし|特になし|覚えていない|覚えてません|その他なし)$/.test(compact))return '記載なし';
+ if(/(?:ホームページ|オフィシャルHP|公式(?:サイト|HP)|店舗(?:サイト|HP)|お店の(?:サイト|HP)|自社(?:サイト|HP))/i.test(compact)||/^HP$/i.test(compact))return 'HP';
+ // Sentences of greeting/acknowledgement are not advertising sources.
+ if(/^(?:よろしく|宜しく|お願い(?:します|いたします|致します)|ありがとう|有難う|お世話にな|承知しました|了解しました|はじめまして|初めまして|こんにちは|こんばんは|お疲れ様|お疲れさま)/.test(compact))return '記載なし';
+ if(compact==='その他')return 'その他';
+ const known=mediaNames.find(m=>m!== 'その他'&&m.toLowerCase()===compact.toLowerCase());
+ if(known)return known;
+ if(wrapped)return 'その他（'+detail+'）';
+ return original;
+}
+function groupedMediaCounts(raw){
+ const grouped=new Map();
+ for(const [name,count] of raw){
+  const category=String(name).startsWith('その他（')||String(name).startsWith('その他(')?'その他':name;
+  grouped.set(category,(grouped.get(category)||0)+count);
+ }
+ return grouped;
+}
+function otherMediaBreakdown(raw){
+ const detail=[...raw.entries()].filter(([name,count])=>count>0&&(name==='その他'||String(name).startsWith('その他（')||String(name).startsWith('その他(')));
+ return detail.sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],'ja')).map(([name,count])=>name+'：'+count+'件');
+}
 function mediaCounts(list){const counts=new Map();for(const a of list)for(const rawName of mediaOf(a)){const name=normalizedRecruitMedia(rawName);counts.set(name,(counts.get(name)||0)+1)}return counts}
-const mediaNow=mediaCounts(applicants),previous=new Date(yr,mo-2,1),previousKey=previous.getFullYear()+'-'+String(previous.getMonth()+1).padStart(2,'0');
-const mediaPrev=mediaCounts(allApplicants.filter(a=>firstDate(a).slice(0,7)===previousKey));
+const mediaNowRaw=mediaCounts(applicants),mediaNow=groupedMediaCounts(mediaNowRaw),previous=new Date(yr,mo-2,1),previousKey=previous.getFullYear()+'-'+String(previous.getMonth()+1).padStart(2,'0');
+const mediaPrevRaw=mediaCounts(allApplicants.filter(a=>firstDate(a).slice(0,7)===previousKey)),mediaPrev=groupedMediaCounts(mediaPrevRaw);
 const mediaColors={
  '記載なし':'#AEB7C5','リラクジョブ':'#168CF2','バニラ':'#F59B48',
  'エステ魂':'#935BDA','メンズエステワーク':'#1FB7A4','エステラブワーク':'#F36A9C',
@@ -818,12 +844,13 @@ function sheetMediaNames(value){
 }
 const attendanceStatuses=new Set(['来店済み','採用','不採用','在籍','入店','辞退']);
 const attendedSheets=storeMetricsSheets.filter(x=>attendanceStatuses.has(x.status)&&String(x.month||'')===month&&matchShop(x.shop));
-const attendedMedia=new Map();
-for(const sheet of attendedSheets)for(const name of sheetMediaNames(sheet.source))attendedMedia.set(name,(attendedMedia.get(name)||0)+1);
+const attendedMediaRaw=new Map();
+for(const sheet of attendedSheets)for(const name of sheetMediaNames(sheet.source))attendedMediaRaw.set(name,(attendedMediaRaw.get(name)||0)+1);
+const attendedMedia=groupedMediaCounts(attendedMediaRaw);
 const pie=panel('');pie.style.padding='8px';
 const pieRow=document.createElement('div');pieRow.className='store-metrics-pies';
 pieRow.style.cssText='display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;align-items:center;justify-items:center;width:100%;height:100%';
-function addMediaPie(title,counts,ready){
+function addMediaPie(title,counts,ready,rawCounts){
  const widget=document.createElement('div');widget.style.cssText='display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;width:100%;min-width:0;height:100%';
  const heading=document.createElement('div');heading.textContent=title;heading.style.cssText='font-size:13px;font-weight:700;color:#24354c;text-align:center';widget.append(heading);
  const total=[...counts.values()].reduce((a,b)=>a+b,0);
@@ -844,19 +871,20 @@ function addMediaPie(title,counts,ready){
   const rect=circle.getBoundingClientRect(),x=event.clientX-rect.left-rect.width/2,y=event.clientY-rect.top-rect.height/2;
   if(Math.hypot(x,y)>rect.width/2){tooltip.style.display='none';return}
   const angle=(Math.atan2(x,-y)*180/Math.PI+360)%360;let cumulative=0;
-  for(const [name,count] of segments){cumulative+=360*count/total;if(angle<cumulative){tooltip.textContent=name+' '+count+'件（'+Math.round(count/total*100)+'%）';tooltip.style.display='block';break}}
+  for(const [name,count] of segments){cumulative+=360*count/total;if(angle<cumulative){tooltip.textContent=name+' '+count+'件（'+Math.round(count/total*100)+'%）'+(name==='その他'?'\n'+otherMediaBreakdown(rawCounts).join('\n'):'');tooltip.style.whiteSpace='pre-line';tooltip.style.display='block';break}}
  };
  circle.addEventListener('mousemove',showPieDetails);
  circle.addEventListener('click',showPieDetails);
  circle.addEventListener('mouseleave',()=>{tooltip.style.display='none'});
  holder.append(circle,tooltip);widget.append(holder);pieRow.append(widget);
 }
-addMediaPie('問い合わせ',mediaNow,lineReady);
-addMediaPie('面接実施',attendedMedia,storeMetricsSheetsStatus==='ready');
+addMediaPie('問い合わせ',mediaNow,lineReady,mediaNowRaw);
+addMediaPie('面接実施',attendedMedia,storeMetricsSheetsStatus==='ready',attendedMediaRaw);
 pie.append(pieRow);chart.append(pie);
 const compare=panel('');
 const priorSheets=storeMetricsSheets.filter(x=>attendanceStatuses.has(x.status)&&String(x.month||'')===previousKey&&matchShop(x.shop));
-const priorMedia=new Map();for(const x of priorSheets)for(const name of sheetMediaNames(x.source))priorMedia.set(name,(priorMedia.get(name)||0)+1);
+const priorMediaRaw=new Map();for(const x of priorSheets)for(const name of sheetMediaNames(x.source))priorMediaRaw.set(name,(priorMediaRaw.get(name)||0)+1);
+const priorMedia=groupedMediaCounts(priorMediaRaw);
 const currentAttendanceAvailable=storeMetricsSheetsStatus==='ready'&&attendedSheets.length>0;
 const priorAttendanceAvailable=storeMetricsSheetsStatus==='ready'&&priorSheets.length>0;
 const priorInquiriesAvailable=allApplicants.some(a=>firstDate(a).slice(0,7)===previousKey);
@@ -880,8 +908,17 @@ const figures=document.createElement('div');figures.style.cssText='position:abso
 const inquiries=document.createElement('span');inquiries.textContent=count;inquiries.style.cssText='font-size:14px;line-height:15px;font-weight:800;color:#182F4B';
 const attended=document.createElement('span');attended.textContent=known?done:'—';attended.style.cssText='font-size:13px;line-height:15px;font-weight:800;color:'+(known?'#D32940':'#8793A3');
 figures.append(inquiries,attended);holder.append(figures)}
-holder.title=name+' '+period+'｜問い合わせ '+count+'件｜面接実施 '+(known?done+'件':'データなし');pair.append(holder)}
-const label=document.createElement('div');label.textContent=mediaChartLabel(name);label.title=name;label.style.cssText='font-size:10px;font-weight:700;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;margin-top:7px';
+const otherRows=name==='その他'?otherMediaBreakdown(period==='先月'?mediaPrevRaw:mediaNowRaw):[];
+const otherAttended=name==='その他'?otherMediaBreakdown(period==='先月'?priorMediaRaw:attendedMediaRaw):[];
+holder.title=name+' '+period+'｜問い合わせ '+count+'件｜面接実施 '+(known?done+'件':'データなし')+(otherRows.length?'\n問い合わせ内訳\n'+otherRows.join('\n'):'')+(otherAttended.length?'\n面接実施内訳\n'+otherAttended.join('\n'):'');pair.append(holder)}
+const label=document.createElement('div');label.textContent=mediaChartLabel(name);
+label.title=name==='その他'?[
+ 'その他の媒体内訳',
+ '今月・問い合わせ',...otherMediaBreakdown(mediaNowRaw),
+ '先月・問い合わせ',...otherMediaBreakdown(mediaPrevRaw),
+ '今月・面接実施',...otherMediaBreakdown(attendedMediaRaw),
+ '先月・面接実施',...otherMediaBreakdown(priorMediaRaw)
+].join('\n'):name;label.style.cssText='font-size:10px;font-weight:700;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;margin-top:7px';
 col.append(pair,label);graph.append(col)}compare.append(graph)
 }else{const empty=document.createElement('p');empty.textContent=lineReady?'媒体情報なし':'LINEデータ未取得';compare.append(empty)}
 chart.append(compare);root.append(chart);
