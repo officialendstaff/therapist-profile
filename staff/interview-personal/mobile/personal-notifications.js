@@ -51,7 +51,7 @@ function update(){
  for(const key of items){
   const el=badge(key);if(!el)continue;
   const count=data[key];el.hidden=!count;
-  el.textContent=count?(key==='今日の予定'?String(count):'新着 '+String(count)):'';
+  el.textContent=count?String(count):'';
  }
  try{
   if('setAppBadge' in navigator){
