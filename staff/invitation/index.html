@@ -29,9 +29,9 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&
 // X ID とアイコン画像URL（または同リポジトリ内の画像パス）を登録。
 // Xのプロフィール画像はIDだけで確実に取得できないため明示指定します。
 const invitationWinners=[
- {x_id:'',icon_url:''},
- {x_id:'',icon_url:''},
- {x_id:'',icon_url:''}
+ {x_id:'@ikuikuikuku',icon_url:'https://unavatar.io/twitter/ikuikuikuku'},
+ {x_id:'@mneslike',icon_url:'https://unavatar.io/twitter/mneslike'},
+ {x_id:'@3RDkDlw357Guud2',icon_url:'https://unavatar.io/twitter/3RDkDlw357Guud2'}
 ];
 function safeWinnerImage(src){
  try{const u=new URL(String(src||''),location.href);return ['https:','http:'].includes(u.protocol)?u.href:''}catch(e){return ''}
