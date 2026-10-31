@@ -1481,7 +1481,7 @@ window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===
  // Keep the PC iframe URL and all other management pages unchanged.
  if(requested==='Interview Sheet'){
   const sheetFrame=document.querySelector('.sheet-preview-host iframe');
-  if(sheetFrame)sheetFrame.src='./sheet.html?v=20261031collage-sheet4';
+  if(sheetFrame)sheetFrame.src='./sheet.html?v='+(params.get('theme')==='president'?'20261031presidentnight1':'20261031collage-sheet4');
  }
  function activate(){
   if(document.body.classList.contains('interview-admin-locked'))return false;
