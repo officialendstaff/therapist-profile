@@ -4,7 +4,7 @@
  const p=new URLSearchParams(location.search);
  if(p.get('personalMobile')!=='1')return;
  const theme=p.get('theme');
- if(theme==='owner'||theme==='festival')document.documentElement.dataset.personalTheme=theme;
+ if(['owner','president','festival'].includes(theme))document.documentElement.dataset.personalTheme=theme;
 })();
 </script>
 <style>
