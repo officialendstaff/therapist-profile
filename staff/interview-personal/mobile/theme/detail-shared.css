@@ -2,6 +2,33 @@
  * Explicitly opt-in via html[data-personal-theme], only for personalMobile=1.
  * No change to colors marking interview status, button enablement, or data flow.
  */
+/* President: same shared applicant/list components as Murakami, distinct blue branding. */
+html[data-personal-theme="president"]{
+ --personal-accent:#285c9c;
+ --personal-accent-dark:#173b69;
+ --personal-accent-soft:#eaf3fc;
+ --personal-accent-line:#b5d3ee;
+ --personal-page:#edf5fc;
+ --personal-surface:#fff;
+ --personal-ink:#243a54;
+ --personal-head:linear-gradient(120deg,#173b69,#285c9c 67%,#438bc1);
+ --personal-glow:rgba(30,76,128,.12);
+ --personal-art:linear-gradient(160deg,#edf5fc,#f9fbff 60%,#e7f2fd);
+}
+html[data-personal-theme="president"] body.personal-mobile-embedded>.header{
+ border-bottom:4px solid #9cc5ed!important;
+}
+html[data-personal-theme="president"] body.personal-mobile-embedded>.header .brand{
+ color:#fff!important;
+}
+html[data-personal-theme="president"] body.personal-mobile-embedded>.header .header-actions button{
+ color:#fff!important;
+}
+html[data-personal-theme="president"] .today-head,
+html[data-personal-theme="president"] .list-head,
+html[data-personal-theme="president"] #storeMetricsHeader{
+ border-left-color:#285c9c!important;
+}
 html[data-personal-theme="owner"]{
  --personal-accent:#ba3a6b;
  --personal-accent-dark:#731a42;
