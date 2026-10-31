@@ -16,6 +16,40 @@ html[data-personal-theme="owner"]{
   radial-gradient(ellipse at 91% 7%,rgba(248,186,212,.24),transparent 48%),
   linear-gradient(147deg,#fdf5f9 0%,#f8eaf1 52%,#fdf8fa 100%);
 }
+/* Owner personal list pages: match the Makibao TOP palette and use uploaded art. */
+html[data-personal-theme="owner"]{
+ --personal-accent:#267447;
+ --personal-accent-dark:#154b31;
+ --personal-accent-soft:#eaf6df;
+ --personal-accent-line:#a7c991;
+ --personal-page:#eef7e7;
+ --personal-surface:#fffef2;
+ --personal-ink:#21452f;
+ --personal-head:linear-gradient(120deg,#104b30,#25834b 68%,#3da762);
+ --personal-glow:rgba(28,92,48,.13);
+ --personal-art:repeating-linear-gradient(145deg,#e8f5df 0 24px,#def0d4 24px 48px);
+}
+html[data-personal-theme="owner"] body.personal-mobile-embedded>.header{
+ position:relative!important;
+ background:linear-gradient(120deg,#104b30,#25834b 68%,#3da762)!important;
+ border-bottom:4px solid #f4d34e!important;
+}
+html[data-personal-theme="owner"] body.personal-mobile-embedded>.header::after{
+ content:"";position:absolute;right:5px;bottom:0;
+ width:94px;height:95%;pointer-events:none;z-index:0;
+ background:url("/therapist-profile/staff/interview-personal/mobile/makibao-02.png") right bottom/contain no-repeat;
+}
+html[data-personal-theme="owner"] body.personal-mobile-embedded>.header>*{
+ position:relative;z-index:1;
+}
+html[data-personal-theme="owner"] body.personal-mobile-embedded>.header .brand{
+ color:#fffef0!important;
+}
+html[data-personal-theme="owner"] .today-head,
+html[data-personal-theme="owner"] .list-head,
+html[data-personal-theme="owner"] #storeMetricsHeader{
+ border-left-color:#e6b72c!important;
+}
 html[data-personal-theme="festival"]{
  --personal-accent:#ac668a;
  --personal-accent-dark:#694069;
