@@ -348,3 +348,21 @@ body[data-personal-mobile-view="blocks"] #personalMobileBlockBar button{
   margin-right:105px!important;
  }
 }
+
+/* Place the header character below the tools, never underneath controls. */
+#personalMobileTop .personal-mobile-header{padding-right:15px!important}
+#personalMobileTop .personal-mobile-header-tools{
+ margin-right:0!important;
+}
+#personalMobileTop .personal-mobile-header::before{
+ top:auto!important;bottom:0!important;right:0!important;
+ width:clamp(88px,28vw,132px)!important;height:65%!important;
+ opacity:.92!important;
+}
+#personalMobileTop .personal-mobile-header>div:first-child{
+ max-width:calc(100% - 90px)!important;
+}
+@media(max-width:390px){
+ #personalMobileTop .personal-mobile-header{padding-right:12px!important}
+ #personalMobileTop .personal-mobile-header::before{width:94px!important;height:58%!important}
+}
