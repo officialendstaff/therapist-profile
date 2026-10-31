@@ -269,3 +269,30 @@ html[data-personal-theme] #sheetDetailTools button:hover{
   font-size:16px!important;
  }
 }
+
+/* Murakami mobile detail pages only: preserve fixed collage beneath all content.
+   The common theme's background shorthand previously hid the uploaded image. */
+@media(max-width:900px){
+ html[data-personal-theme="owner"] body.personal-mobile-embedded{
+  --personal-art:transparent;
+  --personal-page:rgba(255,255,255,.88);
+  background-color:#edf5e7!important;
+  background-image:linear-gradient(rgba(245,250,241,.58),rgba(245,250,241,.58)),url("/therapist-profile/staff/interview-personal/mobile/makibao-detail-collage.webp")!important;
+  background-position:center,center top!important;
+  background-size:cover,min(100vw,760px) auto!important;
+  background-repeat:no-repeat,repeat-y!important;
+ }
+ html[data-personal-theme="owner"] body.personal-mobile-embedded .main{
+  background-color:#edf5e7!important;
+  background-image:linear-gradient(rgba(245,250,241,.58),rgba(245,250,241,.58)),url("/therapist-profile/staff/interview-personal/mobile/makibao-detail-collage.webp")!important;
+  background-position:center,center top!important;
+  background-size:cover,min(100vw,760px) auto!important;
+  background-repeat:no-repeat,repeat-y!important;
+ }
+ html[data-personal-theme="owner"] body.personal-mobile-embedded .main-panel:not(.sheet-mode){
+  background:transparent!important;
+ }
+ html[data-personal-theme="owner"] body.personal-mobile-embedded .main-panel.sheet-mode{
+  background:rgba(255,255,255,.88)!important;
+ }
+}
