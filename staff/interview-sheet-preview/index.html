@@ -652,7 +652,7 @@ async function refreshInterviewLists(){
  const token=sessionStorage.getItem('interview_staff_session_v2')||localStorage.getItem('interview_staff_session_v2');
  if(!token){liveInterviewLists.status='login-required';return false}
  try{const response=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({action:'interview_lists',token})});const data=await response.json();if(!response.ok)throw Error(data.error||'list_failed');
- storeMetricsHistoricalMonthly=data.historicalMonthly||[];const lineApplicantLookup=new Map(lineInboxReadOnly.applicants.map(x=>[String(x.accountId)+':'+String(x.lineUserId),x]));const profileLookup=linePictureLookup();const links=new Map((data.links||[]).map(x=>[String(x.interview_id),x]));const manualApplicants=new Map((data.manualApplicants||[]).map(x=>[String(x.interview_id),x]));const forms=new Map((data.forms||[]).map(x=>[String(x.id),x]));const formLinks=new Map((data.formLinks||[]).map(x=>[String(x.interview_id),forms.get(String(x.interview_applicant_id))]));const staff=new Map((data.staff||[]).map(x=>[String(x.user_id),x.display_name]));const histories=new Map();for(const h of data.history||[]){const id=String(h.interview_id);if(!histories.has(id))histories.set(id,[]);histories.get(id).push({type:h.event_type,scheduledAt:[h.original_date,h.original_time].filter(Boolean).join(' '),updatedAt:h.recorded_at||''})}
+ storeMetricsHistoricalMonthly=data.historicalMonthly||[];storeMetricsRecentInquiryMonthly=data.recentInquiryMonthly&&typeof data.recentInquiryMonthly==='object'&&!data.recentInquiryError?data.recentInquiryMonthly:null;const lineApplicantLookup=new Map(lineInboxReadOnly.applicants.map(x=>[String(x.accountId)+':'+String(x.lineUserId),x]));const profileLookup=linePictureLookup();const links=new Map((data.links||[]).map(x=>[String(x.interview_id),x]));const manualApplicants=new Map((data.manualApplicants||[]).map(x=>[String(x.interview_id),x]));const forms=new Map((data.forms||[]).map(x=>[String(x.id),x]));const formLinks=new Map((data.formLinks||[]).map(x=>[String(x.interview_id),forms.get(String(x.interview_applicant_id))]));const staff=new Map((data.staff||[]).map(x=>[String(x.user_id),x.display_name]));const histories=new Map();for(const h of data.history||[]){const id=String(h.interview_id);if(!histories.has(id))histories.set(id,[]);histories.get(id).push({type:h.event_type,scheduledAt:[h.original_date,h.original_time].filter(Boolean).join(' '),updatedAt:h.recorded_at||''})}
  liveInterviewLists.rows=(data.interviews||[]).map(x=>{const link=links.get(String(x.id)),form=formLinks.get(String(x.id)),status=x.status;return {interviewId:x.id,name:manualApplicants.get(String(x.id))?.applicant_name||form?.name||link?.line_display_name||'応募者名未登録',shop:x.shop,date:[x.interview_date,x.interview_time].filter(Boolean).join(' '),staff:staff.get(String(x.interviewer_user_id))||CHART_STAFF_SOURCE.find(v=>v.id===x.interviewer_user_id)?.name||'担当者未登録',status,updatedAt:x.updated_at||'',confirmed:!!x.confirmed,confirmationLineSent:!!x.confirmation_line_sent,history:lineApplicantLookup.get(String(link?.account_id)+':'+String(link?.line_user_id))?.history?.length?lineApplicantLookup.get(String(link?.account_id)+':'+String(link?.line_user_id)).history:(histories.get(String(x.id))||[]),isManual:manualApplicants.has(String(x.id)),accountId:link?.account_id,lineUserId:link?.line_user_id,picture:profileLookup.get(String(link?.account_id)+':'+String(link?.line_user_id))||link?.line_picture_url||'',messages:lineInboxReadOnly.applicants.find(a=>String(a.accountId)===String(link?.account_id)&&String(a.lineUserId)===String(link?.line_user_id))?.messages||[]}});liveInterviewLists.status='ready';liveInterviewLists.error='';updateSidebarCounts();renderChart();
  if(!$('todayPanel').hidden)renderTodayTest();else if(!$('sharedPanel').hidden&&currentPage!=='LINE通知')renderList();return true;
  }catch(e){liveInterviewLists.status='error';liveInterviewLists.error=e.message;if(!$('todayPanel').hidden)renderTodayTest();else if(!$('sharedPanel').hidden&&currentPage!=='LINE通知')renderList();return false}
@@ -714,6 +714,7 @@ function renderTodayTest(){updateSidebarCounts();const el=$('todayTestList');el.
 
 function bindStoreMetrics(){const shop=document.getElementById('storeMetricsShop'),month=document.getElementById('storeMetricsMonth');if(shop&&!shop.dataset.bound){shop.addEventListener('change',renderStoreMetrics);month.addEventListener('change',renderStoreMetrics);for(const [id,delta] of [['storeMetricsPrev',-1],['storeMetricsNext',1]])document.getElementById(id).addEventListener('click',()=>{const [y,m]=month.value.split('-').map(Number);const d=new Date(y,m-1+delta,1);const next=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');const current=dateKey(new Date()).slice(0,7);month.value=next>current?current:next;renderStoreMetrics()});for(const year of [2025,2026])document.getElementById('storeMetrics'+year).addEventListener('click',()=>{month.value=year===new Date().getFullYear()?dateKey(new Date()).slice(0,7):year+'-12';renderStoreMetrics()});shop.dataset.bound='1'}}
 let storeMetricsHistoricalMonthly=[];
+let storeMetricsRecentInquiryMonthly=null;
 let storeMetricsSheets=[];
 let storeMetricsSheetsStatus='idle';
 async function refreshStoreMetricsSheets(){
@@ -745,22 +746,43 @@ const attendedCount=interviews.filter(r=>attendedStatuses.includes(r.status)).le
 const hiredCount=interviews.filter(r=>['採用','在籍','入店'].includes(r.status)).length;
 const rejectedCount=interviews.filter(r=>r.status==='不採用').length;
 const cancelledCount=interviews.filter(r=>['キャンセル','無断トビ','トビ（キャンセル）'].includes(r.status)).length;
-const applicantKeys=new Set();
-for(const a of applicants)applicantKeys.add('line:'+String(a.accountId)+':'+String(a.lineUserId));
-if(interviewReady)for(const r of interviews){
-  if(r.lineUserId&&r.accountId)applicantKeys.add('line:'+String(r.accountId)+':'+String(r.lineUserId));
-  else applicantKeys.add('manual:'+String(r.interviewId));
+// The 2026-10 baseline is user-confirmed through Oct 30 JST; count only new
+// first LINE contacts at/after 2026-10-31 JST, never interview registrations.
+const confirmedAccounts=['grandluxe','luxy','unsecret','rose'];
+function inquiryCountForMonth(key){
+ const rows=storeMetricsHistoricalMonthly.filter(x=>String(x.month||'').slice(0,7)===key&&(shop==='all'||x.account_id===selectedAccount));
+ const historic=rows.reduce((n,x)=>n+(Number(x.estimated_count)||0),0);
+ const recent=storeMetricsRecentInquiryMonthly;
+ const recentTotal=()=>confirmedAccounts.filter(id=>shop==='all'||selectedAccount===id)
+  .reduce((sum,id)=>sum+(Number(recent[id+':'+key])||0),0);
+ if(key==='2026-10'){
+  if(shop==='BUSTY OSAKA'||rows.length===0||recent===null)return null;
+  return historic+recentTotal();
+ }
+ if(key>'2026-10'){
+  if(shop==='BUSTY OSAKA'||recent===null)return null;
+  return recentTotal();
+ }
+ if(rows.length)return historic;
+ return lineReady?allApplicants.filter(a=>firstDate(a).slice(0,7)===key).length:null;
 }
-const historyThisMonth=storeMetricsHistoricalMonthly.filter(x=>String(x.month||'').slice(0,7)===month&&(shop==='all'||x.account_id===selectedAccount));const applicantCount=month<'2026-10'&&historyThisMonth.length?historyThisMonth.reduce((n,x)=>n+(Number(x.estimated_count)||0),0):(lineReady&&interviewReady)?applicantKeys.size:null;const measuredInterviews=interviewReady&&(month>='2026-10'||interviews.length>0);
-const metrics=[['応募数',applicantCount===null?'—':applicantCount],['面接実施',measuredInterviews?attendedCount:'—'],['面接割合',applicantCount===null||!measuredInterviews?'—':applicantCount?Math.round(attendedCount/applicantCount*100)+'%':'0%'],['採用数',measuredInterviews?hiredCount:'—'],['不採用数',measuredInterviews?rejectedCount:'—'],['キャンセル',measuredInterviews?cancelledCount:'—']]
+const applicantCount=inquiryCountForMonth(month);
+const measuredInterviews=interviewReady&&(month>='2026-10'||interviews.length>0);
+const metrics=[['問い合わせ数',applicantCount===null?'—':applicantCount],['面接実施',measuredInterviews?attendedCount:'—'],['面接割合',applicantCount===null||!measuredInterviews?'—':applicantCount?Math.round(attendedCount/applicantCount*100)+'%':'0%'],['採用数',measuredInterviews?hiredCount:'—'],['不採用数',measuredInterviews?rejectedCount:'—'],['キャンセル',measuredInterviews?cancelledCount:'—']]
 const top=document.createElement('div');top.className='store-metrics-kpis';top.style.cssText='display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px';
 for(const [name,value] of metrics){const cell=document.createElement('div');cell.style.cssText='padding:12px;border:1px solid #d6e1ec;border-radius:7px;background:#f4f7fb';const label=document.createElement('div');label.textContent=name;label.style.cssText='font-size:11px;color:#5b6e85';const num=document.createElement('strong');num.textContent=value;num.style.cssText='font-size:23px';cell.append(label,num);top.append(cell)}root.append(top);
-const note=document.createElement('p');note.style.cssText='font-size:11px;color:#64748b';note.textContent=shop==='BUSTY OSAKA'?'BUSTY OSAKA：LINE未連携':'';if(note.textContent)root.append(note);
+const note=document.createElement('p');note.style.cssText='font-size:11px;color:#64748b';
+note.textContent=shop==='BUSTY OSAKA'?'BUSTY OSAKA：問い合わせ数の自動集計対象外（LINE未連携）':
+month==='2026-10'?'問い合わせ数：10月30日までの確定基準値＋10月31日以降の新規LINE初回受信（同一店舗・同一LINE IDは1件）':
+month>'2026-10'?'問い合わせ数：LINE初回受信の新規応募者数（同一店舗・同一LINE IDは1件）':'';
+if(shop==='all'&&month>='2026-10')note.textContent+='　※対象はGrand Luxe／LUXY／Un Secret／薔薇と紳士の4店舗';
+if(storeMetricsRecentInquiryMonthly===null&&month>='2026-10')note.textContent+='　※LINE新規問い合わせ集計を取得できません';
+if(note.textContent)root.append(note);
 const chart=document.createElement('div');chart.className='store-metrics-charts';chart.style.cssText='display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;grid-template-rows:repeat(2,minmax(320px,1fr));height:max(660px,calc(100vh - 490px))';
 function panel(title,sub){const p=document.createElement('section');p.style.cssText='min-width:0;border:1px solid #d6e1ec;border-radius:8px;padding:14px;min-height:0;overflow:hidden';if(title){const h=document.createElement('strong');h.textContent=title;p.append(h)}if(sub){const small=document.createElement('div');small.textContent=sub;small.style.cssText='font-size:10px;color:#64748b;margin:5px 0';p.append(small)}return p}
 function bars(p,labels,series){const max=Math.max(1,...series.flatMap(s=>s.values.filter(v=>typeof v==='number')));const legend=document.createElement('div');legend.style.cssText='display:flex;gap:20px;flex-wrap:wrap;font-size:14px;font-weight:700;margin:12px 0';for(const item of series){const el=document.createElement('span');el.style.cssText='display:inline-flex;align-items:center;gap:7px;color:#24354c';const swatch=document.createElement('span');swatch.style.cssText='display:inline-block;width:14px;height:14px;border-radius:2px;background:'+item.color;const name=document.createElement('span');name.textContent=item.name;el.append(swatch,name);legend.append(el)}p.append(legend);const graph=document.createElement('div');graph.style.cssText='display:flex;align-items:stretch;gap:2px;height:calc(100% - 52px);min-height:245px;border-bottom:1px solid #cbd5e1;padding-top:16px';labels.forEach((label,i)=>{const col=document.createElement('div');col.style.cssText='display:flex;flex:1;min-width:0;flex-direction:column;align-items:center;justify-content:flex-end';const values=document.createElement('div');values.style.cssText='display:flex;align-items:flex-end;justify-content:center;gap:1px;width:100%;height:calc(100% - 22px)';for(const item of series){const v=item.values[i];const bar=document.createElement('div');bar.style.cssText='flex:1;max-width:20px;height:'+((typeof v==='number'?Math.max(v/max*220,v?3:0):0))+'px;background:linear-gradient(90deg,rgba(255,255,255,.22),transparent 24%,rgba(0,0,0,.09) 82%,rgba(255,255,255,.17)),linear-gradient(180deg,rgba(255,255,255,.52) 0%,rgba(255,255,255,.12) 18%,transparent 48%),'+item.color+';box-shadow:inset 1px 0 rgba(255,255,255,.27),inset -1px 0 rgba(0,0,0,.1);border-radius:3px 3px 0 0;position:relative';bar.title=item.name+' '+label+'：'+(v===null?'未取得':v+'件');if(v>0){const n=document.createElement('span');n.textContent=v;n.style.cssText='position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font-size:12px;font-weight:800;color:#172b46;white-space:nowrap;text-shadow:0 1px 0 #fff';bar.append(n)}values.append(bar)}const tick=document.createElement('div');tick.className='store-metrics-axis-label';tick.textContent=label;tick.style.cssText='font-size:11px;font-weight:700;white-space:nowrap;margin-top:7px;color:#253c56';col.append(values,tick);graph.append(col)});p.append(graph)}
 const months=Array.from({length:12},(_,i)=>{const d=new Date(yr,mo-12+i,1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')});
-const monthlyApplicants=months.map(key=>{const rows=storeMetricsHistoricalMonthly.filter(r=>String(r.month||'').slice(0,7)===key&&(shop==='all'||r.account_id===selectedAccount));const historic=rows.reduce((sum,r)=>sum+(Number(r.estimated_count)||0),0);const automatic=lineReady?allApplicants.filter(a=>firstDate(a).slice(0,7)===key).length:0;return key<'2026-10'&&rows.length?historic:lineReady?automatic:rows.length?historic:null});
+const monthlyApplicants=months.map(inquiryCountForMonth);
 const monthlyInterviews=months.map(key=>interviewReady?allInterviews.filter(r=>String(r.date||'').slice(0,7)===key&&['採用','不採用','辞退','来店済み','在籍','入店'].includes(r.status)).length:null);
 const left=panel('');
 bars(left,months.map(k=>String(Number(k.slice(5)))+'月'),[{name:'問い合わせ',color:'#F24D99',values:monthlyApplicants},{name:'面接実施',color:'#1688F0',values:monthlyInterviews}]);chart.append(left);
@@ -848,6 +870,7 @@ const attendedMediaRaw=new Map();
 for(const sheet of attendedSheets)for(const name of sheetMediaNames(sheet.source))attendedMediaRaw.set(name,(attendedMediaRaw.get(name)||0)+1);
 const attendedMedia=groupedMediaCounts(attendedMediaRaw);
 const pie=panel('');pie.style.padding='8px';
+if(month>='2026-10'){const mediaNote=document.createElement('div');mediaNote.textContent='媒体別の内訳：LINEから確認できたデータのみ（10月30日までの確定基準値の内訳は含まれません）';mediaNote.style.cssText='color:#65748b;font-size:10px;line-height:1.4;padding:0 4px 5px';pie.append(mediaNote)}
 const pieRow=document.createElement('div');pieRow.className='store-metrics-pies';
 pieRow.style.cssText='display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;align-items:center;justify-items:center;width:100%;height:100%';
 function addMediaPie(title,counts,ready,rawCounts){
@@ -882,6 +905,7 @@ addMediaPie('問い合わせ',mediaNow,lineReady,mediaNowRaw);
 addMediaPie('面接実施',attendedMedia,storeMetricsSheetsStatus==='ready',attendedMediaRaw);
 pie.append(pieRow);chart.append(pie);
 const compare=panel('');
+if(month>='2026-10'){const detailNote=document.createElement('div');detailNote.textContent='媒体別：LINE履歴で確認できた分のみ。上部の問い合わせ数とは集計対象が異なります。';detailNote.style.cssText='font-size:10px;color:#65748b;margin:0 0 4px';compare.append(detailNote)}
 const priorSheets=storeMetricsSheets.filter(x=>attendanceStatuses.has(x.status)&&String(x.month||'')===previousKey&&matchShop(x.shop));
 const priorMediaRaw=new Map();for(const x of priorSheets)for(const name of sheetMediaNames(x.source))priorMediaRaw.set(name,(priorMediaRaw.get(name)||0)+1);
 const priorMedia=groupedMediaCounts(priorMediaRaw);
