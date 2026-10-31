@@ -258,3 +258,40 @@ body[data-personal-mobile-view="app"] #personalMobileViewer > #personalMobileFra
  height:auto!important;
  width:100%!important;
 }
+
+/* Ace visibility: foreground art must not be buried beneath opaque pink layers.
+   Apply only to PRESIDENT; do not change operational card/status colors. */
+body[data-personal-mobile-view="home"] #personalMobileTop::before{
+  background:var(--president-ace) 94% 99%/auto 79% no-repeat!important;
+  opacity:.74!important;
+}
+html[data-personal-theme="president"] body.personal-mobile-embedded .main{
+  background-color:#fff3fa!important;
+  background-image:
+    linear-gradient(rgba(255,244,250,.28),rgba(255,244,250,.35)),
+    var(--president-ace)!important;
+  background-size:cover,auto 67vh!important;
+  background-position:center,90% 98%!important;
+  background-repeat:no-repeat!important;
+  background-attachment:scroll!important;
+}
+html.personal-sheet-mobile[data-personal-theme="president"] #layout{
+  background-color:#fce9f3!important;
+  background-image:
+    linear-gradient(rgba(255,243,249,.28),rgba(255,243,249,.35)),
+    var(--president-ace)!important;
+  background-position:center,90% 96%!important;
+  background-size:cover,auto 67vh!important;
+  background-repeat:no-repeat!important;
+}
+html.personal-sheet-mobile[data-personal-theme="president"] #layout>.left,
+html.personal-sheet-mobile[data-personal-theme="president"] #sheetDetailPane{
+  background:rgba(255,250,253,.86)!important;
+}
+body[data-personal-mobile-view="blocks"]{
+  background-image:
+    linear-gradient(rgba(31,9,30,.23),rgba(39,10,36,.32)),
+    var(--president-ace)!important;
+  background-size:cover,auto 68vh!important;
+  background-position:center,90% 95%!important;
+}
