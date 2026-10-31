@@ -123,6 +123,7 @@ async function launchPrintRoster(){
   if(!response.ok||!data.ok||!data.roster)throw Error(data.error==="not_hired"?"採用確定済みのシートではありません。":data.error==="unauthorized"?"ログイン有効期限が切れています。":"従業者名簿を取得できませんでした。");
   const r=data.roster;
   if(String(r.id)!==String(row.id))throw Error("取得した名簿の対象者が一致しません。");
+  if(!r.hire_shop)throw Error("先に採用店舗を選択して保存してください。");
   const japanese=r.nationality==="日本";
   const dateBlank='　　年　　　　月　　　　日';
   const address=[r.prefecture,r.city,r.street].filter(Boolean).join("");
@@ -137,6 +138,7 @@ async function launchPrintRoster(){
    '<tr><th>生年月日</th><td colspan="3">',safe(birthDate(r.birth_date)),'</td></tr>',
    '<tr class="large"><th>住所</th><td colspan="3">',postal,safe(address),'</td></tr>',
    '<tr><th>電話番号</th><td colspan="3">',safe(r.phone),'</td></tr>',
+   '<tr><th>採用店舗</th><td colspan="3">',safe(r.hire_shop),'</td></tr>',
    '<tr><th>従事する業務内容</th><td colspan="3">従業員</td></tr>',
    '<tr><th>採用年月日</th><td colspan="3" class="hand">',dateBlank,'</td></tr>',
    '<tr><th>退職年月日</th><td colspan="3" class="hand">',dateBlank,'</td></tr>',
@@ -193,7 +195,7 @@ function syncHireEntryControls(row){
  if(!switched&&container.dataset.dirty==="1")return;
  container.dataset.sheetId=nextId;
  container.dataset.dirty="0";
- shop.value=normalizedHiringShop(row.hire_shop||row.shop);
+ shop.value=normalizedHiringShop(row.hire_shop);
  stage.value=String(row.stage_name||"");
  if(switched&&msg){msg.textContent="";msg.style.color="";}
 }
