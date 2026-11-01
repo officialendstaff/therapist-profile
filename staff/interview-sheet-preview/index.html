@@ -1487,7 +1487,7 @@ window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===
    try{const refreshed=await auth.auth.refreshSession();if(refreshed.error)console.warn('Embedded session refresh:',refreshed.error.message)}catch(error){console.warn('Embedded session refresh:',error)}
    ok=await restore();
   }
-  if(mobileEmbedded){if(!ok)showEmbeddedAuthError();return}
+  if(mobileEmbedded){if(!ok){const paneReason=message.textContent||'管理者プロフィールまたは認証セッションを取得できませんでした。';showEmbeddedAuthError();const pane=document.getElementById('personalMobileAuthError');if(pane){const reason=document.createElement('small');reason.textContent='確認内容：'+paneReason;reason.style.cssText='max-width:340px;overflow-wrap:anywhere;color:#667085';pane.append(reason)}}return}
   dialog.classList.toggle('open',!ok);
  }).catch(error=>{
   console.error('面接管理の認証復元:',error);
