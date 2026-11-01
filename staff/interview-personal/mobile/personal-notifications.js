@@ -25,7 +25,8 @@ function currentToday(){
  const userId=typeof personalViewer!=='undefined'?personalViewer?.userId:null;
  const rows=Array.isArray(window.scheduleInterviewRows)?window.scheduleInterviewRows:[];
  if(!userId)return [];
- return rows.filter(x=>String(x.interviewer_user_id)===String(userId)&&String(x.interview_date)===dateJP()&&['面接予定','日程変更'].includes(x.status));
+ // Owner's schedule displays all interviewers; other profiles show only their assigned interviews.
+ return rows.filter(x=>(profile==='owner'||String(x.interviewer_user_id)===String(userId))&&String(x.interview_date)===dateJP()&&['面接予定','日程変更'].includes(x.status));
 }
 function unseenSheets(){
  const rows=currentSheets();
