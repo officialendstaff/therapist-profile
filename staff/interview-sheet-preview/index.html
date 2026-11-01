@@ -1497,7 +1497,7 @@ window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===
  });
 })();
 </script>
-<script id="today-top-startup-fallback">(function(){function top(){const p=document.querySelector('.main-panel');if(!p)return;p.classList.remove('sheet-mode');const nav=document.querySelector('#nav button[data-page="今日の予定"]');document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b===nav));const today=document.getElementById('todayPanel'),shared=document.getElementById('sharedPanel');if(today)today.hidden=false;if(shared)shared.hidden=true;}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',top,{once:true});else top();})();</script><script id="personal-mobile-embed-route">
+<script id="today-top-startup-fallback">(function(){if(new URLSearchParams(location.search).get('personalMobile')==='1')return;function top(){const p=document.querySelector('.main-panel');if(!p)return;p.classList.remove('sheet-mode');const nav=document.querySelector('#nav button[data-page="今日の予定"]');document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b===nav));const today=document.getElementById('todayPanel'),shared=document.getElementById('sharedPanel');if(today)today.hidden=false;if(shared)shared.hidden=true;}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',top,{once:true});else top();})();</script><script id="personal-mobile-embed-route">
 (function(){
  const params=new URLSearchParams(location.search);
  if(params.get('personalMobile')!=='1')return;
