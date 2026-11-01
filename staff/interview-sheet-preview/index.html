@@ -1438,7 +1438,7 @@ window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===
   try{
    if(window.parent.location.origin!==location.origin)return;
    const parentSession=window.parent.sessionStorage.getItem('mattan-recruit-auth');
-   if(parentSession&&!sessionStorage.getItem('mattan-recruit-auth')){
+   if(parentSession&&parentSession!==sessionStorage.getItem('mattan-recruit-auth')){
     sessionStorage.setItem('mattan-recruit-auth',parentSession);
    }
   }catch(error){console.warn('Personal TOP session access:',error)}
@@ -1481,7 +1481,12 @@ window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===
  form.onsubmit=async e=>{e.preventDefault();message.textContent='認証しています…';el('authSubmit').disabled=true;try{if(mode==='admin'){const {error}=await auth.auth.signInWithPassword({email:form.elements.email.value.trim(),password:form.elements.password.value});if(error)throw Error('IDまたはPASSが正しくありません。');const p=await adminProfile();if(!p){await auth.auth.signOut({scope:'local'});throw Error('管理者アカウントではありません。')}await exchangeAdminToken();if(redirectMobileAdmin(p.profile_key))return;apply('admin',p.display_name,p.profile_key)}else{const res=await fetch(staffApi,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'login',password:form.elements.staffPassword.value})});const data=await res.json();if(!res.ok||!data.token)throw Error('スタッフ共通PASSが正しくありません。');sessionStorage.setItem('interview_staff_session_v2',data.token);apply('staff')}message.textContent='';form.reset();dialog.classList.remove('open')}catch(err){message.textContent=err.message||'ログインできませんでした。'}finally{el('authSubmit').disabled=false}};
  logout.onclick=async()=>{if(role==='admin')await auth.auth.signOut({scope:'local'});sessionStorage.removeItem('interview_staff_session_v2');localStorage.removeItem('interview_staff_session_v2');apply(null);dialog.classList.add('open')};
  document.body.classList.add('interview-admin-locked');
- restore().then(ok=>{
+ restore().then(async ok=>{
+  if(mobileEmbedded&&!ok){
+   restoreParentSession();
+   try{const refreshed=await auth.auth.refreshSession();if(refreshed.error)console.warn('Embedded session refresh:',refreshed.error.message)}catch(error){console.warn('Embedded session refresh:',error)}
+   ok=await restore();
+  }
   if(mobileEmbedded){if(!ok)showEmbeddedAuthError();return}
   dialog.classList.toggle('open',!ok);
  }).catch(error=>{
