@@ -1030,7 +1030,7 @@ const mediaNames=['エステ魂','メンズエステワーク','エステラブ�
 const colors=['#AEB7C5','#168CF2','#F59B48','#9D69E5','#18B7A5','#F36A9C','#526CE0','#F1C04D','#38A8DC','#76B66D','#D77A58','#6E7D91','#B885D4'];
 function mediaOf(a){
  const texts=(a.messages||[]).map(m=>String(m.text||''));
- const labels=/(?:ご覧になった求人広告|求人広告|求人媒体|応募媒体|見た媒体|広告媒体|媒体名)\s*[：:\s]*([^\n\r]*)/g;
+ const labels=/(?:ご覧になった求人広告|求人広告|求人媒体|応募媒体|見た媒体|広告媒体|媒体名)[ \t　]*[：:]?[ \t　]*([^\n\r]*)/g;
  const values=[];
  for(const t of texts){for(const match of t.matchAll(labels)){if(match[1].trim())values.push(match[1].trim())}}
  if(!values.length){
