@@ -1525,6 +1525,11 @@ window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===
   const link=Array.from(document.querySelectorAll('#nav button[data-page]')).find(btn=>btn.dataset.page===page);
   if(!link)return false;
   link.click();
+  // A mobile iframe must never retain the default Interview Sheet view.
+  if(page!=='Interview Sheet'&&document.querySelector('.main-panel')?.classList.contains('sheet-mode')){
+   document.querySelector('.main-panel').classList.remove('sheet-mode');
+   if(page==='今日の予定')showHome();else showCommon(page);
+  }
   document.documentElement.classList.add('personal-mobile-ready');
   return true;
  }
