@@ -1128,7 +1128,7 @@ function sheetMediaNames(value){
  if(!raw)return ['記載なし'];
  const names=raw.split(/[、,，／\/\n]+/).map(x=>x.trim()).filter(Boolean);
  if(!names.length)return ['記載なし'];
- return [...new Set(names.map(name=>normalizedRecruitMedia(mediaNames.includes(name)||name==='記載なし'||/^その他[（(].+[）)]$/.test(name)?name:'その他（'+name+'）')))];
+ return [...new Set(names.map(name=>normalizedRecruitMedia(mediaNames.includes(name)||name==='HP'||name==='記載なし'||/^その他[（(].+[）)]$/.test(name)?name:'その他（'+name+'）')))];
 }
 const attendanceStatuses=new Set(['来店済み','採用','不採用','在籍','入店','辞退']);
 const attendedSheets=storeMetricsSheets.filter(x=>attendanceStatuses.has(x.status)&&String(x.month||'')===month&&matchShop(x.shop));
