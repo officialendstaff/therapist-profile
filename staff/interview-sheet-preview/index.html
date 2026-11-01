@@ -1052,7 +1052,7 @@ function mediaOf(a){
    const match=name==='X'?/(?:^|[^A-Za-z])(?:X|旧Twitter|Twitter)(?:$|[^A-Za-z])/i.test(v):name==='02'?/(?:^|[^0-9])(?:02|ゼロツー)(?:$|[^0-9])/.test(v):v.includes(name);
    if(match){result.add(name);found=true}
   }
-  if(/(?:求人HP|求人ホームページ|ホームページ|オフィシャルHP|公式(?:サイト|HP)|店舗(?:サイト|HP)|お店の(?:サイト|HP)|自社(?:サイト|HP)|(?:^|[^A-Za-z])HP(?:$|[^A-Za-z])/i.test(v)){result.add('HP');found=true}
+  if(/(?:求人HP|求人ホームページ|ホームページ|オフィシャルHP|公式(?:サイト|HP)|店舗(?:サイト|HP)|お店の(?:サイト|HP)|自社(?:サイト|HP)|(?:^|[^A-Za-z])HP(?:$|[^A-Za-z]))/i.test(v)){result.add('HP');found=true}
   if(!found){
    if(/当店の事務所|地下鉄|日本橋駅|徒歩|面接は日本橋/.test(v))continue;
    const clean=v.replace(/[。！!]+$/,'').trim();
