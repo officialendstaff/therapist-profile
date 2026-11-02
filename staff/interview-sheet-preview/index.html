@@ -61,6 +61,8 @@ button{font-family:inherit;letter-spacing:inherit}
 .confirmation-controls button.sent-btn{background:#e5e7eb;color:#64748b;border-color:#cbd5e1;box-shadow:none}
 .confirmation-controls button.ok-btn{background:#e8f6ef;border-color:#42a77a;color:#26865d}
 .confirmation-controls button.ok-btn.is-ok{background:linear-gradient(#69bf94,#42a77a);color:#fff}
+/* Confirmed status: grey button, not grey card. */
+.today-schedule-card.confirmed .confirmation-controls button.ok-btn.is-ok{background:#d1d5db!important;color:#374151!important;border-color:#9ca3af!important;box-shadow:none!important}
 .applicant .history-labels,.today-test-card .history-labels{width:250px;min-width:0;max-width:250px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px}
 .history-labels:empty{display:none!important}
 .history-labels .history-tag{display:block;box-sizing:border-box;width:250px;min-width:250px;font-size:11px;border-radius:4px;padding:4px 7px;background:#eee8f8;color:#8060a3;white-space:nowrap}
@@ -174,8 +176,6 @@ button{font-family:inherit;letter-spacing:inherit}
 .unified-applicant-card.confirmation-pending{background:#fff0f3!important;border-color:#d9778c!important;border-left:4px solid #d9778c!important}
 .unified-applicant-card.sent{background:#eaf3fa!important;border-color:#568db9!important;border-left:4px solid #568db9!important}
 .unified-applicant-card.confirmed{background:#e9f6ef!important;border-color:#399768!important;border-left:4px solid #399768!important}
-/* Override confirmation green on actual today cards only. */
-.unified-applicant-card.today-schedule-card.confirmed{background:#eef0f3!important;border-color:#a7adb7!important;border-left:4px solid #8c949f!important}
 #nav button[data-page]{position:relative}
 #nav .nav-trailing{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:10px;white-space:nowrap}
 #nav .nav-count{font-variant-numeric:tabular-nums}
