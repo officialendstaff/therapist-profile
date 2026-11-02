@@ -566,7 +566,7 @@ function normalizeLineInbox(data){
   const date=active?[active.interview.interview_date,active.interview.interview_time].filter(Boolean).join(' '):'';
   const outcome=active?(formStatus.get(String(active.interview.id))||String(active.interview.status||'')):'';
   const assignee=active?(staff.get(String(active.interview.interviewer_user_id))||CHART_STAFF_SOURCE.find(x=>x.id===active.interview.interviewer_user_id)?.name||'担当者未登録'):'';
-  return {...item,name:profile.displayName||link.line_display_name||'Unknown',picture:profile.pictureUrl||link.line_picture_url||'',interviewId:active?.interview.id??null,date,staff:assignee,outcome,history:past,lastReceived:item.messages[0]?.receivedAt||''};
+  return {...item,name:profile.displayName||link.line_display_name||'Unknown',picture:profile.pictureUrl||link.line_picture_url||'',pictureFallback:(profile.pictureUrl&&link.line_picture_url&&profile.pictureUrl!==link.line_picture_url)?link.line_picture_url:'',interviewId:active?.interview.id??null,date,staff:assignee,outcome,history:past,lastReceived:item.messages[0]?.receivedAt||''};
  }).sort((a,b)=>b.lastReceived.localeCompare(a.lastReceived));
 }
 function linePictureLookup(){
@@ -767,7 +767,7 @@ function openPendingActionPage(label,record,mode='登録',returnPage=null){
  const left=document.createElement('section');left.className='registration-left';
  const meta=document.createElement('div');meta.className='registration-meta';
  const avatar=document.createElement('div');avatar.className='registration-avatar';
- if(record.picture&&/^https:\/\//.test(record.picture)){const img=document.createElement('img');img.src=record.picture;img.alt='LINEアイコン';img.referrerPolicy='no-referrer';avatar.append(img)}else avatar.textContent='LINE';
+ if(record.picture&&/^https:\/\//.test(record.picture)){const img=document.createElement('img');img.src=record.picture;img.alt='LINEアイコン';img.referrerPolicy='no-referrer';img.onerror=()=>{if(record.pictureFallback&&img.src!==record.pictureFallback){img.src=record.pictureFallback;return}avatar.textContent='LINE'};avatar.append(img)}else avatar.textContent='LINE';
  const info=(caption,value)=>{const el=document.createElement('div');el.className='registration-info';const c=document.createElement('small');c.textContent=caption;const v=document.createElement('strong');v.textContent=value||'—';el.append(c,v);return el};
  const identity=document.createElement('div');identity.className='identity';const displayName=document.createElement('strong');displayName.textContent=record.name||'Unknown';const store=document.createElement('small');store.className='shop-label';store.textContent=record.shop||'—';applyShopTheme(store,record.shop);identity.append(displayName,store);meta.append(avatar,identity);
  const history=document.createElement('button');history.type='button';history.className='registration-history-toggle';history.textContent='過去履歴';
@@ -856,7 +856,7 @@ async function cancelLiveInterview(record,button){
 function makeLiveLineCard(record){
  const card=document.createElement('article');card.className='applicant live-line-card unified-applicant-card';
  const avatar=document.createElement('div');avatar.className='avatar';
- if(record.picture&&/^https:\/\//.test(record.picture)){const img=document.createElement('img');img.src=record.picture;img.alt='LINEアイコン';img.referrerPolicy='no-referrer';avatar.append(img)}else avatar.textContent='LINE';
+ if(record.picture&&/^https:\/\//.test(record.picture)){const img=document.createElement('img');img.src=record.picture;img.alt='LINEアイコン';img.referrerPolicy='no-referrer';img.onerror=()=>{if(record.pictureFallback&&img.src!==record.pictureFallback){img.src=record.pictureFallback;return}avatar.textContent='LINE'};avatar.append(img)}else avatar.textContent='LINE';
  const identity=document.createElement('div');identity.className='identity';
  const name=document.createElement('strong');name.textContent=record.name;
  const store=document.createElement('small');store.className='shop-label';store.textContent=record.shop;identity.append(name,store);applyShopTheme(store,record.shop);
