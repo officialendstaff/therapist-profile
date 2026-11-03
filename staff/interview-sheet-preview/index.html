@@ -663,9 +663,9 @@ function showDecisionPopup(record,kind){
  const field=(label,type,value='')=>{const l=document.createElement('label');l.textContent=label;const el=document.createElement(type==='select'?'select':type==='textarea'?'textarea':'input');if(type!=='select'&&type!=='textarea')el.type=type;el.value=value||'';body.append(l,el);return el};
  let shop,stage,date,checks,note;
  if(kind==='採用'){
-  shop=field('店舗','select',sheet.shop||record.shop);
+  shop=field('採用店舗','select',sheet.hire_shop||sheet.shop||record.shop);
   for(const name of ['Grand Luxe','LUXY OSAKA','薔薇と紳士','Un Secret','BUSTY OSAKA']){const o=document.createElement('option');o.value=name;o.textContent=name;shop.append(o)}
-  shop.value=sheet.shop||record.shop||'Grand Luxe';
+  shop.value=sheet.hire_shop||sheet.shop||record.shop||'Grand Luxe';
   stage=field('源氏名','text',sheet.stage_name);
   date=field('入店予定日（任意）','date',sheet.hire_date);
  }else if(kind==='不採用'){
@@ -677,7 +677,9 @@ function showDecisionPopup(record,kind){
  }else{
   const info=document.createElement('div');info.style.cssText='line-height:2;font-size:14px;white-space:pre-wrap';
   let reasons=[];try{reasons=JSON.parse(sheet.rejection_reason||'[]')}catch{reasons=[sheet.rejection_reason].filter(Boolean)}
-  info.textContent='応募者：'+(sheet.name||record.name)+'\n面接結果：'+(['採用','不採用','辞退'].includes(sheet.status)?sheet.status:'未確定')+(sheet.status==='採用'?'\n店舗：'+(sheet.shop||'－')+'\n源氏名：'+(sheet.stage_name||'－')+'\n入店予定日：'+(sheet.hire_date||'未定'):sheet.status==='不採用'?'\n不採用理由：'+(reasons.join('、')||'－'):sheet.status==='辞退'?'\n辞退理由：'+(sheet.rejection_note||'－'):'');
+  const applicationShop=record.shop||sheet.shop||'未登録';
+  const hiringShop=sheet.hire_shop||'未登録';
+  info.textContent='応募者：'+(sheet.name||record.name)+'\n応募店舗：'+applicationShop+'\n面接結果：'+(['採用','不採用','辞退'].includes(sheet.status)?sheet.status:'未確定')+(sheet.status==='採用'?'\n採用店舗：'+hiringShop+'\n源氏名：'+(sheet.stage_name||'未登録')+'\n入店予定日：'+(sheet.hire_date||'未定'):sheet.status==='不採用'?'\n不採用理由：'+(reasons.join('、')||'－'):sheet.status==='辞退'?'\n辞退理由：'+(sheet.rejection_note||'－'):'');
   body.append(info);
   if(sheet.status==='採用'){const print=document.createElement('p');print.textContent='印刷機能：後日実装予定';print.style.cssText='font-size:12px;color:#64748b;margin-top:14px';body.append(print)}
  }
