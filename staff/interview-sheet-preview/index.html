@@ -224,7 +224,7 @@ button{font-family:inherit;letter-spacing:inherit}
  .store-metrics-charts>section:nth-child(3){height:310px!important}
  .store-metrics-charts>section:nth-child(3) .store-metrics-pies{height:100%!important}
  .store-metrics-charts>section:nth-child(2) .store-metrics-axis-label{font-size:8px!important;letter-spacing:-.04em}
- .store-metrics-charts>section:nth-child(4) .store-metrics-comparison-graph{overflow-x:auto!important;overflow-y:hidden!important}
+ .store-metrics-charts>section:nth-child(4) .store-metrics-comparison-graph{overflow-x:hidden!important;overflow-y:auto!important}
 }
 </style><style id="sheet-preview-layout">.main-panel:not(.sheet-mode)>.sheet-preview-host{display:none!important}.main-panel.sheet-mode> :not(.sheet-preview-host){display:none!important}.main-panel.sheet-mode{height:100%;min-height:0;padding:0!important;overflow:hidden!important}.main-panel:not(.sheet-mode){height:auto!important;min-height:100%!important;padding:12px 16px!important;overflow:visible!important;display:block!important}.main-panel:not(.sheet-mode)>.today-panel:not([hidden]),.main-panel:not(.sheet-mode)>.shared-panel:not([hidden]){display:block!important}.main-panel:not(.sheet-mode)>.sheet-preview-host{display:none!important}.sheet-preview-host{display:block;width:100%;height:100%;min-height:0}.sheet-preview-host iframe{display:block;width:100%;height:100%;border:0;background:#eef3f9}.nav button[data-page="集計頁"]+ .nav-group-space + #interviewSheetPreviewLink{background:#eaf2fc;border-color:#d2e2f6;color:#275c9b}.main{min-height:0!important;overflow:hidden!important}@media(max-width:850px){.sheet-preview-host iframe{min-height:100%}}</style><style id="sheet-visibility-override">.main-panel.sheet-mode>.sheet-preview-host{display:block!important;visibility:visible!important;position:relative!important;flex:1 1 auto!important;min-height:0!important;height:100%!important}.main-panel.sheet-mode>.sheet-preview-host iframe{display:block!important;width:100%!important;height:100%!important;visibility:visible!important}.main-panel.sheet-mode>.today-panel,.main-panel.sheet-mode>.shared-panel,.main-panel.sheet-mode>#registrationPanel,.main-panel.sheet-mode>#applicantDetail{display:none!important}.main-panel.sheet-mode{display:flex!important;flex-direction:column!important;min-height:0!important}</style><style id="applicant-detail-scroll-restoration">
 /* Keep the two history columns bounded by the viewport, each independently scrollable. */
@@ -1185,40 +1185,38 @@ const priorMediaRaw=new Map();for(const x of priorSheets)for(const name of sheet
 const priorMedia=groupedMediaCounts(priorMediaRaw);
 const currentAttendanceAvailable=storeMetricsSheetsStatus==='ready'&&attendedSheets.length>0;
 const priorAttendanceAvailable=storeMetricsSheetsStatus==='ready'&&priorSheets.length>0;
-const priorInquiriesAvailable=allApplicants.some(a=>firstDate(a).slice(0,7)===previousKey);
-const labels=[...new Set([...mediaNow.keys(),...mediaPrev.keys(),...attendedMedia.keys(),...priorMedia.keys()])].sort((a,b)=>(mediaNow.get(b)||0)-(mediaNow.get(a)||0)||a.localeCompare(b,'ja'));const mediaColorByName=new Map([...mediaNow].map(([name])=>[name,mediaColor(name)]));
-if((lineReady||storeMetricsSheetsStatus==='ready')&&labels.length){
-const legend=document.createElement('div');legend.style.cssText='display:flex;gap:18px;font-size:13px;font-weight:700;margin:10px 0';
-for(const [name,color] of [['今月','#168CF2'],[priorInquiriesAvailable?'先月':'先月（媒体データ未取得）','#AEB7C5']]){const item=document.createElement('span');item.style.cssText='display:inline-flex;align-items:center;gap:6px';const square=document.createElement('span');square.style.cssText='width:13px;height:13px;background:'+color;item.append(square,document.createTextNode(name));legend.append(item)}legend.insertAdjacentText('beforeend','　太：問い合わせ／細：面接実施');compare.append(legend);
-const max=Math.max(1,...labels.flatMap(k=>[mediaNow.get(k)||0,mediaPrev.get(k)||0,attendedMedia.get(k)||0,priorMedia.get(k)||0]));
-const graph=document.createElement('div');graph.className='store-metrics-comparison-graph';graph.style.cssText='display:flex;gap:5px;height:265px;align-items:stretch;border-bottom:1px solid #cbd5e1;padding-top:12px';
-for(const name of labels){
-const col=document.createElement('div');col.style.cssText='flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end';
-const pair=document.createElement('div');pair.style.cssText='height:215px;width:100%;display:flex;gap:2px;justify-content:center;align-items:flex-end';
-for(const [count,color,period,done,known] of [[mediaPrev.get(name)||0,'#DDE3EB','先月',priorMedia.get(name)||0,priorAttendanceAvailable],[mediaNow.get(name)||0,mediaColor(name),'今月',attendedMedia.get(name)||0,currentAttendanceAvailable]]){
-const holder=document.createElement('div');holder.style.cssText='flex:1;min-width:0;max-width:34px;height:100%;position:relative;display:flex;justify-content:center;align-items:flex-end';
-const inquiryHeight=Math.max(count>0?4:0,count/max*155),doneHeight=known&&done>0?Math.max(4,done/max*155):0;
-const bar=document.createElement('div');bar.style.cssText='position:absolute;bottom:0;width:76%;max-width:26px;height:'+inquiryHeight+'px;background:linear-gradient(90deg,rgba(255,255,255,.25),transparent 28%,rgba(0,0,0,.1) 85%,rgba(255,255,255,.12)),linear-gradient(180deg,rgba(255,255,255,.6),rgba(255,255,255,.1) 22%,transparent 55%),'+color+';box-shadow:inset 1px 0 rgba(255,255,255,.28),inset -1px 0 rgba(0,0,0,.09);border-radius:3px 3px 0 0';
-holder.append(bar);
-if(doneHeight){const detail=document.createElement('div');detail.style.cssText='position:absolute;bottom:0;width:36%;max-width:13px;height:'+doneHeight+'px;background:linear-gradient(90deg,rgba(255,255,255,.25),rgba(0,0,0,.22)),linear-gradient(180deg,rgba(255,255,255,.35),transparent 30%),'+(period==='先月'?'#8C99AA':color)+';filter:brightness(.72);border:1px solid rgba(255,255,255,.7);border-bottom:0;border-radius:2px 2px 0 0;pointer-events:none';holder.append(detail)}
-if(count>0||doneHeight>0){
-const figures=document.createElement('div');figures.style.cssText='position:absolute;bottom:'+(Math.max(inquiryHeight,doneHeight)+5)+'px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:1px;white-space:nowrap;pointer-events:none;z-index:2;text-shadow:0 1px 0 #fff';
-const inquiries=document.createElement('span');inquiries.textContent=count;inquiries.style.cssText='font-size:14px;line-height:15px;font-weight:800;color:#182F4B';
-const attended=document.createElement('span');attended.textContent=known?done:'—';attended.style.cssText='font-size:13px;line-height:15px;font-weight:800;color:'+(known?'#D32940':'#8793A3');
-figures.append(inquiries,attended);holder.append(figures)}
-const otherRows=name==='その他'?otherMediaBreakdown(period==='先月'?mediaPrevRaw:mediaNowRaw):[];
-const otherAttended=name==='その他'?otherMediaBreakdown(period==='先月'?priorMediaRaw:attendedMediaRaw):[];
-holder.title=name+' '+period+'｜問い合わせ '+count+'件｜面接実施 '+(known?done+'件':'データなし')+(otherRows.length?'\n問い合わせ内訳\n'+otherRows.join('\n'):'')+(otherAttended.length?'\n面接実施内訳\n'+otherAttended.join('\n'):'');pair.append(holder)}
-const label=document.createElement('div');label.textContent=mediaChartLabel(name);
-label.title=name==='その他'?[
- 'その他の媒体内訳',
- '今月・問い合わせ',...otherMediaBreakdown(mediaNowRaw),
- '先月・問い合わせ',...otherMediaBreakdown(mediaPrevRaw),
- '今月・面接実施',...otherMediaBreakdown(attendedMediaRaw),
- '先月・面接実施',...otherMediaBreakdown(priorMediaRaw)
-].join('\n'):name;label.style.cssText='font-size:10px;font-weight:700;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;margin-top:7px';
-col.append(pair,label);graph.append(col)}compare.append(graph)
-}else{const empty=document.createElement('p');empty.textContent=lineReady?'媒体情報なし':'LINEデータ未取得';compare.append(empty)}
+/* 2026-11-03: compact, full-height 7-row x 2-column attendance-only comparison. */
+const comparisonMedia=[...new Set([...mediaNames,'HP','記載なし',...attendedMedia.keys(),...priorMedia.keys()])];
+comparisonMedia.sort((a,b)=>{
+ if(a==='記載なし')return 1;if(b==='記載なし')return -1;
+ return (attendedMedia.get(b)||0)-(attendedMedia.get(a)||0)||a.localeCompare(b,'ja');
+});
+compare.style.padding='7px 9px';
+if(storeMetricsSheetsStatus==='ready'){
+ const max=Math.max(1,...comparisonMedia.flatMap(name=>[attendedMedia.get(name)||0,priorMedia.get(name)||0]));
+ const graph=document.createElement('div');
+ graph.className='store-metrics-comparison-graph';
+ graph.style.cssText='display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(7,minmax(0,1fr));grid-auto-flow:column;column-gap:16px;row-gap:3px;height:100%;min-height:0;width:100%;overflow-y:auto;overflow-x:hidden';
+ if(comparisonMedia.length>14)graph.style.gridTemplateRows='repeat('+Math.ceil(comparisonMedia.length/2)+',minmax(39px,1fr))';
+ for(const name of comparisonMedia){
+  const item=document.createElement('div');item.style.cssText='min-width:0;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:3px;overflow:hidden';
+  const heading=document.createElement('div');heading.textContent=mediaChartLabel(name);heading.title=name;heading.style.cssText='font-size:12px;font-weight:800;line-height:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#24354a';
+  item.append(heading);
+  for(const [period,count,color] of [['先月',priorMedia.get(name)||0,'#AEB7C5'],['当月',attendedMedia.get(name)||0,mediaColor(name)]]){
+   const line=document.createElement('div');line.style.cssText='display:flex;align-items:center;gap:5px;min-width:0;height:9px';
+   const track=document.createElement('div');track.style.cssText='flex:1;min-width:0;height:9px;background:#eff3f7;border-radius:3px;overflow:hidden';
+   const bar=document.createElement('div');bar.style.cssText='height:100%;width:'+(count/max*100)+'%;background:'+color+';border-radius:3px;box-shadow:inset 0 1px rgba(255,255,255,.28)';
+   track.append(bar);
+   const number=document.createElement('span');number.textContent=String(count);number.style.cssText='width:24px;flex:none;text-align:right;font-size:11px;font-weight:800;line-height:10px;color:#26354b;font-variant-numeric:tabular-nums';
+   line.title=name+' '+period+' 面接実施 '+count+'件';
+   line.append(track,number);item.append(line);
+  }
+  graph.append(item);
+ }
+ compare.append(graph);
+}else{
+ const empty=document.createElement('p');empty.textContent='面接実施データ未取得';compare.append(empty);
+}
 chart.append(compare);root.append(chart);
 }
 function showHome(){document.getElementById('storeMetrics').hidden=true; currentPage='今日の予定';refreshInterviewLists(); $('registrationPanel').hidden=true;registrationSelectionSync=null;$('applicantDetail').hidden=true;detailReturn=null;$('todayPanel').hidden=false;$('sharedPanel').hidden=true;document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('active',x.dataset.page==='今日の予定'));$('todayDate').textContent=dateKey(now)}function showCommon(page){if(page==='集計頁'){document.getElementById('myPagePanel').hidden=true;showStoreMetrics();return}document.getElementById('myPagePanel').hidden=true;document.getElementById('storeMetrics').hidden=true;if(page==='来世期待')refreshAfterlifeList();if(page==='LINE通知'){syncLineNewCount(true);updateSidebarCounts()}else refreshInterviewLists();$('registrationPanel').hidden=true;registrationSelectionSync=null;$('applicantDetail').hidden=true;detailReturn=null;currentPage=page;pageNumber=1;$('listShopFilter').value='all';$('todayPanel').hidden=true;$('sharedPanel').hidden=false;renderList()}document.getElementById('listShopFilter').addEventListener('change',()=>{pageNumber=1;renderList()});const $=id=>document.getElementById(id),dateKey=d=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
