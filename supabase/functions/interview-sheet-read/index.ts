@@ -11,11 +11,35 @@ Deno.serve(async(req:Request)=>{
  if(!url||!key)return respond({error:"configuration"},503);
  const db=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
  let body:any;try{body=await req.json()}catch{return respond({error:"invalid"},400)}
- if(!["list_sheets","update_sheet","link_sheet","unlink_sheet","decide_sheet","get_roster"].includes(body?.action))return respond({error:"action"},400);
+ if(!["list_sheets","create_sheet","update_sheet","link_sheet","unlink_sheet","decide_sheet","get_roster"].includes(body?.action))return respond({error:"action"},400);
  const token=body?.token;
  if(typeof token!=="string"||!/^[a-f0-9]{64}$/.test(token))return respond({error:"unauthorized"},401);
  const {data:session,error:sessionError}=await db.from("interview_access_sessions").select("expires_at").eq("token_digest",await digest(token)).maybeSingle();
  if(sessionError||!session||new Date(session.expires_at).getTime()<=Date.now())return respond({error:"unauthorized"},401);
+ if(body.action==="create_sheet"){
+  const sheet=body.sheet;
+  if(!sheet||typeof sheet!=="object"||Array.isArray(sheet))return respond({error:"invalid_payload"},400);
+  const name=typeof sheet.name==="string"?sheet.name.trim():"";
+  const kana=typeof sheet.kana==="string"?sheet.kana.trim():"";
+  if(!name||!kana||name.length>200||kana.length>200)return respond({error:"invalid_name"},400);
+  const allowed=["name","kana","birth_date","phone","street","recruit_source","id_type","smoking","tattoo"];
+  const insert:any={name,kana};
+  for(const field of allowed.filter(x=>x!=="name"&&x!=="kana")){
+   const value=sheet[field];
+   if(value===undefined||value===null||value==="")continue;
+   if(typeof value!=="string"||value.length>2000)return respond({error:"invalid_field",field},400);
+   insert[field]=value.trim()||null;
+  }
+  if(insert.birth_date&&!/^\\d{4}-\\d{2}-\\d{2}$/.test(insert.birth_date))return respond({error:"invalid_birth_date"},400);
+  if(sheet.manual_age!==undefined&&sheet.manual_age!==""){
+   const age=Number(sheet.manual_age);
+   if(!Number.isInteger(age)||age<0||age>120)return respond({error:"invalid_age"},400);
+   insert.manual_age=age;
+  }
+  const {data:created,error:createError}=await db.from("interview_applicants").insert(insert).select("id,name,kana,birth_date,phone,street,recruit_source,id_type,smoking,tattoo,manual_age,submitted_at,status,shop").single();
+  if(createError)return respond({error:"create_failed"},503);
+  return respond({ok:true,sheet:created});
+ }
  if(body.action==="get_roster"){
   const sheetId=body.sheet_id;
   if(typeof sheetId!=="string"||!/^[0-9a-f-]{36}$/i.test(sheetId))return respond({error:"invalid_sheet"},400);
