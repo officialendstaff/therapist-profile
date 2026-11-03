@@ -22,7 +22,7 @@ Deno.serve(async(req:Request)=>{
   const name=typeof sheet.name==="string"?sheet.name.trim():"";
   const kana=typeof sheet.kana==="string"?sheet.kana.trim():"";
   if(!name||!kana||name.length>200||kana.length>200)return respond({error:"invalid_name"},400);
-  const allowed=["name","kana","birth_date","phone","street","recruit_source","id_type","smoking","tattoo"];
+  const allowed=["name","kana","birth_date","phone","street","recruit_source","id_type","smoking","tattoo","shop","stage_name"];
   const insert:any={name,kana};
   for(const field of allowed.filter(x=>x!=="name"&&x!=="kana")){
    const value=sheet[field];
@@ -30,13 +30,16 @@ Deno.serve(async(req:Request)=>{
    if(typeof value!=="string"||value.length>2000)return respond({error:"invalid_field",field},400);
    insert[field]=value.trim()||null;
   }
+  const allowedShops=["Grand Luxe","LUXY OSAKA","薔薇と紳士","Un Secret","BUSTY OSAKA"];
+  if(!insert.shop||!allowedShops.includes(insert.shop))return respond({error:"invalid_shop"},400);
+  if(insert.stage_name&&insert.stage_name.length>100)return respond({error:"invalid_stage_name"},400);
   if(insert.birth_date&&!/^\d{4}-\d{2}-\d{2}$/.test(insert.birth_date))return respond({error:"invalid_birth_date"},400);
   if(sheet.manual_age!==undefined&&sheet.manual_age!==""){
    const age=Number(sheet.manual_age);
    if(!Number.isInteger(age)||age<0||age>120)return respond({error:"invalid_age"},400);
    insert.manual_age=age;
   }
-  const {data:created,error:createError}=await db.from("interview_applicants").insert(insert).select("id,name,kana,birth_date,phone,street,recruit_source,id_type,smoking,tattoo,manual_age,submitted_at,status,shop").single();
+  const {data:created,error:createError}=await db.from("interview_applicants").insert(insert).select("id,name,kana,birth_date,phone,street,recruit_source,id_type,smoking,tattoo,manual_age,submitted_at,status,shop,stage_name").single();
   if(createError)return respond({error:"create_failed"},503);
   return respond({ok:true,sheet:created});
  }
