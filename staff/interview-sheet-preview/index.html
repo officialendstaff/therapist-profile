@@ -1027,7 +1027,7 @@ const months=Array.from({length:12},(_,i)=>{const d=new Date(yr,mo-12+i,1);retur
 const monthlyApplicants=months.map(inquiryCountForMonth);
 const monthlyInterviews=months.map(key=>interviewReady?allInterviews.filter(r=>String(r.date||'').slice(0,7)===key&&['採用','不採用','辞退','来店済み','在籍','入店'].includes(r.status)).length:null);
 const left=panel('');
-bars(left,months.map(k=>String(Number(k.slice(5)))+'月'),[{name:'問い合わせ',color:'#F24D99',values:monthlyApplicants},{name:'面接実施',color:'#1688F0',values:monthlyInterviews}]);chart.append(left);
+bars(left,months.map(k=>String(Number(k.slice(5)))+'月'),[{name:'問い合わせ',color:'#1688F0',values:monthlyApplicants},{name:'面接実施',color:'#F24D99',values:monthlyInterviews}]);chart.append(left);
 const hourly=Array.from({length:24},()=>0);
 if(lineReady)for(const a of allApplicants){const d=firstDate(a);if(!d)continue;const hour=new Date(d).getHours();if(hour>=0&&hour<24)hourly[hour]++}
 const right=panel('');
