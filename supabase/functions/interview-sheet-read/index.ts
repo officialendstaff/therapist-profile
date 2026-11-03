@@ -30,7 +30,7 @@ Deno.serve(async(req:Request)=>{
    if(typeof value!=="string"||value.length>2000)return respond({error:"invalid_field",field},400);
    insert[field]=value.trim()||null;
   }
-  if(insert.birth_date&&!/^\\d{4}-\\d{2}-\\d{2}$/.test(insert.birth_date))return respond({error:"invalid_birth_date"},400);
+  if(insert.birth_date&&!/^\d{4}-\d{2}-\d{2}$/.test(insert.birth_date))return respond({error:"invalid_birth_date"},400);
   if(sheet.manual_age!==undefined&&sheet.manual_age!==""){
    const age=Number(sheet.manual_age);
    if(!Number.isInteger(age)||age<0||age>120)return respond({error:"invalid_age"},400);
