@@ -144,6 +144,21 @@ async function launchPrintRoster(){
 </script>
 
 
+
+<style id="hire-entry-component-styles">
+.hire-entry-section{border-color:#cbdced!important}
+.hire-entry-section>h3{background:#eaf2fd;color:#294a71}
+.hire-entry-section .section-inner{padding:10px 12px}
+.hire-entry-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 90px;gap:10px;align-items:end}
+.hire-entry-grid label{display:flex;flex-direction:column;gap:5px;color:#33465d;font-size:11px;font-weight:700;min-width:0}
+.hire-required{color:#af3946;font-size:10px}
+.hire-optional{color:#687a8f;font-size:10px}
+#hireEntryShop,#hireEntryStage{display:block;width:100%;min-width:0;min-height:34px;padding:6px 9px;border:1px solid #bfcee1;border-radius:5px;background:#fff;color:#27364a;font:inherit;font-size:12px}
+#hireEntrySave{width:90px;min-height:34px;border:1px solid #3675b5;border-radius:5px;background:#3675b5;color:#fff;font-size:12px;font-weight:700}
+#hireEntrySave:disabled{opacity:.55;cursor:wait}
+.hire-entry-note{font-size:11px;min-height:1em;margin-top:6px;color:#4b637f}
+@media(max-width:760px){.hire-entry-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}#hireEntrySave{grid-column:1/-1;width:100%}}
+</style>
 <style id="interview-sheet-readable-type-20261103">
 /* Desktop interview sheet readability; preserve existing layout and mobile rules. */
 @media (min-width: 761px) {
@@ -170,20 +185,6 @@ async function launchPrintRoster(){
   .sheet-create-form label, .sheet-create-chip-field>strong {font-size:14px!important}
   .sheet-create-form input,.sheet-create-form select,.sheet-create-form button {font-size:15px!important}
 }
-</style>
-<style id="hire-entry-component-styles">
-.hire-entry-section{border-color:#cbdced!important}
-.hire-entry-section>h3{background:#eaf2fd;color:#294a71}
-.hire-entry-section .section-inner{padding:10px 12px}
-.hire-entry-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 90px;gap:10px;align-items:end}
-.hire-entry-grid label{display:flex;flex-direction:column;gap:5px;color:#33465d;font-size:11px;font-weight:700;min-width:0}
-.hire-required{color:#af3946;font-size:10px}
-.hire-optional{color:#687a8f;font-size:10px}
-#hireEntryShop,#hireEntryStage{display:block;width:100%;min-width:0;min-height:34px;padding:6px 9px;border:1px solid #bfcee1;border-radius:5px;background:#fff;color:#27364a;font:inherit;font-size:12px}
-#hireEntrySave{width:90px;min-height:34px;border:1px solid #3675b5;border-radius:5px;background:#3675b5;color:#fff;font-size:12px;font-weight:700}
-#hireEntrySave:disabled{opacity:.55;cursor:wait}
-.hire-entry-note{font-size:11px;min-height:1em;margin-top:6px;color:#4b637f}
-@media(max-width:760px){.hire-entry-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}#hireEntrySave{grid-column:1/-1;width:100%}}
 </style>
 <script>
 function normalizedHiringShop(value){
