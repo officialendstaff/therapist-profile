@@ -11,7 +11,7 @@ Deno.serve(async(req:Request)=>{
  if(!url||!key)return respond({error:"configuration"},503);
  const db=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
  let body:any;try{body=await req.json()}catch{return respond({error:"invalid"},400)}
- if(!["list_sheets","create_sheet","update_sheet","link_sheet","unlink_sheet","decide_sheet","get_roster"].includes(body?.action))return respond({error:"action"},400);
+ if(!["list_sheets","create_sheet","hire_manual_sheet","update_sheet","link_sheet","unlink_sheet","decide_sheet","get_roster"].includes(body?.action))return respond({error:"action"},400);
  const token=body?.token;
  if(typeof token!=="string"||!/^[a-f0-9]{64}$/.test(token))return respond({error:"unauthorized"},401);
  const {data:session,error:sessionError}=await db.from("interview_access_sessions").select("expires_at").eq("token_digest",await digest(token)).maybeSingle();
@@ -39,6 +39,29 @@ Deno.serve(async(req:Request)=>{
   const {data:created,error:createError}=await db.from("interview_applicants").insert(insert).select("id,name,kana,birth_date,phone,street,recruit_source,id_type,smoking,tattoo,manual_age,submitted_at,status,shop").single();
   if(createError)return respond({error:"create_failed"},503);
   return respond({ok:true,sheet:created});
+ }
+ if(body.action==="hire_manual_sheet"){
+  const sheetId=body.sheet_id;
+  const shop=body.shop;
+  const stage=body.stage_name;
+  if(typeof sheetId!=="string"||!/^[0-9a-f-]{36}$/i.test(sheetId))return respond({error:"invalid_sheet"},400);
+  const allowedShops=["Grand Luxe","LUXY OSAKA","薔薇と紳士","Un Secret","BUSTY OSAKA"];
+  if(typeof shop!=="string"||!allowedShops.includes(shop))return respond({error:"invalid_hire_shop"},400);
+  if(typeof stage!=="string"||stage.trim().length>100)return respond({error:"invalid_stage_name"},400);
+  const {data:linked,error:linkError}=await db.from("staff_interview_form_links").select("interview_id").eq("interview_applicant_id",sheetId).limit(1);
+  if(linkError)return respond({error:"link_read_failed"},503);
+  if(linked?.length)return respond({error:"linked_interview_use_decision"},409);
+  const {data:current,error:readError}=await db.from("interview_applicants").select("id,status").eq("id",sheetId).maybeSingle();
+  if(readError)return respond({error:"read_failed"},503);
+  if(!current)return respond({error:"not_found"},404);
+  if(["不採用","辞退"].includes(current.status))return respond({error:"closed_sheet"},409);
+  if(!["面接前","採用","在籍","入店"].includes(current.status))return respond({error:"invalid_status"},409);
+  const patch:any={hire_shop:shop,stage_name:stage.trim()||null,updated_at:new Date().toISOString()};
+  if(current.status==="面接前")patch.status="採用";
+  const {data:updated,error:updateError}=await db.from("interview_applicants").update(patch).eq("id",sheetId).eq("status",current.status).select("id,status,hire_shop,stage_name").maybeSingle();
+  if(updateError)return respond({error:"hire_save_failed"},503);
+  if(!updated)return respond({error:"status_changed_retry"},409);
+  return respond({ok:true,sheet:updated});
  }
  if(body.action==="get_roster"){
   const sheetId=body.sheet_id;
