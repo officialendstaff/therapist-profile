@@ -449,7 +449,7 @@ async function load(){
 if(!authorized)return;showMsg("Supabaseを読み込み中…");
 const start=month+"-01",end=dayStr(daysIn());
 const [a,b,c,d,e,future,sv,sl]=await Promise.all([
-client.from("exa_shift_therapists").select("exa_id,stage_name,residency,evaluation_score").eq("store_code","rose"),
+client.from("exa_shift_therapists").select("exa_id,stage_name,residency,employment_status,evaluation_score").eq("store_code","rose"),
 client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_dummy_shift,is_pre_off").eq("store_code","rose").gte("work_date",start).lte("work_date",end).order("work_date"),
 client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code","rose").gte("work_date",start).lte("work_date",end),
 client.from("exa_shift_sync_runs").select("finished_at,record_count,mode").eq("store_code","rose").eq("state","success").order("finished_at",{ascending:false}).limit(1),
@@ -493,7 +493,7 @@ let staffView="real";
 function renderMonthly(){
 const existing=staffById(), byId=new Map();
 for(const r of shifts){if(!byId.has(r.exa_id))byId.set(r.exa_id,new Map());byId.get(r.exa_id).set(r.work_date,r);}
-const real=therapists.filter(t=>t.residency!=="dummy").sort((a,b)=>Number(byId.has(b.exa_id))-Number(byId.has(a.exa_id))||a.exa_id-b.exa_id);
+const real=therapists.filter(t=>t.residency!=="dummy"&&t.employment_status!=="departed").sort((a,b)=>Number(byId.has(b.exa_id))-Number(byId.has(a.exa_id))||a.exa_id-b.exa_id);
 const dummy=therapists.filter(t=>t.residency==="dummy"&&byId.has(t.exa_id)).sort((a,b)=>a.exa_id-b.exa_id);
 const per=new Map(performances.map(p=>[p.exa_id+"|"+p.work_date,p.customer_count]));
 const absence=new Set(performances.filter(p=>p.attendance_status==="absent").map(p=>p.exa_id+"|"+p.work_date));
