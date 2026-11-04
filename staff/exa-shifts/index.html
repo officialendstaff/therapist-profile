@@ -419,7 +419,7 @@ const showMsg=(message,error=false)=>{
  el.textContent=message;
  el.className=error?"error":"muted";
  el.classList.toggle("toast-visible",Boolean(message));
- if(message)messageTimer=setTimeout(()=>{el.classList.remove("toast-visible");},error?8000:4200);
+ if(message && !(/取得中|反映中|読み込み中/.test(message)))messageTimer=setTimeout(()=>{el.classList.remove("toast-visible");},error?10000:5200);
 };
 async function loginCheck(){if(!client){$("loginError").textContent="認証ライブラリを読み込めません";return;}
 const {data:{session}}=await client.auth.getSession();if(!session){authorized=false;$("app").classList.add("hide");$("login").classList.remove("hide");return;}
@@ -846,6 +846,7 @@ $("prev").onclick=()=>{const d=new Date(month+"-01T00:00:00");d.setMonth(d.getMo
 $("next").onclick=()=>{const d=new Date(month+"-01T00:00:00");d.setMonth(d.getMonth()+1);month=[d.getFullYear(),String(d.getMonth()+1).padStart(2,"0")].join("-");load()};
 $("reload").onclick=load;
 let extensionBusy=false;
+let exaSyncStartedAt=0;
 const AUTO_KEY="exa-rose-auto-sync-v1";
 const LAST_KEY="exa-rose-last-sync-v1";
 const ATTEMPT_KEY="exa-rose-auto-attempt-v1";
@@ -891,7 +892,7 @@ async function fetchFromExaExtension(){
 async function synchronizeEXA(mode="manual"){
  if(!authorized||extensionBusy)return;
  const automatic=mode==="auto";
- extensionBusy=true;$("exaSync").disabled=true;$("autoSync").disabled=true;
+ extensionBusy=true;exaSyncStartedAt=Date.now();$("exaSync").disabled=true;$("exaSync").textContent=automatic?"自動更新中…":"更新中…";$("exaSync").title="EXAから取得しています。終了後に再度押せます。";$("autoSync").disabled=true;
  try{
   showMsg(automatic?"EXAを3時間定期取得中…":"EXAから最新30日分を読み込み中…");
   const result=await fetchFromExaExtension();
@@ -904,18 +905,21 @@ async function synchronizeEXA(mode="manual"){
   const {data:{session}}=await client.auth.getSession();
   if(!session)throw new Error("管理ページに再ログインしてください");
   showMsg("Supabaseに"+result.rows.length+"件を反映中…");
-  const res=await fetch(URL_SB+"/functions/v1/exa-shift-import",{
-    method:"POST",
+  const controller=new AbortController();
+  const importTimeout=setTimeout(()=>controller.abort(),45000);
+  let res;
+  try{res=await fetch(URL_SB+"/functions/v1/exa-shift-import",{
+    method:"POST",signal:controller.signal,
     headers:{"Content-Type":"application/json","apikey":KEY_SB,"Authorization":"Bearer "+session.access_token},
     body:JSON.stringify({rows:result.rows,source:"extension_snapshot",first:result.first,last:result.last,days:result.days})
-  });
+  });}finally{clearTimeout(importTimeout)}
   const data=await res.json();
   if(!res.ok||!data.ok)throw new Error(data.error||"Supabaseの更新に失敗しました");
   localStorage.setItem(LAST_KEY,String(Date.now()));
   await load();
   showMsg((automatic?"自動更新":"手動更新")+"完了："+data.imported+"件（"+result.first+"〜"+result.last+"）。出勤取消："+data.removed+"件。");
  }catch(err){showMsg((automatic?"自動更新":"今すぐ更新")+"に失敗："+String(err.message||err),true)}
- finally{extensionBusy=false;$("exaSync").disabled=false;$("autoSync").disabled=false}
+ finally{extensionBusy=false;exaSyncStartedAt=0;$("exaSync").disabled=false;$("exaSync").textContent="今すぐ更新";$("exaSync").title="Chrome拡張機能経由の手動更新";$("autoSync").disabled=false}
 }
 $("serverTest").onclick=async()=>{
  if(!authorized)return;
