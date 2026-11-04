@@ -3,15 +3,62 @@
 <title>薔薇と紳士｜出勤管理</title>
 <style>
 :root{font-family:Arial,"Noto Sans JP",sans-serif;color:#1e2c40;background:#f3f6fa}*{box-sizing:border-box}body{margin:0}header{background:#1b304c;color:#fff;padding:17px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}header h1{font-size:19px;margin:0}button,input,select{font:inherit}button{cursor:pointer;padding:9px 13px;border:1px solid #b6c6d8;border-radius:8px;background:#fff;color:#1c3858}button:disabled{opacity:.45;cursor:not-allowed}button.primary{background:#28659a;color:white;border-color:#28659a}main{max-width:1500px;margin:18px auto;padding:0 14px}.panel{background:white;border:1px solid #dde5ef;border-radius:12px;margin-bottom:14px;padding:16px;box-shadow:0 2px 8px #1b304c08}.muted{color:#677991;font-size:12px}.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.space{justify-content:space-between}.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.kpi{background:#f0f5fa;padding:14px;border-radius:9px}.kpi strong{display:block;font-size:24px}.hide{display:none!important}.table-scroll{overflow:auto;max-height:68vh}.shift-table{width:max-content;min-width:100%;border-collapse:separate;border-spacing:0;font-size:12px}.shift-table th,.shift-table td{border-bottom:1px solid #e5ebf2;border-right:1px solid #eef2f7;padding:4px;text-align:center;min-width:48px;height:36px}.shift-table th{position:sticky;top:0;background:#e9f0f9;z-index:2}.shift-table th:first-child,.shift-table td:first-child{position:sticky;left:0;min-width:118px;text-align:left;background:#fff;z-index:3}.shift-table th:first-child{background:#dbe8f6;z-index:4}.shift-table th button{padding:3px 6px;font-size:11px}.shift-table td.dummy{background:#faf4f6;color:#956675}.shift-table td.today{background:#e8f3ff}.shift-table tr.group td{background:#dde9f4!important;font-weight:bold;text-align:left;position:static}.shift-table input{width:43px;padding:5px 2px;border:1px solid #b5cee6;border-radius:5px;text-align:center;font-size:13px}.shift-table input:focus{outline:2px solid #4891d0}.shift-table td small{color:#68819b}.chart-scroll{overflow:auto}.timeline{border-collapse:separate;border-spacing:2px;font-size:11px;min-width:900px;width:100%}.timeline th,.timeline td{text-align:center;padding:4px;min-width:32px}.timeline td:first-child,.timeline th:first-child{min-width:110px;text-align:left;position:sticky;left:0;background:white}.timeline td.on{background:#a8d5f2}.timeline td.off{background:#edf1f5}.timeline .sum td{font-weight:bold;background:#e1edf8}.timeline .dummy-on{background:#ecdce2}.notice{padding:10px;border-radius:8px;background:#fff3da;color:#79541c}.error{color:#b12639}#login{max-width:430px;margin:60px auto}#login input{width:100%;padding:11px;margin:6px 0 14px;border:1px solid #cbd4e1;border-radius:7px}#message{margin-top:10px}.tag{font-size:11px;background:#e1eaf5;padding:4px 7px;border-radius:12px}footer{padding:24px;font-size:11px;color:#7a8ba0;text-align:center}@media(max-width:720px){.kpis{grid-template-columns:repeat(2,1fr)}.panel{padding:10px}header{padding:12px}header h1{font-size:16px}}
+
+/* PC attendance dashboard */
+:root{font-family:"Noto Sans JP",Arial,sans-serif}
+body{min-width:1180px;background:#f0f3f7}
+.work-header{position:sticky;top:0;z-index:20;min-height:66px;padding:11px 22px;flex-wrap:nowrap;gap:20px}
+.brand{display:flex;align-items:baseline;gap:12px;white-space:nowrap}
+.brand h1{font-size:19px;letter-spacing:.04em}.brand-sub{font-size:9px;opacity:.52;letter-spacing:.14em}
+.head-controls{display:flex;gap:9px;align-items:center;justify-content:flex-end;flex-wrap:nowrap}
+.head-controls button{white-space:nowrap;font-size:12px;padding:8px 10px}
+.store-label{display:flex;align-items:center;gap:7px;font-size:11px;color:#cad9ea;white-space:nowrap}
+.store-label select{background:#2d4664;color:#fff;border:1px solid #526781;border-radius:6px;padding:8px 9px;font-size:12px;min-width:140px}
+.head-month{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.head-month strong{font-size:13px;min-width:88px;text-align:center}
+.head-month button{background:#294563;color:white;border:1px solid #4e6885}
+.settings-menu{position:relative}.settings-menu summary{list-style:none;cursor:pointer;border:1px solid #506985;background:#2b4360;border-radius:7px;padding:9px 12px;color:white;font-size:12px;white-space:nowrap}
+.settings-menu summary::-webkit-details-marker{display:none}
+.settings-panel{position:absolute;right:0;top:calc(100% + 8px);display:flex;flex-direction:column;gap:6px;min-width:210px;background:#fff;border:1px solid #dae3ee;box-shadow:0 8px 26px #0b27452b;border-radius:9px;padding:10px;z-index:30}
+.settings-panel button{text-align:left;color:#253b55;background:#fff;border:0;border-radius:5px}.settings-panel button:hover{background:#edf3fa}
+.login-tag{font-size:10px!important}
+main{max-width:none;margin:11px auto;padding:0 14px}
+.monthly-panel{padding:10px 12px;min-height:calc(100vh - 130px)}
+.month-heading{padding:0 2px 7px}.month-heading h2{font-size:16px;margin:0}.month-heading .muted{font-size:10px}
+.table-scroll{max-height:calc(100vh - 178px);overflow:auto}
+.shift-table{table-layout:fixed;width:100%;min-width:1180px;font-size:10px}
+.shift-table th,.shift-table td{height:29px;min-width:0;padding:2px 1px;white-space:nowrap;overflow:hidden;text-overflow:clip}
+.shift-table th:first-child,.shift-table td:first-child{width:125px;min-width:125px;padding-left:5px}
+.shift-table th:not(:first-child),.shift-table td:not(:first-child){font-size:9px}
+.shift-table th button{font-size:10px;border:none;background:transparent;padding:2px 1px;font-weight:600}
+.shift-table tr.group td{height:24px}
+.shift-table input{width:28px;padding:3px 1px;font-size:10px}
+.shift-table td.today{background:#e1edf9}
+.day-modal{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:25px}
+.day-modal-shade{position:absolute;inset:0;background:#11213999}
+.day-modal-content{position:relative;z-index:1;width:min(1500px,96vw);max-height:90vh;overflow:auto;box-shadow:0 20px 65px #081e3c40;padding:18px}
+.day-modal-content h2{font-size:17px;margin:0}
+#closeDay{background:#f3f6fa}
+footer{display:none}
 </style></head>
 <body>
-<header><h1>薔薇と紳士｜出勤管理</h1><div class="row"><span id="authLabel" class="muted" style="color:#d5e1f1"></span><button id="logout" class="hide">ログアウト</button></div></header>
+<header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
+<label class="store-label">店舗 <select id="storeSelect" aria-label="店舗切替"><option value="rose">薔薇と紳士</option></select></label>
+<div class="head-month"><button id="prev" title="前月">◀</button><strong id="monthLabel"></strong><button id="next" title="翌月">▶</button></div>
+<button id="exaSync" class="primary" title="Chrome拡張機能経由の手動更新">今すぐ更新</button>
+<details class="settings-menu"><summary>その他 <span aria-hidden="true">▾</span></summary><div class="settings-panel">
+<button id="reload">保存データを再読込</button>
+<button id="csvImport">EXA CSV取込・更新</button><input id="csvFile" type="file" accept=".csv,text/csv" style="display:none">
+<button id="serverTest" title="読み取り専用で30日分検証">サーバー30日検証</button>
+<button id="autoSync" title="Chrome起動中の自動更新">ブラウザ自動：OFF</button>
+</div></details><span id="authLabel" class="muted login-tag" style="color:#d5e1f1"></span><button id="logout" class="hide">ログアウト</button>
+</div></header>
 <section id="login" class="panel"><h2>スタッフログイン</h2><p class="muted">面接管理で使用しているSupabaseアカウントでログインしてください。閲覧は承認済み管理者に限定しています。</p><form id="loginForm"><label>メールアドレス<input id="email" type="email" autocomplete="username" required></label><label>パスワード<input id="password" type="password" autocomplete="current-password" required></label><button class="primary" type="submit">ログイン</button></form><p id="loginError" class="error"></p></section>
 <main id="app" class="hide">
-<div class="panel row space"><div class="row"><button id="prev">◀</button><strong id="monthLabel"></strong><button id="next">▶</button><span class="tag">薔薇と紳士</span></div><div class="row"><button id="reload" class="primary">保存データを再読込</button><button id="csvImport">EXA CSV取込・更新</button><input id="csvFile" type="file" accept=".csv,text/csv" style="display:none"><button id="exaSync" class="primary" title="Chrome拡張機能とログイン済みEXAが必要です">今すぐ更新</button><button id="serverTest" type="button" title="EXAのサーバー側ログインを読み取り専用で検証します">サーバー30日検証</button><button id="autoSync" type="button" title="この管理ページとEXAの日別スケジュールをChromeで開いている間だけ3時間ごとに自動同期します">ブラウザ自動：OFF</button></div></div>
+
 <p id="message" class="muted" aria-live="polite" style="margin:0 0 8px"></p>
-<div class="panel"><div class="row space"><h2>月間シフト</h2><span class="muted">過去日の数字＝接客本数（空欄は未入力）／当日以降＝出勤時間</span></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
-<div class="panel" id="dayPanel"><div class="row space"><h2 id="dayTitle">日別タイムチャート</h2><span class="muted">時間帯別の実出勤人数のみ集計。ダミーは下段に表示。</span></div><div id="timeline"></div></div>
+<div class="panel monthly-panel"><div class="row space month-heading"><h2>月間シフト</h2><span class="muted">日付を選択すると日別の出勤状況が開きます</span></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
+<div id="dayPanel" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="dayTitle"><div class="day-modal-shade" id="dayBackdrop"></div><div class="day-modal-content panel"><div class="row space"><h2 id="dayTitle">日別タイムチャート</h2><button id="closeDay" type="button" aria-label="閉じる">閉じる ×</button></div><div id="timeline"></div></div></div>
 </main><footer>EXA管理ページの登録内容は変更しません。接客本数のみSupabaseへ保存します。</footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.10/dist/umd/supabase.min.js"></script>
 <script>
@@ -77,7 +124,7 @@ html+="</td>";
 html+='<td><strong>'+avg+'</strong></td></tr>';
 }}
 html+="</tbody>";$("monthly").innerHTML=html;
-$("monthly").querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{selected=b.dataset.day;renderDay();$("dayPanel").scrollIntoView({behavior:"smooth",block:"start"})});
+$("monthly").querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{selected=b.dataset.day;renderDay();$("dayPanel").classList.remove("hide")});
 $("monthly").querySelectorAll("input[data-id]").forEach(input=>input.onchange=()=>savePerformance(input));
 }
 async function savePerformance(input){const id=Number(input.dataset.id),work_date=input.dataset.date,v=input.value.trim();
@@ -249,5 +296,9 @@ $("csvFile").onchange=async e=>{
  }catch(error){showMsg("取込失敗："+String(error.message||error),true)}
  finally{button.disabled=false;e.target.value=""}
 };
+$("closeDay").onclick=()=>{$("dayPanel").classList.add("hide")};
+$("dayBackdrop").onclick=$("closeDay").onclick;
+document.addEventListener("keydown",e=>{if(e.key==="Escape")$("dayPanel").classList.add("hide")});
+$("storeSelect").onchange=()=>{if($("storeSelect").value!=="rose")showMsg("他店舗のEXA連携は準備中です。",true)};
 loginCheck();
 </script></body></html>
