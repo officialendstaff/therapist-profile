@@ -872,6 +872,15 @@ $("autoSync").onclick=()=>{
 };
 
 const bridgeRequests=new Map();
+let syncAbortRequested=false;
+function cancelEXASync(){
+ syncAbortRequested=true;
+ for(const [requestId,pending] of bridgeRequests){
+  clearTimeout(pending.timer);
+  pending.reject(new Error("EXAの取得を中止しました。"));
+  bridgeRequests.delete(requestId);
+ }
+}
 window.addEventListener("message",event=>{
  if(event.source!==window||event.origin!==location.origin||event.data?.source!=="exa-shift-extension")return;
  if(event.data.action==="ready"){$("exaSync").title="拡張機能を検出しました";}
@@ -885,18 +894,21 @@ window.addEventListener("message",event=>{
 async function fetchFromExaExtension(){
  const requestId=(crypto.randomUUID?.()||Math.random().toString(16).slice(2)+Date.now().toString(16));
  return new Promise((resolve,reject)=>{
-  const timer=setTimeout(()=>{bridgeRequests.delete(requestId);reject(new Error("拡張機能から応答がありません。拡張機能の導入・有効化とEXAのタブを確認してください。"));},90000);
-  bridgeRequests.set(requestId,{resolve,timer});
+  const timer=setTimeout(()=>{bridgeRequests.delete(requestId);reject(new Error("90秒以内にChrome拡張機能から応答がありませんでした。EXAのタブと拡張機能の有効状態を確認してください。"));},90000);
+  bridgeRequests.set(requestId,{resolve,reject,timer});
   window.postMessage({source:"exa-shift-page",action:"fetch-shifts",requestId},location.origin);
  });
 }
 async function synchronizeEXA(mode="manual"){
  if(!authorized||extensionBusy)return;
  const automatic=mode==="auto";
- extensionBusy=true;exaSyncStartedAt=Date.now();$("exaSync").disabled=true;$("exaSync").textContent=automatic?"自動更新中…":"更新中…";$("exaSync").title="EXAから取得しています。終了後に再度押せます。";$("autoSync").disabled=true;
+ syncAbortRequested=false;
+ extensionBusy=true;exaSyncStartedAt=Date.now();$("exaSync").disabled=false;$("exaSync").textContent="更新を中止";$("exaSync").title="EXAの取得待ちを中止します（保存済みデータは変更しません）";$("autoSync").disabled=true;
  try{
   showMsg(automatic?"EXAを3時間定期取得中…":"EXAから最新30日分を読み込み中…");
   const result=await fetchFromExaExtension();
+  if(syncAbortRequested)throw new Error("EXAの取得を中止しました。");
+  $("exaSync").disabled=true;$("exaSync").textContent="反映中…";
   if(!result?.ok)throw new Error(result?.error||"取得できませんでした");
   if(!Array.isArray(result.rows)||!result.rows.length||result.days!==30)throw new Error("取得内容が不完全です。既存データは変更しません");
   if(automatic && result.first!==asTokyoDate())throw new Error("EXAの日別スケジュールが本日("+asTokyoDate()+")ではありません。EXAで本日を表示してください。");
@@ -931,7 +943,7 @@ $("unscheduledAdd").onclick=async()=>{
  const idText=prompt("EXAのセラピスト登録画面に表示されているIDを入力してください。\n出勤予定がない人も登録できます。");
  if(idText===null)return;
  const trimmed=idText.trim();
- if(!/^\\d{1,6}$/.test(trimmed)||Number(trimmed)<1||Number(trimmed)>100000){showMsg("EXA IDは1～100000の整数で入力してください。",true);return;}
+ if(!/^\d{1,6}$/.test(trimmed)||Number(trimmed)<1||Number(trimmed)>100000){showMsg("EXA IDは1～100000の整数で入力してください。",true);return;}
  const id=Number(trimmed);
  const nameInput=prompt("EXAに登録されている源氏名を入力してください。\nEXAの登録画面と同じ表記で入力してください。");
  if(nameInput===null)return;
@@ -970,7 +982,7 @@ $("serverTest").onclick=async()=>{
  }catch(e){showMsg("サーバー接続テスト失敗："+String(e.message||e),true)}
  finally{button.disabled=false}
 };
-$("exaSync").onclick=()=>synchronizeEXA("manual");
+$("exaSync").onclick=()=>extensionBusy?cancelEXASync():synchronizeEXA("manual");
 async function checkAuto(){
  if(!autoEnabled||!authorized||extensionBusy)return;
  const now=Date.now();
