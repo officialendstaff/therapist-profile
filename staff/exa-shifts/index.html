@@ -48,6 +48,28 @@ footer{display:none}
 .staff-filter{display:flex;gap:1px;background:#edf1f5;border:1px solid #dce6ef;border-radius:7px;padding:2px;margin-left:auto}
 .staff-filter button{border:0;background:transparent;border-radius:5px;padding:5px 13px;font-size:11px;color:#526b88}
 .staff-filter button.active{background:#fff;color:#1b3653;box-shadow:0 1px 4px #12365724;font-weight:700}
+
+/* Scrolling monthly grid: fixed name + metrics on the left, days on the right */
+.table-scroll{overflow:auto;max-height:calc(100vh - 166px);scrollbar-gutter:stable}
+.shift-table{width:max-content;min-width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0;font-size:11px}
+.shift-table th,.shift-table td{height:40px;min-width:56px;width:56px;padding:3px 2px;white-space:nowrap;font-size:11px}
+.shift-table th:nth-child(1),.shift-table td:first-child{width:172px;min-width:172px}
+.shift-table tr:not(.group) td:nth-child(n+2):nth-child(-n+5){width:52px;min-width:52px}
+.shift-table thead tr:first-child th{position:sticky;top:0;z-index:8;height:28px;background:#deebf8}
+.shift-table thead tr.daily-totals th{position:sticky;top:28px;z-index:8;height:25px;background:#eff5fc;font-size:10px;font-weight:700;color:#346084}
+.shift-table thead .staff-heading{position:sticky;top:0;left:0;z-index:15!important;width:172px;min-width:172px;text-align:left;padding:5px 8px;font-size:11px}
+.staff-heading span{display:block;line-height:1.5}
+.shift-table thead th.stat-heading{width:52px;min-width:52px;z-index:12!important;text-align:center}
+.shift-table thead th:nth-child(2),.shift-table tbody tr:not(.group) td:nth-child(2){position:sticky;left:172px;z-index:5}
+.shift-table thead th:nth-child(3),.shift-table tbody tr:not(.group) td:nth-child(3){position:sticky;left:224px;z-index:5}
+.shift-table thead th:nth-child(4),.shift-table tbody tr:not(.group) td:nth-child(4){position:sticky;left:276px;z-index:5}
+.shift-table thead th:nth-child(5),.shift-table tbody tr:not(.group) td:nth-child(5){position:sticky;left:328px;z-index:5}
+.shift-table tbody tr:not(.group) td:first-child{z-index:6;left:0}
+.shift-table tbody tr:not(.group) td:nth-child(n+2):nth-child(-n+5){background:#f5f8fd}
+.shift-table thead .day-heading,.shift-table thead .day-total{min-width:56px;width:56px}
+.shift-table tr.group td{position:relative;z-index:4;height:26px}
+.shift-table .staff-name strong{font-size:13px}.shift-table .staff-name .reading{font-size:10px}
+.shift-table th button{font-size:11px}
 </style></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
@@ -116,16 +138,30 @@ const real=therapists.filter(t=>t.residency!=="dummy"&&byId.has(t.exa_id)).sort(
 const dummy=therapists.filter(t=>t.residency==="dummy"&&byId.has(t.exa_id)).sort((a,b)=>a.exa_id-b.exa_id);
 const per=new Map(performances.map(p=>[p.exa_id+"|"+p.work_date,p.customer_count]));
 const absence=new Set(performances.filter(p=>p.attendance_status==="absent").map(p=>p.exa_id+"|"+p.work_date));
-let html="<thead><tr><th>セラピスト</th>";
-for(let n=1;n<=daysIn();n++){const d=dayStr(n);html+='<th><button type="button" data-day="'+d+'">'+n+"日</button></th>";}
-html+="<th>稼働</th><th>出勤</th><th>0本</th><th>評価</th></tr></thead><tbody>";
+const dayCounts=new Map();
+for(let n=1;n<=daysIn();n++){
+ const date=dayStr(n);
+ const r=shifts.filter(x=>x.work_date===date);
+ const active=r.filter(x=>!x.is_dummy_shift&&!isDummy(existing.get(x.exa_id)||{})).length;
+ const dummyTotal=r.filter(x=>x.is_dummy_shift||isDummy(existing.get(x.exa_id)||{})).length;
+ dayCounts.set(date,{real:active,dummy:dummyTotal,all:active+dummyTotal});
+}
+let html='<thead><tr><th class="staff-heading" rowspan="2"><span>実働（'+real.length+'名）</span><span>ダミー（'+dummy.length+'名）</span></th>';
+html+='<th class="stat-heading" rowspan="2">稼働</th><th class="stat-heading" rowspan="2">出勤</th><th class="stat-heading" rowspan="2">無報</th><th class="stat-heading" rowspan="2">評価</th>';
+for(let n=1;n<=daysIn();n++){const d=dayStr(n);html+='<th class="day-heading"><button type="button" data-day="'+d+'">'+n+'日</button></th>';}
+html+='</tr><tr class="daily-totals">';
+for(let n=1;n<=daysIn();n++){const d=dayStr(n);html+='<th class="day-total" title="その日の出勤人数">'+dayCounts.get(d)[staffView]+'人</th>';}
+html+='</tr></thead><tbody>';
 for(const [label,list,group] of [["実働",real,"real"],["ダミー",dummy,"dummy"]]){if(staffView!=="all"&&staffView!==group)continue;
-html+='<tr class="group"><td colspan="'+(daysIn()+5)+'">'+label+"（"+list.length+"名）</td></tr>";
+if(staffView==="all")html+='<tr class="group"><td colspan="'+(daysIn()+5)+'">'+label+"（"+list.length+"名）</td></tr>";
 for(const t of list){const entries=byId.get(t.exa_id),valid=[...entries.values()].filter(r=>r.work_date<today()&&(!isDummy(t))&&!r.is_dummy_shift&&per.has(t.exa_id+"|"+r.work_date));const historical=historyPerformances.filter(p=>p.exa_id===t.exa_id&&p.attendance_status!=="absent");const avg=historical.length?(historical.reduce((sum,p)=>sum+p.customer_count,0)/historical.length).toFixed(1):"—";
 const rawName=String(t.stage_name||"ID "+t.exa_id);
 const nameParts=rawName.match(/^(.+?)-([^-]+)-$/);
 const stageName=nameParts?nameParts[1]:rawName,kana=nameParts?nameParts[2]:"";
+const days=[...entries.values()].filter(r=>!r.is_dummy_shift).length;
+const zeros=valid.filter(r=>!absence.has(t.exa_id+"|"+r.work_date)&&per.get(t.exa_id+"|"+r.work_date)===0).length;
 html+='<tr><td class="staff-name"><strong>'+safe(stageName)+'</strong>'+(kana?'<span class="reading">'+safe(kana)+'</span>':'')+'</td>';
+html+='<td class="stat-cell"><strong>'+avg+'</strong></td><td class="stat-cell">'+days+'</td><td class="stat-cell">'+zeros+'</td><td class="stat-cell" title="アンケート点数は未連携">—</td>';
 for(let n=1;n<=daysIn();n++){const day=dayStr(n),r=entries.get(day),value=per.get(t.exa_id+"|"+day),past=day<today();
 html+='<td class="'+(group==="dummy"?"dummy ":"")+(day===today()?"today":"")+'">';
 if(r&&past&&group==="real"&&!r.is_dummy_shift)html+='<button type="button" class="edit-count" data-id="'+t.exa_id+'" data-date="'+day+'">'+(absence.has(t.exa_id+"|"+day)?"当欠":value===undefined?"＋":value)+'</button>';
@@ -135,9 +171,7 @@ else if(r&&past&&r.is_dummy_shift)html+="—";
 else html+='<small> </small>';
 html+="</td>";
 }
-const days=[...entries.values()].filter(r=>!r.is_dummy_shift).length;
-const zeros=valid.filter(r=>!absence.has(t.exa_id+"|"+r.work_date)&&per.get(t.exa_id+"|"+r.work_date)===0).length;
-html+='<td class="stat-cell"><strong>'+avg+'</strong></td><td class="stat-cell">'+days+'</td><td class="stat-cell">'+zeros+'</td><td class="stat-cell" title="アンケート点数は未連携">—</td></tr>';
+html+='</tr>';
 }}
 html+="</tbody>";$("monthly").innerHTML=html;
 $("monthly").querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{selected=b.dataset.day;renderDay();$("dayPanel").classList.remove("hide")});
