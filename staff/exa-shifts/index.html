@@ -272,6 +272,13 @@ footer{display:none}
  border-top:2px solid #b4c7db!important;
  border-bottom:2px solid #b4c7db!important;
 }
+
+/* Keep the total and real-attendance counts directly beneath hourly headings. */
+.timeline tr.sum.total-count td{background:#d4e7fa!important;color:#143e69!important;font-weight:800}
+.timeline tr.sum.real-count td{background:#e7f2ff!important;color:#1b4e7b!important;font-weight:700}
+.timeline tr.timeline-group.dummy-heading th{background:#f0e1e8!important;color:#673b51!important;text-align:center!important;font-weight:800}
+.timeline tr.timeline-group.dummy-heading th:first-child{text-align:left!important}
+.timeline tr.sum td:first-child{position:sticky;left:0;z-index:4;text-align:left}
 </style></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
@@ -533,8 +540,16 @@ function renderDay(){
  const slots=Array.from({length:19},(_,i)=>600+i*60);
  let html='<div class="chart-scroll"><table class="timeline"><thead><tr><th>セラピスト</th>'+slots.map(x=>"<th>"+minutes(x)+"</th>").join("")+"</tr></thead><tbody>";
  const activeAt=(r,s)=>r.start_minutes<s+60&&r.end_minutes>s;
+ const countRow=(label,rows,extraClass)=>'<tr class="sum '+extraClass+'"><td>'+label+'</td>'+slots.map(slot=>'<td>'+rows.filter(r=>activeAt(r,slot)).length+'</td>').join('')+'</tr>';
+ // Place the overall headcount and real attendance directly below the hour labels.
+ html+=countRow('合計',day,'total-count');
+ html+=countRow('実出勤',real,'real-count');
  function addRows(rows,kind){
-  html+='<tr class="timeline-group"><th colspan="'+(slots.length+1)+'">'+kind+'（'+rows.length+'名）</th></tr>';
+  if(kind==="ダミー"){
+   html+='<tr class="timeline-group dummy-heading"><th>ダミー（'+rows.length+'名）</th>'+slots.map(slot=>'<th>'+rows.filter(r=>activeAt(r,slot)).length+'</th>').join('')+'</tr>';
+  }else{
+   html+='<tr class="timeline-group"><th colspan="'+(slots.length+1)+'">'+kind+'（'+rows.length+'名）</th></tr>';
+  }
   for(const r of rows){
    const t=map.get(r.exa_id);
    const name=String(t?.stage_name||"ID "+r.exa_id).replace(/-([^-]+)-$/,"");
@@ -545,7 +560,7 @@ function renderDay(){
    }
    html+="</tr>";
   }
-  html+='<tr class="sum"><td>'+kind+'人数</td>'+slots.map(slot=>"<td>"+rows.filter(r=>activeAt(r,slot)).length+"</td>").join("")+"</tr>";
+
  }
  addRows(real,"実出勤");
  addRows(dummy,"ダミー");
