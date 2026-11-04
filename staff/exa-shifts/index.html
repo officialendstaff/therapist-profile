@@ -347,6 +347,7 @@ footer{display:none}
 
 #surveyPersonChoice{width:100%;max-width:100%;padding:9px;border:1px solid #bbcfe4;border-radius:7px;background:white;color:#253b53;font-size:12px}
 #surveyLinkOpen,#surveyLinkSave{font-size:12px;margin:5px 0}
+.staff-exa-id{display:inline-block;margin-left:5px;padding:1px 4px;border-radius:3px;background:#eaf1f9;color:#32618a;font-size:10px;font-weight:700;white-space:nowrap}
 </style></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
@@ -531,7 +532,7 @@ const latestDates=futureShifts.filter(r=>r.exa_id===t.exa_id&&!r.is_dummy_shift&
 const lastKnownDate=latestDates.length?latestDates[latestDates.length-1]:null;
 const days=[...entries.values()].filter(r=>!r.is_dummy_shift).length;
 const zeros=valid.filter(r=>!absence.has(t.exa_id+"|"+r.work_date)&&per.get(t.exa_id+"|"+r.work_date)===0).length;
-html+='<tr class="'+(outside?'outside-roster':'')+'"><td class="staff-name"><button type="button" class="name-editor" data-staff-id="'+t.exa_id+'" title="出勤管理区分を変更">'+safe(stageName)+'</button>'+(kana?'<span class="reading">'+safe(kana)+'</span>':'')+(outside?'<span class="outside-label">実働外</span>':'')+'</td>';
+html+='<tr class="'+(outside?'outside-roster':'')+'"><td class="staff-name"><button type="button" class="name-editor" data-staff-id="'+t.exa_id+'" title="出勤管理区分を変更">'+safe(stageName)+'</button><span class="staff-exa-id" title="EXA管理ID">ID '+t.exa_id+'</span>'+(kana?'<span class="reading">'+safe(kana)+'</span>':'')+(outside?'<span class="outside-label">実働外</span>':'')+'</td>';
 const surveyId=surveyLinks.find(l=>l.exa_id===t.exa_id)?.sheet_person_id;
 const survey=surveyScores.find(x=>x.sheet_person_id===surveyId);
 const responseCount=survey?.response_count??0;
