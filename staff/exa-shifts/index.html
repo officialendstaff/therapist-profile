@@ -315,6 +315,18 @@ footer{display:none}
  border-color:#e5a3a5!important;
  color:#a72e39!important;
 }
+
+/* Internal therapist profile with a private, on-demand full-body photo. */
+.therapist-detail-dialog{width:min(770px,95vw)!important;max-height:90vh;overflow-y:auto}
+.therapist-detail-grid{display:grid;grid-template-columns:minmax(220px,1fr) minmax(225px,1.15fr);gap:22px;align-items:start}
+.therapist-photo-frame{width:100%;aspect-ratio:3/4;border:1px solid #d4dfe9;border-radius:9px;overflow:hidden;background:#edf2f7;display:flex;align-items:center;justify-content:center;color:#8391a0;font-size:13px}
+.therapist-photo-frame img{width:100%;height:100%;object-fit:contain}
+.therapist-photo-action{display:block;text-align:center;cursor:pointer;background:#edf5fd;color:#245b89;border:1px solid #b5cee7;border-radius:8px;padding:10px 8px;margin-top:9px;font-size:13px!important;font-weight:700}
+.therapist-photo-action:hover{background:#dfeefa}
+#therapistPhotoStatus{line-height:1.65;min-height:36px}
+.therapist-detail-controls label{margin-top:0}
+.therapist-detail-controls .row{margin-top:25px}
+@media(max-width:590px){.therapist-detail-grid{grid-template-columns:1fr}.therapist-photo-frame{max-height:400px}.therapist-detail-dialog{max-height:94vh}}
 </style></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
@@ -335,13 +347,23 @@ footer{display:none}
 <div class="panel monthly-panel"><div class="row space month-heading"><h2>月間シフト</h2><div class="staff-filter" role="group" aria-label="表示区分"><button type="button" data-show-staff="real" class="active">実働</button><button type="button" data-show-staff="dummy">ダミー</button><button type="button" data-show-staff="all">全件</button></div></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
 <div id="residencyModal" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="residencyTitle">
 <div id="residencyShade" class="day-modal-shade"></div>
-<div class="panel residency-dialog">
-<h2 id="residencyTitle">在籍区分の変更</h2>
+<div class="panel residency-dialog therapist-detail-dialog">
+<h2 id="residencyTitle">セラピスト詳細</h2>
 <p id="residencyInfo" class="muted"></p>
-<label for="residencyChoice">区分</label>
-<select id="residencyChoice"><option value="active">実働</option><option value="dummy">ダミー</option></select>
-<p class="muted">EXAの登録内容やHP公開設定は変更しません。出勤管理の一覧・人数集計のみ切り替わります。</p>
-<div class="row space"><button id="residencyCancel" type="button">キャンセル</button><button id="residencySave" class="primary" type="button">変更を確定</button></div>
+<div class="therapist-detail-grid">
+ <div class="therapist-photo-pane">
+  <div class="therapist-photo-frame"><img id="therapistPhoto" alt="セラピスト管理用画像" class="hide"><span id="therapistPhotoEmpty">画像未登録</span></div>
+  <label class="therapist-photo-action" for="therapistPhotoInput">画像を登録・差し替え</label>
+  <input id="therapistPhotoInput" type="file" accept="image/jpeg,image/png,image/webp" class="hide">
+  <p id="therapistPhotoStatus" class="muted" aria-live="polite">非公開・スタッフ専用。WebPに変換して保存します。</p>
+ </div>
+ <div class="therapist-detail-controls">
+  <label for="residencyChoice">在籍区分</label>
+  <select id="residencyChoice"><option value="active">実働</option><option value="dummy">ダミー</option></select>
+  <p class="muted">EXAの登録内容やHP公開設定は変更しません。出勤管理の一覧・人数集計のみ切り替わります。</p>
+  <div class="row space"><button id="residencyCancel" type="button">閉じる</button><button id="residencySave" class="primary" type="button">区分変更を確定</button></div>
+ </div>
+</div>
 </div></div>
 <div id="countModal" class="day-modal hide" role="dialog" aria-modal="true"><div id="countShade" class="day-modal-shade"></div><div class="panel count-panel"><h2 id="countTitle">接客本数</h2><p class="muted">当欠は0本とは別に記録します。</p><select id="countSelect" size="8"><option value="absent">当欠</option><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select><div class="row space"><button id="countCancel">キャンセル</button><button id="countConfirm" class="primary">確定</button></div></div></div><div id="dayPanel" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="dayTitle"><div class="day-modal-shade" id="dayBackdrop"></div><div class="day-modal-content panel"><div class="row space"><div class="timeline-heading"><h2 id="dayTitle">日別タイムチャート</h2><strong id="dayHeadcount" class="day-headcount"></strong></div><button id="closeDay" type="button" aria-label="閉じる">閉じる ×</button></div><div id="timeline"></div></div></div>
 </main><footer>EXA管理ページの登録内容は変更しません。接客本数のみSupabaseへ保存します。</footer>
@@ -502,19 +524,93 @@ $("monthly").querySelectorAll("[data-staff-id]").forEach(button=>button.onclick=
   }catch(e){showMsg("コピーできませんでした。Chromeのクリップボード権限をご確認ください。",true)}
  });
 }
+const PHOTO_BUCKET="therapist-internal-photos";
+let photoRequest=0,photoBusy=false;
+async function showTherapistPhoto(exaId){
+ const request=++photoRequest;
+ $("therapistPhoto").classList.add("hide");
+ $("therapistPhoto").removeAttribute("src");
+ $("therapistPhotoEmpty").textContent="画像を確認中…";
+ $("therapistPhotoEmpty").classList.remove("hide");
+ $("therapistPhotoStatus").textContent="非公開画像を読み込んでいます。";
+ try{
+  const {data,error}=await client.from("exa_therapist_photos").select("storage_path").eq("store_code","rose").eq("exa_id",exaId).maybeSingle();
+  if(error)throw error;
+  if(request!==photoRequest)return;
+  if(!data){
+   $("therapistPhotoEmpty").textContent="画像未登録";
+   $("therapistPhotoStatus").textContent="画像を選択すると、このスタッフ専用画面に登録されます。";
+   return;
+  }
+  const signed=await client.storage.from(PHOTO_BUCKET).createSignedUrl(data.storage_path,120);
+  if(signed.error)throw signed.error;
+  if(request!==photoRequest)return;
+  $("therapistPhoto").onload=()=>{if(request===photoRequest){$("therapistPhotoEmpty").classList.add("hide");$("therapistPhoto").classList.remove("hide")}};
+  $("therapistPhoto").onerror=()=>{if(request===photoRequest){$("therapistPhoto").classList.add("hide");$("therapistPhotoEmpty").textContent="画像を表示できません"}};
+  $("therapistPhoto").src=signed.data.signedUrl;
+  $("therapistPhotoStatus").textContent="登録済み・非公開";
+ }catch(e){
+  if(request!==photoRequest)return;
+  $("therapistPhotoEmpty").textContent="画像を読み込めません";
+  $("therapistPhotoStatus").textContent="確認失敗："+(e.message||String(e));
+ }
+}
+async function makePhotoWebp(file){
+ if(!["image/jpeg","image/png","image/webp"].includes(file.type))throw Error("JPEG・PNG・WebPの画像を選択してください。");
+ if(file.size>20*1024*1024)throw Error("元画像は20MB以下にしてください。");
+ const image=await createImageBitmap(file);
+ try{
+  const maxWidth=1200,maxHeight=1600,scale=Math.min(1,maxWidth/image.width,maxHeight/image.height);
+  const canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(image.width*scale));canvas.height=Math.max(1,Math.round(image.height*scale));
+  canvas.getContext("2d").drawImage(image,0,0,canvas.width,canvas.height);
+  const blob=await new Promise((resolve,reject)=>canvas.toBlob(v=>v?resolve(v):reject(Error("画像変換に失敗しました。")),"image/webp",0.78));
+  if(blob.size>2097152)throw Error("圧縮後の画像が2MBを超えました。別の画像を選択してください。");
+  return blob;
+ }finally{image.close();}
+}
+$("therapistPhotoInput").onchange=async()=>{
+ const file=$("therapistPhotoInput").files?.[0],editing=editingResidency;
+ if(!file||!editing||!authorized||photoBusy)return;
+ const exaId=editing.exaId;
+ if(!confirm(editing.name+" の全身画像を登録・差し替えしますか？\n画像はスタッフ用非公開Storageに保存されます。")){$("therapistPhotoInput").value="";return;}
+ photoBusy=true;$("therapistPhotoInput").disabled=true;
+ $("therapistPhotoStatus").textContent="画像を圧縮して保存しています…";
+ let newPath=null;
+ try{
+  const blob=await makePhotoWebp(file);
+  const {data:old,error:readError}=await client.from("exa_therapist_photos").select("storage_path").eq("store_code","rose").eq("exa_id",exaId).maybeSingle();
+  if(readError)throw readError;
+  newPath="rose/"+exaId+"/"+crypto.randomUUID().replace(/-/g,"")+".webp";
+  const uploaded=await client.storage.from(PHOTO_BUCKET).upload(newPath,blob,{contentType:"image/webp",upsert:false});
+  if(uploaded.error)throw uploaded.error;
+  const user=(await client.auth.getUser()).data.user;
+  if(!user)throw Error("ログイン状態を確認できません。");
+  const result=await client.from("exa_therapist_photos").upsert({store_code:"rose",exa_id:exaId,storage_path:newPath,updated_by:user.id,updated_at:new Date().toISOString()},{onConflict:"store_code,exa_id"});
+  if(result.error)throw result.error;
+  if(old?.storage_path && old.storage_path!==newPath)await client.storage.from(PHOTO_BUCKET).remove([old.storage_path]);
+  newPath=null;
+  if(editingResidency?.exaId===exaId)await showTherapistPhoto(exaId);
+  showMsg(editing.name+" の画像を登録しました。");
+ }catch(e){
+  if(newPath)await client.storage.from(PHOTO_BUCKET).remove([newPath]);
+  $("therapistPhotoStatus").textContent="登録失敗："+(e.message||String(e));
+  showMsg("画像を保存できませんでした："+(e.message||String(e)),true);
+ }finally{photoBusy=false;$("therapistPhotoInput").disabled=false;$("therapistPhotoInput").value="";}
+};
 let editingResidency=null;
 function openResidency(button){
  const exaId=Number(button.dataset.staffId);
  const person=therapists.find(t=>t.exa_id===exaId);
  if(!person)return;
  editingResidency={exaId,old:person.residency,name:person.stage_name};
- $("residencyTitle").textContent="在籍区分の変更";
+ $("residencyTitle").textContent="セラピスト詳細";
  $("residencyInfo").textContent=person.stage_name+"（EXA ID："+exaId+"）／現在："+(isDummy(person)?"ダミー":"実働");
  $("residencyChoice").value=isDummy(person)?"dummy":"active";
  $("residencyModal").classList.remove("hide");
- $("residencyChoice").focus();
+ showTherapistPhoto(exaId);
 }
 function closeResidency(){
+ photoRequest++;
  $("residencyModal").classList.add("hide");
  editingResidency=null;
 }
