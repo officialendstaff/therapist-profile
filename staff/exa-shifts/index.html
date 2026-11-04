@@ -90,7 +90,7 @@ const start=month+"-01",end=dayStr(daysIn());
 const [a,b,c,d]=await Promise.all([
 client.from("exa_shift_therapists").select("exa_id,stage_name,residency").eq("store_code","rose"),
 client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_dummy_shift").eq("store_code","rose").gte("work_date",start).lte("work_date",end).order("work_date"),
-client.from("exa_shift_performance").select("exa_id,work_date,customer_count").eq("store_code","rose").gte("work_date",start).lte("work_date",end),
+client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code","rose").gte("work_date",start).lte("work_date",end),
 client.from("exa_shift_sync_runs").select("finished_at,record_count,mode").eq("store_code","rose").eq("state","success").order("finished_at",{ascending:false}).limit(1)
 ]);
 const err=[a,b,c,d].find(r=>r.error)?.error;
@@ -114,7 +114,7 @@ for(const t of list){const entries=byId.get(t.exa_id),valid=[...entries.values()
 html+='<tr><td>'+safe(t.stage_name||"ID "+t.exa_id)+'</td>';
 for(let n=1;n<=daysIn();n++){const day=dayStr(n),r=entries.get(day),value=per.get(t.exa_id+"|"+day),past=day<today();
 html+='<td class="'+(group==="dummy"?"dummy ":"")+(day===today()?"today":"")+'">';
-if(r&&past&&group==="real"&&!r.is_dummy_shift)html+='<input type="number" inputmode="numeric" min="0" max="99" data-id="'+t.exa_id+'" data-date="'+day+'" value="'+(value===undefined?"":value)+'" title="接客本数">';
+if(r&&past&&group==="real"&&!r.is_dummy_shift)html+='<button type="button" class="edit-count" data-id="'+t.exa_id+'" data-date="'+day+'">'+(value===undefined?"＋":value)+'</button>';
 else if(r&&!past)html+=safe(range(r));
 else if(r&&past&&group==="dummy")html+="—";
 else if(r&&past&&r.is_dummy_shift)html+="—";
@@ -125,7 +125,7 @@ html+='<td><strong>'+avg+'</strong></td></tr>';
 }}
 html+="</tbody>";$("monthly").innerHTML=html;
 $("monthly").querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{selected=b.dataset.day;renderDay();$("dayPanel").classList.remove("hide")});
-$("monthly").querySelectorAll("input[data-id]").forEach(input=>input.onchange=()=>savePerformance(input));
+$("monthly").querySelectorAll(".edit-count").forEach(input=>input.onclick=()=>openCount(input));
 }
 async function savePerformance(input){const id=Number(input.dataset.id),work_date=input.dataset.date,v=input.value.trim();
 if(v===""||!/^\d+$/.test(v)||Number(v)>99){showMsg("0〜99の整数を入力してください。未入力へ戻す操作は現在未実装です。",true);return;}
