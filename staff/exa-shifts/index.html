@@ -40,7 +40,7 @@ main{max-width:none;margin:11px auto;padding:0 14px}
 .day-modal-content h2{font-size:17px;margin:0}
 #closeDay{background:#f3f6fa}
 footer{display:none}
-</style></head>
+.count-panel{position:relative;z-index:1;width:345px;padding:22px}.count-panel h2{margin:0}.count-panel select{display:block;width:100%;height:255px;border:1px solid #cbd7e7;border-radius:7px;margin:14px 0;font-size:16px}.count-panel option{padding:7px}.shift-table .edit-count{width:100%;height:23px;padding:1px;border:1px solid #d6e2ee;border-radius:4px;background:#f8fbff;font-size:11px;color:#254467}</style></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
 <label class="store-label">店舗 <select id="storeSelect" aria-label="店舗切替"><option value="rose">薔薇と紳士</option></select></label>
@@ -58,7 +58,7 @@ footer{display:none}
 
 <p id="message" class="muted" aria-live="polite" style="margin:0 0 8px"></p>
 <div class="panel monthly-panel"><div class="row space month-heading"><h2>月間シフト</h2><span class="muted">日付を選択すると日別の出勤状況が開きます</span></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
-<div id="dayPanel" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="dayTitle"><div class="day-modal-shade" id="dayBackdrop"></div><div class="day-modal-content panel"><div class="row space"><h2 id="dayTitle">日別タイムチャート</h2><button id="closeDay" type="button" aria-label="閉じる">閉じる ×</button></div><div id="timeline"></div></div></div>
+<div id="countModal" class="day-modal hide" role="dialog" aria-modal="true"><div id="countShade" class="day-modal-shade"></div><div class="panel count-panel"><h2 id="countTitle">接客本数</h2><p class="muted">当欠は0本とは別に記録します。</p><select id="countSelect" size="8"><option value="absent">当欠</option><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select><div class="row space"><button id="countCancel">キャンセル</button><button id="countConfirm" class="primary">確定</button></div></div></div><div id="dayPanel" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="dayTitle"><div class="day-modal-shade" id="dayBackdrop"></div><div class="day-modal-content panel"><div class="row space"><h2 id="dayTitle">日別タイムチャート</h2><button id="closeDay" type="button" aria-label="閉じる">閉じる ×</button></div><div id="timeline"></div></div></div>
 </main><footer>EXA管理ページの登録内容は変更しません。接客本数のみSupabaseへ保存します。</footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.10/dist/umd/supabase.min.js"></script>
 <script>
