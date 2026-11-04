@@ -219,11 +219,11 @@ if(!authorized)return;showMsg("Supabaseを読み込み中…");
 const start=month+"-01",end=dayStr(daysIn());
 const [a,b,c,d,e,future]=await Promise.all([
 client.from("exa_shift_therapists").select("exa_id,stage_name,residency,evaluation_score").eq("store_code","rose"),
-client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_dummy_shift").eq("store_code","rose").gte("work_date",start).lte("work_date",end).order("work_date"),
+client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_dummy_shift,is_pre_off").eq("store_code","rose").gte("work_date",start).lte("work_date",end).order("work_date"),
 client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code","rose").gte("work_date",start).lte("work_date",end),
 client.from("exa_shift_sync_runs").select("finished_at,record_count,mode").eq("store_code","rose").eq("state","success").order("finished_at",{ascending:false}).limit(1),
 client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code","rose").lt("work_date",today()).limit(5000),
-client.from("exa_shift_entries").select("exa_id,work_date,is_dummy_shift").eq("store_code","rose").gte("work_date",today()).order("work_date").limit(5000)
+client.from("exa_shift_entries").select("exa_id,work_date,is_dummy_shift,is_pre_off").eq("store_code","rose").order("work_date").limit(5000)
 ]);
 const err=[a,b,c,d,e,future].find(r=>r.error)?.error;
 if(err){showMsg("読み込みエラー："+err.message,true);return;}
@@ -269,10 +269,9 @@ for(const t of list){const entries=byId.get(t.exa_id),valid=[...entries.values()
 const rawName=String(t.stage_name||"ID "+t.exa_id);
 const nameParts=rawName.match(/^(.+?)-([^-]+)-$/);
 const stageName=nameParts?nameParts[1]:rawName,kana=nameParts?nameParts[2]:"";
-const upcoming=futureShifts.some(r=>r.exa_id===t.exa_id&&!r.is_dummy_shift);
+const upcoming=futureShifts.some(r=>r.exa_id===t.exa_id&&r.work_date>=today()&&!r.is_dummy_shift&&!r.is_pre_off);
 const outside=group==="real"&&!upcoming;
-const latestDates=[...entries.values(),...futureShifts.filter(r=>r.exa_id===t.exa_id)]
- .filter(r=>!r.is_dummy_shift).map(r=>r.work_date).sort();
+const latestDates=futureShifts.filter(r=>r.exa_id===t.exa_id&&!r.is_dummy_shift&&!r.is_pre_off).map(r=>r.work_date).sort();
 const lastKnownDate=latestDates.length?latestDates[latestDates.length-1]:null;
 const days=[...entries.values()].filter(r=>!r.is_dummy_shift).length;
 const zeros=valid.filter(r=>!absence.has(t.exa_id+"|"+r.work_date)&&per.get(t.exa_id+"|"+r.work_date)===0).length;
@@ -283,9 +282,10 @@ const scoreText=evaluation===null?"—":evaluation.toFixed(2);
 html+='<td class="stat-cell"><strong>'+avg+'</strong></td><td class="stat-cell">'+days+'</td><td class="stat-cell '+(zeros>0?'unpaid-positive':'')+'">'+zeros+'</td><td class="stat-cell '+scoreClass+'" title="'+(evaluation===null?'評価点数未連携':'評価点数')+'">'+scoreText+'</td>';
 for(let n=1;n<=daysIn();n++){const day=dayStr(n),r=entries.get(day),value=per.get(t.exa_id+"|"+day),past=day<today();
 const cellClasses=[group==="dummy"?"dummy":"",day===today()?"today":"",dayType(day),
- lastKnownDate===day?"last-scheduled":"",outside?"outside-cell":""].filter(Boolean).join(" ");
+ lastKnownDate===day?"last-scheduled":"",r?.is_pre_off?"pre-off":"",outside?"outside-cell":""].filter(Boolean).join(" ");
 html+='<td class="'+cellClasses+'">';
-if(r&&past&&group==="real"&&!r.is_dummy_shift)html+='<button type="button" class="edit-count '+(absence.has(t.exa_id+"|"+day)?"absent-entry":"")+'" data-id="'+t.exa_id+'" data-date="'+day+'">'+(absence.has(t.exa_id+"|"+day)?"当欠":value===undefined?"＋":value)+'</button>';
+if(r?.is_pre_off)html+="<strong class='pre-off-label'>事前</strong>";
+else if(r&&past&&group==="real"&&!r.is_dummy_shift)html+='<button type="button" class="edit-count '+(absence.has(t.exa_id+"|"+day)?"absent-entry":"")+'" data-id="'+t.exa_id+'" data-date="'+day+'">'+(absence.has(t.exa_id+"|"+day)?"当欠":value===undefined?"＋":value)+'</button>';
 else if(r&&!past)html+=safe(range(r));
 else if(r&&past&&group==="dummy")html+="—";
 else if(r&&past&&r.is_dummy_shift)html+="—";
