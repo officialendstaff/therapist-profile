@@ -70,6 +70,17 @@ footer{display:none}
 .shift-table tr.group td{position:relative;z-index:4;height:26px}
 .shift-table .staff-name strong{font-size:13px}.shift-table .staff-name .reading{font-size:10px}
 .shift-table th button{font-size:11px}
+
+/* The second date-header row must scroll horizontally; only name and metrics stay pinned. */
+.shift-table thead tr.daily-totals th,
+.shift-table thead tr.daily-totals th:first-child,
+.shift-table thead tr.daily-totals th:nth-child(2),
+.shift-table thead tr.daily-totals th:nth-child(3),
+.shift-table thead tr.daily-totals th:nth-child(4),
+.shift-table thead tr.daily-totals th:nth-child(5){
+ left:auto!important;right:auto!important;width:56px!important;min-width:56px!important;z-index:8!important;
+}
+.shift-table thead tr:first-child .staff-heading{height:53px}
 </style></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
