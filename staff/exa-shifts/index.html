@@ -280,6 +280,41 @@ footer{display:none}
 .timeline tr.timeline-group.dummy-heading th:first-child{text-align:left!important}
 .timeline tr.sum td:first-child{position:sticky;left:0;z-index:4;text-align:left}
 .timeline tr.sum.dummy-count td{background:#f3e4eb!important;color:#713b56!important;font-weight:700}
+
+/* Non-displacing notifications: success and error appear as fixed toasts. */
+#message{
+ position:fixed!important;
+ top:77px!important;
+ right:18px!important;
+ left:auto!important;
+ width:max-content!important;
+ max-width:min(560px,calc(100vw - 36px))!important;
+ margin:0!important;
+ padding:11px 15px!important;
+ border:1px solid #a9c3dc!important;
+ border-radius:8px!important;
+ background:#f2f8ff!important;
+ color:#204e79!important;
+ box-shadow:0 6px 22px #0b274529!important;
+ font-size:12px!important;
+ line-height:1.6!important;
+ z-index:120!important;
+ opacity:0;
+ visibility:hidden;
+ transform:translateY(-5px);
+ pointer-events:none;
+ transition:opacity .16s ease,transform .16s ease,visibility .16s;
+}
+#message.toast-visible{
+ opacity:1;
+ visibility:visible;
+ transform:translateY(0);
+}
+#message.error{
+ background:#fff1f1!important;
+ border-color:#e5a3a5!important;
+ color:#a72e39!important;
+}
 </style></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
@@ -296,7 +331,7 @@ footer{display:none}
 <section id="login" class="panel"><h2>スタッフログイン</h2><p class="muted">面接管理で使用しているSupabaseアカウントでログインしてください。閲覧は承認済み管理者に限定しています。</p><form id="loginForm"><label>メールアドレス<input id="email" type="email" autocomplete="username" required></label><label>パスワード<input id="password" type="password" autocomplete="current-password" required></label><button class="primary" type="submit">ログイン</button></form><p id="loginError" class="error"></p></section>
 <main id="app" class="hide">
 
-<p id="message" class="muted" aria-live="polite" style="margin:0 0 8px"></p>
+<p id="message" class="muted" role="status" aria-live="polite"></p>
 <div class="panel monthly-panel"><div class="row space month-heading"><h2>月間シフト</h2><div class="staff-filter" role="group" aria-label="表示区分"><button type="button" data-show-staff="real" class="active">実働</button><button type="button" data-show-staff="dummy">ダミー</button><button type="button" data-show-staff="all">全件</button></div></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
 <div id="residencyModal" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="residencyTitle">
 <div id="residencyShade" class="day-modal-shade"></div>
@@ -325,7 +360,15 @@ const range=x=>shiftTime(x.start_minutes)+"-"+shiftTime(x.end_minutes);
 const isDummy=s=>s.residency==="dummy";
 const staffById=()=>new Map(therapists.map(t=>[t.exa_id,t]));
 const byDay=()=>{const m=new Map();for(const r of shifts){if(!m.has(r.work_date))m.set(r.work_date,[]);m.get(r.work_date).push(r);}return m;};
-const showMsg=(s,error=false)=>{$("message").textContent=s;$("message").className=error?"error":"muted";};
+let messageTimer=null;
+const showMsg=(message,error=false)=>{
+ const el=$("message");
+ clearTimeout(messageTimer);
+ el.textContent=message;
+ el.className=error?"error":"muted";
+ el.classList.toggle("toast-visible",Boolean(message));
+ if(message)messageTimer=setTimeout(()=>{el.classList.remove("toast-visible");},error?8000:4200);
+};
 async function loginCheck(){if(!client){$("loginError").textContent="認証ライブラリを読み込めません";return;}
 const {data:{session}}=await client.auth.getSession();if(!session){authorized=false;$("app").classList.add("hide");$("login").classList.remove("hide");return;}
 const {data,error}=await client.from("recruit_staff_profiles").select("role,approved_at").eq("user_id",session.user.id).maybeSingle();
