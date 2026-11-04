@@ -173,6 +173,23 @@ footer{display:none}
 .shift-table tbody tr:not(.group) td.pre-off{background:#f0e4fa!important;color:#6a338d!important}
 .shift-table tbody tr:not(.group) td.pre-off .pre-off-label{font-size:12px;font-weight:800}
 .shift-table tbody tr.outside-roster td.pre-off{background:#ece0f6!important}
+
+/* Row two begins with the 1st day: there are no name/metrics cells in this row.
+   Override legacy first-child and sticky nth-child rules for every day total. */
+.shift-table thead tr.daily-totals > th.day-total,
+.shift-table thead tr.daily-totals > th.day-total:first-child,
+.shift-table thead tr.daily-totals > th.day-total:nth-child(n){
+  position:sticky!important;
+  top:32px!important;
+  left:auto!important;
+  right:auto!important;
+  width:82px!important;
+  min-width:82px!important;
+  max-width:82px!important;
+  box-sizing:border-box!important;
+  text-align:center!important;
+  z-index:8!important;
+}
 </style></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
