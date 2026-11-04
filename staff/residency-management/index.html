@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>在籍管理｜L GROUP</title>
+<style>
+:root{font-family:"Noto Sans JP",Arial,sans-serif;color:#22334b;background:#f3f6fb}*{box-sizing:border-box}body{margin:0}button,input,select,textarea{font:inherit}button{cursor:pointer}header{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;background:#1b304c;color:#fff;padding:15px 23px}header h1{margin:0;font-size:20px;letter-spacing:.07em}header small{display:block;font-size:11px;color:#b9cede;margin-top:3px}.header-menu{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.header-menu a,.header-menu span{border:1px solid #ffffff36;background:#ffffff12;border-radius:7px;color:#eff5fc;text-decoration:none;padding:8px 11px;font-size:12px}.header-menu .selected{background:#fff;color:#1c4169;font-weight:750}.header-menu .disabled{opacity:.5}.header-menu button{border:1px solid #ffffff55;color:#fff;background:transparent;padding:8px 11px;border-radius:7px;font-size:12px}.hide{display:none!important}.wrap{max-width:1520px;margin:20px auto;padding:0 18px}.sub{font-size:12px;color:#71829a}.page-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:13px}.page-head h2{font-size:21px;margin:0 0 5px}.refresh{border:1px solid #b8cde0;background:#fff;color:#235481;border-radius:7px;padding:9px 15px}.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin:0 0 14px}.metric{background:#fff;border:1px solid #dce5ee;border-radius:11px;padding:13px 16px}.metric span{display:block;font-size:12px;color:#6b7d91}.metric strong{display:block;font-size:25px;margin-top:7px;color:#254c76}.note{padding:11px 14px;border:1px solid #d8e5f5;background:#f2f8ff;color:#4d6784;border-radius:9px;font-size:12px;line-height:1.6;margin-bottom:14px}.filters{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:12px 14px;background:#fff;border:1px solid #dce5ee;border-radius:11px;margin-bottom:13px}.filters input,.filters select{border:1px solid #c7d4e2;border-radius:7px;padding:10px 12px;background:#fff;color:#293d56;min-width:135px}.filters input{flex:1;min-width:220px}.workspace{display:grid;grid-template-columns:minmax(340px,44%) minmax(0,1fr);gap:14px;min-height:590px}.panel{background:#fff;border:1px solid #dae4ee;border-radius:11px;overflow:hidden;box-shadow:0 2px 9px #233b5810}.panel-header{padding:14px 17px;border-bottom:1px solid #e1e8f0;display:flex;justify-content:space-between;align-items:center;gap:8px}.panel-header strong{font-size:14px}.table-wrapper{overflow:auto;max-height:70vh}.staff-table{width:100%;border-collapse:collapse;font-size:12px}.staff-table th{padding:11px 10px;background:#f2f6fa;position:sticky;top:0;text-align:left;color:#52667c;font-weight:650;z-index:1}.staff-table td{padding:11px 10px;border-bottom:1px solid #edf0f5}.staff-table tr.selected td{background:#e9f3ff}.staff-table tbody tr{cursor:pointer}.staff-table tbody tr:hover td{background:#f3f8fc}.staff-name{font-size:13px;font-weight:700}.tiny{font-size:11px;color:#728299;margin-top:3px}.pill{display:inline-block;border-radius:15px;background:#f0f3f7;padding:5px 9px;font-size:11px;white-space:nowrap;color:#516377}.pill.ok{background:#e4f4ee;color:#27735a}.pill.warn{background:#fff0db;color:#97601d}.pill.danger{background:#fce9ed;color:#a74f60}.detail{padding:18px 19px;overflow-y:auto;max-height:80vh}.empty{color:#7d8ea0;text-align:center;padding:95px 15px}.profile-head{display:flex;gap:17px;align-items:flex-start}.profile-photo{width:134px;height:176px;border-radius:9px;flex-shrink:0;border:1px solid #d5e0eb;background:#edf2f7;display:flex;align-items:center;justify-content:center;font-size:12px;color:#899aac;overflow:hidden}.profile-photo img{width:100%;height:100%;object-fit:contain}.profile-head h3{font-size:23px;margin:5px 0 8px}.profile-head .sub{line-height:1.8}.tabs{display:flex;gap:8px;border-bottom:1px solid #e0e7f0;margin:20px 0 16px;flex-wrap:wrap}.tabs button{border:0;border-bottom:3px solid transparent;background:none;color:#6e8094;padding:11px 12px;font-weight:700;font-size:12px}.tabs button.active{color:#245e96;border-bottom-color:#3278b5}.section-title{font-size:14px;margin:18px 0 11px;color:#2a4765}.data-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.data-box{border:1px solid #e3eaf1;background:#fbfcfe;border-radius:8px;padding:11px 13px;min-width:0}.data-box small{display:block;color:#748599;font-size:11px;margin-bottom:6px}.data-box strong,.data-box span{font-size:13px;overflow-wrap:anywhere}.history-item{border-left:3px solid #b5c9df;padding:5px 12px;margin:13px 0;font-size:13px}.history-item small{color:#77899d;display:block;margin-top:5px}.edit-form{padding:15px;background:#f4f8fc;border:1px solid #d9e5f0;border-radius:9px;margin-top:14px}.edit-form label{display:block;color:#4d6177;font-size:12px;font-weight:650;margin:10px 0 5px}.edit-form input,.edit-form select,.edit-form textarea{width:100%;padding:9px 11px;border:1px solid #c5d3e1;border-radius:7px;background:white}.edit-form textarea{resize:vertical;min-height:67px}.edit-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}.primary{border:1px solid #27659c;background:#27659c;color:#fff;border-radius:7px;padding:10px 16px;font-size:12px}.secondary{border:1px solid #bfd0df;background:#fff;color:#28557e;border-radius:7px;padding:10px 16px;font-size:12px}.message{font-size:12px;line-height:1.6;padding:10px 12px;margin:0 0 12px;border:1px solid #bcd9ea;background:#edf7ff;border-radius:8px;color:#22547b}.message.error{background:#fff0f0;border-color:#edbcbc;color:#992f3b}.login{max-width:440px;margin:65px auto;background:white;border:1px solid #d9e3ec;padding:28px;border-radius:13px}.login h2{font-size:20px}.login label{font-size:13px;font-weight:650;display:block;margin:13px 0 5px}.login input{width:100%;padding:11px;border:1px solid #bccddd;border-radius:7px}.login button{margin-top:17px;width:100%}@media(max-width:950px){.workspace{grid-template-columns:1fr}.detail{max-height:none}.table-wrapper{max-height:370px}}@media(max-width:600px){header{padding:12px}.wrap{padding:0 10px}.metrics{grid-template-columns:repeat(2,1fr)}.data-grid{grid-template-columns:1fr}.profile-photo{width:100px;height:140px}.filters input{width:100%}}
+</style></head><body>
+<header><div><h1>在籍管理</h1><small>L GROUP｜セラピストの在籍・退店・履歴管理</small></div><div class="header-menu"><a href="../interview-sheet-preview/">面接管理</a><a href="../exa-shifts/">出勤管理</a><span class="disabled">備品管理</span><a href="./" class="selected">在籍管理</a><button id="logout" class="hide">ログアウト</button></div></header>
+<section id="login" class="login hide"><h2>管理者ログイン</h2><p class="sub">面接管理と同じアカウントでログインできます。4人の管理者専用ページです。</p><form id="loginForm"><label for="email">メールアドレス</label><input id="email" type="email" autocomplete="username" required><label for="password">パスワード</label><input id="password" type="password" autocomplete="current-password" required><button class="primary" type="submit">ログイン</button></form><p id="loginError" class="sub"></p></section>
+<main id="app" class="wrap hide"><div class="page-head"><div><h2>セラピスト一覧</h2><div class="sub">EXAを基準に、面接情報・写真・在籍履歴を確認できます。</div></div><button id="reload" class="refresh">最新データを取得</button></div><p id="message" class="message hide" role="status"></p>
+<div class="metrics"><div class="metric"><span>EXA登録数</span><strong id="countAll">—</strong></div><div class="metric"><span>実働区分</span><strong id="countReal">—</strong></div><div class="metric"><span>ダミー区分</span><strong id="countDummy">—</strong></div><div class="metric"><span>面接情報との紐づけ</span><strong id="countLinked">—</strong></div></div>
+<div class="note">現在、EXAとの連携は「薔薇と紳士」のみです。他4店舗は準備中です。<strong>EXAの「実働・ダミー」と、在籍管理の「在籍中・休業中・退店」は別の情報</strong>です。面接未連携や出勤予定なしを退店とは判断しません。</div>
+<div class="filters"><select id="store"><option value="rose">薔薇と紳士</option><option disabled>Grand Luxe（未連携）</option><option disabled>LUXY OSAKA（未連携）</option><option disabled>Un Secret（未連携）</option><option disabled>BUSTY OSAKA（未連携）</option></select><select id="exaFilter"><option value="all">EXA区分：すべて</option><option value="active">実働</option><option value="dummy">ダミー</option></select><select id="statusFilter"><option value="all">在籍状況：すべて</option><option value="unconfirmed">未確認／未設定</option><option value="preparing">入店準備</option><option value="active">在籍中</option><option value="paused">休業中</option><option value="left">退店</option></select><select id="interviewFilter"><option value="all">面接：すべて</option><option value="linked">紐づけ済み</option><option value="unlinked">未紐づけ</option></select><input id="search" type="search" placeholder="源氏名・EXA IDで検索"></div>
+<div class="workspace"><section class="panel"><div class="panel-header"><strong>セラピスト</strong><span id="listCount" class="sub"></span></div><div class="table-wrapper"><table class="staff-table"><thead><tr><th>源氏名</th><th>EXA</th><th>在籍</th><th>面接</th></tr></thead><tbody id="list"></tbody></table></div></section>
+<section class="panel"><div id="detail" class="detail"><div class="empty">左の一覧からセラピストを選択してください。</div></div></section></div></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.10/dist/umd/supabase.min.js"></script>
+<script>
+const SB_URL="https://vjjnkflbfsjihwzjsjpr.supabase.co",SB_KEY="sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos";
+const client=window.supabase?.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,storage:sessionStorage,storageKey:"mattan-recruit-auth"}});
+const $=id=>document.getElementById(id),STORE="rose",PHOTO_BUCKET="therapist-internal-photos";
+const statusNames={unconfirmed:"未確認",preparing:"入店準備",active:"在籍中",paused:"休業中",left:"退店"};
+const safe=v=>{const el=document.createElement("span");el.textContent=String(v??"");return el.innerHTML;};
+let staff=[],exaLinks=[],interviewLinks=[],membership=[],photos=[],selected=null,currentTab="basic",authorized=false,requestSeq=0;
+const fmtDate=d=>d?String(d).slice(0,10):"—";
+const getPerson=t=>exaLinks.find(x=>x.exa_id===t.exa_id)?.person_id||null;
+const getHistory=t=>membership.filter(x=>x.person_id===getPerson(t)).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+const getStatus=t=>getHistory(t)[0]?.status||"unconfirmed";
+const hasInterview=t=>interviewLinks.some(x=>x.person_id===getPerson(t))&&Boolean(getPerson(t));
+function alertMsg(s,error=false){const el=$("message");el.textContent=s;el.classList.remove("hide");el.classList.toggle("error",error);}
+function cleanMsg(){$("message").classList.add("hide");}
+async function checkLogin(){
+ if(!client){$("login").classList.remove("hide");$("loginError").textContent="認証ライブラリを読み込めません。";return;}
+ const {data:{session}}=await client.auth.getSession();
+ if(!session){$("login").classList.remove("hide");$("app").classList.add("hide");$("logout").classList.add("hide");return;}
+ const [prof,can]=await Promise.all([client.from("recruit_staff_profiles").select("role,approved_at").eq("user_id",session.user.id).maybeSingle(),client.rpc("can_link_therapist_interview")]);
+ if(prof.error||can.error||!prof.data?.approved_at||can.data!==true){
+  $("login").classList.remove("hide");$("app").classList.add("hide");$("loginError").textContent="在籍管理は4人の管理者専用です。";return;
+ }
+ authorized=true;$("login").classList.add("hide");$("app").classList.remove("hide");$("logout").classList.remove("hide");await load();
+}
+$("loginForm").onsubmit=async e=>{e.preventDefault();$("loginError").textContent="認証中…";const {error}=await client.auth.signInWithPassword({email:$("email").value,password:$("password").value});if(error){$("loginError").textContent="ログインに失敗しました。";return;}$("loginError").textContent="";await checkLogin()};
+$("logout").onclick=async()=>{await client.auth.signOut();location.reload()};
+async function load(){
+ if(!authorized)return;alertMsg("在籍情報を取得しています…");
+ const queries=[
+  client.from("exa_shift_therapists").select("store_code,exa_id,stage_name,residency").eq("store_code",STORE).order("stage_name"),
+  client.from("therapist_exa_links").select("store_code,exa_id,person_id").eq("store_code",STORE),
+  client.from("therapist_interview_links").select("person_id,interview_applicant_id"),
+  client.from("therapist_store_memberships").select("id,person_id,store_code,stage_name,status,started_on,ended_on,notes,created_at").eq("store_code",STORE).order("created_at",{ascending:false}),
+  client.from("exa_therapist_photos").select("exa_id,storage_path").eq("store_code",STORE)
+ ];
+ const res=await Promise.all(queries);
+ const err=res.find(r=>r.error)?.error;
+ if(err){alertMsg("データ取得に失敗："+err.message,true);return;}
+ [staff,exaLinks,interviewLinks,membership,photos]=res.map(r=>r.data||[]);
+ $("countAll").textContent=staff.length;
+ $("countReal").textContent=staff.filter(t=>t.residency!=="dummy").length;
+ $("countDummy").textContent=staff.filter(t=>t.residency==="dummy").length;
+ $("countLinked").textContent=staff.filter(t=>hasInterview(t)).length;
+ cleanMsg();renderList();
+ if(selected!==null){if(staff.some(t=>t.exa_id===selected))await showDetail(selected,currentTab);else{$("detail").innerHTML='<div class="empty">対象者が見つかりません。</div>';selected=null;}}
+}
+function renderList(){
+ const term=$("search").value.trim().toLowerCase(),exa=$("exaFilter").value,status=$("statusFilter").value,interview=$("interviewFilter").value;
+ const filtered=staff.filter(t=>{
+  const isDummy=t.residency==="dummy",linked=hasInterview(t),st=getStatus(t);
+  if(exa!=="all"&&(exa==="dummy")!==isDummy)return false;
+  if(status!=="all"&&st!==status)return false;
+  if(interview!=="all"&&(interview==="linked")!==linked)return false;
+  return !term||(String(t.stage_name||"").toLowerCase().includes(term)||String(t.exa_id).includes(term));
+ });
+ $("listCount").textContent=filtered.length+"名表示";
+ const tbody=$("list");tbody.replaceChildren();
+ if(!filtered.length){const tr=document.createElement("tr");const td=document.createElement("td");td.colSpan=4;td.textContent="該当するセラピストがありません。";td.style.padding="28px";tr.appendChild(td);tbody.appendChild(tr);return;}
+ for(const t of filtered){
+  const tr=document.createElement("tr");tr.className=selected===t.exa_id?"selected":"";
+  const a=document.createElement("td");a.innerHTML='<div class="staff-name">'+safe(t.stage_name||"ID "+t.exa_id)+'</div><div class="tiny">ID '+t.exa_id+'</div>';
+  const b=document.createElement("td");b.innerHTML='<span class="pill">'+(t.residency==="dummy"?"ダミー":"実働")+'</span>';
+  const c=document.createElement("td");const st=getStatus(t);c.innerHTML='<span class="pill '+(st==="active"?"ok":st==="left"?"danger":st==="unconfirmed"?"warn":"")+'">'+statusNames[st]+'</span>';
+  const d=document.createElement("td");d.innerHTML='<span class="pill '+(hasInterview(t)?"ok":"")+'">'+(hasInterview(t)?"連携済":"未連携")+'</span>';
+  tr.append(a,b,c,d);tr.onclick=()=>showDetail(t.exa_id,"basic");tbody.appendChild(tr);
+ }
+}
+async function showDetail(exaId,tab="basic"){
+ const t=staff.find(x=>x.exa_id===exaId);if(!t)return;
+ selected=exaId;currentTab=tab;renderList();
+ const seq=++requestSeq;
+ const linked=hasInterview(t),personId=getPerson(t),st=getStatus(t),history=getHistory(t);
+ const el=$("detail");
+ el.innerHTML='<div class="profile-head"><div class="profile-photo" id="photo">画像未登録</div><div><div class="sub">薔薇と紳士｜EXA ID '+t.exa_id+'</div><h3>'+safe(t.stage_name||"ID "+t.exa_id)+'</h3><span class="pill">'+(t.residency==="dummy"?"EXA：ダミー":"EXA：実働")+'</span> <span class="pill '+(st==="active"?"ok":st==="left"?"danger":"warn")+'">在籍：'+statusNames[st]+'</span><p class="sub">面接情報：'+(linked?"紐づけ済み":"未紐づけ")+'</p></div></div><div class="tabs" id="tabs"></div><div id="tabBody"></div>';
+ for(const [key,label] of [["basic","基本情報"],["interview","面接・LINE"],["shift","出勤実績"],["history","在籍履歴"]]){
+  const b=document.createElement("button");b.textContent=label;b.classList.toggle("active",tab===key);b.onclick=()=>showDetail(exaId,key);$("tabs").appendChild(b);
+ }
+ const photo=photos.find(p=>p.exa_id===exaId);
+ if(photo){
+  const r=await client.storage.from(PHOTO_BUCKET).createSignedUrl(photo.storage_path,120);
+  if(seq===requestSeq&&r.data?.signedUrl){
+   const image=document.createElement("img");image.alt="セラピスト管理用画像";image.src=r.data.signedUrl;$("photo").replaceChildren(image);
+  }
+ }
+ if(seq!==requestSeq)return;
+ if(tab==="basic"){
+  $("tabBody").innerHTML='<h4 class="section-title">基本情報</h4><div class="data-grid"><div class="data-box"><small>所属店舗</small><strong>薔薇と紳士</strong></div><div class="data-box"><small>EXA ID</small><strong>'+t.exa_id+'</strong></div><div class="data-box"><small>源氏名（EXA）</small><strong>'+safe(t.stage_name)+'</strong></div><div class="data-box"><small>面接情報</small><strong>'+(linked?"連携済":"未連携")+'</strong></div><div class="data-box"><small>在籍状況</small><strong>'+statusNames[st]+'</strong></div><div class="data-box"><small>共通人物ID</small><span>'+(personId?safe(personId):"未発行")+'</span></div></div><p class="sub">画像の登録・差し替え、面接情報との紐づけは出勤管理のセラピスト詳細から行います。</p><a class="secondary" style="display:inline-block;text-decoration:none;margin-top:8px" href="../exa-shifts/">出勤管理を開く</a>';
+ }else if(tab==="interview"){
+  if(!linked){$("tabBody").innerHTML='<h4 class="section-title">面接・LINE</h4><p class="sub">面接情報は未紐づけです。出勤管理のセラピスト名から紐づけてください。</p>';return;}
+  const ids=interviewLinks.filter(x=>x.person_id===personId).map(x=>x.interview_applicant_id);
+  const r=await client.from("interview_applicants").select("id,name,kana,stage_name,shop,hire_shop,status,submitted_at,recruit_source,hire_date").in("id",ids).limit(30);
+  if(seq!==requestSeq)return;
+  if(r.error){$("tabBody").textContent="面接情報の取得に失敗："+r.error.message;return;}
+  const rows=(r.data||[]).map(x=>'<div class="history-item"><strong>'+safe(x.name||"氏名未登録")+'</strong><small>フリガナ：'+safe(x.kana||"—")+' ／ 源氏名：'+safe(x.stage_name||"—")+'</small><small>応募店舗：'+safe(x.shop||"—")+' ／ 入店先：'+safe(x.hire_shop||"—")+'</small><small>面接結果：'+safe(x.status||"—")+' ／ 応募媒体：'+safe(x.recruit_source||"—")+'</small><small>応募記録：'+fmtDate(x.submitted_at)+' ／ 入店日：'+fmtDate(x.hire_date)+'</small></div>').join("");
+  $("tabBody").innerHTML='<h4 class="section-title">紐づけ済み面接シート</h4>'+(rows||'<p class="sub">該当する面接シートを取得できませんでした。</p>')+'<h4 class="section-title">LINE履歴</h4><p class="sub">現在、この画面へのLINE履歴統合は未実装です。面接管理のLINE通知で確認してください。</p>';
+ }else if(tab==="shift"){
+  const r=await Promise.all([
+   client.from("exa_shift_entries").select("work_date").eq("store_code",STORE).eq("exa_id",exaId).limit(5000),
+   client.from("exa_shift_performance").select("work_date,customer_count,attendance_status").eq("store_code",STORE).eq("exa_id",exaId).limit(5000)
+  ]);
+  if(seq!==requestSeq)return;
+  const a=r[0],b=r[1];if(a.error||b.error){$("tabBody").textContent="出勤実績の取得に失敗しました。";return;}
+  const days=(a.data||[]).length,perform=(b.data||[]),count=perform.reduce((sum,x)=>sum+(Number(x.customer_count)||0),0);
+  $("tabBody").innerHTML='<h4 class="section-title">出勤実績（保存されているデータ）</h4><div class="data-grid"><div class="data-box"><small>EXAシフト登録件数</small><strong>'+days+'件</strong></div><div class="data-box"><small>接客本数記録数</small><strong>'+perform.length+'件</strong></div><div class="data-box"><small>記録済み接客合計</small><strong>'+count+'本</strong></div></div><p class="sub">対象期間はデータ保存範囲によります。登録件数は実際の出勤日数を保証するものではありません。</p><a class="secondary" style="display:inline-block;text-decoration:none" href="../exa-shifts/">月間シフトを確認</a>';
+ }else if(tab==="history"){
+  const hist=history.map(x=>'<div class="history-item"><strong>'+statusNames[x.status]+'</strong><small>登録：'+fmtDate(x.created_at)+' ／ 入店日：'+fmtDate(x.started_on)+' ／ 退店日：'+fmtDate(x.ended_on)+'</small>'+(x.notes?'<small>備考：'+safe(x.notes)+'</small>':'')+'</div>').join("");
+  $("tabBody").innerHTML='<h4 class="section-title">在籍履歴</h4>'+(hist||'<p class="sub">在籍履歴は未登録です。EXAの登録状態から在籍・退店は推測しません。</p>')+(personId?'<div class="edit-form"><strong>在籍状況を記録する</strong><label for="statusChoice">状態</label><select id="statusChoice"><option value="active">在籍中</option><option value="preparing">入店準備</option><option value="paused">休業中</option><option value="left">退店</option><option value="unconfirmed">未確認</option></select><label for="statusDate">日付（入店または退店の日）</label><input id="statusDate" type="date"><label for="statusNotes">備考・退店理由（任意）</label><textarea id="statusNotes" maxlength="2000"></textarea><div class="edit-actions"><button id="statusSave" class="primary">履歴を保存</button></div></div>':'<p class="sub">在籍履歴の登録には、面接情報との紐づけが必要です。</p>');
+  if(personId){
+   $("statusChoice").value=st;
+   $("statusSave").onclick=async()=>{
+    const status=$("statusChoice").value,date=$("statusDate").value||null,notes=$("statusNotes").value.trim();
+    if(!confirm(safe(t.stage_name)+" の在籍状況を「"+statusNames[status]+"」として履歴に追加しますか？"))return;
+    $("statusSave").disabled=true;
+    const user=(await client.auth.getUser()).data.user;
+    if(!user){alertMsg("認証情報を確認できません。",true);return;}
+    const record={person_id:personId,store_code:STORE,stage_name:t.stage_name,status,started_on:status==="active"||status==="preparing"?date:null,ended_on:status==="left"?date:null,notes:notes||null,created_by:user.id};
+    const res=await client.from("therapist_store_memberships").insert(record);
+    if(res.error){alertMsg("保存失敗："+res.error.message,true);$("statusSave").disabled=false;return;}
+    alertMsg("在籍履歴を記録しました。");await load();
+   };
+  }
+ }
+}
+for(const id of ["search","exaFilter","statusFilter","interviewFilter"])$(id).addEventListener(id==="search"?"input":"change",renderList);
+$("reload").onclick=load;
+checkLogin();
+</script></body></html>
