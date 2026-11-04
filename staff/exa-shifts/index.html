@@ -330,6 +330,48 @@ $("monthly").querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{selected=b
 $("monthly").querySelectorAll(".edit-count").forEach(input=>input.onclick=()=>openCount(input));
 $("monthly").querySelectorAll("[data-staff-id]").forEach(button=>button.onclick=()=>openResidency(button));
 }
+let editingResidency=null;
+function openResidency(button){
+ const exaId=Number(button.dataset.staffId);
+ const person=therapists.find(t=>t.exa_id===exaId);
+ if(!person)return;
+ editingResidency={exaId,old:person.residency,name:person.stage_name};
+ $("residencyTitle").textContent="在籍区分の変更";
+ $("residencyInfo").textContent=person.stage_name+"（EXA ID："+exaId+"）／現在："+(isDummy(person)?"ダミー":"実働");
+ $("residencyChoice").value=isDummy(person)?"dummy":"active";
+ $("residencyModal").classList.remove("hide");
+ $("residencyChoice").focus();
+}
+function closeResidency(){
+ $("residencyModal").classList.add("hide");
+ editingResidency=null;
+}
+$("residencyCancel").onclick=closeResidency;
+$("residencyShade").onclick=closeResidency;
+$("residencySave").onclick=async()=>{
+ if(!editingResidency||!authorized)return;
+ const newResidency=$("residencyChoice").value;
+ if(!["active","dummy"].includes(newResidency))return;
+ const current=therapists.find(t=>t.exa_id===editingResidency.exaId);
+ if(!current)return;
+ if(current.residency===newResidency){closeResidency();return;}
+ const label=newResidency==="dummy"?"ダミー":"実働";
+ const oldLabel=isDummy(current)?"ダミー":"実働";
+ if(!confirm(current.stage_name+"（EXA ID："+current.exa_id+"）を"+oldLabel+"から"+label+"へ変更しますか？\n出勤管理の人数集計にも反映します。"))return;
+ const saveButton=$("residencySave");saveButton.disabled=true;
+ try{
+  const {data,error}=await client.from("exa_shift_therapists")
+   .update({residency:newResidency})
+   .eq("store_code","rose").eq("exa_id",current.exa_id).eq("residency",current.residency)
+   .select("exa_id,residency").maybeSingle();
+  if(error)throw error;
+  if(!data||data.residency!==newResidency)throw Error("変更結果を確認できませんでした。再読込して確認してください。");
+  closeResidency();
+  await load();
+  showMsg(current.stage_name+"を"+label+"に変更しました。");
+ }catch(e){showMsg("在籍区分の変更に失敗："+String(e.message||e),true)}
+ finally{saveButton.disabled=false}
+};
 let editingCount=null;
 function openCount(button){
  const id=Number(button.dataset.id),date=button.dataset.date;
@@ -526,7 +568,7 @@ $("csvFile").onchange=async e=>{
 };
 $("closeDay").onclick=()=>{$("dayPanel").classList.add("hide")};
 $("dayBackdrop").onclick=$("closeDay").onclick;
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("dayPanel").classList.add("hide");closeCount();}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("dayPanel").classList.add("hide");closeCount();closeResidency();}});
 $("storeSelect").onchange=()=>{if($("storeSelect").value!=="rose")showMsg("他店舗のEXA連携は準備中です。",true)};
 document.querySelectorAll("[data-show-staff]").forEach(b=>b.onclick=()=>{
  staffView=b.dataset.showStaff;
