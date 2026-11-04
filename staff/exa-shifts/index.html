@@ -127,10 +127,35 @@ html+="</tbody>";$("monthly").innerHTML=html;
 $("monthly").querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{selected=b.dataset.day;renderDay();$("dayPanel").classList.remove("hide")});
 $("monthly").querySelectorAll(".edit-count").forEach(input=>input.onclick=()=>openCount(input));
 }
-async function savePerformance(input){const id=Number(input.dataset.id),work_date=input.dataset.date,v=input.value.trim();
-if(v===""||!/^\d+$/.test(v)||Number(v)>99){showMsg("0〜99の整数を入力してください。未入力へ戻す操作は現在未実装です。",true);return;}
-input.disabled=true;const {error}=await client.from("exa_shift_performance").upsert({store_code:"rose",exa_id:id,work_date,customer_count:Number(v)},{onConflict:"store_code,exa_id,work_date"});
-input.disabled=false;if(error){showMsg("保存失敗："+error.message,true)}else{showMsg("接客本数を保存しました");await load();}}
+let editingCount=null;
+function openCount(button){
+ const id=Number(button.dataset.id),date=button.dataset.date;
+ const old=performances.find(p=>p.exa_id===id&&p.work_date===date);
+ editingCount={id,date};
+ $("countTitle").textContent=(therapists.find(t=>t.exa_id===id)?.stage_name||"セラピスト")+"｜"+date;
+ $("countSelect").selectedIndex=-1;
+ if(old)$("countSelect").value=old.attendance_status==="absent"?"absent":String(old.customer_count);
+ $("countModal").classList.remove("hide");
+}
+function closeCount(){$("countModal").classList.add("hide");editingCount=null;}
+$("countCancel").onclick=closeCount;
+$("countShade").onclick=closeCount;
+$("countConfirm").onclick=async()=>{
+ if(!editingCount)return;
+ const selected=$("countSelect").value;
+ if(!["absent","0","1","2","3","4","5","6"].includes(selected)){showMsg("当欠または0〜6を選択してください",true);return;}
+ const button=$("countConfirm");button.disabled=true;
+ try{
+  const {error}=await client.from("exa_shift_performance").upsert({
+   store_code:"rose",exa_id:editingCount.id,work_date:editingCount.date,
+   customer_count:selected==="absent"?0:Number(selected),
+   attendance_status:selected==="absent"?"absent":"worked"
+  },{onConflict:"store_code,exa_id,work_date"});
+  if(error)throw error;
+  closeCount();await load();showMsg("接客本数を確定しました。");
+ }catch(e){showMsg("保存失敗："+String(e.message||e),true)}
+ finally{button.disabled=false}
+};
 function renderDay(){if(!selected.startsWith(month))selected=month+"-01";
 $("dayTitle").textContent=selected+"｜日別タイムチャート";
 const map=staffById(),day=shifts.filter(s=>s.work_date===selected);
