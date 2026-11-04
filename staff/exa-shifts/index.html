@@ -40,7 +40,12 @@ main{max-width:none;margin:11px auto;padding:0 14px}
 .day-modal-content h2{font-size:17px;margin:0}
 #closeDay{background:#f3f6fa}
 footer{display:none}
-.count-panel{position:relative;z-index:1;width:345px;padding:22px}.count-panel h2{margin:0}.count-panel select{display:block;width:100%;height:255px;border:1px solid #cbd7e7;border-radius:7px;margin:14px 0;font-size:16px}.count-panel option{padding:7px}.shift-table .edit-count{width:100%;height:23px;padding:1px;border:1px solid #d6e2ee;border-radius:4px;background:#f8fbff;font-size:11px;color:#254467}</style></head>
+.count-panel{position:relative;z-index:1;width:345px;padding:22px}.count-panel h2{margin:0}.count-panel select{display:block;width:100%;height:255px;border:1px solid #cbd7e7;border-radius:7px;margin:14px 0;font-size:16px}.count-panel option{padding:7px}.shift-table .edit-count{width:100%;height:23px;padding:1px;border:1px solid #d6e2ee;border-radius:4px;background:#f8fbff;font-size:11px;color:#254467}.shift-table th:first-child,.shift-table td:first-child{width:164px;min-width:164px}
+.shift-table .staff-name{font-weight:500;line-height:1.1}
+.staff-name .reading{display:block;font-weight:400;color:#77879c;font-size:9px;margin-top:2px}
+.shift-table td.stat-cell{background:#f7f9fc;font-weight:600}
+.shift-table th:nth-last-child(-n+4),.shift-table td:nth-last-child(-n+4){min-width:35px}
+</style></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
 <label class="store-label">店舗 <select id="storeSelect" aria-label="店舗切替"><option value="rose">薔薇と紳士</option></select></label>
@@ -108,11 +113,14 @@ const per=new Map(performances.map(p=>[p.exa_id+"|"+p.work_date,p.customer_count
 const absence=new Set(performances.filter(p=>p.attendance_status==="absent").map(p=>p.exa_id+"|"+p.work_date));
 let html="<thead><tr><th>セラピスト</th>";
 for(let n=1;n<=daysIn();n++){const d=dayStr(n);html+='<th><button type="button" data-day="'+d+'">'+n+"日</button></th>";}
-html+="<th>平均稼働</th></tr></thead><tbody>";
+html+="<th>稼働</th><th>出勤</th><th>0本</th><th>評価</th></tr></thead><tbody>";
 for(const [label,list,group] of [["実在籍",real,"real"],["ダミー在籍",dummy,"dummy"]]){
-html+='<tr class="group"><td colspan="'+(daysIn()+2)+'">'+label+"（"+list.length+"名）</td></tr>";
+html+='<tr class="group"><td colspan="'+(daysIn()+5)+'">'+label+"（"+list.length+"名）</td></tr>";
 for(const t of list){const entries=byId.get(t.exa_id),valid=[...entries.values()].filter(r=>r.work_date<today()&&(!isDummy(t))&&!r.is_dummy_shift&&per.has(t.exa_id+"|"+r.work_date));const paid=valid.filter(r=>!absence.has(t.exa_id+"|"+r.work_date));const avg=paid.length?(paid.reduce((s,r)=>s+per.get(t.exa_id+"|"+r.work_date),0)/paid.length).toFixed(1):"—";
-html+='<tr><td>'+safe(t.stage_name||"ID "+t.exa_id)+'</td>';
+const rawName=String(t.stage_name||"ID "+t.exa_id);
+const nameParts=rawName.match(/^(.+?)-([^-]+)-$/);
+const stageName=nameParts?nameParts[1]:rawName,kana=nameParts?nameParts[2]:"";
+html+='<tr><td class="staff-name"><strong>'+safe(stageName)+'</strong>'+(kana?'<span class="reading">'+safe(kana)+'</span>':'')+'</td>';
 for(let n=1;n<=daysIn();n++){const day=dayStr(n),r=entries.get(day),value=per.get(t.exa_id+"|"+day),past=day<today();
 html+='<td class="'+(group==="dummy"?"dummy ":"")+(day===today()?"today":"")+'">';
 if(r&&past&&group==="real"&&!r.is_dummy_shift)html+='<button type="button" class="edit-count" data-id="'+t.exa_id+'" data-date="'+day+'">'+(absence.has(t.exa_id+"|"+day)?"当欠":value===undefined?"＋":value)+'</button>';
@@ -122,7 +130,9 @@ else if(r&&past&&r.is_dummy_shift)html+="—";
 else html+='<small> </small>';
 html+="</td>";
 }
-html+='<td><strong>'+avg+'</strong></td></tr>';
+const days=[...entries.values()].filter(r=>!r.is_dummy_shift).length;
+const zeros=valid.filter(r=>!absence.has(t.exa_id+"|"+r.work_date)&&per.get(t.exa_id+"|"+r.work_date)===0).length;
+html+='<td class="stat-cell"><strong>'+avg+'</strong></td><td class="stat-cell">'+days+'</td><td class="stat-cell">'+zeros+'</td><td class="stat-cell" title="アンケート点数は未連携">—</td></tr>';
 }}
 html+="</tbody>";$("monthly").innerHTML=html;
 $("monthly").querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{selected=b.dataset.day;renderDay();$("dayPanel").classList.remove("hide")});
