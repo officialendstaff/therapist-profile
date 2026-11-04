@@ -118,6 +118,55 @@ footer{display:none}
 .shift-table thead tr:first-child th:nth-child(3),.shift-table tbody tr:not(.group) td:nth-child(3){left:168px!important}
 .shift-table thead tr:first-child th:nth-child(4),.shift-table tbody tr:not(.group) td:nth-child(4){left:220px!important}
 .shift-table thead tr:first-child th:nth-child(5),.shift-table tbody tr:not(.group) td:nth-child(5){left:272px!important}
+
+/* Status colours: subdued, high-contrast, independently readable. */
+.shift-table tbody tr:not(.group) td.stat-cell.unpaid-positive{
+  background:#ffe8e6!important;color:#a72d35!important;font-weight:800;
+}
+.shift-table .edit-count.absent-entry{
+  background:#ffdcd7!important;border-color:#d77474!important;color:#a92732!important;font-weight:800;
+}
+.shift-table thead tr:first-child th.day-heading.saturday,
+.shift-table thead tr.daily-totals th.day-total.saturday{
+  background:#dbeafe!important;color:#205b9c!important;
+}
+.shift-table thead tr:first-child th.day-heading.sunday,
+.shift-table thead tr.daily-totals th.day-total.sunday,
+.shift-table thead tr:first-child th.day-heading.holiday,
+.shift-table thead tr.daily-totals th.day-total.holiday{
+  background:#fce4e6!important;color:#a82e41!important;
+}
+.shift-table tbody tr:not(.group) td.saturday{background:#f1f7ff!important}
+.shift-table tbody tr:not(.group) td.sunday,
+.shift-table tbody tr:not(.group) td.holiday{background:#fff2f3!important}
+.shift-table tbody tr:not(.group) td.today{
+  background:#d7e9fa!important;
+  box-shadow:inset 2px 0 #4380b7,inset -2px 0 #4380b7;
+  border-bottom-color:#a4c5e6!important;
+}
+.shift-table thead tr:first-child th.today-marker,
+.shift-table thead tr.daily-totals th.today-marker{
+  background:#bcd8f2!important;color:#174673!important;
+  box-shadow:inset 2px 0 #4380b7,inset -2px 0 #4380b7;
+}
+.shift-table tbody tr:not(.group) td.last-scheduled{
+  box-shadow:inset 0 0 0 2px #bc8a36!important;
+  background:#fff2d8!important;
+}
+.shift-table tbody tr.outside-roster td:not(.last-scheduled){
+  background:#eceff3!important;color:#67778a!important;
+}
+.shift-table tbody tr.outside-roster td:first-child,
+.shift-table tbody tr.outside-roster td.stat-cell{
+  background:#e7ebf1!important;
+}
+.shift-table tbody tr.outside-roster td.today{
+  box-shadow:inset 2px 0 #4380b7,inset -2px 0 #4380b7!important;
+}
+.outside-label{
+  display:inline-block;margin-top:3px;margin-left:2px;padding:1px 4px;
+  border-radius:3px;background:#d0d8e2;color:#485a6d;font-size:9px;font-weight:700;
+}
 </style></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
