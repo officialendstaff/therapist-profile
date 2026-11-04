@@ -22,8 +22,9 @@ export function parseExaDay(html:string,baseUrl:string):DayResult {
  for(const tr of doc.querySelectorAll("tr")){
    const statuses=Array.from(tr.querySelectorAll('input[type="radio"][name$="[status]"]'));
    if(!statuses.length)continue;
-   const selected=statuses.find(x=>x.hasAttribute("checked"));
-   if(!selected)throw Error("Unselected status in "+date);
+   const checked=statuses.filter(x=>x.hasAttribute("checked"));
+   if(checked.length!==1)throw Error("Invalid number of selected statuses in "+date);
+   const selected=checked[0];
    const idMatch=(selected.getAttribute("name")||"").match(/^(\d+)\[status\]$/);
    if(!idMatch)throw Error("Invalid therapist ID");
    const id=Number(idMatch[1]);
