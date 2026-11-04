@@ -349,7 +349,7 @@ footer{display:none}
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
 <label class="store-label">店舗 <select id="storeSelect" aria-label="店舗切替"><option value="rose">薔薇と紳士</option></select></label>
 <div class="head-month"><button id="prev" title="前月">◀</button><strong id="monthLabel"></strong><button id="next" title="翌月">▶</button></div>
-<button id="exaSync" class="primary" title="Chrome拡張機能経由の手動更新">今すぐ更新</button>
+<button id="exaSync" class="primary" title="EXAサーバーから30日分を直接取得・反映">今すぐ更新</button>
 <details class="settings-menu"><summary>その他 <span aria-hidden="true">▾</span></summary><div class="settings-panel">
 <button id="reload">保存データを再読込</button>
 <button id="unscheduledAdd" title="EXA登録画面でIDと源氏名を確認した人だけ追加。出勤データは変更しません">出勤予定なしのEXA登録者を追加</button>
@@ -857,7 +857,7 @@ let autoEnabled=localStorage.getItem(AUTO_KEY)==="on";
 const asTokyoDate=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
 function paintAuto(){
  $("autoSync").textContent=autoEnabled?"ブラウザ自動：ON":"ブラウザ自動：OFF";
- $("autoSync").title="Chrome・この管理ページ・EXAタブを開いている間に動作します。Chrome終了中は実行されません。";
+ $("autoSync").title="この画面を開いている間に3時間おきにサーバー同期します。画面を閉じていても別途サーバー定期同期が動作します。";
  $("autoSync").setAttribute("aria-pressed",String(autoEnabled));
 }
 paintAuto();
@@ -868,7 +868,7 @@ $("autoSync").onclick=()=>{
    localStorage.setItem(LAST_KEY,String(Date.now()));
  }
  paintAuto();
- showMsg(autoEnabled?"3時間自動更新を有効にしました。Chrome・管理ページ・EXAタブを開いている間のみ作動します。":"3時間自動更新を停止しました。");
+ showMsg(autoEnabled?"3時間自動更新を有効にしました。このページを開いている間、3時間おきに更新します。":"3時間自動更新を停止しました。");
 };
 
 const bridgeRequests=new Map();
@@ -902,37 +902,37 @@ async function fetchFromExaExtension(){
 async function synchronizeEXA(mode="manual"){
  if(!authorized||extensionBusy)return;
  const automatic=mode==="auto";
- syncAbortRequested=false;
- extensionBusy=true;exaSyncStartedAt=Date.now();$("exaSync").disabled=false;$("exaSync").textContent="更新を中止";$("exaSync").title="EXAの取得待ちを中止します（保存済みデータは変更しません）";$("autoSync").disabled=true;
+ extensionBusy=true;exaSyncStartedAt=Date.now();
+ $("exaSync").disabled=true;$("exaSync").textContent="更新中…";$("exaSync").title="EXAサーバーから直接30日分を同期しています";
+ $("autoSync").disabled=true;
  try{
-  showMsg(automatic?"EXAを3時間定期取得中…":"EXAから最新30日分を読み込み中…");
-  const result=await fetchFromExaExtension();
-  if(syncAbortRequested)throw new Error("EXAの取得を中止しました。");
-  $("exaSync").disabled=true;$("exaSync").textContent="反映中…";
-  if(!result?.ok)throw new Error(result?.error||"取得できませんでした");
-  if(!Array.isArray(result.rows)||!result.rows.length||result.days!==30)throw new Error("取得内容が不完全です。既存データは変更しません");
-  if(automatic && result.first!==asTokyoDate())throw new Error("EXAの日別スケジュールが本日("+asTokyoDate()+")ではありません。EXAで本日を表示してください。");
-  if(!automatic&&!confirm("EXAから"+result.first+"〜"+result.last+"の"+result.rows.length+"件を取得しました。対象30日分をEXAと照合し、取り消された出勤も反映します。接客本数・ダミー区分は保持します。続行しますか？")){
-    showMsg("更新をキャンセルしました");return;
-  }
+  showMsg(automatic?"EXAのサーバー自動同期中…":"EXAサーバーから最新30日分を取得・反映中…");
   const {data:{session}}=await client.auth.getSession();
   if(!session)throw new Error("管理ページに再ログインしてください");
-  showMsg("Supabaseに"+result.rows.length+"件を反映中…");
   const controller=new AbortController();
-  const importTimeout=setTimeout(()=>controller.abort(),45000);
+  const timer=setTimeout(()=>controller.abort(),75000);
   let res;
-  try{res=await fetch(URL_SB+"/functions/v1/exa-shift-import",{
+  try{
+   res=await fetch(URL_SB+"/functions/v1/exa-rose-manual-sync",{
     method:"POST",signal:controller.signal,
     headers:{"Content-Type":"application/json","apikey":KEY_SB,"Authorization":"Bearer "+session.access_token},
-    body:JSON.stringify({rows:result.rows,source:"extension_snapshot",first:result.first,last:result.last,days:result.days})
-  });}finally{clearTimeout(importTimeout)}
+    body:"{}"
+   });
+  }finally{clearTimeout(timer)}
   const data=await res.json();
-  if(!res.ok||!data.ok)throw new Error(data.error||"Supabaseの更新に失敗しました");
+  if(!res.ok||!data.ok)throw new Error(data.error||"サーバー同期に失敗しました（HTTP "+res.status+"）");
   localStorage.setItem(LAST_KEY,String(Date.now()));
   await load();
-  showMsg((automatic?"自動更新":"手動更新")+"完了："+data.imported+"件（"+result.first+"〜"+result.last+"）。出勤取消："+data.removed+"件。");
- }catch(err){showMsg((automatic?"自動更新":"今すぐ更新")+"に失敗："+String(err.message||err),true)}
- finally{extensionBusy=false;exaSyncStartedAt=0;$("exaSync").disabled=false;$("exaSync").textContent="今すぐ更新";$("exaSync").title="Chrome拡張機能経由の手動更新";$("autoSync").disabled=false}
+  showMsg((automatic?"自動更新":"手動更新")+"完了："+data.imported+"件・"+data.days+"日分。出勤取消："+data.removed+"件。");
+ }catch(err){
+  const timedOut=err?.name==="AbortError";
+  showMsg((automatic?"自動更新":"今すぐ更新")+"に失敗："+(timedOut?"サーバー応答が75秒を超えました。最新データ再読込で反映状況を確認してください。":String(err.message||err)),true);
+ }finally{
+  extensionBusy=false;exaSyncStartedAt=0;
+  $("exaSync").disabled=false;$("exaSync").textContent="今すぐ更新";
+  $("exaSync").title="EXAサーバー側で最新30日分のシフトを取得・反映";
+  $("autoSync").disabled=false;
+ }
 }
 // Manual bridge for EXA registrations not included in a 30-day schedule snapshot.
 // It never changes existing rows, shifts or roster classifications.
@@ -982,7 +982,7 @@ $("serverTest").onclick=async()=>{
  }catch(e){showMsg("サーバー接続テスト失敗："+String(e.message||e),true)}
  finally{button.disabled=false}
 };
-$("exaSync").onclick=()=>extensionBusy?cancelEXASync():synchronizeEXA("manual");
+$("exaSync").onclick=()=>synchronizeEXA("manual");
 async function checkAuto(){
  if(!autoEnabled||!authorized||extensionBusy)return;
  const now=Date.now();
