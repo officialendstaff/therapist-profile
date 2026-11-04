@@ -73,7 +73,7 @@ footer{display:none}
 const URL_SB="https://vjjnkflbfsjihwzjsjpr.supabase.co",KEY_SB="sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos";
 const client=window.supabase?.createClient(URL_SB,KEY_SB,{auth:{persistSession:true,autoRefreshToken:true,storage:sessionStorage,storageKey:"mattan-recruit-auth"}});
 const $=id=>document.getElementById(id), today=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
-const initial=today();let month=initial.slice(0,7),selected=initial,therapists=[],shifts=[],performances=[],authorized=false;
+const initial=today();let month=initial.slice(0,7),selected=initial,therapists=[],shifts=[],performances=[],historyPerformances=[],authorized=false;
 const safe=(v)=>{const e=document.createElement("span");e.textContent=String(v??"");return e.innerHTML;};
 const daysIn=()=>new Date(Number(month.slice(0,4)),Number(month.slice(5,7)),0).getDate();
 const dayStr=n=>month+"-"+String(n).padStart(2,"0");
@@ -95,15 +95,16 @@ $("logout").onclick=async()=>{await client.auth.signOut();location.reload()};
 async function load(){
 if(!authorized)return;showMsg("Supabaseを読み込み中…");
 const start=month+"-01",end=dayStr(daysIn());
-const [a,b,c,d]=await Promise.all([
+const [a,b,c,d,e]=await Promise.all([
 client.from("exa_shift_therapists").select("exa_id,stage_name,residency").eq("store_code","rose"),
 client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_dummy_shift").eq("store_code","rose").gte("work_date",start).lte("work_date",end).order("work_date"),
 client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code","rose").gte("work_date",start).lte("work_date",end),
-client.from("exa_shift_sync_runs").select("finished_at,record_count,mode").eq("store_code","rose").eq("state","success").order("finished_at",{ascending:false}).limit(1)
+client.from("exa_shift_sync_runs").select("finished_at,record_count,mode").eq("store_code","rose").eq("state","success").order("finished_at",{ascending:false}).limit(1),
+client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code","rose").lt("work_date",today()).limit(5000)
 ]);
-const err=[a,b,c,d].find(r=>r.error)?.error;
+const err=[a,b,c,d,e].find(r=>r.error)?.error;
 if(err){showMsg("読み込みエラー："+err.message,true);return;}
-therapists=a.data||[];shifts=b.data||[];performances=c.data||[];
+therapists=a.data||[];shifts=b.data||[];performances=c.data||[];historyPerformances=e.data||[];
 $("monthLabel").textContent=month.replace("-","年")+"月";
 $("message").textContent="";
 renderMonthly();renderDay();}
@@ -120,7 +121,7 @@ for(let n=1;n<=daysIn();n++){const d=dayStr(n);html+='<th><button type="button" 
 html+="<th>稼働</th><th>出勤</th><th>0本</th><th>評価</th></tr></thead><tbody>";
 for(const [label,list,group] of [["実働",real,"real"],["ダミー",dummy,"dummy"]]){if(staffView!=="all"&&staffView!==group)continue;
 html+='<tr class="group"><td colspan="'+(daysIn()+5)+'">'+label+"（"+list.length+"名）</td></tr>";
-for(const t of list){const entries=byId.get(t.exa_id),valid=[...entries.values()].filter(r=>r.work_date<today()&&(!isDummy(t))&&!r.is_dummy_shift&&per.has(t.exa_id+"|"+r.work_date));const paid=valid.filter(r=>!absence.has(t.exa_id+"|"+r.work_date));const avg=paid.length?(paid.reduce((s,r)=>s+per.get(t.exa_id+"|"+r.work_date),0)/paid.length).toFixed(1):"—";
+for(const t of list){const entries=byId.get(t.exa_id),valid=[...entries.values()].filter(r=>r.work_date<today()&&(!isDummy(t))&&!r.is_dummy_shift&&per.has(t.exa_id+"|"+r.work_date));const historical=historyPerformances.filter(p=>p.exa_id===t.exa_id&&p.attendance_status!=="absent");const avg=historical.length?(historical.reduce((sum,p)=>sum+p.customer_count,0)/historical.length).toFixed(1):"—";
 const rawName=String(t.stage_name||"ID "+t.exa_id);
 const nameParts=rawName.match(/^(.+?)-([^-]+)-$/);
 const stageName=nameParts?nameParts[1]:rawName,kana=nameParts?nameParts[2]:"";
