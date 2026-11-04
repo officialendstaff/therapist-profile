@@ -9,8 +9,7 @@
 <section id="login" class="panel"><h2>スタッフログイン</h2><p class="muted">面接管理で使用しているSupabaseアカウントでログインしてください。閲覧は承認済み管理者に限定しています。</p><form id="loginForm"><label>メールアドレス<input id="email" type="email" autocomplete="username" required></label><label>パスワード<input id="password" type="password" autocomplete="current-password" required></label><button class="primary" type="submit">ログイン</button></form><p id="loginError" class="error"></p></section>
 <main id="app" class="hide">
 <div class="panel row space"><div class="row"><button id="prev">◀</button><strong id="monthLabel"></strong><button id="next">▶</button><span class="tag">薔薇と紳士</span></div><div class="row"><button id="reload" class="primary">保存データを再読込</button><button id="exaSync" disabled title="EXA自動認証・収集処理は未接続">EXAから今すぐ更新（未接続）</button></div></div>
-<div class="panel"><div class="row space"><div><strong>データ同期状況</strong><p class="muted" id="syncLabel">読み込み前</p></div><span class="tag">3時間自動更新：未接続</span></div><p class="muted">「保存データを再読込」はSupabase内の最新データを表示します。EXAの直接取得はまだ行いません。</p><p id="message" aria-live="polite"></p></div>
-<div class="panel"><div class="kpis"><div class="kpi"><span class="muted">登録シフト数</span><strong id="nAll">—</strong></div><div class="kpi"><span class="muted">実在籍シフト数</span><strong id="nReal">—</strong></div><div class="kpi"><span class="muted">ダミーシフト数</span><strong id="nDummy">—</strong></div><div class="kpi"><span class="muted">対象セラピスト</span><strong id="nPeople">—</strong></div></div></div>
+<p id="message" class="muted" aria-live="polite" style="margin:0 0 8px"></p>
 <div class="panel"><div class="row space"><h2>月間シフト</h2><span class="muted">過去日の数字＝接客本数（空欄は未入力）／当日以降＝出勤時間</span></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
 <div class="panel" id="dayPanel"><div class="row space"><h2 id="dayTitle">日別タイムチャート</h2><span class="muted">時間帯別の実出勤人数のみ集計。ダミーは下段に表示。</span></div><div id="timeline"></div></div>
 </main><footer>EXA管理ページの登録内容は変更しません。接客本数のみSupabaseへ保存します。</footer>
@@ -50,10 +49,8 @@ client.from("exa_shift_sync_runs").select("finished_at,record_count,mode").eq("s
 const err=[a,b,c,d].find(r=>r.error)?.error;
 if(err){showMsg("読み込みエラー："+err.message,true);return;}
 therapists=a.data||[];shifts=b.data||[];performances=c.data||[];
-$("syncLabel").textContent=d.data?.[0]?.finished_at?"最終取込："+new Date(d.data[0].finished_at).toLocaleString("ja-JP",{timeZone:"Asia/Tokyo"})+"（"+d.data[0].mode+"）":"同期履歴なし";
-$("nAll").textContent=shifts.length;$("nReal").textContent=shifts.filter(r=>!isDummy(staffById().get(r.exa_id)||{})&&!r.is_dummy_shift).length;$("nDummy").textContent=shifts.length-Number($("nReal").textContent);$("nPeople").textContent=new Set(shifts.map(s=>s.exa_id)).size;
 $("monthLabel").textContent=month.replace("-","年")+"月";
-showMsg(shifts.length+"件の保存データを表示しています（EXAへの通信なし）");
+$("message").textContent="";
 renderMonthly();renderDay();}
 function renderMonthly(){
 const existing=staffById(), byId=new Map();
