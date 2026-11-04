@@ -236,6 +236,23 @@ footer{display:none}
   box-shadow:inset 0 0 0 2px #bd8429!important;
   border-bottom-color:#bd8429!important;
 }
+
+/* Enlarged desktop day chart with group headcounts and chronological rows. */
+.day-modal{padding:12px!important}
+.day-modal-content{width:min(1740px,98vw)!important;height:94vh!important;max-height:94vh!important;display:flex;flex-direction:column;padding:16px 19px!important}
+.day-modal-content .row.space{flex-shrink:0;padding-bottom:13px;border-bottom:1px solid #dfe7f1;margin-bottom:10px}
+.timeline-heading{display:flex;align-items:baseline;gap:24px;flex-wrap:wrap}
+.day-headcount{font-size:14px;color:#214d79;font-weight:750}
+#timeline{min-height:0;flex:1;display:flex;flex-direction:column}
+#timeline .chart-scroll{flex:1;max-height:100%;overflow:auto}
+.timeline{min-width:1160px;border-spacing:1px;font-size:12px}
+.timeline th,.timeline td{height:30px;padding:6px 4px}
+.timeline thead th{position:sticky;top:0;z-index:6;background:#e5effa}
+.timeline thead th:first-child{z-index:7;background:#dbe8f5}
+.timeline .timeline-group th{position:sticky;left:0;z-index:3;text-align:left;background:#dce9f7;padding:9px 11px;font-size:13px}
+.timeline .timeline-name{font-weight:650;min-width:145px}
+.timeline .timeline-name small{display:block;font-size:10px;color:#64768c;font-weight:400}
+.timeline .sum td{font-weight:750;background:#dbeafa}
 </style></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
@@ -264,7 +281,7 @@ footer{display:none}
 <p class="muted">EXAの登録内容やHP公開設定は変更しません。出勤管理の一覧・人数集計のみ切り替わります。</p>
 <div class="row space"><button id="residencyCancel" type="button">キャンセル</button><button id="residencySave" class="primary" type="button">変更を確定</button></div>
 </div></div>
-<div id="countModal" class="day-modal hide" role="dialog" aria-modal="true"><div id="countShade" class="day-modal-shade"></div><div class="panel count-panel"><h2 id="countTitle">接客本数</h2><p class="muted">当欠は0本とは別に記録します。</p><select id="countSelect" size="8"><option value="absent">当欠</option><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select><div class="row space"><button id="countCancel">キャンセル</button><button id="countConfirm" class="primary">確定</button></div></div></div><div id="dayPanel" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="dayTitle"><div class="day-modal-shade" id="dayBackdrop"></div><div class="day-modal-content panel"><div class="row space"><h2 id="dayTitle">日別タイムチャート</h2><button id="closeDay" type="button" aria-label="閉じる">閉じる ×</button></div><div id="timeline"></div></div></div>
+<div id="countModal" class="day-modal hide" role="dialog" aria-modal="true"><div id="countShade" class="day-modal-shade"></div><div class="panel count-panel"><h2 id="countTitle">接客本数</h2><p class="muted">当欠は0本とは別に記録します。</p><select id="countSelect" size="8"><option value="absent">当欠</option><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select><div class="row space"><button id="countCancel">キャンセル</button><button id="countConfirm" class="primary">確定</button></div></div></div><div id="dayPanel" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="dayTitle"><div class="day-modal-shade" id="dayBackdrop"></div><div class="day-modal-content panel"><div class="row space"><div class="timeline-heading"><h2 id="dayTitle">日別タイムチャート</h2><strong id="dayHeadcount" class="day-headcount"></strong></div><button id="closeDay" type="button" aria-label="閉じる">閉じる ×</button></div><div id="timeline"></div></div></div>
 </main><footer>EXA管理ページの登録内容は変更しません。接客本数のみSupabaseへ保存します。</footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.10/dist/umd/supabase.min.js"></script>
 <script>
@@ -486,19 +503,35 @@ $("countConfirm").onclick=async()=>{
  }catch(e){showMsg("保存失敗："+String(e.message||e),true)}
  finally{button.disabled=false}
 };
-function renderDay(){if(!selected.startsWith(month))selected=month+"-01";
-$("dayTitle").textContent=selected+"｜日別タイムチャート";
-const map=staffById(),day=shifts.filter(s=>s.work_date===selected);
-const real=day.filter(r=>!isDummy(map.get(r.exa_id)||{})&&!r.is_dummy_shift);
-const dummy=day.filter(r=>!real.includes(r));
-const slots=Array.from({length:20},(_,i)=>600+i*60);
-let html='<div class="chart-scroll"><table class="timeline"><thead><tr><th>セラピスト</th>'+slots.map(x=>"<th>"+minutes(x)+"</th>").join("")+"</tr></thead><tbody>";
-function addRows(rows,kind){if(!rows.length)return;
-html+='<tr><th colspan="21" style="text-align:left;background:#e0eaf5">'+kind+'</th></tr>';
-for(const r of rows){const t=map.get(r.exa_id);html+='<tr><td>'+safe(t?.stage_name||"ID "+r.exa_id)+'</td>';
-for(const s of slots){const yes=r.start_minutes<s+60&&r.end_minutes>s;html+='<td class="'+(yes?(kind==="ダミー"?"dummy-on":"on"):"off")+'">'+(yes?"●":"")+"</td>";}html+="</tr>";}}
-addRows(real,"実出勤");html+='<tr class="sum"><td>出勤人数</td>'+slots.map(s=>"<td>"+real.filter(r=>r.start_minutes<s+60&&r.end_minutes>s).length+"</td>").join("")+"</tr>";addRows(dummy,"ダミー");
-html+="</tbody></table></div>";$("timeline").innerHTML=day.length?html:'<p class="notice">この日付のシフトは保存されていません。未取得か出勤0件かは区別できません。</p>';
+function renderDay(){
+ if(!selected.startsWith(month))selected=month+"-01";
+ const map=staffById(),day=shifts.filter(r=>r.work_date===selected&&!r.is_pre_off);
+ const byStartThenEnd=(a,b)=>a.start_minutes-b.start_minutes||a.end_minutes-b.end_minutes||a.exa_id-b.exa_id;
+ const real=day.filter(r=>!isDummy(map.get(r.exa_id)||{})&&!r.is_dummy_shift).sort(byStartThenEnd);
+ const dummy=day.filter(r=>isDummy(map.get(r.exa_id)||{})||r.is_dummy_shift).sort(byStartThenEnd);
+ $("dayTitle").textContent=selected+"｜日別タイムチャート";
+ $("dayHeadcount").textContent="合計 "+(real.length+dummy.length)+"名（実働 "+real.length+"名・ダミー "+dummy.length+"名）";
+ const slots=Array.from({length:20},(_,i)=>600+i*60);
+ let html='<div class="chart-scroll"><table class="timeline"><thead><tr><th>セラピスト</th>'+slots.map(x=>"<th>"+minutes(x)+"</th>").join("")+"</tr></thead><tbody>";
+ const activeAt=(r,s)=>r.start_minutes<s+60&&r.end_minutes>s;
+ function addRows(rows,kind){
+  html+='<tr class="timeline-group"><th colspan="'+(slots.length+1)+'">'+kind+'（'+rows.length+'名）</th></tr>';
+  for(const r of rows){
+   const t=map.get(r.exa_id);
+   const name=String(t?.stage_name||"ID "+r.exa_id).replace(/-([^-]+)-$/,"");
+   html+='<tr><td class="timeline-name">'+safe(name)+'<small>'+safe(range(r))+'</small></td>';
+   for(const slot of slots){
+    const working=activeAt(r,slot);
+    html+='<td class="'+(working?(kind==="ダミー"?"dummy-on":"on"):"off")+'">'+(working?"●":"")+"</td>";
+   }
+   html+="</tr>";
+  }
+  html+='<tr class="sum"><td>'+kind+'人数</td>'+slots.map(slot=>"<td>"+rows.filter(r=>activeAt(r,slot)).length+"</td>").join("")+"</tr>";
+ }
+ addRows(real,"実出勤");
+ addRows(dummy,"ダミー");
+ html+="</tbody></table></div>";
+ $("timeline").innerHTML=day.length?html:'<p class="notice">この日付のシフトは保存されていません。未取得か出勤0件かは区別できません。</p>';
 }
 $("prev").onclick=()=>{const d=new Date(month+"-01T00:00:00");d.setMonth(d.getMonth()-1);month=[d.getFullYear(),String(d.getMonth()+1).padStart(2,"0")].join("-");load()};
 $("next").onclick=()=>{const d=new Date(month+"-01T00:00:00");d.setMonth(d.getMonth()+1);month=[d.getFullYear(),String(d.getMonth()+1).padStart(2,"0")].join("-");load()};
