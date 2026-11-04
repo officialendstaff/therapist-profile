@@ -1434,18 +1434,174 @@ window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===
  body.interview-admin-locked:not(.personal-mobile-embedded)>.sidebar,
  body.interview-admin-locked:not(.personal-mobile-embedded)>.main{visibility:hidden}
 }
+
+/* Desktop-only login refresh. Mobile styling and authentication flows remain unchanged. */
+#adminAuthDialog .auth-brand-panel,
+#adminAuthDialog .auth-eyebrow,
+#adminAuthDialog .auth-footnote { display:none; }
+#adminAuthDialog .auth-form-panel { display:contents; }
+@media (min-width:901px) {
+  #adminAuthDialog {
+    padding:42px;
+    background:radial-gradient(ellipse at 16% 14%,rgba(62,101,151,.32),transparent 46%),
+               radial-gradient(ellipse at 87% 90%,rgba(159,137,105,.12),transparent 40%),
+               linear-gradient(138deg,#0a1727 0%,#14253b 55%,#0c1523 100%);
+    -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  }
+  #adminAuthDialog::before {
+    content:"";position:absolute;inset:0;pointer-events:none;opacity:.2;
+    background:repeating-linear-gradient(120deg,transparent 0,transparent 118px,rgba(255,255,255,.065) 119px,transparent 120px);
+  }
+  #adminAuthDialog .auth-card {
+    position:relative;isolation:isolate;display:grid;grid-template-columns:1.02fr 1fr;
+    width:min(940px,calc(100vw - 84px));min-height:570px;padding:0;
+    overflow:hidden;border:1px solid rgba(238,244,251,.16);
+    border-radius:22px;background:#fff;
+    box-shadow:0 36px 90px rgba(0,0,0,.42),0 2px 12px rgba(0,0,0,.15);
+  }
+  #adminAuthDialog .auth-brand-panel {
+    position:relative;display:flex;flex-direction:column;justify-content:space-between;
+    min-width:0;overflow:hidden;padding:48px 46px;color:#f5f8fc;
+    background:
+      radial-gradient(circle at 110% 5%,rgba(139,171,206,.23),transparent 43%),
+      linear-gradient(148deg,#162f4c 0%,#0d1f36 50%,#0a1527 100%);
+  }
+  #adminAuthDialog .auth-brand-panel::before {
+    content:"";position:absolute;width:410px;height:410px;right:-225px;top:85px;
+    border:1px solid rgba(198,216,237,.16);border-radius:50%;
+    box-shadow:0 0 0 58px rgba(200,217,237,.035),0 0 0 120px rgba(200,217,237,.025);
+    pointer-events:none;
+  }
+  #adminAuthDialog .auth-brand-panel::after {
+    content:"";position:absolute;left:46px;right:46px;bottom:117px;height:1px;
+    background:linear-gradient(90deg,rgba(207,179,127,.8),rgba(207,179,127,0));pointer-events:none;
+  }
+  #adminAuthDialog .auth-brand-top,
+  #adminAuthDialog .auth-brand-middle,
+  #adminAuthDialog .auth-brand-bottom {position:relative;z-index:1}
+  #adminAuthDialog .auth-brand-top {display:flex;align-items:center;gap:12px}
+  #adminAuthDialog .auth-brand-symbol {
+    display:grid;place-items:center;width:44px;height:44px;border-radius:12px;
+    border:1px solid rgba(223,198,148,.45);color:#e7c995;
+    background:linear-gradient(145deg,rgba(235,215,175,.16),rgba(235,215,175,.025));
+    font-size:24px;font-weight:600;font-family:Georgia,serif;line-height:1;
+  }
+  #adminAuthDialog .auth-brand-name {
+    display:flex;flex-direction:column;gap:3px;font-size:14px;font-weight:750;
+    letter-spacing:.16em;line-height:1.2;
+  }
+  #adminAuthDialog .auth-brand-name small {
+    color:#a8b8cc;font-size:9px;font-weight:600;letter-spacing:.19em;
+  }
+  #adminAuthDialog .auth-brand-kicker {
+    display:block;margin-bottom:19px;color:#d6b884;font-size:10px;
+    font-weight:700;letter-spacing:.28em;
+  }
+  #adminAuthDialog .auth-brand-title {
+    margin:0;color:#fff;font-family:Arial,"Helvetica Neue",sans-serif;
+    font-size:clamp(34px,3.45vw,49px);font-weight:650;line-height:1.13;letter-spacing:.045em;
+  }
+  #adminAuthDialog .auth-brand-description {
+    margin:26px 0 0;color:#bfcee0;font-size:13px;letter-spacing:.08em;line-height:2;
+  }
+  #adminAuthDialog .auth-brand-bottom {
+    display:flex;justify-content:space-between;gap:10px;color:#93a8c0;
+    font-size:10px;font-weight:600;letter-spacing:.14em;
+  }
+  #adminAuthDialog .auth-form-panel {
+    display:flex;flex-direction:column;justify-content:center;min-width:0;
+    padding:48px clamp(32px,4vw,55px);background:linear-gradient(160deg,#fff 0%,#fafcff 100%);
+  }
+  #adminAuthDialog .auth-eyebrow {
+    display:block;margin:0 0 11px;color:#667d99;font-size:10px;
+    font-weight:800;letter-spacing:.24em;
+  }
+  #adminAuthDialog .auth-form-panel h2 {
+    margin:0 0 24px!important;color:#192d45;font-size:29px!important;
+    font-weight:750;letter-spacing:.04em;line-height:1.4;
+  }
+  #adminAuthDialog .auth-mode-switch {
+    display:flex;gap:5px!important;margin:0 0 23px!important;
+    padding:5px;background:#edf2f7;border:1px solid #e0e8f1;border-radius:11px;
+  }
+  #adminAuthDialog .auth-mode-switch button {
+    padding:11px 12px;min-height:42px;border:0;border-radius:8px;
+    background:transparent!important;color:#708199;
+    font-size:13px;font-weight:750;transition:background .18s,box-shadow .18s,color .18s;
+  }
+  #adminAuthDialog .auth-mode-switch button[aria-pressed="true"] {
+    background:linear-gradient(145deg,#28496f,#193550)!important;
+    color:white;box-shadow:0 3px 9px rgba(22,51,83,.23),inset 0 1px rgba(255,255,255,.12);
+  }
+  #adminAuthDialog #authHelp {
+    margin:0 0 23px!important;color:#6d7e90!important;
+    font-size:11px!important;line-height:1.8;
+  }
+  #adminAuthDialog .auth-form-panel label {
+    display:block;margin:0 0 6px;color:#34475f;font-size:12px;font-weight:700;
+    letter-spacing:.035em;
+  }
+  #adminAuthDialog .auth-form-panel label[hidden] {display:none!important;}
+  #adminAuthDialog .auth-form-panel input {
+    display:block;width:100%;height:47px;margin:9px 0 18px;padding:0 15px;
+    border:1px solid #d8e1ed;border-radius:9px;background:#f8fafc;
+    color:#1f334c;font-size:14px;letter-spacing:.02em;
+    outline:none;box-shadow:inset 0 1px 2px rgba(24,52,86,.025);
+    transition:border-color .18s,box-shadow .18s,background .18s;
+  }
+  #adminAuthDialog .auth-form-panel input:focus {
+    border-color:#5b82ad;background:#fff;box-shadow:0 0 0 3px rgba(74,123,178,.15);
+  }
+  #adminAuthDialog #adminAuthMessage {
+    margin:0 0 8px;min-height:18px;color:#b43c42!important;
+    font-size:11px!important;line-height:1.5;
+  }
+  #adminAuthDialog .auth-action-row {display:flex;gap:10px;justify-content:stretch!important;margin-top:5px;}
+  #adminAuthDialog .auth-action-row button {
+    min-height:48px;border-radius:9px;font-size:13px;font-weight:750;
+  }
+  #adminAuthDialog #authSubmit {
+    flex:1;border:1px solid #264b73;color:#fff;
+    background:linear-gradient(130deg,#315f90 0%,#1a395b 100%);
+    box-shadow:0 7px 16px rgba(32,74,117,.18),inset 0 1px rgba(255,255,255,.22);
+    transition:filter .15s,transform .15s,box-shadow .15s;
+  }
+  #adminAuthDialog #authSubmit:hover:not(:disabled) {filter:brightness(1.12);transform:translateY(-1px);}
+  #adminAuthDialog #authSubmit:disabled {opacity:.65;cursor:wait;}
+  #adminAuthDialog #adminAuthCancel {
+    min-width:94px;background:#fff;color:#62758a;border:1px solid #d7e0eb;
+  }
+  body.interview-admin-locked #adminAuthDialog #adminAuthCancel {display:none;}
+  #adminAuthDialog #adminAuthLogout {
+    align-self:flex-end;margin-top:12px!important;padding:8px 0;
+    border:0;background:transparent;color:#718096;font-size:12px;
+    text-decoration:underline;text-underline-offset:3px;
+  }
+  #adminAuthDialog .auth-footnote {
+    display:block;margin:24px 0 0;color:#9ba8b8;
+    font-size:10px;letter-spacing:.1em;text-align:center;
+  }
+  #adminAuthDialog button:focus-visible {outline:3px solid rgba(86,141,195,.45);outline-offset:2px;}
+}
 </style>
 <button id="adminAuthOpen" type="button">ログイン</button>
 <div id="adminAuthDialog" role="dialog" aria-modal="true" aria-label="面接管理ログイン"><div class="auth-card">
+<aside class="auth-brand-panel" aria-hidden="true">
+<div class="auth-brand-top"><div class="auth-brand-symbol">L</div><div class="auth-brand-name">L GROUP<small>INTERNAL MANAGEMENT</small></div></div>
+<div class="auth-brand-middle"><span class="auth-brand-kicker">STAFF MANAGEMENT SYSTEM</span><h1 class="auth-brand-title">INTERVIEW<br>MANAGEMENT.</h1><p class="auth-brand-description">面接管理を、もっとスマートに。<br>日々の採用業務をひとつの場所で。</p></div>
+<div class="auth-brand-bottom"><span>STAFF PORTAL</span><span>L GROUP © 2026</span></div>
+</aside>
+<section class="auth-form-panel"><p class="auth-eyebrow">WELCOME BACK</p>
 <h2 style="margin:0 0 10px;font-size:19px">面接管理ログイン</h2>
-<div style="display:flex;gap:8px;margin:12px 0 18px"><button type="button" id="chooseAdmin" style="flex:1">管理者</button><button type="button" id="chooseStaff" style="flex:1">スタッフ</button></div>
+<div class="auth-mode-switch" style="display:flex;gap:8px;margin:12px 0 18px"><button type="button" id="chooseAdmin" style="flex:1">管理者</button><button type="button" id="chooseStaff" style="flex:1">スタッフ</button></div>
 <form id="adminAuthForm"><p id="authHelp" style="font-size:12px;color:#607085">既存の個人面接管理ページと同じID・PASSを使用します。</p>
 <label id="adminEmailRow">ID（メールアドレス）<input name="email" type="email" autocomplete="username" required></label>
 <label id="adminPasswordRow">PASS<input name="password" type="password" autocomplete="current-password" required></label>
 <label id="staffPasswordRow" hidden>スタッフ共通PASS<input name="staffPassword" type="password" autocomplete="current-password" disabled></label>
 <p id="adminAuthMessage" style="color:#b43c42;font-size:12px"></p>
-<div style="display:flex;gap:8px;justify-content:flex-end"><button id="adminAuthCancel" type="button">閉じる</button><button type="submit" id="authSubmit">ログイン</button></div></form>
-<button id="adminAuthLogout" type="button" hidden style="margin-top:12px">ログアウト</button></div></div>
+<div class="auth-action-row" style="display:flex;gap:8px;justify-content:flex-end"><button id="adminAuthCancel" type="button">閉じる</button><button type="submit" id="authSubmit">ログイン</button></div></form>
+<button id="adminAuthLogout" type="button" hidden style="margin-top:12px">ログアウト</button>
+<p class="auth-footnote">AUTHORIZED PERSONNEL ONLY</p></section></div></div>
 <script>
 (function(){
  const url='https://vjjnkflbfsjihwzjsjpr.supabase.co',key='sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos',staffApi=url+'/functions/v1/interview-staff-access';
@@ -1494,7 +1650,7 @@ window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===
   location.replace('/therapist-profile/staff/interview-personal/'+profileKey+'/');
   return true;
  }
- function choose(next){mode=next;const staff=mode==='staff';el('adminEmailRow').hidden=staff;el('adminPasswordRow').hidden=staff;el('staffPasswordRow').hidden=!staff;form.elements.email.disabled=staff;form.elements.password.disabled=staff;form.elements.staffPassword.disabled=!staff;el('authHelp').textContent=staff?'スタッフ共通PASSでログインしてください。':'個人面接管理ページと同じID・PASSを使用します。';el('chooseAdmin').style.background=staff?'#fff':'#d9e9f9';el('chooseStaff').style.background=staff?'#d9e9f9':'#fff';message.textContent=''}
+ function choose(next){mode=next;const staff=mode==='staff';el('adminEmailRow').hidden=staff;el('adminPasswordRow').hidden=staff;el('staffPasswordRow').hidden=!staff;form.elements.email.disabled=staff;form.elements.password.disabled=staff;form.elements.staffPassword.disabled=!staff;el('authHelp').textContent=staff?'スタッフ共通PASSでログインしてください。':'個人面接管理ページと同じID・PASSを使用します。';el('chooseAdmin').style.background=staff?'#fff':'#d9e9f9';el('chooseStaff').style.background=staff?'#d9e9f9':'#fff';el('chooseAdmin').setAttribute('aria-pressed',String(!staff));el('chooseStaff').setAttribute('aria-pressed',String(staff));message.textContent=''}
  el('chooseAdmin').onclick=()=>choose('admin');el('chooseStaff').onclick=()=>choose('staff');choose('admin');
  function apply(next,name,profileKey){const avatar=document.getElementById('homeAvatar'),label=document.getElementById('homeLabel');const names={owner:'村上',president:'社長',ota:'オオタ',festival:'お祭り'};const key=profileKey||'';window.interviewCurrentProfileKey=next==='admin'?key:null;label.textContent=next==='admin'?(names[key]||name||'管理者')+' TOP':'TOP';avatar.src=next==='admin'&&key==='owner'?'./icons/murakami-pc.webp':'./icons/recruit-180.png';avatar.style.display='block';role=next;window.interviewAdminAuthorized=next==='admin';window.interviewStaffAuthorized=next==='staff';document.body.classList.toggle('interview-admin-locked',!next);window.dispatchEvent(new Event('interview-auth-ready'));open.textContent=next?'アカウント':'ログイン';open.style.display='';logout.hidden=!next;document.querySelectorAll('#nav button').forEach(b=>{if(b.dataset.page==='Interview Sheet'||b.dataset.page==='集計頁')b.hidden=next==='staff'});if(next==='staff'&&document.querySelector('.main-panel')?.classList.contains('sheet-mode')){document.querySelector('.main-panel').classList.remove('sheet-mode');document.getElementById('home')?.click()}}
  async function exchangeAdminToken(){const {data:{session}}=await auth.auth.getSession();if(!session?.access_token)throw Error('管理者セッションがありません');const res=await fetch(staffApi,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},cache:'no-store',body:JSON.stringify({action:'admin_exchange'})});const data=await res.json();if(!res.ok||!data.token)throw Error('データ接続の認証に失敗しました（HTTP '+res.status+' / '+String(data.error||'token_missing')+'）');sessionStorage.setItem('interview_staff_session_v2',data.token);localStorage.removeItem('interview_staff_session_v2');void Promise.allSettled([window.interviewMobileRefresh?.lists?.(),window.interviewNewLineReadOnly?.refresh?.(),window.interviewMobileRefresh?.sheets?.()]);return data.token}
