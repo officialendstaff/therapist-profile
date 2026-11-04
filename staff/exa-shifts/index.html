@@ -190,7 +190,21 @@ footer{display:none}
   text-align:center!important;
   z-index:8!important;
 }
-.residency-dialog{position:relative;z-index:1;width:410px;max-width:90vw;padding:22px}.residency-dialog h2{margin:0 0 12px;font-size:19px}.residency-dialog label{display:block;margin:14px 0 7px;font-size:13px;font-weight:700}.residency-dialog select{width:100%;padding:11px;border:1px solid #b6c6d8;border-radius:7px;background:#fff}.staff-name .name-editor{border:none;background:none;padding:0;color:inherit;font-weight:700;font-size:14px;text-align:left;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px}.staff-name .name-editor:hover,.staff-name .name-editor:focus-visible{color:#2466a3;text-decoration-color:#2466a3;outline-offset:2px}.staff-name .name-editor:after{content:" ✎";font-size:10px;color:#8299ad}</style></head>
+.residency-dialog{position:relative;z-index:1;width:410px;max-width:90vw;padding:22px}.residency-dialog h2{margin:0 0 12px;font-size:19px}.residency-dialog label{display:block;margin:14px 0 7px;font-size:13px;font-weight:700}.residency-dialog select{width:100%;padding:11px;border:1px solid #b6c6d8;border-radius:7px;background:#fff}.staff-name .name-editor{border:none;background:none;padding:0;color:inherit;font-weight:700;font-size:14px;text-align:left;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px}.staff-name .name-editor:hover,.staff-name .name-editor:focus-visible{color:#2466a3;text-decoration-color:#2466a3;outline-offset:2px}.staff-name .name-editor:after{content:" ✎";font-size:10px;color:#8299ad}
+/* Dummy EXA paste helpers, independent of public therapist pages. */
+.shift-table.dummy-layout thead tr:first-child th:nth-child(2),
+.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(2){width:100px!important;min-width:100px!important;left:116px!important}
+.shift-table.dummy-layout thead tr:first-child th:nth-child(3),
+.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(3){width:66px!important;min-width:66px!important;left:216px!important}
+.shift-table.dummy-layout thead tr:first-child th:nth-child(4),
+.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(4){width:66px!important;min-width:66px!important;left:282px!important}
+.shift-table.dummy-layout thead tr:first-child th:nth-child(5),
+.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(5){width:54px!important;min-width:54px!important;left:348px!important}
+.shift-table.dummy-layout td.weekday-cell{white-space:nowrap;font-size:11px!important;letter-spacing:-.04em}
+.shift-table .copy-exa{display:block;width:100%;border:1px solid #a8c9e9;border-radius:5px;background:#edf6ff;color:#185b91;padding:5px 1px;font-size:12px;font-weight:700}
+.shift-table .copy-exa:hover{background:#d4eafd;border-color:#5f9dca}
+.shift-table .copy-exa.copy-pair{font-size:10px}
+</style></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
 <label class="store-label">店舗 <select id="storeSelect" aria-label="店舗切替"><option value="rose">薔薇と紳士</option></select></label>
@@ -254,7 +268,7 @@ client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minu
 client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code","rose").gte("work_date",start).lte("work_date",end),
 client.from("exa_shift_sync_runs").select("finished_at,record_count,mode").eq("store_code","rose").eq("state","success").order("finished_at",{ascending:false}).limit(1),
 client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code","rose").lt("work_date",today()).limit(5000),
-client.from("exa_shift_entries").select("exa_id,work_date,is_dummy_shift,is_pre_off").eq("store_code","rose").order("work_date").limit(5000)
+client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_dummy_shift,is_pre_off").eq("store_code","rose").order("work_date").limit(5000)
 ]);
 const err=[a,b,c,d,e,future].find(r=>r.error)?.error;
 if(err){showMsg("読み込みエラー："+err.message,true);return;}
@@ -271,6 +285,21 @@ const dayType=date=>{
  const weekday=new Date(date+"T00:00:00Z").getUTCDay();
  return japanHolidayDates.has(date)?"holiday":weekday===0?"sunday":weekday===6?"saturday":"weekday";
 };
+const exaFourDigit=minutes=>String(Math.floor(minutes/60)).padStart(2,"0")+String(minutes%60).padStart(2,"0");
+const weekdayNames=["日","月","火","水","木","金","土"];
+function dummyPattern(id){
+ const rows=futureShifts.filter(r=>r.exa_id===id&&!r.is_pre_off);
+ if(!rows.length)return {weekdays:"—",start:null,end:null,multiple:false};
+ const weekdaySet=[...new Set(rows.map(r=>new Date(r.work_date+"T00:00:00Z").getUTCDay()))];
+ weekdaySet.sort((a,b)=>(a+6)%7-(b+6)%7);
+ const times=[...new Set(rows.map(r=>r.start_minutes+"/"+r.end_minutes))];
+ return {
+  weekdays:weekdaySet.map(x=>weekdayNames[x]).join("・"),
+  start:times.length===1?exaFourDigit(rows[0].start_minutes):null,
+  end:times.length===1?exaFourDigit(rows[0].end_minutes):null,
+  multiple:times.length>1
+ };
+}
 let staffView="real";
 function renderMonthly(){
 const existing=staffById(), byId=new Map();
@@ -289,7 +318,8 @@ for(let n=1;n<=daysIn();n++){
 }
 const countHeader=staffView==="real"?"実働（"+real.length+"名）":staffView==="dummy"?"ダミー（"+dummy.length+"名）":"実働（"+real.length+"名）／ダミー（"+dummy.length+"名）";
 let html='<thead><tr><th class="staff-heading" rowspan="2"><span>'+countHeader+'</span></th>';
-html+='<th class="stat-heading" rowspan="2">稼働</th><th class="stat-heading" rowspan="2">出勤</th><th class="stat-heading" rowspan="2">無報</th><th class="stat-heading" rowspan="2">評価</th>';
+if(staffView==="dummy")html+='<th class="stat-heading" rowspan="2">登録曜日</th><th class="stat-heading" rowspan="2">出勤</th><th class="stat-heading" rowspan="2">退勤</th><th class="stat-heading" rowspan="2">時刻</th>';
+else html+='<th class="stat-heading" rowspan="2">稼働</th><th class="stat-heading" rowspan="2">出勤</th><th class="stat-heading" rowspan="2">無報</th><th class="stat-heading" rowspan="2">評価</th>';
 for(let n=1;n<=daysIn();n++){const d=dayStr(n),kind=dayType(d);html+='<th class="day-heading '+kind+(d===today()?" today-marker":"")+'"><button type="button" data-day="'+d+'">'+n+'日</button></th>';}
 html+='</tr><tr class="daily-totals">';
 for(let n=1;n<=daysIn();n++){const d=dayStr(n),kind=dayType(d);html+='<th class="day-total '+kind+(d===today()?" today-marker":"")+'" title="その日の出勤人数">'+dayCounts.get(d)[staffView]+'人</th>';}
@@ -310,7 +340,17 @@ html+='<tr class="'+(outside?'outside-roster':'')+'"><td class="staff-name"><but
 const evaluation=t.evaluation_score===null||t.evaluation_score===undefined?null:Number(t.evaluation_score);
 const scoreClass=evaluation===null?"":evaluation>=95?"score-high":"score-low";
 const scoreText=evaluation===null?"—":evaluation.toFixed(2);
-html+='<td class="stat-cell"><strong>'+avg+'</strong></td><td class="stat-cell">'+days+'</td><td class="stat-cell '+(zeros>0?'unpaid-positive':'')+'">'+zeros+'</td><td class="stat-cell '+scoreClass+'" title="'+(evaluation===null?'評価点数未連携':'評価点数')+'">'+scoreText+'</td>';
+if(staffView==="dummy"){
+ const pattern=dummyPattern(t.exa_id);
+ const timeButton=(v,label)=>v?'<button type="button" class="copy-exa" data-copy-exa="'+v+'" title="'+label+' '+v+' をコピー">'+v+'</button>':'—';
+ const combined=pattern.start&&pattern.end?pattern.start+" "+pattern.end:null;
+ html+='<td class="stat-cell weekday-cell" title="保存済みシフトから抽出した曜日">'+safe(pattern.weekdays)+'</td>';
+ html+='<td class="stat-cell">'+timeButton(pattern.start,"出勤")+'</td>';
+ html+='<td class="stat-cell">'+timeButton(pattern.end,"退勤")+'</td>';
+ html+='<td class="stat-cell">'+(combined?'<button type="button" class="copy-exa copy-pair" data-copy-exa="'+combined+'" title="出勤・退勤をまとめてコピー">両方</button>':pattern.multiple?'複数':'—')+'</td>';
+}else{
+ html+='<td class="stat-cell"><strong>'+avg+'</strong></td><td class="stat-cell">'+days+'</td><td class="stat-cell '+(zeros>0?'unpaid-positive':'')+'">'+zeros+'</td><td class="stat-cell '+scoreClass+'" title="'+(evaluation===null?'評価点数未連携':'評価点数')+'">'+scoreText+'</td>';
+}
 for(let n=1;n<=daysIn();n++){const day=dayStr(n),r=entries.get(day),value=per.get(t.exa_id+"|"+day),past=day<today();
 const cellClasses=[group==="dummy"?"dummy":"",day===today()?"today":"",dayType(day),
  lastKnownDate===day?"last-scheduled":"",r?.is_pre_off?"pre-off":"",outside?"outside-cell":""].filter(Boolean).join(" ");
@@ -329,6 +369,14 @@ html+="</tbody>";$("monthly").innerHTML=html;
 $("monthly").querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{selected=b.dataset.day;renderDay();$("dayPanel").classList.remove("hide")});
 $("monthly").querySelectorAll(".edit-count").forEach(input=>input.onclick=()=>openCount(input));
 $("monthly").querySelectorAll("[data-staff-id]").forEach(button=>button.onclick=()=>openResidency(button));
+ $("monthly").classList.toggle("dummy-layout",staffView==="dummy");
+ $("monthly").querySelectorAll("[data-copy-exa]").forEach(button=>button.onclick=async()=>{
+  const text=button.dataset.copyExa;
+  try{
+   await navigator.clipboard.writeText(text);
+   showMsg(text+" をコピーしました。EXAの時刻欄に貼り付けできます。");
+  }catch(e){showMsg("コピーできませんでした。Chromeのクリップボード権限をご確認ください。",true)}
+ });
 }
 let editingResidency=null;
 function openResidency(button){
