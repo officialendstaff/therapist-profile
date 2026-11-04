@@ -493,7 +493,7 @@ let staffView="real";
 function renderMonthly(){
 const existing=staffById(), byId=new Map();
 for(const r of shifts){if(!byId.has(r.exa_id))byId.set(r.exa_id,new Map());byId.get(r.exa_id).set(r.work_date,r);}
-const real=therapists.filter(t=>t.residency!=="dummy"&&byId.has(t.exa_id)).sort((a,b)=>a.exa_id-b.exa_id);
+const real=therapists.filter(t=>t.residency!=="dummy").sort((a,b)=>Number(byId.has(b.exa_id))-Number(byId.has(a.exa_id))||a.exa_id-b.exa_id);
 const dummy=therapists.filter(t=>t.residency==="dummy"&&byId.has(t.exa_id)).sort((a,b)=>a.exa_id-b.exa_id);
 const per=new Map(performances.map(p=>[p.exa_id+"|"+p.work_date,p.customer_count]));
 const absence=new Set(performances.filter(p=>p.attendance_status==="absent").map(p=>p.exa_id+"|"+p.work_date));
@@ -515,7 +515,7 @@ for(let n=1;n<=daysIn();n++){const d=dayStr(n),kind=dayType(d);html+='<th class=
 html+='</tr></thead><tbody>';
 for(const [label,list,group] of [["実働",real,"real"],["ダミー",dummy,"dummy"]]){if(staffView!=="all"&&staffView!==group)continue;
 if(staffView==="all")html+='<tr class="group"><td colspan="'+(daysIn()+5)+'">'+label+"（"+list.length+"名）</td></tr>";
-for(const t of list){const entries=byId.get(t.exa_id),valid=[...entries.values()].filter(r=>r.work_date<today()&&(!isDummy(t))&&!r.is_dummy_shift&&per.has(t.exa_id+"|"+r.work_date));const historical=historyPerformances.filter(p=>p.exa_id===t.exa_id&&p.attendance_status!=="absent");const avg=historical.length?(historical.reduce((sum,p)=>sum+p.customer_count,0)/historical.length).toFixed(1):"—";
+for(const t of list){const entries=byId.get(t.exa_id)||new Map(),valid=[...entries.values()].filter(r=>r.work_date<today()&&(!isDummy(t))&&!r.is_dummy_shift&&per.has(t.exa_id+"|"+r.work_date));const historical=historyPerformances.filter(p=>p.exa_id===t.exa_id&&p.attendance_status!=="absent");const avg=historical.length?(historical.reduce((sum,p)=>sum+p.customer_count,0)/historical.length).toFixed(1):"—";
 const rawName=String(t.stage_name||"ID "+t.exa_id);
 const nameParts=rawName.match(/^(.+?)-([^-]+)-$/);
 const stageName=nameParts?nameParts[1]:rawName,kana=nameParts?nameParts[2]:"";
