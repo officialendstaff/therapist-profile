@@ -45,6 +45,9 @@ footer{display:none}
 .staff-name .reading{display:block;font-weight:400;color:#77879c;font-size:9px;margin-top:2px}
 .shift-table td.stat-cell{background:#f7f9fc;font-weight:600}
 .shift-table th:nth-last-child(-n+4),.shift-table td:nth-last-child(-n+4){min-width:35px}
+.staff-filter{display:flex;gap:1px;background:#edf1f5;border:1px solid #dce6ef;border-radius:7px;padding:2px;margin-left:auto}
+.staff-filter button{border:0;background:transparent;border-radius:5px;padding:5px 13px;font-size:11px;color:#526b88}
+.staff-filter button.active{background:#fff;color:#1b3653;box-shadow:0 1px 4px #12365724;font-weight:700}
 </style></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
@@ -62,7 +65,7 @@ footer{display:none}
 <main id="app" class="hide">
 
 <p id="message" class="muted" aria-live="polite" style="margin:0 0 8px"></p>
-<div class="panel monthly-panel"><div class="row space month-heading"><h2>月間シフト</h2><span class="muted">日付を選択すると日別の出勤状況が開きます</span></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
+<div class="panel monthly-panel"><div class="row space month-heading"><h2>月間シフト</h2><div class="staff-filter" role="group" aria-label="表示区分"><button type="button" data-show-staff="real" class="active">実働</button><button type="button" data-show-staff="dummy">ダミー</button><button type="button" data-show-staff="all">全件</button></div></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
 <div id="countModal" class="day-modal hide" role="dialog" aria-modal="true"><div id="countShade" class="day-modal-shade"></div><div class="panel count-panel"><h2 id="countTitle">接客本数</h2><p class="muted">当欠は0本とは別に記録します。</p><select id="countSelect" size="8"><option value="absent">当欠</option><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select><div class="row space"><button id="countCancel">キャンセル</button><button id="countConfirm" class="primary">確定</button></div></div></div><div id="dayPanel" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="dayTitle"><div class="day-modal-shade" id="dayBackdrop"></div><div class="day-modal-content panel"><div class="row space"><h2 id="dayTitle">日別タイムチャート</h2><button id="closeDay" type="button" aria-label="閉じる">閉じる ×</button></div><div id="timeline"></div></div></div>
 </main><footer>EXA管理ページの登録内容は変更しません。接客本数のみSupabaseへ保存します。</footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.10/dist/umd/supabase.min.js"></script>
@@ -104,6 +107,7 @@ therapists=a.data||[];shifts=b.data||[];performances=c.data||[];
 $("monthLabel").textContent=month.replace("-","年")+"月";
 $("message").textContent="";
 renderMonthly();renderDay();}
+let staffView="real";
 function renderMonthly(){
 const existing=staffById(), byId=new Map();
 for(const r of shifts){if(!byId.has(r.exa_id))byId.set(r.exa_id,new Map());byId.get(r.exa_id).set(r.work_date,r);}
@@ -114,7 +118,7 @@ const absence=new Set(performances.filter(p=>p.attendance_status==="absent").map
 let html="<thead><tr><th>セラピスト</th>";
 for(let n=1;n<=daysIn();n++){const d=dayStr(n);html+='<th><button type="button" data-day="'+d+'">'+n+"日</button></th>";}
 html+="<th>稼働</th><th>出勤</th><th>0本</th><th>評価</th></tr></thead><tbody>";
-for(const [label,list,group] of [["実在籍",real,"real"],["ダミー在籍",dummy,"dummy"]]){
+for(const [label,list,group] of [["実働",real,"real"],["ダミー",dummy,"dummy"]]){if(staffView!=="all"&&staffView!==group)continue;
 html+='<tr class="group"><td colspan="'+(daysIn()+5)+'">'+label+"（"+list.length+"名）</td></tr>";
 for(const t of list){const entries=byId.get(t.exa_id),valid=[...entries.values()].filter(r=>r.work_date<today()&&(!isDummy(t))&&!r.is_dummy_shift&&per.has(t.exa_id+"|"+r.work_date));const paid=valid.filter(r=>!absence.has(t.exa_id+"|"+r.work_date));const avg=paid.length?(paid.reduce((s,r)=>s+per.get(t.exa_id+"|"+r.work_date),0)/paid.length).toFixed(1):"—";
 const rawName=String(t.stage_name||"ID "+t.exa_id);
@@ -336,5 +340,10 @@ $("closeDay").onclick=()=>{$("dayPanel").classList.add("hide")};
 $("dayBackdrop").onclick=$("closeDay").onclick;
 document.addEventListener("keydown",e=>{if(e.key==="Escape")$("dayPanel").classList.add("hide")});
 $("storeSelect").onchange=()=>{if($("storeSelect").value!=="rose")showMsg("他店舗のEXA連携は準備中です。",true)};
+document.querySelectorAll("[data-show-staff]").forEach(b=>b.onclick=()=>{
+ staffView=b.dataset.showStaff;
+ document.querySelectorAll("[data-show-staff]").forEach(x=>x.classList.toggle("active",x===b));
+ renderMonthly();
+});
 loginCheck();
 </script></body></html>
