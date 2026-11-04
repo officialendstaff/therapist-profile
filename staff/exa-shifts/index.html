@@ -129,19 +129,19 @@ $("exaSync").onclick=async()=>{
   const result=await fetchFromExaExtension();
   if(!result?.ok)throw new Error(result?.error||"取得できませんでした");
   if(!Array.isArray(result.rows)||!result.rows.length||result.days!==30)throw new Error("取得内容が不完全です。既存データは変更しません");
-  if(!confirm("EXAから"+result.first+"〜"+result.last+"の"+result.rows.length+"件を取得しました。Supabaseの出勤情報を更新しますか？（接客本数・ダミー区分は保持）")){showMsg("更新をキャンセルしました");return}
+  if(!confirm("EXAから"+result.first+"〜"+result.last+"の"+result.rows.length+"件を取得しました。対象30日分をEXAと照合し、取り消された出勤も反映します。接客本数・ダミー区分は保持します。続行しますか？")){showMsg("更新をキャンセルしました");return}
   const {data:{session}}=await client.auth.getSession();
   if(!session)throw new Error("管理ページに再ログインしてください");
   showMsg("Supabaseに"+result.rows.length+"件を反映中…");
   const res=await fetch(URL_SB+"/functions/v1/exa-shift-import",{
     method:"POST",
     headers:{"Content-Type":"application/json","apikey":KEY_SB,"Authorization":"Bearer "+session.access_token},
-    body:JSON.stringify({rows:result.rows})
+    body:JSON.stringify({rows:result.rows,source:"extension_snapshot",first:result.first,last:result.last,days:result.days})
   });
   const data=await res.json();
   if(!res.ok||!data.ok)throw new Error(data.error||"Supabaseの更新に失敗しました");
   await load();
-  showMsg("EXAから"+data.imported+"件を更新しました（"+result.first+"〜"+result.last+"）。");
+  showMsg("EXAから"+data.imported+"件を同期しました（"+result.first+"〜"+result.last+"）。取り消された出勤："+data.removed+"件を反映しました。");
  }catch(err){showMsg("今すぐ更新に失敗："+String(err.message||err),true)}
  finally{extensionBusy=false;$("exaSync").disabled=false}
 };
