@@ -344,6 +344,9 @@ footer{display:none}
 .interview-result.selected{border:2px solid #28659a;background:#eaf4ff;padding:8px 9px}
 #interviewLinkConfirm{font-size:12px;margin:7px 0;width:100%}
 #interviewLinkOpen{margin:5px 0 8px}
+
+#surveyPersonChoice{width:100%;max-width:100%;padding:9px;border:1px solid #bbcfe4;border-radius:7px;background:white;color:#253b53;font-size:12px}
+#surveyLinkOpen,#surveyLinkSave{font-size:12px;margin:5px 0}
 </style></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
@@ -388,6 +391,17 @@ footer{display:none}
     <button id="interviewLinkConfirm" type="button" class="primary hide">選択した面接情報と紐づける</button>
    </div>
    <p class="muted">面接情報がないセラピストは、未紐づけのままで構いません。</p>
+  </div>
+  <div class="person-registry interview-match">
+   <strong>アンケート評価</strong>
+   <p id="surveyLinkState" class="muted">評価データを確認中…</p>
+   <button id="surveyLinkOpen" type="button" class="hide">アンケートIDを紐づける</button>
+   <div id="surveyLinkPanel" class="hide">
+    <label for="surveyPersonChoice">スプレッドシートの管理ID／源氏名</label>
+    <select id="surveyPersonChoice"><option value="">選択してください</option></select>
+    <p class="muted">EXA IDと管理IDは異なります。本人を確認してから確定してください。回答3件以下は評価欄に表示しません。</p>
+    <button id="surveyLinkSave" type="button" class="primary">本人確認して紐づける</button>
+   </div>
   </div>
   <label for="residencyChoice">在籍区分</label>
   <select id="residencyChoice"><option value="active">実働</option><option value="dummy">ダミー</option></select>
@@ -434,17 +448,20 @@ $("logout").onclick=async()=>{await client.auth.signOut();location.reload()};
 async function load(){
 if(!authorized)return;showMsg("Supabaseを読み込み中…");
 const start=month+"-01",end=dayStr(daysIn());
-const [a,b,c,d,e,future]=await Promise.all([
+const [a,b,c,d,e,future,sv,sl]=await Promise.all([
 client.from("exa_shift_therapists").select("exa_id,stage_name,residency,evaluation_score").eq("store_code","rose"),
 client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_dummy_shift,is_pre_off").eq("store_code","rose").gte("work_date",start).lte("work_date",end).order("work_date"),
 client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code","rose").gte("work_date",start).lte("work_date",end),
 client.from("exa_shift_sync_runs").select("finished_at,record_count,mode").eq("store_code","rose").eq("state","success").order("finished_at",{ascending:false}).limit(1),
 client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code","rose").lt("work_date",today()).limit(5000),
-client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_dummy_shift,is_pre_off").eq("store_code","rose").order("work_date").limit(5000)
+client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_dummy_shift,is_pre_off").eq("store_code","rose").order("work_date").limit(5000),
+client.from("exa_survey_scores").select("sheet_person_id,rose_stage_name,response_count,score_100,synced_at").limit(1000),
+client.from("exa_survey_links").select("exa_id,sheet_person_id").eq("store_code","rose")
 ]);
-const err=[a,b,c,d,e,future].find(r=>r.error)?.error;
+const err=[a,b,c,d,e,future,sv,sl].find(r=>r.error)?.error;
 if(err){showMsg("読み込みエラー："+err.message,true);return;}
 therapists=a.data||[];shifts=b.data||[];performances=c.data||[];historyPerformances=e.data||[];futureShifts=future.data||[];
+surveyScores=sv.data||[];surveyLinks=sl.data||[];
 $("monthLabel").textContent=month.replace("-","年")+"月";
 $("message").textContent="";
 renderMonthly();renderDay();}
@@ -509,9 +526,13 @@ const lastKnownDate=latestDates.length?latestDates[latestDates.length-1]:null;
 const days=[...entries.values()].filter(r=>!r.is_dummy_shift).length;
 const zeros=valid.filter(r=>!absence.has(t.exa_id+"|"+r.work_date)&&per.get(t.exa_id+"|"+r.work_date)===0).length;
 html+='<tr class="'+(outside?'outside-roster':'')+'"><td class="staff-name"><button type="button" class="name-editor" data-staff-id="'+t.exa_id+'" title="実働／ダミーを変更">'+safe(stageName)+'</button>'+(kana?'<span class="reading">'+safe(kana)+'</span>':'')+(outside?'<span class="outside-label">実働外</span>':'')+'</td>';
-const evaluation=t.evaluation_score===null||t.evaluation_score===undefined?null:Number(t.evaluation_score);
+const surveyId=surveyLinks.find(l=>l.exa_id===t.exa_id)?.sheet_person_id;
+const survey=surveyScores.find(x=>x.sheet_person_id===surveyId);
+const responseCount=survey?.response_count??0;
+const evaluation=responseCount>=4&&survey?.score_100!==null&&Number.isFinite(Number(survey?.score_100))?Number(survey.score_100):null;
 const scoreClass=evaluation===null?"":evaluation>=95?"score-high":"score-low";
-const scoreText=evaluation===null?"—":evaluation.toFixed(2);
+const scoreText=evaluation===null?"—":evaluation.toFixed(1);
+const scoreTitle=!survey?"アンケート未連携":responseCount<=3?"回答数 "+responseCount+"件：4件未満のため点数非表示":"回答数 "+responseCount+"件／アンケート平均（100点満点）";
 if(staffView==="dummy"){
  const pattern=dummyPattern(t.exa_id);
  const timeButton=(v,label)=>v?'<button type="button" class="copy-exa" data-copy-exa="'+v+'" title="'+label+' '+v+' をコピー">'+v+'</button>':'—';
@@ -519,7 +540,7 @@ if(staffView==="dummy"){
  html+='<td class="stat-cell">'+timeButton(pattern.start,"出勤")+'</td>';
  html+='<td class="stat-cell">'+timeButton(pattern.end,"退勤")+'</td>';
 }else{
- html+='<td class="stat-cell"><strong>'+avg+'</strong></td><td class="stat-cell">'+days+'</td><td class="stat-cell '+(zeros>0?'unpaid-positive':'')+'">'+zeros+'</td><td class="stat-cell '+scoreClass+'" title="'+(evaluation===null?'評価点数未連携':'評価点数')+'">'+scoreText+'</td>';
+ html+='<td class="stat-cell"><strong>'+avg+'</strong></td><td class="stat-cell">'+days+'</td><td class="stat-cell '+(zeros>0?'unpaid-positive':'')+'">'+zeros+'</td><td class="stat-cell '+scoreClass+'" title="'+safe(scoreTitle)+'">'+scoreText+'</td>';
 }
 for(let n=1;n<=daysIn();n++){const day=dayStr(n),r=entries.get(day),value=per.get(t.exa_id+"|"+day),past=day<today();
 const cellClasses=[group==="dummy"?"dummy":"",day===today()?"today":"",dayType(day),
@@ -628,6 +649,7 @@ $("therapistPhotoInput").onchange=async()=>{
   showMsg("画像を保存できませんでした："+(e.message||String(e)),true);
  }finally{photoBusy=false;$("therapistPhotoInput").disabled=false;$("therapistPhotoInput").value="";}
 };
+let surveyScores=[],surveyLinks=[],surveyRequest=0;
 let registryRequest=0,selectedInterviewId=null,registryAdmin=false,linkingInterview=false;
 let searchInterviewItems=[];
 async function loadPersonRegistry(exaId){
@@ -734,6 +756,54 @@ $("interviewLinkConfirm").onclick=async()=>{
  }catch(e){showMsg("面接情報の紐づけに失敗しました："+(e.message||String(e)),true);}
  finally{linkingInterview=false;$("interviewLinkConfirm").disabled=false;}
 };
+// Survey scores are a read-only snapshot of the connected sheet's ID tab.
+// EXA and sheet IDs are only joined by a manager-confirmed mapping.
+async function loadSurveyLink(exaId){
+ const request=++surveyRequest;
+ const status=$("surveyLinkState"),btn=$("surveyLinkOpen"),panel=$("surveyLinkPanel");
+ panel.classList.add("hide");btn.classList.add("hide");
+ status.textContent="評価情報を確認中…";
+ const linked=surveyLinks.find(x=>x.exa_id===exaId);
+ const score=linked&&surveyScores.find(x=>x.sheet_person_id===linked.sheet_person_id);
+ if(score){
+  status.textContent=score.sheet_person_id+"｜"+(score.rose_stage_name||"源氏名なし")+"｜回答 "+score.response_count+"件｜"+(score.response_count>=4&&score.score_100!==null?Number(score.score_100).toFixed(1)+"点":"4件未満・点数非表示");
+ }else{
+  status.textContent=linked?"評価データを取得できません":"アンケート評価：未紐づけ";
+ }
+ try{
+  const allowed=await client.rpc("can_link_therapist_interview");
+  if(allowed.error)throw allowed.error;
+  if(request!==surveyRequest)return;
+  if(!allowed.data||linked)return;
+  const used=new Set(surveyLinks.map(x=>x.sheet_person_id));
+  const choice=$("surveyPersonChoice");choice.replaceChildren();
+  const first=document.createElement("option");first.value="";first.textContent="管理ID・源氏名を選択";choice.appendChild(first);
+  for(const row of surveyScores.filter(x=>x.rose_stage_name&&!used.has(x.sheet_person_id)).sort((a,b)=>a.sheet_person_id.localeCompare(b.sheet_person_id))){
+   const o=document.createElement("option");o.value=row.sheet_person_id;o.textContent=row.sheet_person_id+"｜"+row.rose_stage_name+"（回答"+row.response_count+"件）";choice.appendChild(o);
+  }
+  btn.classList.remove("hide");
+ }catch(e){if(request===surveyRequest)status.textContent+="｜権限確認失敗："+(e.message||String(e))}
+}
+$("surveyLinkOpen").onclick=()=>{$("surveyLinkPanel").classList.toggle("hide")};
+$("surveyLinkSave").onclick=async()=>{
+ const exaId=editingResidency?.exaId;
+ const sheetId=$("surveyPersonChoice").value;
+ if(!authorized||!exaId||!sheetId)return;
+ const staff=therapists.find(t=>t.exa_id===exaId),score=surveyScores.find(x=>x.sheet_person_id===sheetId);
+ if(!staff||!score)return;
+ if(!confirm("EXA："+staff.stage_name+"（ID "+exaId+"）\nアンケート："+score.rose_stage_name+"（"+sheetId+"）\n\n同一人物であることを確認しましたか？\n別人との誤連携防止のため、確認後に確定してください。"))return;
+ const button=$("surveyLinkSave");button.disabled=true;
+ try{
+  const {data:{user}}=await client.auth.getUser();
+  if(!user)throw Error("管理者ログインを確認できません");
+  const r=await client.from("exa_survey_links").insert({store_code:"rose",exa_id:exaId,sheet_person_id:sheetId,linked_by:user.id});
+  if(r.error)throw r.error;
+  await load();
+  if(editingResidency?.exaId===exaId)await loadSurveyLink(exaId);
+  showMsg("アンケートIDを紐づけました。回答4件以上の評価点のみ表示します。");
+ }catch(e){showMsg("アンケート紐づけ失敗："+(e.message||String(e)),true)}
+ finally{button.disabled=false}
+};
 let editingResidency=null;
 function openResidency(button){
  const exaId=Number(button.dataset.staffId);
@@ -746,10 +816,12 @@ function openResidency(button){
  $("residencyModal").classList.remove("hide");
  showTherapistPhoto(exaId);
  loadPersonRegistry(exaId);
+ loadSurveyLink(exaId);
 }
 function closeResidency(){
  photoRequest++;
  registryRequest++;
+ surveyRequest++;
  $("residencyModal").classList.add("hide");
  editingResidency=null;
 }
