@@ -12,9 +12,19 @@ export function parseExaDay(html:string,baseUrl:string):DayResult {
  if(base.origin!==EXA_ORIGIN || base.pathname!==EXA_DAILY) throw Error("Unsupported EXA daily page");
  const doc=new DOMParser().parseFromString(html,"text/html");
  const text=doc.body?.textContent||"";
- const m=text.match(/(20\d{2})年\s*(\d{1,2})月\s*(\d{1,2})日\s*(?:\([^)]*\))?\s*の出勤/);
- if(!m) throw Error("Daily date missing");
+ // The EXA daily title has varied between Japanese and slash/hyphen date formats.
+ // Parse the visible page text, not href attributes (which can contain the *next* day).
+ const normalized=text.replace(/\u00a0/g," ").replace(/[０-９]/g,c=>String(c.charCodeAt(0)-0xFF10));
+ const patterns=[
+  /(20\d{2})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/,
+  /(20\d{2})[\/-](\d{1,2})[\/-](\d{1,2})/,
+ ];
+ let m:RegExpMatchArray|null=null;
+ for(const pattern of patterns){m=normalized.match(pattern);if(m)break;}
+ if(!m)throw Error("Daily date missing");
  const date=m[1]+"-"+m[2].padStart(2,"0")+"-"+m[3].padStart(2,"0");
+ const parsed=new Date(date+"T00:00:00Z");
+ if(Number.isNaN(parsed.getTime())||parsed.toISOString().slice(0,10)!==date)throw Error("Daily date invalid");
  const dayRows:ExaRow[]=[];
  const ids=new Set<number>();
  const radios=doc.querySelectorAll('input[type="radio"][name$="[status]"]');
