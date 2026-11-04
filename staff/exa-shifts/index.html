@@ -208,9 +208,9 @@ for(let n=1;n<=daysIn();n++){
 const countHeader=staffView==="real"?"実働（"+real.length+"名）":staffView==="dummy"?"ダミー（"+dummy.length+"名）":"実働（"+real.length+"名）／ダミー（"+dummy.length+"名）";
 let html='<thead><tr><th class="staff-heading" rowspan="2"><span>'+countHeader+'</span></th>';
 html+='<th class="stat-heading" rowspan="2">稼働</th><th class="stat-heading" rowspan="2">出勤</th><th class="stat-heading" rowspan="2">無報</th><th class="stat-heading" rowspan="2">評価</th>';
-for(let n=1;n<=daysIn();n++){const d=dayStr(n);html+='<th class="day-heading"><button type="button" data-day="'+d+'">'+n+'日</button></th>';}
+for(let n=1;n<=daysIn();n++){const d=dayStr(n),kind=dayType(d);html+='<th class="day-heading '+kind+(d===today()?" today-marker":"")+'"><button type="button" data-day="'+d+'">'+n+'日</button></th>';}
 html+='</tr><tr class="daily-totals">';
-for(let n=1;n<=daysIn();n++){const d=dayStr(n);html+='<th class="day-total" title="その日の出勤人数">'+dayCounts.get(d)[staffView]+'人</th>';}
+for(let n=1;n<=daysIn();n++){const d=dayStr(n),kind=dayType(d);html+='<th class="day-total '+kind+(d===today()?" today-marker":"")+'" title="その日の出勤人数">'+dayCounts.get(d)[staffView]+'人</th>';}
 html+='</tr></thead><tbody>';
 for(const [label,list,group] of [["実働",real,"real"],["ダミー",dummy,"dummy"]]){if(staffView!=="all"&&staffView!==group)continue;
 if(staffView==="all")html+='<tr class="group"><td colspan="'+(daysIn()+5)+'">'+label+"（"+list.length+"名）</td></tr>";
