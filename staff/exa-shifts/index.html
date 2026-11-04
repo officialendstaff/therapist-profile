@@ -190,7 +190,7 @@ footer{display:none}
   text-align:center!important;
   z-index:8!important;
 }
-</style></head>
+.residency-dialog{position:relative;z-index:1;width:410px;max-width:90vw;padding:22px}.residency-dialog h2{margin:0 0 12px;font-size:19px}.residency-dialog label{display:block;margin:14px 0 7px;font-size:13px;font-weight:700}.residency-dialog select{width:100%;padding:11px;border:1px solid #b6c6d8;border-radius:7px;background:#fff}.staff-name .name-editor{border:none;background:none;padding:0;color:inherit;font-weight:700;font-size:14px;text-align:left;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px}.staff-name .name-editor:hover,.staff-name .name-editor:focus-visible{color:#2466a3;text-decoration-color:#2466a3;outline-offset:2px}.staff-name .name-editor:after{content:" ✎";font-size:10px;color:#8299ad}</style></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
 <label class="store-label">店舗 <select id="storeSelect" aria-label="店舗切替"><option value="rose">薔薇と紳士</option></select></label>
@@ -208,6 +208,16 @@ footer{display:none}
 
 <p id="message" class="muted" aria-live="polite" style="margin:0 0 8px"></p>
 <div class="panel monthly-panel"><div class="row space month-heading"><h2>月間シフト</h2><div class="staff-filter" role="group" aria-label="表示区分"><button type="button" data-show-staff="real" class="active">実働</button><button type="button" data-show-staff="dummy">ダミー</button><button type="button" data-show-staff="all">全件</button></div></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
+<div id="residencyModal" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="residencyTitle">
+<div id="residencyShade" class="day-modal-shade"></div>
+<div class="panel residency-dialog">
+<h2 id="residencyTitle">在籍区分の変更</h2>
+<p id="residencyInfo" class="muted"></p>
+<label for="residencyChoice">区分</label>
+<select id="residencyChoice"><option value="active">実働</option><option value="dummy">ダミー</option></select>
+<p class="muted">EXAの登録内容やHP公開設定は変更しません。出勤管理の一覧・人数集計のみ切り替わります。</p>
+<div class="row space"><button id="residencyCancel" type="button">キャンセル</button><button id="residencySave" class="primary" type="button">変更を確定</button></div>
+</div></div>
 <div id="countModal" class="day-modal hide" role="dialog" aria-modal="true"><div id="countShade" class="day-modal-shade"></div><div class="panel count-panel"><h2 id="countTitle">接客本数</h2><p class="muted">当欠は0本とは別に記録します。</p><select id="countSelect" size="8"><option value="absent">当欠</option><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select><div class="row space"><button id="countCancel">キャンセル</button><button id="countConfirm" class="primary">確定</button></div></div></div><div id="dayPanel" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="dayTitle"><div class="day-modal-shade" id="dayBackdrop"></div><div class="day-modal-content panel"><div class="row space"><h2 id="dayTitle">日別タイムチャート</h2><button id="closeDay" type="button" aria-label="閉じる">閉じる ×</button></div><div id="timeline"></div></div></div>
 </main><footer>EXA管理ページの登録内容は変更しません。接客本数のみSupabaseへ保存します。</footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.10/dist/umd/supabase.min.js"></script>
@@ -296,7 +306,7 @@ const latestDates=futureShifts.filter(r=>r.exa_id===t.exa_id&&!r.is_dummy_shift&
 const lastKnownDate=latestDates.length?latestDates[latestDates.length-1]:null;
 const days=[...entries.values()].filter(r=>!r.is_dummy_shift).length;
 const zeros=valid.filter(r=>!absence.has(t.exa_id+"|"+r.work_date)&&per.get(t.exa_id+"|"+r.work_date)===0).length;
-html+='<tr class="'+(outside?'outside-roster':'')+'"><td class="staff-name"><strong>'+safe(stageName)+'</strong>'+(kana?'<span class="reading">'+safe(kana)+'</span>':'')+(outside?'<span class="outside-label">実働外</span>':'')+'</td>';
+html+='<tr class="'+(outside?'outside-roster':'')+'"><td class="staff-name"><button type="button" class="name-editor" data-staff-id="'+t.exa_id+'" title="実働／ダミーを変更">'+safe(stageName)+'</button>'+(kana?'<span class="reading">'+safe(kana)+'</span>':'')+(outside?'<span class="outside-label">実働外</span>':'')+'</td>';
 const evaluation=t.evaluation_score===null||t.evaluation_score===undefined?null:Number(t.evaluation_score);
 const scoreClass=evaluation===null?"":evaluation>=95?"score-high":"score-low";
 const scoreText=evaluation===null?"—":evaluation.toFixed(2);
@@ -318,6 +328,7 @@ html+='</tr>';
 html+="</tbody>";$("monthly").innerHTML=html;
 $("monthly").querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{selected=b.dataset.day;renderDay();$("dayPanel").classList.remove("hide")});
 $("monthly").querySelectorAll(".edit-count").forEach(input=>input.onclick=()=>openCount(input));
+$("monthly").querySelectorAll("[data-staff-id]").forEach(button=>button.onclick=()=>openResidency(button));
 }
 let editingCount=null;
 function openCount(button){
