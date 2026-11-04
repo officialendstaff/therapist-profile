@@ -253,6 +253,25 @@ footer{display:none}
 .timeline .timeline-name{font-weight:650;min-width:145px}
 .timeline .timeline-name small{display:block;font-size:10px;color:#64768c;font-weight:400}
 .timeline .sum td{font-weight:750;background:#dbeafa}
+
+/* Timeline: clear hourly and therapist-row grid lines. The last column is 4:00. */
+.timeline{border-collapse:separate!important;border-spacing:0!important;table-layout:fixed}
+.timeline thead th,.timeline tbody td,.timeline tbody th{
+ border-right:1px solid #cbd6e3!important;
+ border-bottom:1px solid #d5dee9!important;
+}
+.timeline thead th{border-bottom:2px solid #9db4cc!important}
+.timeline tbody tr:not(.timeline-group):not(.sum) td.timeline-name{
+ border-right:2px solid #a9bed4!important;
+}
+.timeline tbody tr.timeline-group th{
+ border-top:2px solid #b2c6da!important;
+ border-bottom:1px solid #b2c6da!important;
+}
+.timeline tbody tr.sum td{
+ border-top:2px solid #b4c7db!important;
+ border-bottom:2px solid #b4c7db!important;
+}
 </style></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
@@ -511,7 +530,7 @@ function renderDay(){
  const dummy=day.filter(r=>isDummy(map.get(r.exa_id)||{})||r.is_dummy_shift).sort(byStartThenEnd);
  $("dayTitle").textContent=selected+"｜日別タイムチャート";
  $("dayHeadcount").textContent="合計 "+(real.length+dummy.length)+"名（実働 "+real.length+"名・ダミー "+dummy.length+"名）";
- const slots=Array.from({length:20},(_,i)=>600+i*60);
+ const slots=Array.from({length:19},(_,i)=>600+i*60);
  let html='<div class="chart-scroll"><table class="timeline"><thead><tr><th>セラピスト</th>'+slots.map(x=>"<th>"+minutes(x)+"</th>").join("")+"</tr></thead><tbody>";
  const activeAt=(r,s)=>r.start_minutes<s+60&&r.end_minutes>s;
  function addRows(rows,kind){
