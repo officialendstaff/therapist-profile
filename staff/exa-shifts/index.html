@@ -81,6 +81,30 @@ footer{display:none}
  left:auto!important;right:auto!important;width:56px!important;min-width:56px!important;z-index:8!important;
 }
 .shift-table thead tr:first-child .staff-heading{height:53px}
+
+/* Readability first: date columns scroll horizontally rather than shrinking text. */
+.table-scroll{overflow:auto;max-height:calc(100vh - 155px)}
+.shift-table{width:max-content!important;min-width:0!important;table-layout:fixed;font-size:13px}
+.shift-table th,.shift-table td{height:46px!important;padding:5px 4px!important}
+.shift-table thead tr:first-child th.day-heading,
+.shift-table thead tr.daily-totals th.day-total,
+.shift-table tbody tr:not(.group) td:nth-child(n+6){
+  width:82px!important;min-width:82px!important;max-width:82px!important;
+  font-size:13px!important;white-space:nowrap!important;overflow:visible!important;
+}
+.shift-table tbody tr:not(.group) td:nth-child(n+6){font-weight:500;letter-spacing:-.025em}
+.shift-table thead tr:first-child th.day-heading{height:32px!important}
+.shift-table thead tr.daily-totals th.day-total{
+  top:32px!important;height:29px!important;font-size:12px!important;
+}
+.shift-table thead tr:first-child .staff-heading{height:61px!important;font-size:12px!important}
+.shift-table th.day-heading button{font-size:13px!important;font-weight:700}
+.shift-table tbody tr:not(.group) td.staff-name{padding-left:9px!important}
+.shift-table .staff-name strong{font-size:14px!important}
+.shift-table .staff-name .reading{font-size:11px!important;margin-top:4px}
+.shift-table tbody tr:not(.group) td.stat-cell{font-size:13px!important}
+.shift-table td .edit-count{height:29px;font-size:13px!important;font-weight:650}
+.shift-table tr.group td{height:28px!important}
 </style></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
