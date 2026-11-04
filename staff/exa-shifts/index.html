@@ -403,9 +403,15 @@ footer{display:none}
     <button id="surveyLinkSave" type="button" class="primary">本人確認して紐づける</button>
    </div>
   </div>
-  <label for="residencyChoice">在籍区分</label>
-  <select id="residencyChoice"><option value="active">実働</option><option value="dummy">ダミー</option></select>
-  <p class="muted">EXAの登録内容やHP公開設定は変更しません。出勤管理の一覧・人数集計のみ切り替わります。</p>
+  <label for="residencyChoice">出勤管理区分</label>
+  <select id="residencyChoice">
+   <option value="unclassified">仮登録（実働一覧に表示）</option>
+   <option value="real_working">実在籍・実働</option>
+   <option value="real_outside">実在籍・実働外</option>
+   <option value="dummy_use">退店・ダミーとして使用</option>
+   <option value="not_used">退店・使用不要（一覧非表示）</option>
+  </select>
+  <p class="muted">EXAの登録内容・HP公開設定・過去の出勤記録は変更しません。実在籍か退店済みかは管理者が確認して区分を確定してください。</p>
   <div class="row space"><button id="residencyCancel" type="button">閉じる</button><button id="residencySave" class="primary" type="button">区分変更を確定</button></div>
  </div>
 </div>
@@ -417,7 +423,7 @@ footer{display:none}
 const URL_SB="https://vjjnkflbfsjihwzjsjpr.supabase.co",KEY_SB="sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos";
 const client=window.supabase?.createClient(URL_SB,KEY_SB,{auth:{persistSession:true,autoRefreshToken:true,storage:sessionStorage,storageKey:"mattan-recruit-auth"}});
 const $=id=>document.getElementById(id), today=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
-const initial=today();let month=initial.slice(0,7),selected=initial,therapists=[],shifts=[],futureShifts=[],performances=[],historyPerformances=[],authorized=false;
+const initial=today();let month=initial.slice(0,7),selected=initial,therapists=[],shifts=[],futureShifts=[],performances=[],historyPerformances=[],authorized=false,rosterIds=new Set();
 const safe=(v)=>{const e=document.createElement("span");e.textContent=String(v??"");return e.innerHTML;};
 const daysIn=()=>new Date(Number(month.slice(0,4)),Number(month.slice(5,7)),0).getDate();
 const dayStr=n=>month+"-"+String(n).padStart(2,"0");
@@ -448,19 +454,21 @@ $("logout").onclick=async()=>{await client.auth.signOut();location.reload()};
 async function load(){
 if(!authorized)return;showMsg("Supabaseを読み込み中…");
 const start=month+"-01",end=dayStr(daysIn());
-const [a,b,c,d,e,future,sv,sl]=await Promise.all([
-client.from("exa_shift_therapists").select("exa_id,stage_name,residency,employment_status,evaluation_score").eq("store_code","rose"),
+const [a,b,c,d,e,future,sv,sl,roster]=await Promise.all([
+client.from("exa_shift_therapists").select("exa_id,stage_name,residency,employment_status,operating_category,evaluation_score").eq("store_code","rose"),
 client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_dummy_shift,is_pre_off").eq("store_code","rose").gte("work_date",start).lte("work_date",end).order("work_date"),
 client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code","rose").gte("work_date",start).lte("work_date",end),
 client.from("exa_shift_sync_runs").select("finished_at,record_count,mode").eq("store_code","rose").eq("state","success").order("finished_at",{ascending:false}).limit(1),
 client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code","rose").lt("work_date",today()).limit(5000),
 client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_dummy_shift,is_pre_off").eq("store_code","rose").order("work_date").limit(5000),
 client.from("exa_survey_scores").select("sheet_person_id,rose_stage_name,response_count,score_100,synced_at").limit(1000),
-client.from("exa_survey_links").select("exa_id,sheet_person_id").eq("store_code","rose")
+client.from("exa_survey_links").select("exa_id,sheet_person_id").eq("store_code","rose"),
+client.from("exa_rose_roster_current").select("exa_id,roster_name")
 ]);
-const err=[a,b,c,d,e,future,sv,sl].find(r=>r.error)?.error;
+const err=[a,b,c,d,e,future,sv,sl,roster].find(r=>r.error)?.error;
 if(err){showMsg("読み込みエラー："+err.message,true);return;}
-therapists=a.data||[];shifts=b.data||[];performances=c.data||[];historyPerformances=e.data||[];futureShifts=future.data||[];
+rosterIds=new Set((roster.data||[]).map(r=>r.exa_id));
+therapists=(a.data||[]).filter(t=>rosterIds.has(t.exa_id));shifts=b.data||[];performances=c.data||[];historyPerformances=e.data||[];futureShifts=future.data||[];
 surveyScores=sv.data||[];surveyLinks=sl.data||[];
 $("monthLabel").textContent=month.replace("-","年")+"月";
 $("message").textContent="";
@@ -493,16 +501,16 @@ let staffView="real";
 function renderMonthly(){
 const existing=staffById(), byId=new Map();
 for(const r of shifts){if(!byId.has(r.exa_id))byId.set(r.exa_id,new Map());byId.get(r.exa_id).set(r.work_date,r);}
-const real=therapists.filter(t=>t.residency!=="dummy"&&t.employment_status!=="departed").sort((a,b)=>Number(byId.has(b.exa_id))-Number(byId.has(a.exa_id))||a.exa_id-b.exa_id);
-const dummy=therapists.filter(t=>t.residency==="dummy"&&byId.has(t.exa_id)).sort((a,b)=>a.exa_id-b.exa_id);
+const real=therapists.filter(t=>t.operating_category!=="not_used"&&t.operating_category!=="dummy_use").sort((a,b)=>Number(byId.has(b.exa_id))-Number(byId.has(a.exa_id))||a.exa_id-b.exa_id);
+const dummy=therapists.filter(t=>t.operating_category==="dummy_use").sort((a,b)=>a.exa_id-b.exa_id);
 const per=new Map(performances.map(p=>[p.exa_id+"|"+p.work_date,p.customer_count]));
 const absence=new Set(performances.filter(p=>p.attendance_status==="absent").map(p=>p.exa_id+"|"+p.work_date));
 const dayCounts=new Map();
 for(let n=1;n<=daysIn();n++){
  const date=dayStr(n);
  const r=shifts.filter(x=>x.work_date===date);
- const active=r.filter(x=>!x.is_dummy_shift&&!isDummy(existing.get(x.exa_id)||{})).length;
- const dummyTotal=r.filter(x=>x.is_dummy_shift||isDummy(existing.get(x.exa_id)||{})).length;
+ const active=r.filter(x=>rosterIds.has(x.exa_id)&&existing.get(x.exa_id)?.operating_category!=="not_used"&&!x.is_dummy_shift&&!isDummy(existing.get(x.exa_id)||{})).length;
+ const dummyTotal=r.filter(x=>rosterIds.has(x.exa_id)&&existing.get(x.exa_id)?.operating_category!=="not_used"&&(x.is_dummy_shift||isDummy(existing.get(x.exa_id)||{}))).length;
  dayCounts.set(date,{real:active,dummy:dummyTotal,all:active+dummyTotal});
 }
 const countHeader=staffView==="real"?"実働（"+real.length+"名）":staffView==="dummy"?"ダミー（"+dummy.length+"名）":"実働（"+real.length+"名）／ダミー（"+dummy.length+"名）";
@@ -520,7 +528,7 @@ const rawName=String(t.stage_name||"ID "+t.exa_id);
 const nameParts=rawName.match(/^(.+?)-([^-]+)-$/);
 const stageName=nameParts?nameParts[1]:rawName,kana=nameParts?nameParts[2]:"";
 const upcoming=futureShifts.some(r=>r.exa_id===t.exa_id&&r.work_date>=today()&&!r.is_dummy_shift&&!r.is_pre_off);
-const outside=group==="real"&&!upcoming;
+const outside=group==="real"&&(t.operating_category==="real_outside"||(t.operating_category==="unclassified"&&!upcoming));
 const latestDates=futureShifts.filter(r=>r.exa_id===t.exa_id&&!r.is_dummy_shift&&!r.is_pre_off).map(r=>r.work_date).sort();
 const lastKnownDate=latestDates.length?latestDates[latestDates.length-1]:null;
 const days=[...entries.values()].filter(r=>!r.is_dummy_shift).length;
@@ -809,10 +817,10 @@ function openResidency(button){
  const exaId=Number(button.dataset.staffId);
  const person=therapists.find(t=>t.exa_id===exaId);
  if(!person)return;
- editingResidency={exaId,old:person.residency,name:person.stage_name};
+ editingResidency={exaId,old:person.operating_category,name:person.stage_name};
  $("residencyTitle").textContent="セラピスト詳細";
- $("residencyInfo").textContent=person.stage_name+"（EXA ID："+exaId+"）／現在："+(isDummy(person)?"ダミー":"実働");
- $("residencyChoice").value=isDummy(person)?"dummy":"active";
+ $("residencyInfo").textContent=person.stage_name+"（EXA ID："+exaId+"）／区分："+({unclassified:"仮登録",real_working:"実在籍・実働",real_outside:"実在籍・実働外",dummy_use:"退店・ダミー使用",not_used:"退店・使用不要"}[person.operating_category]||"未設定");
+ $("residencyChoice").value=person.operating_category||"unclassified";
  $("residencyModal").classList.remove("hide");
  showTherapistPhoto(exaId);
  loadPersonRegistry(exaId);
@@ -829,27 +837,22 @@ $("residencyCancel").onclick=closeResidency;
 $("residencyShade").onclick=closeResidency;
 $("residencySave").onclick=async()=>{
  if(!editingResidency||!authorized)return;
- const newResidency=$("residencyChoice").value;
- if(!["active","dummy"].includes(newResidency))return;
- const current=therapists.find(t=>t.exa_id===editingResidency.exaId);
- if(!current)return;
- if(current.residency===newResidency){closeResidency();return;}
- const label=newResidency==="dummy"?"ダミー":"実働";
- const oldLabel=isDummy(current)?"ダミー":"実働";
- if(!confirm(current.stage_name+"（EXA ID："+current.exa_id+"）を"+oldLabel+"から"+label+"へ変更しますか？\n出勤管理の人数集計にも反映します。"))return;
- const saveButton=$("residencySave");saveButton.disabled=true;
+ const category=$("residencyChoice").value;
+ const labels={unclassified:"仮登録",real_working:"実在籍・実働",real_outside:"実在籍・実働外",dummy_use:"退店・ダミーとして使用",not_used:"退店・使用不要"};
+ if(!Object.prototype.hasOwnProperty.call(labels,category))return;
+ const person=therapists.find(t=>t.exa_id===editingResidency.exaId);
+ if(!person)return;
+ if(person.operating_category===category){closeResidency();return;}
+ if(!confirm(person.stage_name+"（EXA ID："+person.exa_id+"）を「"+labels[category]+"」に変更しますか？\\nEXA本体や過去の出勤実績には影響しません。"))return;
+ const button=$("residencySave");button.disabled=true;
  try{
-  const {data,error}=await client.from("exa_shift_therapists")
-   .update({residency:newResidency})
-   .eq("store_code","rose").eq("exa_id",current.exa_id).eq("residency",current.residency)
-   .select("exa_id,residency").maybeSingle();
+  const {data,error}=await client.rpc("set_rose_operating_category",{p_exa_id:person.exa_id,p_category:category});
   if(error)throw error;
-  if(!data||data.residency!==newResidency)throw Error("変更結果を確認できませんでした。再読込して確認してください。");
-  closeResidency();
-  await load();
-  showMsg(current.stage_name+"を"+label+"に変更しました。");
- }catch(e){showMsg("在籍区分の変更に失敗："+String(e.message||e),true)}
- finally{saveButton.disabled=false}
+  if(!Array.isArray(data)||!data.length||data[0].operating_category!==category)throw Error("区分変更を確認できませんでした");
+  closeResidency();await load();
+  showMsg(person.stage_name+"を「"+labels[category]+"」に変更しました。");
+ }catch(e){showMsg("区分変更に失敗："+String(e.message||e),true)}
+ finally{button.disabled=false;}
 };
 let editingCount=null;
 function openCount(button){
@@ -882,7 +885,7 @@ $("countConfirm").onclick=async()=>{
 };
 function renderDay(){
  if(!selected.startsWith(month))selected=month+"-01";
- const map=staffById(),day=shifts.filter(r=>r.work_date===selected&&!r.is_pre_off);
+ const map=staffById(),day=shifts.filter(r=>r.work_date===selected&&!r.is_pre_off&&rosterIds.has(r.exa_id)&&map.get(r.exa_id)?.operating_category!=="not_used");
  const byStartThenEnd=(a,b)=>a.start_minutes-b.start_minutes||a.end_minutes-b.end_minutes||a.exa_id-b.exa_id;
  const real=day.filter(r=>!isDummy(map.get(r.exa_id)||{})&&!r.is_dummy_shift).sort(byStartThenEnd);
  const dummy=day.filter(r=>isDummy(map.get(r.exa_id)||{})||r.is_dummy_shift).sort(byStartThenEnd);
