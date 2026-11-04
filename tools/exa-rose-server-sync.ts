@@ -8,7 +8,7 @@ import { readThirtyDays } from "./exa-snapshot-fetch.ts";
 
 const SB_URL=Deno.env.get("SUPABASE_URL")||"";
 const SB_SERVICE=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")||"";
-const CRON_TOKEN=Deno.env.get("EXA_SERVER_CRON_TOKEN")||"";
+// Cron calls carry a Vault-backed token, validated by its SHA-256 in a service-role-only RPC.
 const EXA_ID=Deno.env.get("EXA_LOGIN_ID")||"";
 const EXA_PASSWORD=Deno.env.get("EXA_LOGIN_PASSWORD")||"";
 const admin=createClient(SB_URL,SB_SERVICE,{auth:{persistSession:false}});
@@ -28,7 +28,12 @@ Deno.serve(async (req:Request)=>{
   if(req.method!=="POST")return json({error:"method_not_allowed"},405);
   const authorization=req.headers.get("Authorization")||"";
   // Empty secrets never permit a request; browsers never receive a usable credential.
-  if(!CRON_TOKEN||authorization!=="Bearer "+CRON_TOKEN)return json({error:"unauthorized"},401);
+  const bearer=authorization.startsWith("Bearer ")?authorization.slice(7):"";
+  if(!bearer||bearer.length>256)return json({error:"unauthorized"},401);
+  const {data:valid,error:authError}=await admin.rpc("exa_server_sync_auth_valid",{
+    p_store:"rose",p_token:bearer
+  });
+  if(authError||valid!==true)return json({error:"unauthorized"},401);
   const {data:allowed,error:gateError}=await admin.rpc("exa_server_sync_is_permitted",{p_store:"rose"});
   if(gateError||allowed!==true)return json({status:"disabled"},200);
   if(!EXA_ID||!EXA_PASSWORD)return json({error:"credentials_not_configured"},503);
