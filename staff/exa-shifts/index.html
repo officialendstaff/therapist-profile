@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EXA シフト管理｜薔薇と紳士</title>
+<style>
+:root{font-family:Arial,"Noto Sans JP",sans-serif;color:#1e2c40;background:#f3f6fa}*{box-sizing:border-box}body{margin:0}header{background:#1b304c;color:#fff;padding:17px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}header h1{font-size:19px;margin:0}button,input,select{font:inherit}button{cursor:pointer;padding:9px 13px;border:1px solid #b6c6d8;border-radius:8px;background:#fff;color:#1c3858}button:disabled{opacity:.45;cursor:not-allowed}button.primary{background:#28659a;color:white;border-color:#28659a}main{max-width:1500px;margin:18px auto;padding:0 14px}.panel{background:white;border:1px solid #dde5ef;border-radius:12px;margin-bottom:14px;padding:16px;box-shadow:0 2px 8px #1b304c08}.muted{color:#677991;font-size:12px}.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.space{justify-content:space-between}.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.kpi{background:#f0f5fa;padding:14px;border-radius:9px}.kpi strong{display:block;font-size:24px}.hide{display:none!important}.table-scroll{overflow:auto;max-height:68vh}.shift-table{width:max-content;min-width:100%;border-collapse:separate;border-spacing:0;font-size:12px}.shift-table th,.shift-table td{border-bottom:1px solid #e5ebf2;border-right:1px solid #eef2f7;padding:4px;text-align:center;min-width:48px;height:36px}.shift-table th{position:sticky;top:0;background:#e9f0f9;z-index:2}.shift-table th:first-child,.shift-table td:first-child{position:sticky;left:0;min-width:118px;text-align:left;background:#fff;z-index:3}.shift-table th:first-child{background:#dbe8f6;z-index:4}.shift-table th button{padding:3px 6px;font-size:11px}.shift-table td.dummy{background:#faf4f6;color:#956675}.shift-table td.today{background:#e8f3ff}.shift-table tr.group td{background:#dde9f4!important;font-weight:bold;text-align:left;position:static}.shift-table input{width:43px;padding:5px 2px;border:1px solid #b5cee6;border-radius:5px;text-align:center;font-size:13px}.shift-table input:focus{outline:2px solid #4891d0}.shift-table td small{color:#68819b}.chart-scroll{overflow:auto}.timeline{border-collapse:separate;border-spacing:2px;font-size:11px;min-width:900px;width:100%}.timeline th,.timeline td{text-align:center;padding:4px;min-width:32px}.timeline td:first-child,.timeline th:first-child{min-width:110px;text-align:left;position:sticky;left:0;background:white}.timeline td.on{background:#a8d5f2}.timeline td.off{background:#edf1f5}.timeline .sum td{font-weight:bold;background:#e1edf8}.timeline .dummy-on{background:#ecdce2}.notice{padding:10px;border-radius:8px;background:#fff3da;color:#79541c}.error{color:#b12639}#login{max-width:430px;margin:60px auto}#login input{width:100%;padding:11px;margin:6px 0 14px;border:1px solid #cbd4e1;border-radius:7px}#message{margin-top:10px}.tag{font-size:11px;background:#e1eaf5;padding:4px 7px;border-radius:12px}footer{padding:24px;font-size:11px;color:#7a8ba0;text-align:center}@media(max-width:720px){.kpis{grid-template-columns:repeat(2,1fr)}.panel{padding:10px}header{padding:12px}header h1{font-size:16px}}
+</style></head>
+<body>
+<header><h1>薔薇と紳士｜シフト管理</h1><div class="row"><span id="authLabel" class="muted" style="color:#d5e1f1"></span><button id="logout" class="hide">ログアウト</button></div></header>
+<section id="login" class="panel"><h2>スタッフログイン</h2><p class="muted">面接管理で使用しているSupabaseアカウントでログインしてください。閲覧は承認済み管理者に限定しています。</p><form id="loginForm"><label>メールアドレス<input id="email" type="email" autocomplete="username" required></label><label>パスワード<input id="password" type="password" autocomplete="current-password" required></label><button class="primary" type="submit">ログイン</button></form><p id="loginError" class="error"></p></section>
+<main id="app" class="hide">
+<div class="panel row space"><div class="row"><button id="prev">◀</button><strong id="monthLabel"></strong><button id="next">▶</button><span class="tag">薔薇と紳士</span></div><div class="row"><button id="reload" class="primary">保存データを再読込</button><button id="exaSync" disabled title="EXA自動認証・収集処理は未接続">EXAから今すぐ更新（未接続）</button></div></div>
+<div class="panel"><div class="row space"><div><strong>データ同期状況</strong><p class="muted" id="syncLabel">読み込み前</p></div><span class="tag">3時間自動更新：未接続</span></div><p class="muted">「保存データを再読込」はSupabase内の最新データを表示します。EXAの直接取得はまだ行いません。</p><p id="message" aria-live="polite"></p></div>
+<div class="panel"><div class="kpis"><div class="kpi"><span class="muted">登録シフト数</span><strong id="nAll">—</strong></div><div class="kpi"><span class="muted">実在籍シフト数</span><strong id="nReal">—</strong></div><div class="kpi"><span class="muted">ダミーシフト数</span><strong id="nDummy">—</strong></div><div class="kpi"><span class="muted">対象セラピスト</span><strong id="nPeople">—</strong></div></div></div>
+<div class="panel"><div class="row space"><h2>月間シフト</h2><span class="muted">過去日の数字＝接客本数（空欄は未入力）／当日以降＝出勤時間</span></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
+<div class="panel" id="dayPanel"><div class="row space"><h2 id="dayTitle">日別タイムチャート</h2><span class="muted">時間帯別の実出勤人数のみ集計。ダミーは下段に表示。</span></div><div id="timeline"></div></div>
+</main><footer>EXA管理ページの登録内容は変更しません。接客本数のみSupabaseへ保存します。</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.10/dist/umd/supabase.min.js"></script>
+<script>
+const URL_SB="https://vjjnkflbfsjihwzjsjpr.supabase.co",KEY_SB="sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos";
+const client=window.supabase?.createClient(URL_SB,KEY_SB,{auth:{persistSession:true,autoRefreshToken:true,storage:sessionStorage,storageKey:"mattan-recruit-auth"}});
+const $=id=>document.getElementById(id), today=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+const initial=today();let month=initial.slice(0,7),selected=initial,therapists=[],shifts=[],performances=[],authorized=false;
+const safe=(v)=>{const e=document.createElement("span");e.textContent=String(v??"");return e.innerHTML;};
+const daysIn=()=>new Date(Number(month.slice(0,4)),Number(month.slice(5,7)),0).getDate();
+const dayStr=n=>month+"-"+String(n).padStart(2,"0");
+const minutes=x=>{const h=Math.floor(x/60),m=x%60;return (h>=24?(h===24?"24":String(h-24)):String(h))+(m?":"+String(m).padStart(2,"0"):"")};
+const range=x=>minutes(x.start_minutes)+"-"+minutes(x.end_minutes);
+const isDummy=s=>s.residency==="dummy";
+const staffById=()=>new Map(therapists.map(t=>[t.exa_id,t]));
+const byDay=()=>{const m=new Map();for(const r of shifts){if(!m.has(r.work_date))m.set(r.work_date,[]);m.get(r.work_date).push(r);}return m;};
+const showMsg=(s,error=false)=>{$("message").textContent=s;$("message").className=error?"error":"muted";};
+async function loginCheck(){if(!client){$("loginError").textContent="認証ライブラリを読み込めません";return;}
+const {data:{session}}=await client.auth.getSession();if(!session){authorized=false;$("app").classList.add("hide");$("login").classList.remove("hide");return;}
+const {data,error}=await client.from("recruit_staff_profiles").select("role,approved_at").eq("user_id",session.user.id).maybeSingle();
+if(error||!data||!data.approved_at||!["master","full"].includes(data.role)){
+  authorized=false;$("app").classList.add("hide");$("login").classList.remove("hide");$("loginError").textContent="このページへの権限がありません。";return;
+}
+authorized=true;$("login").classList.add("hide");$("app").classList.remove("hide");$("logout").classList.remove("hide");$("authLabel").textContent="認証済み";await load();}
+$("loginForm").onsubmit=async e=>{e.preventDefault();$("loginError").textContent="確認中…";const {error}=await client.auth.signInWithPassword({email:$("email").value,password:$("password").value});if(error){$("loginError").textContent="ログインできません。入力情報をご確認ください。";return;}$("loginError").textContent="";await loginCheck()};
+$("logout").onclick=async()=>{await client.auth.signOut();location.reload()};
+async function load(){
+if(!authorized)return;showMsg("Supabaseを読み込み中…");
+const start=month+"-01",end=dayStr(daysIn());
+const [a,b,c,d]=await Promise.all([
+client.from("exa_shift_therapists").select("exa_id,stage_name,residency").eq("store_code","rose"),
+client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_dummy_shift").eq("store_code","rose").gte("work_date",start).lte("work_date",end).order("work_date"),
+client.from("exa_shift_performance").select("exa_id,work_date,customer_count").eq("store_code","rose").gte("work_date",start).lte("work_date",end),
+client.from("exa_shift_sync_runs").select("finished_at,record_count,mode").eq("store_code","rose").eq("state","success").order("finished_at",{ascending:false}).limit(1)
+]);
+const err=[a,b,c,d].find(r=>r.error)?.error;
+if(err){showMsg("読み込みエラー："+err.message,true);return;}
+therapists=a.data||[];shifts=b.data||[];performances=c.data||[];
+$("syncLabel").textContent=d.data?.[0]?.finished_at?"最終取込："+new Date(d.data[0].finished_at).toLocaleString("ja-JP",{timeZone:"Asia/Tokyo"})+"（"+d.data[0].mode+"）":"同期履歴なし";
+$("nAll").textContent=shifts.length;$("nReal").textContent=shifts.filter(r=>!isDummy(staffById().get(r.exa_id)||{})&&!r.is_dummy_shift).length;$("nDummy").textContent=shifts.length-Number($("nReal").textContent);$("nPeople").textContent=new Set(shifts.map(s=>s.exa_id)).size;
+$("monthLabel").textContent=month.replace("-","年")+"月";
+showMsg(shifts.length+"件の保存データを表示しています（EXAへの通信なし）");
+renderMonthly();renderDay();}
+function renderMonthly(){
+const existing=staffById(), byId=new Map();
+for(const r of shifts){if(!byId.has(r.exa_id))byId.set(r.exa_id,new Map());byId.get(r.exa_id).set(r.work_date,r);}
+const real=therapists.filter(t=>t.residency!=="dummy"&&byId.has(t.exa_id)).sort((a,b)=>a.exa_id-b.exa_id);
+const dummy=therapists.filter(t=>t.residency==="dummy"&&byId.has(t.exa_id)).sort((a,b)=>a.exa_id-b.exa_id);
+const per=new Map(performances.map(p=>[p.exa_id+"|"+p.work_date,p.customer_count]));
+let html="<thead><tr><th>セラピスト</th>";
+for(let n=1;n<=daysIn();n++){const d=dayStr(n);html+='<th><button type="button" data-day="'+d+'">'+n+"日</button></th>";}
+html+="<th>平均稼働</th></tr></thead><tbody>";
+for(const [label,list,group] of [["実在籍",real,"real"],["ダミー在籍",dummy,"dummy"]]){
+html+='<tr class="group"><td colspan="'+(daysIn()+2)+'">'+label+"（"+list.length+"名）</td></tr>";
+for(const t of list){const entries=byId.get(t.exa_id),valid=[...entries.values()].filter(r=>r.work_date<today()&&(!isDummy(t))&&!r.is_dummy_shift&&per.has(t.exa_id+"|"+r.work_date));const avg=valid.length?(valid.reduce((s,r)=>s+per.get(t.exa_id+"|"+r.work_date),0)/valid.length).toFixed(2):"—";
+html+='<tr><td>'+safe(t.stage_name||"ID "+t.exa_id)+'</td>';
+for(let n=1;n<=daysIn();n++){const day=dayStr(n),r=entries.get(day),value=per.get(t.exa_id+"|"+day),past=day<today();
+html+='<td class="'+(group==="dummy"?"dummy ":"")+(day===today()?"today":"")+'">';
+if(r&&past&&group==="real"&&!r.is_dummy_shift)html+='<input type="number" inputmode="numeric" min="0" max="99" data-id="'+t.exa_id+'" data-date="'+day+'" value="'+(value===undefined?"":value)+'" title="接客本数">';
+else if(r&&!past)html+=safe(range(r));
+else if(r&&past&&group==="dummy")html+="—";
+else if(r&&past&&r.is_dummy_shift)html+="—";
+else html+='<small> </small>';
+html+="</td>";
+}
+html+='<td><strong>'+avg+'</strong></td></tr>';
+}}
+html+="</tbody>";$("monthly").innerHTML=html;
+$("monthly").querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{selected=b.dataset.day;renderDay();$("dayPanel").scrollIntoView({behavior:"smooth",block:"start"})});
+$("monthly").querySelectorAll("input[data-id]").forEach(input=>input.onchange=()=>savePerformance(input));
+}
+async function savePerformance(input){const id=Number(input.dataset.id),work_date=input.dataset.date,v=input.value.trim();
+if(v===""||!/^\d+$/.test(v)||Number(v)>99){showMsg("0〜99の整数を入力してください。未入力へ戻す操作は現在未実装です。",true);return;}
+input.disabled=true;const {error}=await client.from("exa_shift_performance").upsert({store_code:"rose",exa_id:id,work_date,customer_count:Number(v)},{onConflict:"store_code,exa_id,work_date"});
+input.disabled=false;if(error){showMsg("保存失敗："+error.message,true)}else{showMsg("接客本数を保存しました");await load();}}
+function renderDay(){if(!selected.startsWith(month))selected=month+"-01";
+$("dayTitle").textContent=selected+"｜日別タイムチャート";
+const map=staffById(),day=shifts.filter(s=>s.work_date===selected);
+const real=day.filter(r=>!isDummy(map.get(r.exa_id)||{})&&!r.is_dummy_shift);
+const dummy=day.filter(r=>!real.includes(r));
+const slots=Array.from({length:20},(_,i)=>600+i*60);
+let html='<div class="chart-scroll"><table class="timeline"><thead><tr><th>セラピスト</th>'+slots.map(x=>"<th>"+minutes(x)+"</th>").join("")+"</tr></thead><tbody>";
+function addRows(rows,kind){if(!rows.length)return;
+html+='<tr><th colspan="21" style="text-align:left;background:#e0eaf5">'+kind+'</th></tr>';
+for(const r of rows){const t=map.get(r.exa_id);html+='<tr><td>'+safe(t?.stage_name||"ID "+r.exa_id)+'</td>';
+for(const s of slots){const yes=r.start_minutes<s+60&&r.end_minutes>s;html+='<td class="'+(yes?(kind==="ダミー"?"dummy-on":"on"):"off")+'">'+(yes?"●":"")+"</td>";}html+="</tr>";}}
+addRows(real,"実出勤");html+='<tr class="sum"><td>出勤人数</td>'+slots.map(s=>"<td>"+real.filter(r=>r.start_minutes<s+60&&r.end_minutes>s).length+"</td>").join("")+"</tr>";addRows(dummy,"ダミー");
+html+="</tbody></table></div>";$("timeline").innerHTML=day.length?html:'<p class="notice">この日付のシフトは保存されていません。未取得か出勤0件かは区別できません。</p>';
+}
+$("prev").onclick=()=>{const d=new Date(month+"-01T00:00:00");d.setMonth(d.getMonth()-1);month=[d.getFullYear(),String(d.getMonth()+1).padStart(2,"0")].join("-");load()};
+$("next").onclick=()=>{const d=new Date(month+"-01T00:00:00");d.setMonth(d.getMonth()+1);month=[d.getFullYear(),String(d.getMonth()+1).padStart(2,"0")].join("-");load()};
+$("reload").onclick=load;loginCheck();
+</script></body></html>
