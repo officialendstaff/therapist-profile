@@ -204,6 +204,17 @@ footer{display:none}
 .shift-table .copy-exa{display:block;width:100%;border:1px solid #a8c9e9;border-radius:5px;background:#edf6ff;color:#185b91;padding:5px 1px;font-size:12px;font-weight:700}
 .shift-table .copy-exa:hover{background:#d4eafd;border-color:#5f9dca}
 .shift-table .copy-exa.copy-pair{font-size:10px}
+
+/* Dummy view has three metric columns, not four. */
+.shift-table.dummy-layout thead tr:first-child th.day-heading,
+.shift-table.dummy-layout thead tr.daily-totals th.day-total,
+.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(n+5){
+ width:82px!important;min-width:82px!important;max-width:82px!important;
+}
+.shift-table.dummy-layout thead tr:first-child th:nth-child(5),
+.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(5){
+ position:static!important;left:auto!important;background:inherit;
+}
 </style></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
@@ -318,7 +329,7 @@ for(let n=1;n<=daysIn();n++){
 }
 const countHeader=staffView==="real"?"実働（"+real.length+"名）":staffView==="dummy"?"ダミー（"+dummy.length+"名）":"実働（"+real.length+"名）／ダミー（"+dummy.length+"名）";
 let html='<thead><tr><th class="staff-heading" rowspan="2"><span>'+countHeader+'</span></th>';
-if(staffView==="dummy")html+='<th class="stat-heading" rowspan="2">登録曜日</th><th class="stat-heading" rowspan="2">出勤</th><th class="stat-heading" rowspan="2">退勤</th><th class="stat-heading" rowspan="2">時刻</th>';
+if(staffView==="dummy")html+='<th class="stat-heading" rowspan="2">登録曜日</th><th class="stat-heading" rowspan="2">出勤</th><th class="stat-heading" rowspan="2">退勤</th>';
 else html+='<th class="stat-heading" rowspan="2">稼働</th><th class="stat-heading" rowspan="2">出勤</th><th class="stat-heading" rowspan="2">無報</th><th class="stat-heading" rowspan="2">評価</th>';
 for(let n=1;n<=daysIn();n++){const d=dayStr(n),kind=dayType(d);html+='<th class="day-heading '+kind+(d===today()?" today-marker":"")+'"><button type="button" data-day="'+d+'">'+n+'日</button></th>';}
 html+='</tr><tr class="daily-totals">';
@@ -343,11 +354,9 @@ const scoreText=evaluation===null?"—":evaluation.toFixed(2);
 if(staffView==="dummy"){
  const pattern=dummyPattern(t.exa_id);
  const timeButton=(v,label)=>v?'<button type="button" class="copy-exa" data-copy-exa="'+v+'" title="'+label+' '+v+' をコピー">'+v+'</button>':'—';
- const combined=pattern.start&&pattern.end?pattern.start+" "+pattern.end:null;
  html+='<td class="stat-cell weekday-cell" title="保存済みシフトから抽出した曜日">'+safe(pattern.weekdays)+'</td>';
  html+='<td class="stat-cell">'+timeButton(pattern.start,"出勤")+'</td>';
  html+='<td class="stat-cell">'+timeButton(pattern.end,"退勤")+'</td>';
- html+='<td class="stat-cell">'+(combined?'<button type="button" class="copy-exa copy-pair" data-copy-exa="'+combined+'" title="出勤・退勤をまとめてコピー">両方</button>':pattern.multiple?'複数':'—')+'</td>';
 }else{
  html+='<td class="stat-cell"><strong>'+avg+'</strong></td><td class="stat-cell">'+days+'</td><td class="stat-cell '+(zeros>0?'unpaid-positive':'')+'">'+zeros+'</td><td class="stat-cell '+scoreClass+'" title="'+(evaluation===null?'評価点数未連携':'評価点数')+'">'+scoreText+'</td>';
 }
