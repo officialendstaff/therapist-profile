@@ -187,7 +187,7 @@ $("serverTest").onclick=async()=>{
   });
   const data=await res.json();
   if(!res.ok)throw Error(data.error||"接続テストに失敗しました");
-  if(!data.ok)throw Error(data.stage==="secrets_missing"?"EXAのSecretsを読み取れません":"EXAへのログイン、または日別スケジュールの取得に失敗しました");
+  if(!data.ok)throw Error(data.stage==="secrets_missing"?"EXAのSecretsを読み取れません":`EXA検証エラー：${data.stage||"unknown"} / ${data.reason||"unknown"} / ${data.day||0}日目`);
   if(data.stage!=="snapshot_compared")throw Error("30日分の検証が完了しませんでした");
   showMsg("サーバー30日検証成功：EXA "+data.imported+"件（"+data.first+"〜"+data.last+"）。保存済み"+data.existing+"件との比較：追加"+data.additions+"件・時間変更"+data.updates+"件・取消"+data.removals+"件。"+(data.currentDayMatches?"":"注意：取得開始日が本日と一致しません。")+" ※保存データは変更していません。");
  }catch(e){showMsg("サーバー接続テスト失敗："+String(e.message||e),true)}
