@@ -195,7 +195,8 @@ for(let n=1;n<=daysIn();n++){
  const dummyTotal=r.filter(x=>x.is_dummy_shift||isDummy(existing.get(x.exa_id)||{})).length;
  dayCounts.set(date,{real:active,dummy:dummyTotal,all:active+dummyTotal});
 }
-let html='<thead><tr><th class="staff-heading" rowspan="2"><span>実働（'+real.length+'名）</span><span>ダミー（'+dummy.length+'名）</span></th>';
+const countHeader=staffView==="real"?"実働（"+real.length+"名）":staffView==="dummy"?"ダミー（"+dummy.length+"名）":"実働（"+real.length+"名）／ダミー（"+dummy.length+"名）";
+let html='<thead><tr><th class="staff-heading" rowspan="2"><span>'+countHeader+'</span></th>';
 html+='<th class="stat-heading" rowspan="2">稼働</th><th class="stat-heading" rowspan="2">出勤</th><th class="stat-heading" rowspan="2">無報</th><th class="stat-heading" rowspan="2">評価</th>';
 for(let n=1;n<=daysIn();n++){const d=dayStr(n);html+='<th class="day-heading"><button type="button" data-day="'+d+'">'+n+'日</button></th>';}
 html+='</tr><tr class="daily-totals">';
