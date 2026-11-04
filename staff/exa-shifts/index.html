@@ -227,6 +227,15 @@ footer{display:none}
  background:#27875e;color:#fff;font-size:10px;line-height:1;
  box-shadow:0 1px 3px #0002;pointer-events:none;
 }
+
+/* Final scheduled shift overrides today's blue highlight for real therapists. */
+.shift-table:not(.dummy-layout) tbody tr:not(.group) td.today.last-scheduled,
+.shift-table:not(.dummy-layout) tbody tr.outside-roster td.today.last-scheduled{
+  background:#fff0cf!important;
+  color:#67471c!important;
+  box-shadow:inset 0 0 0 2px #bd8429!important;
+  border-bottom-color:#bd8429!important;
+}
 </style></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
