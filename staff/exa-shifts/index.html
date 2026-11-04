@@ -327,6 +327,12 @@ footer{display:none}
 .therapist-detail-controls label{margin-top:0}
 .therapist-detail-controls .row{margin-top:25px}
 @media(max-width:590px){.therapist-detail-grid{grid-template-columns:1fr}.therapist-photo-frame{max-height:400px}.therapist-detail-dialog{max-height:94vh}}
+
+.person-registry{border:1px solid #d8e3ef;border-radius:9px;background:#f7faff;padding:12px;margin:0 0 18px}
+.person-registry strong{font-size:13px;color:#254b71}
+.person-registry p{margin:8px 0;font-size:11px;line-height:1.6}
+#personRegister{background:#28659a;color:#fff;border-color:#28659a;font-size:12px;padding:9px 12px}
+#personRegistryState{overflow-wrap:anywhere}
 </style></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
@@ -358,6 +364,12 @@ footer{display:none}
   <p id="therapistPhotoStatus" class="muted" aria-live="polite">非公開・スタッフ専用。WebPに変換して保存します。</p>
  </div>
  <div class="therapist-detail-controls">
+  <div class="person-registry">
+   <strong>共通セラピスト台帳</strong>
+   <p id="personRegistryState" class="muted">登録状況を確認中…</p>
+   <button id="personRegister" type="button" class="hide">台帳に新規登録</button>
+   <p class="muted">登録時点では在籍状況は「未確認」です。別人との誤統合防止のため、他店舗の人物IDとは自動で統合しません。</p>
+  </div>
   <label for="residencyChoice">在籍区分</label>
   <select id="residencyChoice"><option value="active">実働</option><option value="dummy">ダミー</option></select>
   <p class="muted">EXAの登録内容やHP公開設定は変更しません。出勤管理の一覧・人数集計のみ切り替わります。</p>
@@ -597,6 +609,47 @@ $("therapistPhotoInput").onchange=async()=>{
   showMsg("画像を保存できませんでした："+(e.message||String(e)),true);
  }finally{photoBusy=false;$("therapistPhotoInput").disabled=false;$("therapistPhotoInput").value="";}
 };
+let registryRequest=0;
+async function loadPersonRegistry(exaId){
+ const request=++registryRequest;
+ $("personRegister").classList.add("hide");
+ $("personRegistryState").textContent="登録状況を確認中…";
+ try{
+  const r=await client.from("therapist_exa_links").select("person_id").eq("store_code","rose").eq("exa_id",exaId).maybeSingle();
+  if(r.error)throw r.error;
+  if(request!==registryRequest)return;
+  if(r.data){
+   $("personRegistryState").textContent="登録済み｜共通人物ID："+r.data.person_id;
+  }else{
+   const person=therapists.find(t=>t.exa_id===exaId);
+   if(person?.residency==="dummy"){
+    $("personRegistryState").textContent="未登録｜ダミー区分のため新規登録対象外です。";
+   }else{
+    $("personRegistryState").textContent="未登録｜実際の在籍を確認してから登録してください。";
+    $("personRegister").classList.remove("hide");
+   }
+  }
+ }catch(e){
+  if(request!==registryRequest)return;
+  $("personRegistryState").textContent="台帳の確認に失敗しました："+(e.message||String(e));
+ }
+}
+$("personRegister").onclick=async()=>{
+ if(!authorized||!editingResidency)return;
+ const person=therapists.find(t=>t.exa_id===editingResidency.exaId);
+ if(!person||person.residency!=="active")return;
+ if(!confirm(person.stage_name+" を新しい共通人物IDで台帳に登録しますか？\n同一人物が既に別の台帳に存在する場合、登録しないでください。\n登録時の在籍状況は「未確認」となります。"))return;
+ $("personRegister").disabled=true;
+ try{
+  const r=await client.rpc("register_rose_therapist_person",{p_exa_id:person.exa_id});
+  if(r.error)throw r.error;
+  if(editingResidency?.exaId===person.exa_id)await loadPersonRegistry(person.exa_id);
+  showMsg(person.stage_name+" の共通人物IDを登録しました。");
+ }catch(e){
+  showMsg("台帳登録に失敗しました："+(e.message||String(e)),true);
+  if(editingResidency?.exaId===person.exa_id)await loadPersonRegistry(person.exa_id);
+ }finally{$("personRegister").disabled=false;}
+};
 let editingResidency=null;
 function openResidency(button){
  const exaId=Number(button.dataset.staffId);
@@ -608,9 +661,11 @@ function openResidency(button){
  $("residencyChoice").value=isDummy(person)?"dummy":"active";
  $("residencyModal").classList.remove("hide");
  showTherapistPhoto(exaId);
+ loadPersonRegistry(exaId);
 }
 function closeResidency(){
  photoRequest++;
+ registryRequest++;
  $("residencyModal").classList.add("hide");
  editingResidency=null;
 }
