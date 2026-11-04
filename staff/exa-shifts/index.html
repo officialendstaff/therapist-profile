@@ -8,7 +8,7 @@
 <header><h1>薔薇と紳士｜シフト管理</h1><div class="row"><span id="authLabel" class="muted" style="color:#d5e1f1"></span><button id="logout" class="hide">ログアウト</button></div></header>
 <section id="login" class="panel"><h2>スタッフログイン</h2><p class="muted">面接管理で使用しているSupabaseアカウントでログインしてください。閲覧は承認済み管理者に限定しています。</p><form id="loginForm"><label>メールアドレス<input id="email" type="email" autocomplete="username" required></label><label>パスワード<input id="password" type="password" autocomplete="current-password" required></label><button class="primary" type="submit">ログイン</button></form><p id="loginError" class="error"></p></section>
 <main id="app" class="hide">
-<div class="panel row space"><div class="row"><button id="prev">◀</button><strong id="monthLabel"></strong><button id="next">▶</button><span class="tag">薔薇と紳士</span></div><div class="row"><button id="reload" class="primary">保存データを再読込</button><button id="exaSync" disabled title="EXA自動認証・収集処理は未接続">EXAから今すぐ更新（未接続）</button></div></div>
+<div class="panel row space"><div class="row"><button id="prev">◀</button><strong id="monthLabel"></strong><button id="next">▶</button><span class="tag">薔薇と紳士</span></div><div class="row"><button id="reload" class="primary">保存データを再読込</button><button id="csvImport">EXA CSV取込・更新</button><input id="csvFile" type="file" accept=".csv,text/csv" style="display:none"><button id="exaSync" disabled title="EXAからの直接取得は認証・実行方式の検証中">EXA直接更新（未接続）</button></div></div>
 <p id="message" class="muted" aria-live="polite" style="margin:0 0 8px"></p>
 <div class="panel"><div class="row space"><h2>月間シフト</h2><span class="muted">過去日の数字＝接客本数（空欄は未入力）／当日以降＝出勤時間</span></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
 <div class="panel" id="dayPanel"><div class="row space"><h2 id="dayTitle">日別タイムチャート</h2><span class="muted">時間帯別の実出勤人数のみ集計。ダミーは下段に表示。</span></div><div id="timeline"></div></div>
@@ -100,5 +100,50 @@ html+="</tbody></table></div>";$("timeline").innerHTML=day.length?html:'<p class
 }
 $("prev").onclick=()=>{const d=new Date(month+"-01T00:00:00");d.setMonth(d.getMonth()-1);month=[d.getFullYear(),String(d.getMonth()+1).padStart(2,"0")].join("-");load()};
 $("next").onclick=()=>{const d=new Date(month+"-01T00:00:00");d.setMonth(d.getMonth()+1);month=[d.getFullYear(),String(d.getMonth()+1).padStart(2,"0")].join("-");load()};
-$("reload").onclick=load;loginCheck();
+$("reload").onclick=load;
+$("csvImport").onclick=()=>{if(!authorized)return;$("csvFile").click()};
+$("csvFile").onchange=async e=>{
+ const file=e.target.files?.[0];if(!file)return;
+ const button=$("csvImport");button.disabled=true;
+ try{
+  if(file.size>1024*1024)throw Error("CSV容量が大きすぎます（上限1MB）");
+  const source=(await file.text()).replace(/^\uFEFF/,"").replace(/\r\n/g,"\n");
+  const lines=source.trim().split("\n").filter(Boolean);
+  const parseLine=line=>{
+   const parts=[];let buffer="",quoted=false;
+   for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(c==='"'){if(quoted&&line[i+1]==='"'){buffer+='"';i++}else quoted=!quoted}
+    else if(c===","&&!quoted){parts.push(buffer);buffer=""}
+    else buffer+=c;
+   }
+   if(quoted)throw Error("CSVの引用符が閉じられていません");
+   parts.push(buffer);return parts;
+  };
+  if(lines.length<2||lines.length>3001)throw Error("CSVの行数が不正です");
+  const head=parseLine(lines.shift()).map(x=>x.trim().replace(/^\uFEFF/,""));
+  const required=["出勤日","EXA ID","源氏名","出勤","退勤"];
+  const idx=required.map(h=>head.indexOf(h));
+  if(idx.some(i=>i<0))throw Error("CSVの列名が一致しません："+required.join("、"));
+  const rows=lines.map(line=>{
+   const vals=parseLine(line);
+   return {date:vals[idx[0]],id:Number(vals[idx[1]]),name:vals[idx[2]],start:vals[idx[3]],finish:vals[idx[4]]};
+  });
+  const agree=confirm("EXAシフト"+rows.length+"件をSupabaseに更新登録します。既存の接客本数とダミー区分は保持します。続行しますか？");
+  if(!agree)return;
+  const {data:{session}}=await client.auth.getSession();
+  if(!session)throw Error("ログイン期限切れです。再ログインしてください");
+  showMsg("EXA CSV "+rows.length+"件を反映中…");
+  const response=await fetch(URL_SB+"/functions/v1/exa-shift-import",{
+   method:"POST",headers:{"Content-Type":"application/json","apikey":KEY_SB,"Authorization":"Bearer "+session.access_token},
+   body:JSON.stringify({rows})
+  });
+  const result=await response.json();
+  if(!response.ok||!result.ok)throw Error(result.error||"取込に失敗しました（HTTP "+response.status+"）");
+  await load();
+  showMsg("取込完了："+result.imported+"件・"+result.days+"日分。EXA直接更新ではなくCSV取込です。");
+ }catch(error){showMsg("取込失敗："+String(error.message||error),true)}
+ finally{button.disabled=false;e.target.value=""}
+};
+loginCheck();
 </script></body></html>
