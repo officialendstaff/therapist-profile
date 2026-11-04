@@ -333,6 +333,17 @@ footer{display:none}
 .person-registry p{margin:8px 0;font-size:11px;line-height:1.6}
 #personRegister{background:#28659a;color:#fff;border-color:#28659a;font-size:12px;padding:9px 12px}
 #personRegistryState{overflow-wrap:anywhere}
+
+.interview-match{margin-bottom:18px}
+.interview-search-row{display:flex;flex-wrap:nowrap!important;gap:7px}
+.interview-search-row input{width:100%;min-width:0;border:1px solid #b9cbdc;border-radius:7px;padding:9px;font-size:12px}
+.interview-search-row button{white-space:nowrap;font-size:12px;padding:8px 11px}
+.interview-results{margin:8px 0;max-height:205px;overflow-y:auto}
+.interview-result{width:100%;display:block;text-align:left;margin:5px 0;padding:9px 10px;background:#fff;border:1px solid #cedbe8;border-radius:7px;color:#203750;font-size:12px}
+.interview-result small{display:block;color:#697e94;line-height:1.65;margin-top:3px}
+.interview-result.selected{border:2px solid #28659a;background:#eaf4ff;padding:8px 9px}
+#interviewLinkConfirm{font-size:12px;margin:7px 0;width:100%}
+#interviewLinkOpen{margin:5px 0 8px}
 </style></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
@@ -364,11 +375,18 @@ footer{display:none}
   <p id="therapistPhotoStatus" class="muted" aria-live="polite">非公開・スタッフ専用。WebPに変換して保存します。</p>
  </div>
  <div class="therapist-detail-controls">
-  <div class="person-registry">
-   <strong>共通セラピスト台帳</strong>
-   <p id="personRegistryState" class="muted">登録状況を確認中…</p>
-   <button id="personRegister" type="button" class="hide">台帳に新規登録</button>
-   <p class="muted">登録時点では在籍状況は「未確認」です。別人との誤統合防止のため、他店舗の人物IDとは自動で統合しません。</p>
+  <div class="person-registry interview-match">
+   <strong>面接情報</strong>
+   <p id="personRegistryState" class="muted">面接情報を確認中…</p>
+   <button id="interviewLinkOpen" type="button" class="hide">面接情報と紐づける</button>
+   <div id="interviewLinkPanel" class="hide">
+    <label for="interviewSearchInput">Interviewを検索</label>
+    <div class="row interview-search-row"><input id="interviewSearchInput" type="search" placeholder="本名・フリガナ・源氏名・電話番号"><button type="button" id="interviewSearchButton">検索</button></div>
+    <p class="muted">同一人物だと確認できた面接シートを選択してください。</p>
+    <div id="interviewResults" class="interview-results" aria-live="polite"></div>
+    <button id="interviewLinkConfirm" type="button" class="primary hide">選択した面接情報と紐づける</button>
+   </div>
+   <p class="muted">面接情報がないセラピストは、未紐づけのままで構いません。</p>
   </div>
   <label for="residencyChoice">在籍区分</label>
   <select id="residencyChoice"><option value="active">実働</option><option value="dummy">ダミー</option></select>
@@ -609,46 +627,111 @@ $("therapistPhotoInput").onchange=async()=>{
   showMsg("画像を保存できませんでした："+(e.message||String(e)),true);
  }finally{photoBusy=false;$("therapistPhotoInput").disabled=false;$("therapistPhotoInput").value="";}
 };
-let registryRequest=0;
+let registryRequest=0,selectedInterviewId=null,registryAdmin=false,linkingInterview=false;
+let searchInterviewItems=[];
 async function loadPersonRegistry(exaId){
  const request=++registryRequest;
- $("personRegister").classList.add("hide");
- $("personRegistryState").textContent="登録状況を確認中…";
+ selectedInterviewId=null;searchInterviewItems=[];
+ $("interviewLinkOpen").classList.add("hide");
+ $("interviewLinkPanel").classList.add("hide");
+ $("interviewLinkConfirm").classList.add("hide");
+ $("interviewResults").replaceChildren();
+ $("interviewSearchInput").value="";
+ $("personRegistryState").textContent="面接情報を確認中…";
  try{
-  const r=await client.from("therapist_exa_links").select("person_id").eq("store_code","rose").eq("exa_id",exaId).maybeSingle();
-  if(r.error)throw r.error;
+  const allowed=await client.rpc("can_link_therapist_interview");
+  if(allowed.error)throw allowed.error;
+  registryAdmin=allowed.data===true;
+  const link=await client.from("therapist_exa_links").select("person_id").eq("store_code","rose").eq("exa_id",exaId).maybeSingle();
+  if(link.error)throw link.error;
   if(request!==registryRequest)return;
-  if(r.data){
-   $("personRegistryState").textContent="登録済み｜共通人物ID："+r.data.person_id;
-  }else{
-   const person=therapists.find(t=>t.exa_id===exaId);
-   if(person?.residency==="dummy"){
-    $("personRegistryState").textContent="未登録｜ダミー区分のため新規登録対象外です。";
-   }else{
-    $("personRegistryState").textContent="未登録｜実際の在籍を確認してから登録してください。";
-    $("personRegister").classList.remove("hide");
+  if(link.data){
+   const matches=await client.from("therapist_interview_links").select("interview_applicant_id").eq("person_id",link.data.person_id).limit(20);
+   if(matches.error)throw matches.error;
+   if(request!==registryRequest)return;
+   if(matches.data.length){
+    const ids=matches.data.map(x=>x.interview_applicant_id);
+    const found=await client.from("interview_applicants").select("id,name,stage_name,shop,hire_shop,status").in("id",ids);
+    if(found.error)throw found.error;
+    if(request!==registryRequest)return;
+    $("personRegistryState").textContent="紐づけ済み："+(found.data||[]).map(x=>[x.name||"氏名未登録",x.status||"状態未記録"].join("／")).join("、");
+    return;
    }
+  }
+  const person=therapists.find(t=>t.exa_id===exaId);
+  if(person?.residency==="dummy"){
+   $("personRegistryState").textContent="面接情報：未紐づけ（ダミー区分）";
+  }else if(!registryAdmin){
+   $("personRegistryState").textContent="面接情報：未紐づけ（紐づけ操作は指定管理者のみ）";
+  }else{
+   $("personRegistryState").textContent="面接情報：未紐づけ";
+   $("interviewLinkOpen").classList.remove("hide");
   }
  }catch(e){
   if(request!==registryRequest)return;
-  $("personRegistryState").textContent="台帳の確認に失敗しました："+(e.message||String(e));
+  $("personRegistryState").textContent="面接情報の確認に失敗しました："+(e.message||String(e));
  }
 }
-$("personRegister").onclick=async()=>{
- if(!authorized||!editingResidency)return;
- const person=therapists.find(t=>t.exa_id===editingResidency.exaId);
- if(!person||person.residency!=="active")return;
- if(!confirm(person.stage_name+" を新しい共通人物IDで台帳に登録しますか？\n同一人物が既に別の台帳に存在する場合、登録しないでください。\n登録時の在籍状況は「未確認」となります。"))return;
- $("personRegister").disabled=true;
+$("interviewLinkOpen").onclick=()=>{
+ $("interviewLinkPanel").classList.toggle("hide");
+ if(!$("interviewLinkPanel").classList.contains("hide"))$("interviewSearchInput").focus();
+};
+async function searchInterview(){
+ if(!authorized||!registryAdmin||!editingResidency)return;
+ const term=$("interviewSearchInput").value.trim();
+ selectedInterviewId=null;$("interviewLinkConfirm").classList.add("hide");
+ const out=$("interviewResults");out.replaceChildren();
+ if(term.length<2){out.textContent="2文字以上入力して検索してください。";return;}
+ const cleaned=term.replace(/[%_,().\\]/g,"").slice(0,60);
+ if(cleaned.length<2){out.textContent="検索文字を確認してください。";return;}
+ const currentExa=editingResidency.exaId,request=registryRequest;
+ out.textContent="検索しています…";
+ const pattern="%"+cleaned+"%";
  try{
-  const r=await client.rpc("register_rose_therapist_person",{p_exa_id:person.exa_id});
-  if(r.error)throw r.error;
-  if(editingResidency?.exaId===person.exa_id)await loadPersonRegistry(person.exa_id);
-  showMsg(person.stage_name+" の共通人物IDを登録しました。");
- }catch(e){
-  showMsg("台帳登録に失敗しました："+(e.message||String(e)),true);
-  if(editingResidency?.exaId===person.exa_id)await loadPersonRegistry(person.exa_id);
- }finally{$("personRegister").disabled=false;}
+  const query=client.from("interview_applicants")
+   .select("id,name,kana,stage_name,phone,shop,hire_shop,status,submitted_at")
+   .or("name.ilike."+pattern+",kana.ilike."+pattern+",stage_name.ilike."+pattern+",phone.ilike."+pattern)
+   .order("submitted_at",{ascending:false}).limit(30);
+  const result=await query;
+  if(result.error)throw result.error;
+  if(request!==registryRequest||editingResidency?.exaId!==currentExa)return;
+  searchInterviewItems=result.data||[];
+  out.replaceChildren();
+  if(!searchInterviewItems.length){out.textContent="一致する面接シートはありません。";return;}
+  searchInterviewItems.forEach(item=>{
+   const b=document.createElement("button");
+   b.type="button";b.className="interview-result";
+   const name=document.createElement("strong");name.textContent=item.name||"氏名未登録";b.appendChild(name);
+   const detail=document.createElement("small");
+   const phone=item.phone?("電話末尾："+String(item.phone).slice(-4)):"電話未登録";
+   detail.textContent=[item.kana,item.stage_name?("源氏名："+item.stage_name):"",item.hire_shop||item.shop||"店舗未登録",item.status||"状態未登録",phone].filter(Boolean).join("／");
+   b.appendChild(detail);
+   b.onclick=()=>{
+    selectedInterviewId=item.id;
+    out.querySelectorAll(".interview-result").forEach(el=>el.classList.remove("selected"));
+    b.classList.add("selected");
+    $("interviewLinkConfirm").classList.remove("hide");
+   };
+   out.appendChild(b);
+  });
+ }catch(e){if(request===registryRequest)out.textContent="検索失敗："+(e.message||String(e));}
+}
+$("interviewSearchButton").onclick=searchInterview;
+$("interviewSearchInput").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();searchInterview();}};
+$("interviewLinkConfirm").onclick=async()=>{
+ if(!authorized||!registryAdmin||linkingInterview||!editingResidency||!selectedInterviewId)return;
+ const exaId=editingResidency.exaId,exaName=editingResidency.name;
+ const item=searchInterviewItems.find(x=>x.id===selectedInterviewId);
+ if(!item)return;
+ if(!confirm("EXA："+exaName+"（ID "+exaId+"）\nInterview："+(item.name||"氏名未登録")+"（"+(item.hire_shop||item.shop||"店舗未登録")+"）\n\n同一人物であることを確認しましたか？\n確定すると面接情報が紐づきます。"))return;
+ linkingInterview=true;$("interviewLinkConfirm").disabled=true;
+ try{
+  const result=await client.rpc("link_rose_therapist_interview",{p_exa_id:exaId,p_applicant_id:item.id});
+  if(result.error)throw result.error;
+  if(editingResidency?.exaId===exaId)await loadPersonRegistry(exaId);
+  showMsg(exaName+" の面接情報を紐づけました。");
+ }catch(e){showMsg("面接情報の紐づけに失敗しました："+(e.message||String(e)),true);}
+ finally{linkingInterview=false;$("interviewLinkConfirm").disabled=false;}
 };
 let editingResidency=null;
 function openResidency(button){
