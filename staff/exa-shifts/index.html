@@ -348,7 +348,7 @@ footer{display:none}
 #surveyPersonChoice{width:100%;max-width:100%;padding:9px;border:1px solid #bbcfe4;border-radius:7px;background:white;color:#253b53;font-size:12px}
 #surveyLinkOpen,#surveyLinkSave{font-size:12px;margin:5px 0}
 .staff-exa-id{display:inline-block;margin-left:5px;padding:1px 4px;border-radius:3px;background:#eaf1f9;color:#32618a;font-size:10px;font-weight:700;white-space:nowrap}
-</style></head>
+</style><script id="shared-management-auth-migration">(function(){try{const k='mattan-recruit-auth';if(!localStorage.getItem(k)){const old=sessionStorage.getItem(k);if(old)localStorage.setItem(k,old);}}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
 <label class="store-label">店舗 <select id="storeSelect" aria-label="店舗切替"><option value="rose">薔薇と紳士</option></select></label>
@@ -420,7 +420,7 @@ footer{display:none}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.10/dist/umd/supabase.min.js"></script>
 <script>
 const URL_SB="https://vjjnkflbfsjihwzjsjpr.supabase.co",KEY_SB="sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos";
-const client=window.supabase?.createClient(URL_SB,KEY_SB,{auth:{persistSession:true,autoRefreshToken:true,storage:sessionStorage,storageKey:"mattan-recruit-auth"}});
+const client=window.supabase?.createClient(URL_SB,KEY_SB,{auth:{persistSession:true,autoRefreshToken:true,storage:localStorage,storageKey:"mattan-recruit-auth"}});
 const $=id=>document.getElementById(id), today=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
 const initial=today();let month=initial.slice(0,7),selected=initial,therapists=[],shifts=[],futureShifts=[],performances=[],historyPerformances=[],authorized=false,rosterIds=new Set();
 const safe=(v)=>{const e=document.createElement("span");e.textContent=String(v??"");return e.innerHTML;};
@@ -443,13 +443,13 @@ const showMsg=(message,error=false)=>{
 };
 async function loginCheck(){if(!client){$("loginError").textContent="認証ライブラリを読み込めません";return;}
 const {data:{session}}=await client.auth.getSession();if(!session){authorized=false;$("app").classList.add("hide");$("login").classList.remove("hide");return;}
-const {data,error}=await client.from("recruit_staff_profiles").select("role,approved_at").eq("user_id",session.user.id).maybeSingle();
-if(error||!data||!data.approved_at||!["master","full"].includes(data.role)){
+const [{data,error},access]=await Promise.all([client.from("recruit_staff_profiles").select("role,approved_at").eq("user_id",session.user.id).maybeSingle(),client.rpc("can_link_therapist_interview")]);
+if(error||access.error||access.data!==true||!data||!data.approved_at||!["master","full"].includes(data.role)){
   authorized=false;$("app").classList.add("hide");$("login").classList.remove("hide");$("loginError").textContent="このページへの権限がありません。";return;
 }
 authorized=true;$("login").classList.add("hide");$("app").classList.remove("hide");$("logout").classList.remove("hide");$("authLabel").textContent="認証済み";await load();}
 $("loginForm").onsubmit=async e=>{e.preventDefault();$("loginError").textContent="確認中…";const {error}=await client.auth.signInWithPassword({email:$("email").value,password:$("password").value});if(error){$("loginError").textContent="ログインできません。入力情報をご確認ください。";return;}$("loginError").textContent="";await loginCheck()};
-$("logout").onclick=async()=>{await client.auth.signOut();location.reload()};
+$("logout").onclick=async()=>{await client.auth.signOut();sessionStorage.removeItem("mattan-recruit-auth");location.reload()};
 async function load(){
 if(!authorized)return;showMsg("Supabaseを読み込み中…");
 const start=month+"-01",end=dayStr(daysIn());
