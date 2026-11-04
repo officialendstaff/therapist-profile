@@ -8,7 +8,7 @@
 <header><h1>薔薇と紳士｜出勤管理</h1><div class="row"><span id="authLabel" class="muted" style="color:#d5e1f1"></span><button id="logout" class="hide">ログアウト</button></div></header>
 <section id="login" class="panel"><h2>スタッフログイン</h2><p class="muted">面接管理で使用しているSupabaseアカウントでログインしてください。閲覧は承認済み管理者に限定しています。</p><form id="loginForm"><label>メールアドレス<input id="email" type="email" autocomplete="username" required></label><label>パスワード<input id="password" type="password" autocomplete="current-password" required></label><button class="primary" type="submit">ログイン</button></form><p id="loginError" class="error"></p></section>
 <main id="app" class="hide">
-<div class="panel row space"><div class="row"><button id="prev">◀</button><strong id="monthLabel"></strong><button id="next">▶</button><span class="tag">薔薇と紳士</span></div><div class="row"><button id="reload" class="primary">保存データを再読込</button><button id="csvImport">EXA CSV取込・更新</button><input id="csvFile" type="file" accept=".csv,text/csv" style="display:none"><button id="exaSync" class="primary" title="Chrome拡張機能とログイン済みEXAが必要です">今すぐ更新</button><button id="serverTest" type="button" title="EXAのサーバー側ログインを読み取り専用で検証します">サーバー30日検証</button><button id="autoSync" type="button" title="この管理ページとEXAの日別スケジュールをChromeで開いている間だけ3時間ごとに自動同期します">3時間自動：OFF</button></div></div>
+<div class="panel row space"><div class="row"><button id="prev">◀</button><strong id="monthLabel"></strong><button id="next">▶</button><span class="tag">薔薇と紳士</span></div><div class="row"><button id="reload" class="primary">保存データを再読込</button><button id="csvImport">EXA CSV取込・更新</button><input id="csvFile" type="file" accept=".csv,text/csv" style="display:none"><button id="exaSync" class="primary" title="Chrome拡張機能とログイン済みEXAが必要です">今すぐ更新</button><button id="serverTest" type="button" title="EXAのサーバー側ログインを読み取り専用で検証します">サーバー30日検証</button><button id="autoSync" type="button" title="この管理ページとEXAの日別スケジュールをChromeで開いている間だけ3時間ごとに自動同期します">ブラウザ自動：OFF</button></div></div>
 <p id="message" class="muted" aria-live="polite" style="margin:0 0 8px"></p>
 <div class="panel"><div class="row space"><h2>月間シフト</h2><span class="muted">過去日の数字＝接客本数（空欄は未入力）／当日以降＝出勤時間</span></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
 <div class="panel" id="dayPanel"><div class="row space"><h2 id="dayTitle">日別タイムチャート</h2><span class="muted">時間帯別の実出勤人数のみ集計。ダミーは下段に表示。</span></div><div id="timeline"></div></div>
@@ -110,7 +110,7 @@ const RETRY_MS=30*60*1000;
 let autoEnabled=localStorage.getItem(AUTO_KEY)==="on";
 const asTokyoDate=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
 function paintAuto(){
- $("autoSync").textContent=autoEnabled?"3時間自動：ON":"3時間自動：OFF";
+ $("autoSync").textContent=autoEnabled?"ブラウザ自動：ON":"ブラウザ自動：OFF";
  $("autoSync").title="Chrome・この管理ページ・EXAタブを開いている間に動作します。Chrome終了中は実行されません。";
  $("autoSync").setAttribute("aria-pressed",String(autoEnabled));
 }
