@@ -231,7 +231,7 @@ for(let n=1;n<=daysIn();n++){const day=dayStr(n),r=entries.get(day),value=per.ge
 const cellClasses=[group==="dummy"?"dummy":"",day===today()?"today":"",dayType(day),
  lastKnownDate===day?"last-scheduled":"",outside?"outside-cell":""].filter(Boolean).join(" ");
 html+='<td class="'+cellClasses+'">';
-if(r&&past&&group==="real"&&!r.is_dummy_shift)html+='<button type="button" class="edit-count" data-id="'+t.exa_id+'" data-date="'+day+'">'+(absence.has(t.exa_id+"|"+day)?"当欠":value===undefined?"＋":value)+'</button>';
+if(r&&past&&group==="real"&&!r.is_dummy_shift)html+='<button type="button" class="edit-count '+(absence.has(t.exa_id+"|"+day)?"absent-entry":"")+'" data-id="'+t.exa_id+'" data-date="'+day+'">'+(absence.has(t.exa_id+"|"+day)?"当欠":value===undefined?"＋":value)+'</button>';
 else if(r&&!past)html+=safe(range(r));
 else if(r&&past&&group==="dummy")html+="—";
 else if(r&&past&&r.is_dummy_shift)html+="—";
