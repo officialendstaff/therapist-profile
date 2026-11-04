@@ -352,6 +352,7 @@ footer{display:none}
 <button id="exaSync" class="primary" title="Chrome拡張機能経由の手動更新">今すぐ更新</button>
 <details class="settings-menu"><summary>その他 <span aria-hidden="true">▾</span></summary><div class="settings-panel">
 <button id="reload">保存データを再読込</button>
+<button id="unscheduledAdd" title="EXA登録画面でIDと源氏名を確認した人だけ追加。出勤データは変更しません">出勤予定なしのEXA登録者を追加</button>
 <button id="csvImport">EXA CSV取込・更新</button><input id="csvFile" type="file" accept=".csv,text/csv" style="display:none">
 <button id="serverTest" title="読み取り専用で30日分検証">サーバー30日検証</button>
 <button id="autoSync" title="Chrome起動中の自動更新">ブラウザ自動：OFF</button>
@@ -921,6 +922,34 @@ async function synchronizeEXA(mode="manual"){
  }catch(err){showMsg((automatic?"自動更新":"今すぐ更新")+"に失敗："+String(err.message||err),true)}
  finally{extensionBusy=false;exaSyncStartedAt=0;$("exaSync").disabled=false;$("exaSync").textContent="今すぐ更新";$("exaSync").title="Chrome拡張機能経由の手動更新";$("autoSync").disabled=false}
 }
+// Manual bridge for EXA registrations not included in a 30-day schedule snapshot.
+// It never changes existing rows, shifts or roster classifications.
+$("unscheduledAdd").onclick=async()=>{
+ if(!authorized)return;
+ const allowed=await client.rpc("can_link_therapist_interview");
+ if(allowed.error||allowed.data!==true){showMsg("この登録操作は指定された4人の管理者のみ可能です。",true);return;}
+ const idText=prompt("EXAのセラピスト登録画面に表示されているIDを入力してください。\n出勤予定がない人も登録できます。");
+ if(idText===null)return;
+ const trimmed=idText.trim();
+ if(!/^\\d{1,6}$/.test(trimmed)||Number(trimmed)<1||Number(trimmed)>100000){showMsg("EXA IDは1～100000の整数で入力してください。",true);return;}
+ const id=Number(trimmed);
+ const nameInput=prompt("EXAに登録されている源氏名を入力してください。\nEXAの登録画面と同じ表記で入力してください。");
+ if(nameInput===null)return;
+ const name=nameInput.trim();
+ if(!name||name.length>100){showMsg("源氏名は1～100文字で入力してください。",true);return;}
+ const existing=await client.from("exa_shift_therapists").select("exa_id,stage_name").eq("store_code","rose").eq("exa_id",id).maybeSingle();
+ if(existing.error){showMsg("登録確認に失敗："+existing.error.message,true);return;}
+ if(existing.data){showMsg("EXA ID "+id+" は既に登録済みです："+existing.data.stage_name,true);return;}
+ if(!confirm("EXAの登録内容と一致することを確認してください。\nEXA ID："+id+"\n源氏名："+name+"\n\nこの人物を出勤管理に手動追加します。シフトは作成・変更しません。"))return;
+ const button=$("unscheduledAdd");button.disabled=true;
+ try{
+  const result=await client.from("exa_shift_therapists").insert({store_code:"rose",exa_id:id,stage_name:name}).select("exa_id,stage_name").single();
+  if(result.error)throw result.error;
+  await load();
+  showMsg("EXA ID "+id+"（"+name+"）を追加しました。出勤予定のない人は「実働外」と表示されます。");
+ }catch(err){showMsg("EXA登録者の追加に失敗："+String(err.message||err),true);}
+ finally{button.disabled=false;}
+};
 $("serverTest").onclick=async()=>{
  if(!authorized)return;
  const button=$("serverTest");button.disabled=true;
