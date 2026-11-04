@@ -215,6 +215,18 @@ footer{display:none}
 .shift-table.dummy-layout tbody tr:not(.group) td:nth-child(5){
  position:static!important;left:auto!important;background:inherit;
 }
+
+/* A copied time gives inline confirmation without moving the monthly table. */
+.shift-table .copy-exa{position:relative;transition:background-color .15s,border-color .15s,color .15s}
+.shift-table .copy-exa.copied-exa{
+ background:#e1f5e9!important;border-color:#39966b!important;color:#1b6848!important;
+}
+.shift-table .copy-exa.copied-exa::after{
+ content:"✓";position:absolute;right:2px;top:-6px;
+ display:grid;place-items:center;width:14px;height:14px;border-radius:50%;
+ background:#27875e;color:#fff;font-size:10px;line-height:1;
+ box-shadow:0 1px 3px #0002;pointer-events:none;
+}
 </style></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
@@ -383,7 +395,14 @@ $("monthly").querySelectorAll("[data-staff-id]").forEach(button=>button.onclick=
   const text=button.dataset.copyExa;
   try{
    await navigator.clipboard.writeText(text);
-   showMsg(text+" をコピーしました。EXAの時刻欄に貼り付けできます。");
+   button.classList.add("copied-exa");
+   button.setAttribute("aria-label",text+" コピー済み");
+   clearTimeout(button._copyReset);
+   button._copyReset=setTimeout(()=>{
+    if(!button.isConnected)return;
+    button.classList.remove("copied-exa");
+    button.removeAttribute("aria-label");
+   },1600);
   }catch(e){showMsg("コピーできませんでした。Chromeのクリップボード権限をご確認ください。",true)}
  });
 }
