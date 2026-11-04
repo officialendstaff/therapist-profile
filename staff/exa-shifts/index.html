@@ -105,16 +105,17 @@ for(const r of shifts){if(!byId.has(r.exa_id))byId.set(r.exa_id,new Map());byId.
 const real=therapists.filter(t=>t.residency!=="dummy"&&byId.has(t.exa_id)).sort((a,b)=>a.exa_id-b.exa_id);
 const dummy=therapists.filter(t=>t.residency==="dummy"&&byId.has(t.exa_id)).sort((a,b)=>a.exa_id-b.exa_id);
 const per=new Map(performances.map(p=>[p.exa_id+"|"+p.work_date,p.customer_count]));
+const absence=new Set(performances.filter(p=>p.attendance_status==="absent").map(p=>p.exa_id+"|"+p.work_date));
 let html="<thead><tr><th>セラピスト</th>";
 for(let n=1;n<=daysIn();n++){const d=dayStr(n);html+='<th><button type="button" data-day="'+d+'">'+n+"日</button></th>";}
 html+="<th>平均稼働</th></tr></thead><tbody>";
 for(const [label,list,group] of [["実在籍",real,"real"],["ダミー在籍",dummy,"dummy"]]){
 html+='<tr class="group"><td colspan="'+(daysIn()+2)+'">'+label+"（"+list.length+"名）</td></tr>";
-for(const t of list){const entries=byId.get(t.exa_id),valid=[...entries.values()].filter(r=>r.work_date<today()&&(!isDummy(t))&&!r.is_dummy_shift&&per.has(t.exa_id+"|"+r.work_date));const avg=valid.length?(valid.reduce((s,r)=>s+per.get(t.exa_id+"|"+r.work_date),0)/valid.length).toFixed(2):"—";
+for(const t of list){const entries=byId.get(t.exa_id),valid=[...entries.values()].filter(r=>r.work_date<today()&&(!isDummy(t))&&!r.is_dummy_shift&&per.has(t.exa_id+"|"+r.work_date));const paid=valid.filter(r=>!absence.has(t.exa_id+"|"+r.work_date));const avg=paid.length?(paid.reduce((s,r)=>s+per.get(t.exa_id+"|"+r.work_date),0)/paid.length).toFixed(1):"—";
 html+='<tr><td>'+safe(t.stage_name||"ID "+t.exa_id)+'</td>';
 for(let n=1;n<=daysIn();n++){const day=dayStr(n),r=entries.get(day),value=per.get(t.exa_id+"|"+day),past=day<today();
 html+='<td class="'+(group==="dummy"?"dummy ":"")+(day===today()?"today":"")+'">';
-if(r&&past&&group==="real"&&!r.is_dummy_shift)html+='<button type="button" class="edit-count" data-id="'+t.exa_id+'" data-date="'+day+'">'+(value===undefined?"＋":value)+'</button>';
+if(r&&past&&group==="real"&&!r.is_dummy_shift)html+='<button type="button" class="edit-count" data-id="'+t.exa_id+'" data-date="'+day+'">'+(absence.has(t.exa_id+"|"+day)?"当欠":value===undefined?"＋":value)+'</button>';
 else if(r&&!past)html+=safe(range(r));
 else if(r&&past&&group==="dummy")html+="—";
 else if(r&&past&&r.is_dummy_shift)html+="—";
