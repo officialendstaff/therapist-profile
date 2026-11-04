@@ -8,7 +8,7 @@
 <header><h1>薔薇と紳士｜シフト管理</h1><div class="row"><span id="authLabel" class="muted" style="color:#d5e1f1"></span><button id="logout" class="hide">ログアウト</button></div></header>
 <section id="login" class="panel"><h2>スタッフログイン</h2><p class="muted">面接管理で使用しているSupabaseアカウントでログインしてください。閲覧は承認済み管理者に限定しています。</p><form id="loginForm"><label>メールアドレス<input id="email" type="email" autocomplete="username" required></label><label>パスワード<input id="password" type="password" autocomplete="current-password" required></label><button class="primary" type="submit">ログイン</button></form><p id="loginError" class="error"></p></section>
 <main id="app" class="hide">
-<div class="panel row space"><div class="row"><button id="prev">◀</button><strong id="monthLabel"></strong><button id="next">▶</button><span class="tag">薔薇と紳士</span></div><div class="row"><button id="reload" class="primary">保存データを再読込</button><button id="csvImport">EXA CSV取込・更新</button><input id="csvFile" type="file" accept=".csv,text/csv" style="display:none"><button id="exaSync" class="primary" title="Chrome拡張機能とログイン済みEXAが必要です">今すぐ更新</button></div></div>
+<div class="panel row space"><div class="row"><button id="prev">◀</button><strong id="monthLabel"></strong><button id="next">▶</button><span class="tag">薔薇と紳士</span></div><div class="row"><button id="reload" class="primary">保存データを再読込</button><button id="csvImport">EXA CSV取込・更新</button><input id="csvFile" type="file" accept=".csv,text/csv" style="display:none"><button id="exaSync" class="primary" title="Chrome拡張機能とログイン済みEXAが必要です">今すぐ更新</button><button id="autoSync" type="button" title="この管理ページとEXAの日別スケジュールをChromeで開いている間だけ3時間ごとに自動同期します">3時間自動：OFF</button></div></div>
 <p id="message" class="muted" aria-live="polite" style="margin:0 0 8px"></p>
 <div class="panel"><div class="row space"><h2>月間シフト</h2><span class="muted">過去日の数字＝接客本数（空欄は未入力）／当日以降＝出勤時間</span></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
 <div class="panel" id="dayPanel"><div class="row space"><h2 id="dayTitle">日別タイムチャート</h2><span class="muted">時間帯別の実出勤人数のみ集計。ダミーは下段に表示。</span></div><div id="timeline"></div></div>
@@ -102,6 +102,29 @@ $("prev").onclick=()=>{const d=new Date(month+"-01T00:00:00");d.setMonth(d.getMo
 $("next").onclick=()=>{const d=new Date(month+"-01T00:00:00");d.setMonth(d.getMonth()+1);month=[d.getFullYear(),String(d.getMonth()+1).padStart(2,"0")].join("-");load()};
 $("reload").onclick=load;
 let extensionBusy=false;
+const AUTO_KEY="exa-rose-auto-sync-v1";
+const LAST_KEY="exa-rose-last-sync-v1";
+const ATTEMPT_KEY="exa-rose-auto-attempt-v1";
+const AUTO_MS=3*60*60*1000;
+const RETRY_MS=30*60*1000;
+let autoEnabled=localStorage.getItem(AUTO_KEY)==="on";
+const asTokyoDate=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+function paintAuto(){
+ $("autoSync").textContent=autoEnabled?"3時間自動：ON":"3時間自動：OFF";
+ $("autoSync").title="Chrome・この管理ページ・EXAタブを開いている間に動作します。Chrome終了中は実行されません。";
+ $("autoSync").setAttribute("aria-pressed",String(autoEnabled));
+}
+paintAuto();
+$("autoSync").onclick=()=>{
+ autoEnabled=!autoEnabled;
+ localStorage.setItem(AUTO_KEY,autoEnabled?"on":"off");
+ if(autoEnabled && !localStorage.getItem(LAST_KEY)){
+   localStorage.setItem(LAST_KEY,String(Date.now()));
+ }
+ paintAuto();
+ showMsg(autoEnabled?"3時間自動更新を有効にしました。Chrome・管理ページ・EXAタブを開いている間のみ作動します。":"3時間自動更新を停止しました。");
+};
+
 const bridgeRequests=new Map();
 window.addEventListener("message",event=>{
  if(event.source!==window||event.origin!==location.origin||event.data?.source!=="exa-shift-extension")return;
@@ -121,15 +144,19 @@ async function fetchFromExaExtension(){
   window.postMessage({source:"exa-shift-page",action:"fetch-shifts",requestId},location.origin);
  });
 }
-$("exaSync").onclick=async()=>{
+async function synchronizeEXA(mode="manual"){
  if(!authorized||extensionBusy)return;
- extensionBusy=true;$("exaSync").disabled=true;
+ const automatic=mode==="auto";
+ extensionBusy=true;$("exaSync").disabled=true;$("autoSync").disabled=true;
  try{
-  showMsg("EXAから最新30日分を読み込み中…");
+  showMsg(automatic?"EXAを3時間定期取得中…":"EXAから最新30日分を読み込み中…");
   const result=await fetchFromExaExtension();
   if(!result?.ok)throw new Error(result?.error||"取得できませんでした");
   if(!Array.isArray(result.rows)||!result.rows.length||result.days!==30)throw new Error("取得内容が不完全です。既存データは変更しません");
-  if(!confirm("EXAから"+result.first+"〜"+result.last+"の"+result.rows.length+"件を取得しました。対象30日分をEXAと照合し、取り消された出勤も反映します。接客本数・ダミー区分は保持します。続行しますか？")){showMsg("更新をキャンセルしました");return}
+  if(automatic && result.first!==asTokyoDate())throw new Error("EXAの日別スケジュールが本日("+asTokyoDate()+")ではありません。EXAで本日を表示してください。");
+  if(!automatic&&!confirm("EXAから"+result.first+"〜"+result.last+"の"+result.rows.length+"件を取得しました。対象30日分をEXAと照合し、取り消された出勤も反映します。接客本数・ダミー区分は保持します。続行しますか？")){
+    showMsg("更新をキャンセルしました");return;
+  }
   const {data:{session}}=await client.auth.getSession();
   if(!session)throw new Error("管理ページに再ログインしてください");
   showMsg("Supabaseに"+result.rows.length+"件を反映中…");
@@ -140,11 +167,24 @@ $("exaSync").onclick=async()=>{
   });
   const data=await res.json();
   if(!res.ok||!data.ok)throw new Error(data.error||"Supabaseの更新に失敗しました");
+  localStorage.setItem(LAST_KEY,String(Date.now()));
   await load();
-  showMsg("EXAから"+data.imported+"件を同期しました（"+result.first+"〜"+result.last+"）。取り消された出勤："+data.removed+"件を反映しました。");
- }catch(err){showMsg("今すぐ更新に失敗："+String(err.message||err),true)}
- finally{extensionBusy=false;$("exaSync").disabled=false}
-};
+  showMsg((automatic?"自動更新":"手動更新")+"完了："+data.imported+"件（"+result.first+"〜"+result.last+"）。出勤取消："+data.removed+"件。");
+ }catch(err){showMsg((automatic?"自動更新":"今すぐ更新")+"に失敗："+String(err.message||err),true)}
+ finally{extensionBusy=false;$("exaSync").disabled=false;$("autoSync").disabled=false}
+}
+$("exaSync").onclick=()=>synchronizeEXA("manual");
+async function checkAuto(){
+ if(!autoEnabled||!authorized||extensionBusy)return;
+ const now=Date.now();
+ const last=Number(localStorage.getItem(LAST_KEY)||0);
+ const attempt=Number(localStorage.getItem(ATTEMPT_KEY)||0);
+ if(!last){localStorage.setItem(LAST_KEY,String(now));return}
+ if(now-last<AUTO_MS||now-attempt<RETRY_MS)return;
+ localStorage.setItem(ATTEMPT_KEY,String(now));
+ await synchronizeEXA("auto");
+}
+setInterval(checkAuto,60*1000);
 $("csvImport").onclick=()=>{if(!authorized)return;$("csvFile").click()};
 $("csvFile").onchange=async e=>{
  const file=e.target.files?.[0];if(!file)return;
