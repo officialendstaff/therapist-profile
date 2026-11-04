@@ -148,7 +148,8 @@ const safe=(v)=>{const e=document.createElement("span");e.textContent=String(v??
 const daysIn=()=>new Date(Number(month.slice(0,4)),Number(month.slice(5,7)),0).getDate();
 const dayStr=n=>month+"-"+String(n).padStart(2,"0");
 const minutes=x=>{const h=Math.floor(x/60),m=x%60;return (h>=24?(h===24?"24":String(h-24)):String(h))+(m?":"+String(m).padStart(2,"0"):"")};
-const range=x=>minutes(x.start_minutes)+"-"+minutes(x.end_minutes);
+const shiftTime=x=>{const h=Math.floor(x/60),m=x%60,clock=h>=24?h-24:h;return m===30?clock+".5":m===0?String(h===24?24:clock):clock+":"+String(m).padStart(2,"0");};
+const range=x=>shiftTime(x.start_minutes)+"-"+shiftTime(x.end_minutes);
 const isDummy=s=>s.residency==="dummy";
 const staffById=()=>new Map(therapists.map(t=>[t.exa_id,t]));
 const byDay=()=>{const m=new Map();for(const r of shifts){if(!m.has(r.work_date))m.set(r.work_date,[]);m.get(r.work_date).push(r);}return m;};
