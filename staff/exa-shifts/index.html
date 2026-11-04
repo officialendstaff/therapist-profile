@@ -339,7 +339,7 @@ $("csvFile").onchange=async e=>{
 };
 $("closeDay").onclick=()=>{$("dayPanel").classList.add("hide")};
 $("dayBackdrop").onclick=$("closeDay").onclick;
-document.addEventListener("keydown",e=>{if(e.key==="Escape")$("dayPanel").classList.add("hide")});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("dayPanel").classList.add("hide");closeCount();}});
 $("storeSelect").onchange=()=>{if($("storeSelect").value!=="rose")showMsg("他店舗のEXA連携は準備中です。",true)};
 document.querySelectorAll("[data-show-staff]").forEach(b=>b.onclick=()=>{
  staffView=b.dataset.showStaff;
