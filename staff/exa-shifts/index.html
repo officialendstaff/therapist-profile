@@ -105,6 +105,19 @@ footer{display:none}
 .shift-table tbody tr:not(.group) td.stat-cell{font-size:13px!important}
 .shift-table td .edit-count{height:29px;font-size:13px!important;font-weight:650}
 .shift-table tr.group td{height:28px!important}
+
+/* Compact two-line therapist names and realign the four frozen summary columns. */
+.shift-table thead .staff-heading,
+.shift-table thead th:first-child,
+.shift-table tbody tr:not(.group) td:first-child{
+ width:116px!important;min-width:116px!important;max-width:116px!important;
+}
+.shift-table tbody tr:not(.group) td.staff-name{padding-left:7px!important;padding-right:4px!important;overflow:hidden!important}
+.shift-table .staff-name strong,.shift-table .staff-name .reading{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.shift-table thead tr:first-child th:nth-child(2),.shift-table tbody tr:not(.group) td:nth-child(2){left:116px!important}
+.shift-table thead tr:first-child th:nth-child(3),.shift-table tbody tr:not(.group) td:nth-child(3){left:168px!important}
+.shift-table thead tr:first-child th:nth-child(4),.shift-table tbody tr:not(.group) td:nth-child(4){left:220px!important}
+.shift-table thead tr:first-child th:nth-child(5),.shift-table tbody tr:not(.group) td:nth-child(5){left:272px!important}
 </style></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
