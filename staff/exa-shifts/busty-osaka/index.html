@@ -354,18 +354,18 @@ footer{display:none}
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
 <label class="store-label">店舗 <select id="storeSelect" aria-label="店舗切替"><option value="grand-luxe">Grand Luxe</option><option value="luxy-osaka">LUXY OSAKA</option><option value="rose">薔薇と紳士</option><option value="un-secret">Un Secret</option><option value="busty-osaka" selected>BUSTY OSAKA</option></select></label>
 <div class="head-month"><button id="prev" title="前月">◀</button><strong id="monthLabel"></strong><button id="next" title="翌月">▶</button></div>
-<button id="exaSync" class="primary" disabled title="BUSTY自動同期は未接続です">今すぐ更新</button>
+<button id="exaSync" class="primary" title="BUSTYのEXAから最新30日分を取得して反映">今すぐ更新</button>
 <details class="settings-menu"><summary>その他 <span aria-hidden="true">▾</span></summary><div class="settings-panel">
 <button id="reload">保存データを再読込</button>
 <button id="unscheduledAdd" title="EXA登録画面でIDと源氏名を確認した人だけ追加。出勤データは変更しません">出勤予定なしのEXA登録者を追加</button>
 <button id="csvImport">EXA CSV取込・更新</button><input id="csvFile" type="file" accept=".csv,text/csv" style="display:none">
 <button id="serverTest" title="BUSTY専用EXAサーバーログイン・30日分の読み取り専用検証">サーバー30日検証</button>
-<button id="autoSync" disabled title="BUSTY自動同期は未接続です">ブラウザ自動：OFF</button>
+<button id="autoSync" title="画面表示中の3時間間隔更新">ブラウザ自動：OFF</button>
 </div></details><span id="authLabel" class="muted login-tag" style="color:#d5e1f1"></span><button id="logout" class="hide">ログアウト</button>
 </div></header>
 <section id="login" class="panel hide"><h2>スタッフログイン</h2><p class="muted">面接管理で使用しているSupabaseアカウントでログインしてください。閲覧は承認済み管理者に限定しています。</p><form id="loginForm"><label>メールアドレス<input id="email" type="email" autocomplete="username" required></label><label>パスワード<input id="password" type="password" autocomplete="current-password" required></label><button class="primary" type="submit">ログイン</button></form><p id="loginError" class="error"></p></section>
 <main id="app" class="hide">
-<div class="busty-info">BUSTY OSAKAは初回EXAデータを取得済みです。自動同期とアンケート評価データの接続は準備中です。</div>
+<div class="busty-info">BUSTY OSAKAのEXAサーバー自動同期を有効化しています。アンケート評価データは未接続です。</div>
 
 <p id="message" class="muted" role="status" aria-live="polite"></p>
 <div class="panel monthly-panel"><div class="row space month-heading"><h2>月間シフト</h2><div class="staff-filter" role="group" aria-label="表示区分"><button type="button" data-show-staff="real" class="active">実働</button><button type="button" data-show-staff="dummy">ダミー</button><button type="button" data-show-staff="all">全件</button></div></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
@@ -900,8 +900,55 @@ function renderDay(){
 $("prev").onclick=()=>{const d=new Date(month+"-01T00:00:00");d.setMonth(d.getMonth()-1);month=[d.getFullYear(),String(d.getMonth()+1).padStart(2,"0")].join("-");load()};
 $("next").onclick=()=>{const d=new Date(month+"-01T00:00:00");d.setMonth(d.getMonth()+1);month=[d.getFullYear(),String(d.getMonth()+1).padStart(2,"0")].join("-");load()};
 $("reload").onclick=load;
-// Direct EXA synchronization for BUSTY is intentionally not activated.
-$("exaSync").disabled=true;$("autoSync").disabled=true;
+// BUSTY dedicated server synchronization. Never reuse Rose endpoint or storage keys.
+let extensionBusy=false;
+const AUTO_KEY="exa-busty-auto-sync-v1",LAST_KEY="exa-busty-last-sync-v1",ATTEMPT_KEY="exa-busty-auto-attempt-v1";
+const AUTO_MS=3*60*60*1000,RETRY_MS=30*60*1000;
+let autoEnabled=localStorage.getItem(AUTO_KEY)==="on";
+function paintAuto(){
+ $("autoSync").textContent=autoEnabled?"ブラウザ自動：ON":"ブラウザ自動：OFF";
+ $("autoSync").setAttribute("aria-pressed",String(autoEnabled));
+}
+paintAuto();
+$("autoSync").onclick=()=>{
+ autoEnabled=!autoEnabled;localStorage.setItem(AUTO_KEY,autoEnabled?"on":"off");
+ if(autoEnabled&&!localStorage.getItem(LAST_KEY))localStorage.setItem(LAST_KEY,String(Date.now()));
+ paintAuto();
+ showMsg(autoEnabled?"画面表示中の3時間自動更新を有効にしました。サーバー定期同期も独立して稼働します。":"ブラウザ自動更新を停止しました。サーバー定期同期は継続します。");
+};
+async function synchronizeEXA(mode="manual"){
+ if(!authorized||extensionBusy)return;
+ extensionBusy=true;
+ $("exaSync").disabled=true;$("exaSync").textContent="更新中…";$("autoSync").disabled=true;
+ try{
+  showMsg("BUSTY EXAから30日分を取得し、保存データを更新しています…");
+  const {data:{session}}=await client.auth.getSession();if(!session)throw Error("管理ページに再ログインしてください");
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),120000);
+  let response;
+  try{
+   response=await fetch(URL_SB+"/functions/v1/exa-busty-manual-sync",{
+    method:"POST",signal:controller.signal,
+    headers:{"Content-Type":"application/json","apikey":KEY_SB,"Authorization":"Bearer "+session.access_token},
+    body:"{}"
+   });
+  }finally{clearTimeout(timer)}
+  const data=await response.json();
+  if(!response.ok||!data.ok)throw Error(data.error||"サーバー同期に失敗しました（HTTP "+response.status+"）");
+  localStorage.setItem(LAST_KEY,String(Date.now()));await load();
+  showMsg("BUSTY "+(mode==="auto"?"自動":"手動")+"同期完了："+data.imported+"件・"+data.days+"日分、出勤取消"+data.removed+"件");
+ }catch(e){showMsg("BUSTY同期失敗："+(e.name==="AbortError"?"120秒でタイムアウトしました":String(e.message||e)),true)}
+ finally{extensionBusy=false;$("exaSync").disabled=false;$("exaSync").textContent="今すぐ更新";$("autoSync").disabled=false}
+}
+$("exaSync").onclick=()=>synchronizeEXA("manual");
+async function checkAuto(){
+ if(!autoEnabled||!authorized||extensionBusy)return;
+ const now=Date.now(),last=Number(localStorage.getItem(LAST_KEY)||0),attempt=Number(localStorage.getItem(ATTEMPT_KEY)||0);
+ if(!last){localStorage.setItem(LAST_KEY,String(now));return}
+ if(now-last<AUTO_MS||now-attempt<RETRY_MS)return;
+ localStorage.setItem(ATTEMPT_KEY,String(now));
+ await synchronizeEXA("auto");
+}
+setInterval(checkAuto,60000);
 // Manual bridge for EXA registrations not included in a 30-day schedule snapshot.
 // It never changes existing rows, shifts or roster classifications.
 $("unscheduledAdd").onclick=async()=>{
