@@ -23,9 +23,9 @@ button.primary{background:#28659a;color:#fff;border-color:#28659a}.muted{font-si
 <button id="logout" class="headerbtn hide">ログアウト</button></div></header>
 <section id="login" class="panel hide"><h2>スタッフログイン</h2><p class="muted">面接管理で使用する承認済み管理者アカウントでログインしてください。</p><form id="loginForm"><label>メールアドレス<input id="email" type="email" autocomplete="username" required></label><label>パスワード<input id="password" type="password" autocomplete="current-password" required></label><button class="primary">ログイン</button></form><p class="error" id="loginError"></p></section>
 <main id="app" class="hide">
-<div class="notice">この店舗の出勤管理ページは準備済みです。EXA直接同期・CSV取込・接客本数編集・画像登録・アンケート連携は未接続です。薔薇と紳士のデータにはアクセスしません。</div>
+<div class="notice">EXAから抽出した2026年11月6日〜12月5日のシフト333件と登録者42名を初回取込済みです。今後の自動同期・編集・画像登録・アンケート連携は未接続です。出勤予定なしの方もダミーと断定せず登録しています。</div>
 <section class="panel"><div class="month-heading"><h2>月間シフト</h2><div class="filter"><button data-filter="real" class="active">実働</button><button data-filter="dummy">ダミー</button><button data-filter="all">全件</button></div></div>
-<p id="message" class="muted"></p><div class="scroll"><table id="monthly" class="shift"></table><div id="empty" class="empty hide">この店舗の登録データはありません。EXA連携は未設定です。</div></div></section>
+<p id="message" class="muted"></p><div class="scroll"><table id="monthly" class="shift"></table><div id="empty" class="empty hide">この月の出勤予定・登録データがありません。</div></div></section>
 </main>
 <div id="dayPanel" class="dialog hide"><section><div class="month-heading"><h2 id="dayTitle">日別タイムチャート</h2><button id="closeDay">閉じる ×</button></div><div id="timeline"></div></section></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
