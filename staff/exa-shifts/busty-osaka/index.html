@@ -1,102 +1,493 @@
-<!doctype html>
-<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>BUSTY OSAKA｜出勤管理</title>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BUSTY OSAKA｜出勤管理</title>
 <style>
-:root{font-family:"Noto Sans JP",Arial,sans-serif;color:#1e2c40;background:#f0f3f7}*{box-sizing:border-box}body{margin:0;min-width:1180px}button,input,select{font:inherit}button{cursor:pointer;padding:8px 11px;border:1px solid #b6c6d8;border-radius:7px;background:#fff;color:#1c3858}button:disabled{opacity:.45;cursor:not-allowed}.hide{display:none!important}
-header{background:#1b304c;color:#fff;padding:11px 22px;display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:66px;position:sticky;top:0;z-index:20}
-.brand{display:flex;align-items:baseline;gap:12px;white-space:nowrap}.brand h1{font-size:19px;letter-spacing:.04em;margin:0}.brand span{font-size:9px;opacity:.6;letter-spacing:.14em}
-.controls{display:flex;align-items:center;gap:9px}.controls label{font-size:11px;color:#cbd8e8}.controls select{background:#2d4664;color:white;padding:8px;border:1px solid #526781;border-radius:6px;min-width:155px}.month{display:flex;align-items:center;gap:5px}.month strong{min-width:92px;text-align:center;font-size:13px}.month button{background:#294563;color:white;border-color:#4e6885}
-.panel{background:white;border:1px solid #dde5ef;border-radius:12px;padding:12px;margin:11px 14px;box-shadow:0 2px 8px #1b304c08}
-button.primary{background:#28659a;color:#fff;border-color:#28659a}.muted{font-size:12px;color:#64748b}.notice{padding:10px 12px;background:#fff3da;color:#79541c;border-radius:8px;font-size:12px}
-.headerbtn{background:#294563;color:#fff;border-color:#4e6885;font-size:12px}
-.month-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.month-heading h2{font-size:16px;margin:0}.filter{display:flex;gap:1px;background:#edf1f5;border-radius:7px;padding:3px}.filter button{border:0;background:transparent;font-size:11px;padding:6px 14px}.filter button.active{background:white;box-shadow:0 1px 4px #12365724;font-weight:700}
-.scroll{overflow:auto;max-height:calc(100vh - 205px);min-height:330px}.shift{border-collapse:separate;border-spacing:0;width:max-content;table-layout:fixed;font-size:12px}.shift th,.shift td{border-bottom:1px solid #e5ebf2;border-right:1px solid #edf2f6;text-align:center;height:46px;min-width:82px;width:82px;padding:5px 4px;white-space:nowrap}.shift th{position:sticky;top:0;background:#deebf8;z-index:4}.shift th:first-child,.shift td:first-child{position:sticky;left:0;min-width:172px;width:172px;text-align:left;background:#fff;z-index:6;padding-left:10px}.shift th:first-child{background:#deebf8;z-index:8}.shift th:nth-child(n+2):nth-child(-n+5),.shift td:nth-child(n+2):nth-child(-n+5){min-width:52px;width:52px;background:#f5f8fd}.shift td:nth-child(2),.shift th:nth-child(2){position:sticky;left:172px;z-index:5}.shift td:nth-child(3),.shift th:nth-child(3){position:sticky;left:224px;z-index:5}.shift td:nth-child(4),.shift th:nth-child(4){position:sticky;left:276px;z-index:5}.shift td:nth-child(5),.shift th:nth-child(5){position:sticky;left:328px;z-index:5}.shift th:nth-child(n+2):nth-child(-n+5){z-index:7}.shift .today{background:#e8f3ff}.shift .dummy{background:#faf4f6}.shift .group td{background:#dde9f4!important;font-weight:bold;position:static;text-align:left}.shift .staff{font-weight:700;font-size:13px}.shift small{font-size:10px;color:#74869b;display:block}.empty{text-align:center;color:#64748b;padding:34px}
-#login{max-width:430px;margin:70px auto;padding:22px}#login h2{margin-top:0}#login input{display:block;width:100%;padding:11px;margin:6px 0 14px;border:1px solid #cbd4e1;border-radius:7px}.error{color:#b12639}
-.dialog{position:fixed;inset:0;background:#11213999;z-index:30;display:grid;place-items:center}.dialog>section{background:white;border-radius:12px;padding:20px;min-width:500px;max-height:90vh;overflow:auto}.timeline{border-collapse:collapse;width:100%}.timeline td,.timeline th{padding:7px;border:1px solid #e1e7ef;text-align:center}.timeline th{background:#e9f0f9}
-</style></head>
-<body>
-<header><div class="brand"><h1>出勤管理</h1><span>SHIFT MANAGEMENT</span></div><div class="controls">
-<label>店舗 <select id="storeSelect"><option value="grand-luxe">Grand Luxe</option><option value="luxy-osaka">LUXY OSAKA</option><option value="rose">薔薇と紳士</option><option value="un-secret">Un Secret</option><option value="busty-osaka">BUSTY OSAKA</option></select></label>
-<div class="month"><button id="prev">◀</button><strong id="monthLabel"></strong><button id="next">▶</button></div>
-<button class="primary" disabled title="店舗別EXA同期は未接続です">今すぐ更新</button>
-<button id="reload" class="headerbtn">保存データを再読込</button>
-<button id="logout" class="headerbtn hide">ログアウト</button></div></header>
-<section id="login" class="panel hide"><h2>スタッフログイン</h2><p class="muted">面接管理で使用する承認済み管理者アカウントでログインしてください。</p><form id="loginForm"><label>メールアドレス<input id="email" type="email" autocomplete="username" required></label><label>パスワード<input id="password" type="password" autocomplete="current-password" required></label><button class="primary">ログイン</button></form><p class="error" id="loginError"></p></section>
+:root{font-family:Arial,"Noto Sans JP",sans-serif;color:#1e2c40;background:#f3f6fa}*{box-sizing:border-box}body{margin:0}header{background:#1b304c;color:#fff;padding:17px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}header h1{font-size:19px;margin:0}button,input,select{font:inherit}button{cursor:pointer;padding:9px 13px;border:1px solid #b6c6d8;border-radius:8px;background:#fff;color:#1c3858}button:disabled{opacity:.45;cursor:not-allowed}button.primary{background:#28659a;color:white;border-color:#28659a}main{max-width:1500px;margin:18px auto;padding:0 14px}.panel{background:white;border:1px solid #dde5ef;border-radius:12px;margin-bottom:14px;padding:16px;box-shadow:0 2px 8px #1b304c08}.muted{color:#677991;font-size:12px}.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.space{justify-content:space-between}.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.kpi{background:#f0f5fa;padding:14px;border-radius:9px}.kpi strong{display:block;font-size:24px}.hide{display:none!important}.table-scroll{overflow:auto;max-height:68vh}.shift-table{width:max-content;min-width:100%;border-collapse:separate;border-spacing:0;font-size:12px}.shift-table th,.shift-table td{border-bottom:1px solid #e5ebf2;border-right:1px solid #eef2f7;padding:4px;text-align:center;min-width:48px;height:36px}.shift-table th{position:sticky;top:0;background:#e9f0f9;z-index:2}.shift-table th:first-child,.shift-table td:first-child{position:sticky;left:0;min-width:118px;text-align:left;background:#fff;z-index:3}.shift-table th:first-child{background:#dbe8f6;z-index:4}.shift-table th button{padding:3px 6px;font-size:11px}.shift-table td.dummy{background:#faf4f6;color:#956675}.shift-table td.today{background:#e8f3ff}.shift-table tr.group td{background:#dde9f4!important;font-weight:bold;text-align:left;position:static}.shift-table input{width:43px;padding:5px 2px;border:1px solid #b5cee6;border-radius:5px;text-align:center;font-size:13px}.shift-table input:focus{outline:2px solid #4891d0}.shift-table td small{color:#68819b}.chart-scroll{overflow:auto}.timeline{border-collapse:separate;border-spacing:2px;font-size:11px;min-width:900px;width:100%}.timeline th,.timeline td{text-align:center;padding:4px;min-width:32px}.timeline td:first-child,.timeline th:first-child{min-width:110px;text-align:left;position:sticky;left:0;background:white}.timeline td.on{background:#a8d5f2}.timeline td.off{background:#edf1f5}.timeline .sum td{font-weight:bold;background:#e1edf8}.timeline .dummy-on{background:#ecdce2}.notice{padding:10px;border-radius:8px;background:#fff3da;color:#79541c}.error{color:#b12639}#login{max-width:430px;margin:60px auto}#login input{width:100%;padding:11px;margin:6px 0 14px;border:1px solid #cbd4e1;border-radius:7px}#message{margin-top:10px}.tag{font-size:11px;background:#e1eaf5;padding:4px 7px;border-radius:12px}footer{padding:24px;font-size:11px;color:#7a8ba0;text-align:center}@media(max-width:720px){.kpis{grid-template-columns:repeat(2,1fr)}.panel{padding:10px}header{padding:12px}header h1{font-size:16px}}
+
+/* PC attendance dashboard */
+:root{font-family:"Noto Sans JP",Arial,sans-serif}
+body{min-width:1180px;background:#f0f3f7}
+.work-header{position:sticky;top:0;z-index:20;min-height:66px;padding:11px 22px;flex-wrap:nowrap;gap:20px}
+.brand{display:flex;align-items:baseline;gap:12px;white-space:nowrap}
+.brand h1{font-size:19px;letter-spacing:.04em}.brand-sub{font-size:9px;opacity:.52;letter-spacing:.14em}
+.head-controls{display:flex;gap:9px;align-items:center;justify-content:flex-end;flex-wrap:nowrap}
+.head-controls button{white-space:nowrap;font-size:12px;padding:8px 10px}
+.store-label{display:flex;align-items:center;gap:7px;font-size:11px;color:#cad9ea;white-space:nowrap}
+.store-label select{background:#2d4664;color:#fff;border:1px solid #526781;border-radius:6px;padding:8px 9px;font-size:12px;min-width:140px}
+.head-month{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.head-month strong{font-size:13px;min-width:88px;text-align:center}
+.head-month button{background:#294563;color:white;border:1px solid #4e6885}
+.settings-menu{position:relative}.settings-menu summary{list-style:none;cursor:pointer;border:1px solid #506985;background:#2b4360;border-radius:7px;padding:9px 12px;color:white;font-size:12px;white-space:nowrap}
+.settings-menu summary::-webkit-details-marker{display:none}
+.settings-panel{position:absolute;right:0;top:calc(100% + 8px);display:flex;flex-direction:column;gap:6px;min-width:210px;background:#fff;border:1px solid #dae3ee;box-shadow:0 8px 26px #0b27452b;border-radius:9px;padding:10px;z-index:30}
+.settings-panel button{text-align:left;color:#253b55;background:#fff;border:0;border-radius:5px}.settings-panel button:hover{background:#edf3fa}
+.login-tag{font-size:10px!important}
+main{max-width:none;margin:11px auto;padding:0 14px}
+.monthly-panel{padding:10px 12px;min-height:calc(100vh - 130px)}
+.month-heading{padding:0 2px 7px}.month-heading h2{font-size:16px;margin:0}.month-heading .muted{font-size:10px}
+.table-scroll{max-height:calc(100vh - 178px);overflow:auto}
+.shift-table{table-layout:fixed;width:100%;min-width:1180px;font-size:10px}
+.shift-table th,.shift-table td{height:29px;min-width:0;padding:2px 1px;white-space:nowrap;overflow:hidden;text-overflow:clip}
+.shift-table th:first-child,.shift-table td:first-child{width:125px;min-width:125px;padding-left:5px}
+.shift-table th:not(:first-child),.shift-table td:not(:first-child){font-size:9px}
+.shift-table th button{font-size:10px;border:none;background:transparent;padding:2px 1px;font-weight:600}
+.shift-table tr.group td{height:24px}
+.shift-table input{width:28px;padding:3px 1px;font-size:10px}
+.shift-table td.today{background:#e1edf9}
+.day-modal{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:25px}
+.day-modal-shade{position:absolute;inset:0;background:#11213999}
+.day-modal-content{position:relative;z-index:1;width:min(1500px,96vw);max-height:90vh;overflow:auto;box-shadow:0 20px 65px #081e3c40;padding:18px}
+.day-modal-content h2{font-size:17px;margin:0}
+#closeDay{background:#f3f6fa}
+footer{display:none}
+.count-panel{position:relative;z-index:1;width:345px;padding:22px}.count-panel h2{margin:0}.count-panel select{display:block;width:100%;height:255px;border:1px solid #cbd7e7;border-radius:7px;margin:14px 0;font-size:16px}.count-panel option{padding:7px}.shift-table .edit-count{width:100%;height:23px;padding:1px;border:1px solid #d6e2ee;border-radius:4px;background:#f8fbff;font-size:11px;color:#254467}.shift-table th:first-child,.shift-table td:first-child{width:164px;min-width:164px}
+.shift-table .staff-name{font-weight:500;line-height:1.1}
+.staff-name .reading{display:block;font-weight:400;color:#77879c;font-size:9px;margin-top:2px}
+.shift-table td.stat-cell{background:#f7f9fc;font-weight:600}
+.shift-table th:nth-last-child(-n+4),.shift-table td:nth-last-child(-n+4){min-width:35px}
+.staff-filter{display:flex;gap:1px;background:#edf1f5;border:1px solid #dce6ef;border-radius:7px;padding:2px;margin-left:auto}
+.staff-filter button{border:0;background:transparent;border-radius:5px;padding:5px 13px;font-size:11px;color:#526b88}
+.staff-filter button.active{background:#fff;color:#1b3653;box-shadow:0 1px 4px #12365724;font-weight:700}
+
+/* Scrolling monthly grid: fixed name + metrics on the left, days on the right */
+.table-scroll{overflow:auto;max-height:calc(100vh - 166px);scrollbar-gutter:stable}
+.shift-table{width:max-content;min-width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0;font-size:11px}
+.shift-table th,.shift-table td{height:40px;min-width:56px;width:56px;padding:3px 2px;white-space:nowrap;font-size:11px}
+.shift-table th:nth-child(1),.shift-table td:first-child{width:172px;min-width:172px}
+.shift-table tr:not(.group) td:nth-child(n+2):nth-child(-n+5){width:52px;min-width:52px}
+.shift-table thead tr:first-child th{position:sticky;top:0;z-index:8;height:28px;background:#deebf8}
+.shift-table thead tr.daily-totals th{position:sticky;top:28px;z-index:8;height:25px;background:#eff5fc;font-size:10px;font-weight:700;color:#346084}
+.shift-table thead .staff-heading{position:sticky;top:0;left:0;z-index:15!important;width:172px;min-width:172px;text-align:left;padding:5px 8px;font-size:11px}
+.staff-heading span{display:block;line-height:1.5}
+.shift-table thead th.stat-heading{width:52px;min-width:52px;z-index:12!important;text-align:center}
+.shift-table thead th:nth-child(2),.shift-table tbody tr:not(.group) td:nth-child(2){position:sticky;left:172px;z-index:5}
+.shift-table thead th:nth-child(3),.shift-table tbody tr:not(.group) td:nth-child(3){position:sticky;left:224px;z-index:5}
+.shift-table thead th:nth-child(4),.shift-table tbody tr:not(.group) td:nth-child(4){position:sticky;left:276px;z-index:5}
+.shift-table thead th:nth-child(5),.shift-table tbody tr:not(.group) td:nth-child(5){position:sticky;left:328px;z-index:5}
+.shift-table tbody tr:not(.group) td:first-child{z-index:6;left:0}
+.shift-table tbody tr:not(.group) td:nth-child(n+2):nth-child(-n+5){background:#f5f8fd}
+.shift-table thead .day-heading,.shift-table thead .day-total{min-width:56px;width:56px}
+.shift-table tr.group td{position:relative;z-index:4;height:26px}
+.shift-table .staff-name strong{font-size:13px}.shift-table .staff-name .reading{font-size:10px}
+.shift-table th button{font-size:11px}
+
+/* The second date-header row must scroll horizontally; only name and metrics stay pinned. */
+.shift-table thead tr.daily-totals th,
+.shift-table thead tr.daily-totals th:first-child,
+.shift-table thead tr.daily-totals th:nth-child(2),
+.shift-table thead tr.daily-totals th:nth-child(3),
+.shift-table thead tr.daily-totals th:nth-child(4),
+.shift-table thead tr.daily-totals th:nth-child(5){
+ left:auto!important;right:auto!important;width:56px!important;min-width:56px!important;z-index:8!important;
+}
+.shift-table thead tr:first-child .staff-heading{height:53px}
+
+/* Readability first: date columns scroll horizontally rather than shrinking text. */
+.table-scroll{overflow:auto;max-height:calc(100vh - 155px)}
+.shift-table{width:max-content!important;min-width:0!important;table-layout:fixed;font-size:13px}
+.shift-table th,.shift-table td{height:46px!important;padding:5px 4px!important}
+.shift-table thead tr:first-child th.day-heading,
+.shift-table thead tr.daily-totals th.day-total,
+.shift-table tbody tr:not(.group) td:nth-child(n+6){
+  width:82px!important;min-width:82px!important;max-width:82px!important;
+  font-size:13px!important;white-space:nowrap!important;overflow:visible!important;
+}
+.shift-table tbody tr:not(.group) td:nth-child(n+6){font-weight:500;letter-spacing:-.025em}
+.shift-table thead tr:first-child th.day-heading{height:32px!important}
+.shift-table thead tr.daily-totals th.day-total{
+  top:32px!important;height:29px!important;font-size:12px!important;
+}
+.shift-table thead tr:first-child .staff-heading{height:61px!important;font-size:12px!important}
+.shift-table th.day-heading button{font-size:13px!important;font-weight:700}
+.shift-table tbody tr:not(.group) td.staff-name{padding-left:9px!important}
+.shift-table .staff-name strong{font-size:14px!important}
+.shift-table .staff-name .reading{font-size:11px!important;margin-top:4px}
+.shift-table tbody tr:not(.group) td.stat-cell{font-size:13px!important}
+.shift-table td .edit-count{height:29px;font-size:13px!important;font-weight:650}
+.shift-table tr.group td{height:28px!important}
+
+/* Compact two-line therapist names and realign the four frozen summary columns. */
+.shift-table thead .staff-heading,
+.shift-table thead th:first-child,
+.shift-table tbody tr:not(.group) td:first-child{
+ width:116px!important;min-width:116px!important;max-width:116px!important;
+}
+.shift-table tbody tr:not(.group) td.staff-name{padding-left:7px!important;padding-right:4px!important;overflow:hidden!important}
+.shift-table .staff-name strong,.shift-table .staff-name .reading{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.shift-table thead tr:first-child th:nth-child(2),.shift-table tbody tr:not(.group) td:nth-child(2){left:116px!important}
+.shift-table thead tr:first-child th:nth-child(3),.shift-table tbody tr:not(.group) td:nth-child(3){left:168px!important}
+.shift-table thead tr:first-child th:nth-child(4),.shift-table tbody tr:not(.group) td:nth-child(4){left:220px!important}
+.shift-table thead tr:first-child th:nth-child(5),.shift-table tbody tr:not(.group) td:nth-child(5){left:272px!important}
+
+/* Status colours: subdued, high-contrast, independently readable. */
+.shift-table tbody tr:not(.group) td.stat-cell.unpaid-positive{
+  background:#ffe8e6!important;color:#a72d35!important;font-weight:800;
+}
+.shift-table .edit-count.absent-entry{
+  background:#ffdcd7!important;border-color:#d77474!important;color:#a92732!important;font-weight:800;
+}
+.shift-table thead tr:first-child th.day-heading.saturday,
+.shift-table thead tr.daily-totals th.day-total.saturday{
+  background:#dbeafe!important;color:#205b9c!important;
+}
+.shift-table thead tr:first-child th.day-heading.sunday,
+.shift-table thead tr.daily-totals th.day-total.sunday,
+.shift-table thead tr:first-child th.day-heading.holiday,
+.shift-table thead tr.daily-totals th.day-total.holiday{
+  background:#fce4e6!important;color:#a82e41!important;
+}
+.shift-table tbody tr:not(.group) td.saturday{background:#f1f7ff!important}
+.shift-table tbody tr:not(.group) td.sunday,
+.shift-table tbody tr:not(.group) td.holiday{background:#fff2f3!important}
+.shift-table tbody tr:not(.group) td.today{
+  background:#d7e9fa!important;
+  box-shadow:inset 2px 0 #4380b7,inset -2px 0 #4380b7;
+  border-bottom-color:#a4c5e6!important;
+}
+.shift-table thead tr:first-child th.today-marker,
+.shift-table thead tr.daily-totals th.today-marker{
+  background:#bcd8f2!important;color:#174673!important;
+  box-shadow:inset 2px 0 #4380b7,inset -2px 0 #4380b7;
+}
+.shift-table tbody tr:not(.group) td.last-scheduled{
+  box-shadow:inset 0 0 0 2px #bc8a36!important;
+  background:#fff2d8!important;
+}
+.shift-table tbody tr.outside-roster td:not(.last-scheduled){
+  background:#eceff3!important;color:#67778a!important;
+}
+.shift-table tbody tr.outside-roster td:first-child,
+.shift-table tbody tr.outside-roster td.stat-cell{
+  background:#e7ebf1!important;
+}
+.shift-table tbody tr.outside-roster td.today{
+  box-shadow:inset 2px 0 #4380b7,inset -2px 0 #4380b7!important;
+}
+.outside-label{
+  display:inline-block;margin-top:3px;margin-left:2px;padding:1px 4px;
+  border-radius:3px;background:#d0d8e2;color:#485a6d;font-size:9px;font-weight:700;
+}
+.shift-table tbody tr:not(.group) td.stat-cell.score-high{background:#e0f3e8!important;color:#217048!important;font-weight:800}
+.shift-table tbody tr:not(.group) td.stat-cell.score-low{background:#fff0d9!important;color:#a4611d!important;font-weight:800}
+
+.shift-table tbody tr:not(.group) td.pre-off{background:#f0e4fa!important;color:#6a338d!important}
+.shift-table tbody tr:not(.group) td.pre-off .pre-off-label{font-size:12px;font-weight:800}
+.shift-table tbody tr.outside-roster td.pre-off{background:#ece0f6!important}
+
+/* Row two begins with the 1st day: there are no name/metrics cells in this row.
+   Override legacy first-child and sticky nth-child rules for every day total. */
+.shift-table thead tr.daily-totals > th.day-total,
+.shift-table thead tr.daily-totals > th.day-total:first-child,
+.shift-table thead tr.daily-totals > th.day-total:nth-child(n){
+  position:sticky!important;
+  top:32px!important;
+  left:auto!important;
+  right:auto!important;
+  width:82px!important;
+  min-width:82px!important;
+  max-width:82px!important;
+  box-sizing:border-box!important;
+  text-align:center!important;
+  z-index:8!important;
+}
+.residency-dialog{position:relative;z-index:1;width:410px;max-width:90vw;padding:22px}.residency-dialog h2{margin:0 0 12px;font-size:19px}.residency-dialog label{display:block;margin:14px 0 7px;font-size:13px;font-weight:700}.residency-dialog select{width:100%;padding:11px;border:1px solid #b6c6d8;border-radius:7px;background:#fff}.staff-name .name-editor{border:none;background:none;padding:0;color:inherit;font-weight:700;font-size:14px;text-align:left;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px}.staff-name .name-editor:hover,.staff-name .name-editor:focus-visible{color:#2466a3;text-decoration-color:#2466a3;outline-offset:2px}.staff-name .name-editor:after{content:" ✎";font-size:10px;color:#8299ad}
+/* Dummy EXA paste helpers, independent of public therapist pages. */
+.shift-table.dummy-layout thead tr:first-child th:nth-child(2),
+.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(2){width:100px!important;min-width:100px!important;left:116px!important}
+.shift-table.dummy-layout thead tr:first-child th:nth-child(3),
+.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(3){width:66px!important;min-width:66px!important;left:216px!important}
+.shift-table.dummy-layout thead tr:first-child th:nth-child(4),
+.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(4){width:66px!important;min-width:66px!important;left:282px!important}
+.shift-table.dummy-layout thead tr:first-child th:nth-child(5),
+.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(5){width:54px!important;min-width:54px!important;left:348px!important}
+.shift-table.dummy-layout td.weekday-cell{white-space:nowrap;font-size:11px!important;letter-spacing:-.04em}
+.shift-table .copy-exa{display:block;width:100%;border:1px solid #a8c9e9;border-radius:5px;background:#edf6ff;color:#185b91;padding:5px 1px;font-size:12px;font-weight:700}
+.shift-table .copy-exa:hover{background:#d4eafd;border-color:#5f9dca}
+.shift-table .copy-exa.copy-pair{font-size:10px}
+
+/* Dummy view has three metric columns, not four. */
+.shift-table.dummy-layout thead tr:first-child th.day-heading,
+.shift-table.dummy-layout thead tr.daily-totals th.day-total,
+.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(n+5){
+ width:82px!important;min-width:82px!important;max-width:82px!important;
+}
+.shift-table.dummy-layout thead tr:first-child th:nth-child(5),
+.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(5){
+ position:static!important;left:auto!important;background:inherit;
+}
+
+/* A copied time gives inline confirmation without moving the monthly table. */
+.shift-table .copy-exa{position:relative;transition:background-color .15s,border-color .15s,color .15s}
+.shift-table .copy-exa.copied-exa{
+ background:#e1f5e9!important;border-color:#39966b!important;color:#1b6848!important;
+}
+.shift-table .copy-exa.copied-exa::after{
+ content:"✓";position:absolute;right:2px;top:-6px;
+ display:grid;place-items:center;width:14px;height:14px;border-radius:50%;
+ background:#27875e;color:#fff;font-size:10px;line-height:1;
+ box-shadow:0 1px 3px #0002;pointer-events:none;
+}
+
+/* Final scheduled shift overrides today's blue highlight for real therapists. */
+.shift-table:not(.dummy-layout) tbody tr:not(.group) td.today.last-scheduled,
+.shift-table:not(.dummy-layout) tbody tr.outside-roster td.today.last-scheduled{
+  background:#fff0cf!important;
+  color:#67471c!important;
+  box-shadow:inset 0 0 0 2px #bd8429!important;
+  border-bottom-color:#bd8429!important;
+}
+
+/* Enlarged desktop day chart with group headcounts and chronological rows. */
+.day-modal{padding:12px!important}
+.day-modal-content{width:min(1740px,98vw)!important;height:94vh!important;max-height:94vh!important;display:flex;flex-direction:column;padding:16px 19px!important}
+.day-modal-content .row.space{flex-shrink:0;padding-bottom:13px;border-bottom:1px solid #dfe7f1;margin-bottom:10px}
+.timeline-heading{display:flex;align-items:baseline;gap:24px;flex-wrap:wrap}
+.day-headcount{font-size:14px;color:#214d79;font-weight:750}
+#timeline{min-height:0;flex:1;display:flex;flex-direction:column}
+#timeline .chart-scroll{flex:1;max-height:100%;overflow:auto}
+.timeline{min-width:1160px;border-spacing:1px;font-size:12px}
+.timeline th,.timeline td{height:30px;padding:6px 4px}
+.timeline thead th{position:sticky;top:0;z-index:6;background:#e5effa}
+.timeline thead th:first-child{z-index:7;background:#dbe8f5}
+.timeline .timeline-group th{position:sticky;left:0;z-index:3;text-align:left;background:#dce9f7;padding:9px 11px;font-size:13px}
+.timeline .timeline-name{font-weight:650;min-width:145px}
+.timeline .timeline-name small{display:block;font-size:10px;color:#64768c;font-weight:400}
+.timeline .sum td{font-weight:750;background:#dbeafa}
+
+/* Timeline: clear hourly and therapist-row grid lines. The last column is 4:00. */
+.timeline{border-collapse:separate!important;border-spacing:0!important;table-layout:fixed}
+.timeline thead th,.timeline tbody td,.timeline tbody th{
+ border-right:1px solid #cbd6e3!important;
+ border-bottom:1px solid #d5dee9!important;
+}
+.timeline thead th{border-bottom:2px solid #9db4cc!important}
+.timeline tbody tr:not(.timeline-group):not(.sum) td.timeline-name{
+ border-right:2px solid #a9bed4!important;
+}
+.timeline tbody tr.timeline-group th{
+ border-top:2px solid #b2c6da!important;
+ border-bottom:1px solid #b2c6da!important;
+}
+.timeline tbody tr.sum td{
+ border-top:2px solid #b4c7db!important;
+ border-bottom:2px solid #b4c7db!important;
+}
+
+/* Keep the total and real-attendance counts directly beneath hourly headings. */
+.timeline tr.sum.total-count td{background:#d4e7fa!important;color:#143e69!important;font-weight:800}
+.timeline tr.sum.real-count td{background:#e7f2ff!important;color:#1b4e7b!important;font-weight:700}
+.timeline tr.timeline-group.dummy-heading th{background:#f0e1e8!important;color:#673b51!important;text-align:center!important;font-weight:800}
+.timeline tr.timeline-group.dummy-heading th:first-child{text-align:left!important}
+.timeline tr.sum td:first-child{position:sticky;left:0;z-index:4;text-align:left}
+.timeline tr.sum.dummy-count td{background:#f3e4eb!important;color:#713b56!important;font-weight:700}
+
+/* Non-displacing notifications: success and error appear as fixed toasts. */
+#message{
+ position:fixed!important;
+ top:77px!important;
+ right:18px!important;
+ left:auto!important;
+ width:max-content!important;
+ max-width:min(560px,calc(100vw - 36px))!important;
+ margin:0!important;
+ padding:11px 15px!important;
+ border:1px solid #a9c3dc!important;
+ border-radius:8px!important;
+ background:#f2f8ff!important;
+ color:#204e79!important;
+ box-shadow:0 6px 22px #0b274529!important;
+ font-size:12px!important;
+ line-height:1.6!important;
+ z-index:120!important;
+ opacity:0;
+ visibility:hidden;
+ transform:translateY(-5px);
+ pointer-events:none;
+ transition:opacity .16s ease,transform .16s ease,visibility .16s;
+}
+#message.toast-visible{
+ opacity:1;
+ visibility:visible;
+ transform:translateY(0);
+}
+#message.error{
+ background:#fff1f1!important;
+ border-color:#e5a3a5!important;
+ color:#a72e39!important;
+}
+
+/* Internal therapist profile with a private, on-demand full-body photo. */
+.therapist-detail-dialog{width:min(770px,95vw)!important;max-height:90vh;overflow-y:auto}
+.therapist-detail-grid{display:grid;grid-template-columns:minmax(220px,1fr) minmax(225px,1.15fr);gap:22px;align-items:start}
+.therapist-photo-frame{width:100%;aspect-ratio:3/4;border:1px solid #d4dfe9;border-radius:9px;overflow:hidden;background:#edf2f7;display:flex;align-items:center;justify-content:center;color:#8391a0;font-size:13px}
+.therapist-photo-frame img{width:100%;height:100%;object-fit:contain}
+.therapist-photo-action{display:block;text-align:center;cursor:pointer;background:#edf5fd;color:#245b89;border:1px solid #b5cee7;border-radius:8px;padding:10px 8px;margin-top:9px;font-size:13px!important;font-weight:700}
+.therapist-photo-action:hover{background:#dfeefa}
+#therapistPhotoStatus{line-height:1.65;min-height:36px}
+.therapist-detail-controls label{margin-top:0}
+.therapist-detail-controls .row{margin-top:25px}
+@media(max-width:590px){.therapist-detail-grid{grid-template-columns:1fr}.therapist-photo-frame{max-height:400px}.therapist-detail-dialog{max-height:94vh}}
+
+.person-registry{border:1px solid #d8e3ef;border-radius:9px;background:#f7faff;padding:12px;margin:0 0 18px}
+.person-registry strong{font-size:13px;color:#254b71}
+.person-registry p{margin:8px 0;font-size:11px;line-height:1.6}
+#personRegister{background:#28659a;color:#fff;border-color:#28659a;font-size:12px;padding:9px 12px}
+#personRegistryState{overflow-wrap:anywhere}
+
+.interview-match{margin-bottom:18px}
+.interview-search-row{display:flex;flex-wrap:nowrap!important;gap:7px}
+.interview-search-row input{width:100%;min-width:0;border:1px solid #b9cbdc;border-radius:7px;padding:9px;font-size:12px}
+.interview-search-row button{white-space:nowrap;font-size:12px;padding:8px 11px}
+.interview-results{margin:8px 0;max-height:205px;overflow-y:auto}
+.interview-result{width:100%;display:block;text-align:left;margin:5px 0;padding:9px 10px;background:#fff;border:1px solid #cedbe8;border-radius:7px;color:#203750;font-size:12px}
+.interview-result small{display:block;color:#697e94;line-height:1.65;margin-top:3px}
+.interview-result.selected{border:2px solid #28659a;background:#eaf4ff;padding:8px 9px}
+#interviewLinkConfirm{font-size:12px;margin:7px 0;width:100%}
+#interviewLinkOpen{margin:5px 0 8px}
+
+#surveyPersonChoice{width:100%;max-width:100%;padding:9px;border:1px solid #bbcfe4;border-radius:7px;background:white;color:#253b53;font-size:12px}
+#surveyLinkOpen,#surveyLinkSave{font-size:12px;margin:5px 0}
+.staff-exa-id{display:inline-block;margin-left:5px;padding:1px 4px;border-radius:3px;background:#eaf1f9;color:#32618a;font-size:10px;font-weight:700;white-space:nowrap}
+</style>
+<style>
+/* This page inherits the exact same attendance table CSS as the Rose master. */
+.busty-info{padding:7px 14px;font-size:11px;color:#79541c;background:#fff4dc;border-bottom:1px solid #efdcae}
+.shift-table .count-placeholder{display:inline-block;min-width:34px;font-weight:600}
+.shift-table .readonly-name{font-weight:700;border:0;background:transparent;padding:0;color:inherit;text-align:left;cursor:default}
+.shift-table .stat-heading{font-size:11px}
+</style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script></head><body>
+<header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
+<label class="store-label">店舗 <select id="storeSelect" aria-label="店舗切替"><option value="grand-luxe">Grand Luxe</option><option value="luxy-osaka">LUXY OSAKA</option><option value="rose">薔薇と紳士</option><option value="un-secret">Un Secret</option><option value="busty-osaka" selected>BUSTY OSAKA</option></select></label>
+<div class="head-month"><button id="prev" title="前月">◀</button><strong id="monthLabel"></strong><button id="next" title="翌月">▶</button></div>
+<button id="exaSync" class="primary" disabled title="BUSTYのサーバー自動同期は未接続です">今すぐ更新</button>
+<details class="settings-menu"><summary>その他 <span aria-hidden="true">▾</span></summary><div class="settings-panel">
+<button id="reload">保存データを再読込</button>
+<button disabled title="BUSTYのEXA直接連携の準備中です">EXA CSV取込・更新</button>
+<button disabled title="BUSTYのEXA認証設定が必要です">サーバー30日検証</button>
+<button disabled title="自動同期は未設定です">ブラウザ自動：OFF</button>
+</div></details><span id="authLabel" class="muted login-tag" style="color:#d5e1f1"></span><button id="logout" class="hide">ログアウト</button>
+</div></header>
+<section id="login" class="panel hide"><h2>スタッフログイン</h2><p class="muted">面接管理で使用しているSupabaseアカウントでログインしてください。閲覧は承認済み管理者に限定しています。</p><form id="loginForm"><label>メールアドレス<input id="email" type="email" autocomplete="username" required></label><label>パスワード<input id="password" type="password" autocomplete="current-password" required></label><button class="primary" type="submit">ログイン</button></form><p id="loginError" class="error"></p></section>
 <main id="app" class="hide">
-<div class="notice">EXAから抽出した2026年11月6日〜12月5日のシフト333件と登録者42名を初回取込済みです。今後の自動同期・編集・画像登録・アンケート連携は未接続です。出勤予定なしの方もダミーと断定せず登録しています。</div>
-<section class="panel"><div class="month-heading"><h2>月間シフト</h2><div class="filter"><button data-filter="real" class="active">実働</button><button data-filter="dummy">ダミー</button><button data-filter="all">全件</button></div></div>
-<p id="message" class="muted"></p><div class="scroll"><table id="monthly" class="shift"></table><div id="empty" class="empty hide">この月の出勤予定・登録データがありません。</div></div></section>
+<div class="busty-info">BUSTY OSAKA｜2026年11月6日〜12月5日の初回EXA抽出データを反映済み。自動同期・編集機能は準備中です。</div>
+<p id="message" class="muted" role="status" aria-live="polite"></p>
+<div class="panel monthly-panel"><div class="row space month-heading"><h2>月間シフト</h2><div class="staff-filter" role="group" aria-label="表示区分"><button type="button" data-show-staff="real" class="active">実働</button><button type="button" data-show-staff="dummy">ダミー</button><button type="button" data-show-staff="all">全件</button></div></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
+<div id="dayPanel" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="dayTitle"><div class="day-modal-shade" id="dayBackdrop"></div><div class="day-modal-content panel"><div class="row space"><div class="timeline-heading"><h2 id="dayTitle">日別タイムチャート</h2><strong id="dayHeadcount" class="day-headcount"></strong></div><button id="closeDay" type="button">閉じる ×</button></div><div id="timeline"></div></div></div>
 </main>
-<div id="dayPanel" class="dialog hide"><section><div class="month-heading"><h2 id="dayTitle">日別タイムチャート</h2><button id="closeDay">閉じる ×</button></div><div id="timeline"></div></section></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-(function(){
-"use strict";
-const code="busty",slug="busty-osaka";
+(function(){"use strict";
 const $=id=>document.getElementById(id);
-const url="https://vjjnkflbfsjihwzjsjpr.supabase.co",key="sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos";
-const client=window.supabase?.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,storage:localStorage,storageKey:"mattan-recruit-auth"}});
-const jst=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
-let month=jst().slice(0,7),filter="real",staff=[],shifts=[],performance=[],authorized=false;
-const pad=n=>String(n).padStart(2,"0");
-const dates=()=>{const [year,m]=month.split("-").map(Number);return Array.from({length:new Date(year,m,0).getDate()},(_,i)=>month+"-"+pad(i+1))};
-$("storeSelect").value=slug;
-$("storeSelect").onchange=()=>{const v=$("storeSelect").value;location.href=v==="rose"?"../": "../"+v+"/"};
-function shiftTime(v){if(v===null||v===undefined)return "";const h=Math.floor(v/60),m=v%60;return h+":"+pad(m)}
-function makeCell(row,value,tag="td",cls=""){const cell=document.createElement(tag);cell.textContent=value;cell.className=cls;row.append(cell);return cell}
-function render(){
- $("monthLabel").textContent=month.replace("-","年")+"月";
- const days=dates(),table=$("monthly");table.replaceChildren();
- const head=document.createElement("tr");["源氏名","出勤","接客","当欠","評価",...days.map(d=>String(+d.slice(8))+"日")].forEach(x=>makeCell(head,x,"th"));table.append(head);
- const wanted=staff.filter(t=>filter==="all"||(filter==="dummy"?["dummy","dummy_use"].includes(t.residency||t.operating_category):!["dummy","dummy_use"].includes(t.residency||t.operating_category)));
- for(const person of wanted){
-  const row=document.createElement("tr");const id=person.exa_id;
-  makeCell(row,person.stage_name||"ID "+id,"td","staff");
-  const entries=shifts.filter(s=>s.exa_id===id);
-  const done=performance.filter(p=>p.exa_id===id);
-  makeCell(row,String(entries.length));makeCell(row,String(done.reduce((n,p)=>n+(Number(p.customer_count)||0),0)));
-  makeCell(row,String(done.filter(p=>p.attendance_status==="absent").length));
-  makeCell(row,person.evaluation_score==null?"—":String(person.evaluation_score));
-  for(const d of days){const s=entries.find(x=>x.work_date===d);const cell=makeCell(row,s?shiftTime(s.start_minutes)+"-"+shiftTime(s.end_minutes):"");if(d===jst())cell.classList.add("today")}
-  table.append(row);
+const BASE="https://vjjnkflbfsjihwzjsjpr.supabase.co",KEY="sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos";
+const client=window.supabase?.createClient(BASE,KEY,{auth:{persistSession:true,autoRefreshToken:true,storage:localStorage,storageKey:"mattan-recruit-auth"}});
+const today=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+let month=today().slice(0,7),selected=today(),staffView="real",therapists=[],shifts=[],performances=[],historyPerformances=[],futureShifts=[],authorized=false;
+const fmtDate=n=>month+"-"+String(n).padStart(2,"0");
+const daysIn=()=>new Date(Number(month.slice(0,4)),Number(month.slice(5,7)),0).getDate();
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const shiftTime=x=>{const h=Math.floor(x/60),m=x%60,v=h>=24?h-24:h;return m===30?v+".5":m===0?String(h===24?24:v):v+":"+String(m).padStart(2,"0")};
+const range=x=>shiftTime(x.start_minutes)+"-"+shiftTime(x.end_minutes);
+const holidays=new Set(("2026-01-01 2026-01-12 2026-02-11 2026-02-23 2026-03-20 2026-04-29 2026-05-03 2026-05-04 2026-05-05 2026-05-06 2026-07-20 2026-08-11 2026-09-21 2026-09-22 2026-09-23 2026-10-12 2026-11-03 2026-11-23 2027-01-01 2027-01-11 2027-02-11 2027-02-23 2027-03-21 2027-03-22 2027-04-29 2027-05-03 2027-05-04 2027-05-05 2027-07-19 2027-08-11 2027-09-20 2027-09-23 2027-10-11 2027-11-03 2027-11-23").split(" "));
+const dayType=d=>holidays.has(d)?"holiday":new Date(d+"T00:00:00Z").getUTCDay()===0?"sunday":new Date(d+"T00:00:00Z").getUTCDay()===6?"saturday":"weekday";
+const outside=t=>!futureShifts.some(s=>s.exa_id===t.exa_id&&s.work_date>=today()&&!s.is_dummy_shift&&!s.is_pre_off);
+function showMsg(message,error=false){$("message").textContent=message;$("message").className=error?"error":"muted";}
+function renderMonthly(){
+ const byId=new Map(),activeIds=new Set(therapists.map(t=>t.exa_id));
+ for(const s of shifts){if(!byId.has(s.exa_id))byId.set(s.exa_id,new Map());byId.get(s.exa_id).set(s.work_date,s)}
+ const real=therapists.filter(t=>t.operating_category!=="dummy_use"&&t.operating_category!=="not_used").sort((a,b)=>Number(byId.has(b.exa_id))-Number(byId.has(a.exa_id))||a.exa_id-b.exa_id);
+ const dummy=therapists.filter(t=>t.operating_category==="dummy_use").sort((a,b)=>a.exa_id-b.exa_id);
+ const per=new Map(performances.map(p=>[p.exa_id+"|"+p.work_date,p.customer_count]));
+ const absent=new Set(performances.filter(p=>p.attendance_status==="absent").map(p=>p.exa_id+"|"+p.work_date));
+ const counts=new Map();
+ for(let n=1;n<=daysIn();n++){
+  const d=fmtDate(n),ss=shifts.filter(x=>x.work_date===d&&activeIds.has(x.exa_id));
+  const r=ss.filter(x=>!x.is_dummy_shift&&therapists.find(t=>t.exa_id===x.exa_id)?.operating_category!=="dummy_use").length;
+  counts.set(d,{real:r,dummy:ss.length-r,all:ss.length});
  }
- $("empty").classList.toggle("hide",wanted.length!==0);
+ let html='<thead><tr><th class="staff-heading" rowspan="2"><span>'+(staffView==="real"?"実働（"+real.length+"名）":staffView==="dummy"?"ダミー（"+dummy.length+"名）":"実働（"+real.length+"名）／ダミー（"+dummy.length+"名）")+'</span></th>';
+ if(staffView==="dummy")html+='<th class="stat-heading" rowspan="2">登録曜日</th><th class="stat-heading" rowspan="2">出勤</th><th class="stat-heading" rowspan="2">退勤</th>';
+ else html+='<th class="stat-heading" rowspan="2">稼働</th><th class="stat-heading" rowspan="2">出勤</th><th class="stat-heading" rowspan="2">無報</th><th class="stat-heading" rowspan="2">評価</th>';
+ for(let n=1;n<=daysIn();n++){const d=fmtDate(n);html+='<th class="day-heading '+dayType(d)+(d===today()?" today-marker":"")+'"><button type="button" data-day="'+d+'">'+n+'日</button></th>'}
+ html+='</tr><tr class="daily-totals">';
+ for(let n=1;n<=daysIn();n++){const d=fmtDate(n);html+='<th class="day-total '+dayType(d)+(d===today()?" today-marker":"")+'">'+counts.get(d)[staffView]+'人</th>'}
+ html+='</tr></thead><tbody>';
+ for(const [title,people,group] of [["実働",real,"real"],["ダミー",dummy,"dummy"]]){
+  if(staffView!=="all"&&staffView!==group)continue;
+  if(staffView==="all")html+='<tr class="group"><td colspan="'+(daysIn()+5)+'">'+title+'（'+people.length+'名）</td></tr>';
+  for(const person of people){
+   const entries=byId.get(person.exa_id)||new Map(),history=historyPerformances.filter(p=>p.exa_id===person.exa_id&&p.attendance_status!=="absent");
+   const avg=history.length?(history.reduce((sum,p)=>sum+(Number(p.customer_count)||0),0)/history.length).toFixed(1):"—";
+   const dates=[...entries.values()].filter(x=>!x.is_dummy_shift),future=outside(person),last=dates.length?dates.map(x=>x.work_date).sort().at(-1):null;
+   const name=String(person.stage_name||"ID "+person.exa_id),match=name.match(/^(.+?)-([^-]+)-$/),display=match?match[1]:name,kana=match?match[2]:"";
+   html+='<tr class="'+(future&&group==="real"?"outside-roster":"")+'"><td class="staff-name"><span class="readonly-name">'+esc(display)+'</span><span class="staff-exa-id">ID '+person.exa_id+'</span>'+(kana?'<span class="reading">'+esc(kana)+'</span>':"")+(future&&group==="real"?'<span class="outside-label">実働外</span>':"")+'</td>';
+   if(group==="dummy"){
+    const futureEntries=futureShifts.filter(x=>x.exa_id===person.exa_id);const weekdays=[...new Set(futureEntries.map(x=>new Date(x.work_date+"T00:00:00Z").getUTCDay()))].sort();
+    const names=["日","月","火","水","木","金","土"];
+    const times=[...new Set(futureEntries.map(x=>x.start_minutes+"/"+x.end_minutes))];
+    html+='<td class="stat-cell weekday-cell">'+(weekdays.length?weekdays.map(x=>names[x]).join("・"):"—")+'</td><td class="stat-cell">'+(times.length===1?esc(shiftTime(futureEntries[0].start_minutes)):"—")+'</td><td class="stat-cell">'+(times.length===1?esc(shiftTime(futureEntries[0].end_minutes)):"—")+'</td>';
+   }else{
+    const zeros=performances.filter(p=>p.exa_id===person.exa_id&&p.customer_count===0&&p.attendance_status!=="absent").length;
+    const evalScore=Number(person.evaluation_score),score=person.evaluation_score==null?"—":evalScore.toFixed(1);
+    html+='<td class="stat-cell"><strong>'+avg+'</strong></td><td class="stat-cell">'+dates.length+'</td><td class="stat-cell '+(zeros?"unpaid-positive":"")+'">'+zeros+'</td><td class="stat-cell '+(person.evaluation_score==null?"":evalScore>=95?"score-high":"score-low")+'">'+score+'</td>';
+   }
+   for(let n=1;n<=daysIn();n++){
+    const d=fmtDate(n),s=entries.get(d),past=d<today();const classes=[group==="dummy"?"dummy":"",d===today()?"today":"",dayType(d),last===d?"last-scheduled":"",future?"outside-cell":""].filter(Boolean).join(" ");
+    const k=person.exa_id+"|"+d;
+    let value='<small> </small>';
+    if(s&&past&&group==="real")value='<span class="count-placeholder">'+(absent.has(k)?"当欠":per.has(k)?per.get(k):"＋")+'</span>';
+    else if(s&&!past)value=esc(range(s));
+    else if(s&&past)value="—";
+    html+='<td class="'+classes+'">'+value+'</td>';
+   }
+   html+='</tr>';
+  }
+ }
+ html+='</tbody>';$("monthly").innerHTML=html;
+ $("monthly").classList.toggle("dummy-layout",staffView==="dummy");
+ $("monthly").querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{selected=b.dataset.day;renderDay();$("dayPanel").classList.remove("hide")});
+}
+function renderDay(){
+ $("dayTitle").textContent=selected+"｜日別タイムチャート";
+ const dayShifts=shifts.filter(s=>s.work_date===selected);
+ $("dayHeadcount").textContent=dayShifts.length+"人";
+ const names=new Map(therapists.map(t=>[t.exa_id,t.stage_name]));
+ const slots=Array.from({length:40},(_,i)=>600+i*30);
+ let html='<div class="chart-scroll"><table class="timeline"><thead><tr><th>セラピスト</th>'+slots.map(m=>'<th>'+Math.floor(m/60)+(m%60?":30":":00")+'</th>').join("")+'</tr></thead><tbody>';
+ for(const s of dayShifts){
+ html+='<tr><td>'+esc(names.get(s.exa_id)||"ID "+s.exa_id)+'</td>'+slots.map(m=>'<td class="'+(m>=s.start_minutes&&m<s.end_minutes?"on":"off")+'"></td>').join("")+'</tr>';
+ }
+ html+='</tbody></table></div>';$("timeline").innerHTML=html;
 }
 async function load(){
- if(!authorized)return;
- $("message").textContent="保存済みデータを確認しています…";
- const start=month+"-01",days=dates(),end=days[days.length-1];
- const results=await Promise.all([
- client.from("exa_shift_therapists").select("exa_id,stage_name,residency,operating_category,evaluation_score").eq("store_code",code),
- client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes").eq("store_code",code).gte("work_date",start).lte("work_date",end),
- client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code",code).gte("work_date",start).lte("work_date",end)
+ if(!authorized)return;showMsg("Supabaseを読み込み中…");
+ const start=fmtDate(1),end=fmtDate(daysIn());
+ const [a,b,c,history,future]=await Promise.all([
+ client.from("exa_shift_therapists").select("exa_id,stage_name,residency,operating_category,evaluation_score").eq("store_code","busty"),
+ client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_dummy_shift,is_pre_off").eq("store_code","busty").gte("work_date",start).lte("work_date",end).order("work_date"),
+ client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code","busty").gte("work_date",start).lte("work_date",end),
+ client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code","busty").lt("work_date",today()).limit(5000),
+ client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_dummy_shift,is_pre_off").eq("store_code","busty").order("work_date").limit(5000)
  ]);
- const error=results.find(x=>x.error)?.error;
- if(error){$("message").textContent="取得できませんでした："+error.message;staff=[];shifts=[];performance=[];render();return}
- [staff,shifts,performance]=results.map(x=>x.data||[]);
- $("message").textContent="";render();
+ const err=[a,b,c,history,future].find(x=>x.error)?.error;if(err){showMsg("読み込みエラー："+err.message,true);return}
+ therapists=a.data||[];shifts=b.data||[];performances=c.data||[];historyPerformances=history.data||[];futureShifts=future.data||[];
+ $("monthLabel").textContent=month.replace("-","年")+"月";showMsg("");renderMonthly();renderDay();
 }
 async function loginCheck(){
  if(!client){$("login").classList.remove("hide");$("loginError").textContent="認証ライブラリを読み込めません";return}
  const {data:{session}}=await client.auth.getSession();
  if(!session){$("login").classList.remove("hide");$("app").classList.add("hide");return}
- const [profile,access]=await Promise.all([
- client.from("recruit_staff_profiles").select("role,approved_at").eq("user_id",session.user.id).maybeSingle(),
- client.rpc("can_link_therapist_interview")
- ]);
+ const [profile,access]=await Promise.all([client.from("recruit_staff_profiles").select("role,approved_at").eq("user_id",session.user.id).maybeSingle(),client.rpc("can_link_therapist_interview")]);
  if(profile.error||access.error||access.data!==true||!profile.data?.approved_at||!["master","full"].includes(profile.data.role)){
-  $("login").classList.remove("hide");$("app").classList.add("hide");$("loginError").textContent="このページへの権限がありません。";return
- }
- authorized=true;$("login").classList.add("hide");$("app").classList.remove("hide");$("logout").classList.remove("hide");await load();
+ $("login").classList.remove("hide");$("app").classList.add("hide");$("loginError").textContent="このページへの権限がありません。";return}
+ authorized=true;$("login").classList.add("hide");$("app").classList.remove("hide");$("logout").classList.remove("hide");$("authLabel").textContent="認証済み";await load();
 }
-$("loginForm").onsubmit=async e=>{e.preventDefault();$("loginError").textContent="認証中…";const {error}=await client.auth.signInWithPassword({email:$("email").value,password:$("password").value});if(error){$("loginError").textContent="ログインできません。入力情報をご確認ください。";return}$("loginError").textContent="";await loginCheck()};
+$("loginForm").onsubmit=async e=>{e.preventDefault();const {error}=await client.auth.signInWithPassword({email:$("email").value,password:$("password").value});if(error){$("loginError").textContent="ログインできません。入力情報をご確認ください。";return}$("loginError").textContent="";await loginCheck()};
 $("logout").onclick=async()=>{await client.auth.signOut();sessionStorage.removeItem("mattan-recruit-auth");location.reload()};
-$("prev").onclick=()=>{const [y,m]=month.split("-").map(Number),d=new Date(y,m-2,1);month=d.getFullYear()+"-"+pad(d.getMonth()+1);void load()};
-$("next").onclick=()=>{const [y,m]=month.split("-").map(Number),d=new Date(y,m,1);month=d.getFullYear()+"-"+pad(d.getMonth()+1);void load()};
+$("storeSelect").onchange=()=>{const slug=$("storeSelect").value;location.href=slug==="rose"?"../":"../"+slug+"/"};
+$("prev").onclick=()=>{const [y,m]=month.split("-").map(Number);const d=new Date(y,m-2,1);month=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");void load()};
+$("next").onclick=()=>{const [y,m]=month.split("-").map(Number);const d=new Date(y,m,1);month=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");void load()};
 $("reload").onclick=()=>void load();
-document.querySelectorAll("[data-filter]").forEach(b=>b.onclick=()=>{filter=b.dataset.filter;document.querySelectorAll("[data-filter]").forEach(x=>x.classList.toggle("active",x===b));render()});
-$("closeDay").onclick=()=>$("dayPanel").classList.add("hide");
-$("dayPanel").onclick=e=>{if(e.target===$("dayPanel"))$("closeDay").click()};
+$("closeDay").onclick=()=>$("dayPanel").classList.add("hide");$("dayBackdrop").onclick=$("closeDay").onclick;
+document.addEventListener("keydown",e=>{if(e.key==="Escape")$("dayPanel").classList.add("hide")});
+document.querySelectorAll("[data-show-staff]").forEach(b=>b.onclick=()=>{staffView=b.dataset.showStaff;document.querySelectorAll("[data-show-staff]").forEach(x=>x.classList.toggle("active",x===b));renderMonthly()});
 loginCheck();
 })();
 </script></body></html>
