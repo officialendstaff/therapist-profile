@@ -351,7 +351,7 @@ footer{display:none}
 </style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
-<label class="store-label">店舗 <select id="storeSelect" aria-label="店舗切替"><option value="rose">薔薇と紳士</option></select></label>
+<label class="store-label">店舗 <select id="storeSelect" aria-label="店舗切替"><option value="grand-luxe">Grand Luxe</option><option value="luxy-osaka">LUXY OSAKA</option><option value="rose">薔薇と紳士</option><option value="un-secret">Un Secret</option><option value="busty-osaka">BUSTY OSAKA</option></select></label>
 <div class="head-month"><button id="prev" title="前月">◀</button><strong id="monthLabel"></strong><button id="next" title="翌月">▶</button></div>
 <button id="exaSync" class="primary" title="EXAサーバーから30日分を直接取得・反映">今すぐ更新</button>
 <details class="settings-menu"><summary>その他 <span aria-hidden="true">▾</span></summary><div class="settings-panel">
@@ -1115,7 +1115,7 @@ $("csvFile").onchange=async e=>{
 $("closeDay").onclick=()=>{$("dayPanel").classList.add("hide")};
 $("dayBackdrop").onclick=$("closeDay").onclick;
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("dayPanel").classList.add("hide");closeCount();closeResidency();}});
-$("storeSelect").onchange=()=>{if($("storeSelect").value!=="rose")showMsg("他店舗のEXA連携は準備中です。",true)};
+$("storeSelect").onchange=()=>{const store=$("storeSelect").value;if(store!=="rose")location.href="./"+store+"/";};
 document.querySelectorAll("[data-show-staff]").forEach(b=>b.onclick=()=>{
  staffView=b.dataset.showStaff;
  document.querySelectorAll("[data-show-staff]").forEach(x=>x.classList.toggle("active",x===b));
