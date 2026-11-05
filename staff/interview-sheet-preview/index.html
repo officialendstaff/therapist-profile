@@ -554,9 +554,6 @@ html.metrics-standalone .main-panel{min-height:100%!important;height:100%!import
 html.metrics-standalone #storeMetrics{height:100%!important;min-height:100%!important}
 html.metrics-standalone #storeMetricsBody{height:calc(100% - 65px)!important;overflow:auto!important}
 html.metrics-standalone body.interview-admin-locked>.main{visibility:hidden!important}
-
-/* Full-width metrics: last-row total charts (mobile keeps one column). */
-@media(max-width:700px){.store-metrics-total-section{grid-template-columns:minmax(0,1fr)!important}.store-metrics-total-section>section{padding:10px!important}.store-metrics-total-section .store-metrics-pies{min-height:280px!important}}
 </style><script id="metrics-standalone-init">if(new URLSearchParams(location.search).get('standaloneMetrics')==='1')document.documentElement.classList.add('metrics-standalone');</script><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script></head><body>
 <header class="header"><button class="brand" id="home"><img id="homeAvatar" src="./icons/recruit-180.png" alt="" onerror="this.style.display='none'"><span id="homeLabel">TOP</span></button><div class="header-actions"><button id="manualInterviewOpen" type="button">面接登録</button><button id="sound">通知設定</button></div></header>
 <section class="calendar" aria-label="月間カレンダー"><div class="cal-head"><button id="prev" aria-label="前月">◀</button><span id="month"></span><button id="next" aria-label="翌月">▶</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="days" id="days"></div></section>
@@ -1197,14 +1194,14 @@ const pie=panel('');pie.style.padding='8px';
 
 const pieRow=document.createElement('div');pieRow.className='store-metrics-pies';
 pieRow.style.cssText='display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;align-items:center;justify-items:center;width:100%;height:100%';
-function addMediaPie(title,counts,ready,rawCounts,targetRow=pieRow){
+function addMediaPie(title,counts,ready,rawCounts){
  const widget=document.createElement('div');widget.style.cssText='display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;width:100%;min-width:0;height:100%';
  const heading=document.createElement('div');heading.textContent=title;heading.style.cssText='font-size:13px;font-weight:700;color:#24354c;text-align:center';widget.append(heading);
  const total=[...counts.values()].reduce((a,b)=>a+b,0);
  if(!ready||!total){
   const empty=document.createElement('div');empty.textContent=!ready?(storeMetricsSheetsStatus==='error'?'面接データ取得失敗':storeMetricsSheetsStatus==='login-required'?'ログインが必要です':'データ取得中'):'該当データなし';
   empty.style.cssText='display:grid;place-items:center;width:250px;max-width:100%;aspect-ratio:1;border-radius:50%;background:#f0f3f7;color:#64748b;font-size:12px';
-  widget.append(empty);targetRow.append(widget);return;
+  widget.append(empty);pieRow.append(widget);return;
  }
  const segments=[...counts.entries()].sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],'ja'));
  let running=0;const stops=segments.map(([name,n])=>{const from=running;running+=100*n/total;return mediaColor(name)+' '+from+'% '+running+'%'});
@@ -1223,7 +1220,7 @@ function addMediaPie(title,counts,ready,rawCounts,targetRow=pieRow){
  circle.addEventListener('mousemove',showPieDetails);
  circle.addEventListener('click',showPieDetails);
  circle.addEventListener('mouseleave',()=>{tooltip.style.display='none'});
- holder.append(circle,tooltip);widget.append(holder);targetRow.append(widget);
+ holder.append(circle,tooltip);widget.append(holder);pieRow.append(widget);
 }
 addMediaPie('問い合わせ',mediaNow,lineReady,mediaNowRaw);
 addMediaPie('面接実施',attendedMedia,storeMetricsSheetsStatus==='ready',attendedMediaRaw);
@@ -1269,67 +1266,7 @@ if(storeMetricsSheetsStatus==='ready'){
 }
 chart.append(compare);root.append(chart);
 
-/* All-shop monthly summary: independent from the shop selector, below existing charts. */
-const totalSection=document.createElement('div');
-totalSection.className='store-metrics-total-section';
-totalSection.style.cssText='margin-top:14px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:stretch';
-const totalPiePanel=panel('');
-const totalPieRow=document.createElement('div');
-totalPieRow.className='store-metrics-pies';
-totalPieRow.style.cssText='display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;align-items:center;justify-items:center;width:100%;min-height:310px';
-const allMonthlyApplicants=lineInboxReadOnly.applicants.filter(a=>firstDate(a).slice(0,7)===month);
-const totalMediaInquiryRaw=mediaCounts(allMonthlyApplicants);
-const totalMediaAttendanceRaw=new Map();
-for(const sheet of storeMetricsSheets.filter(x=>attendanceStatuses.has(x.status)&&String(x.month||'')===month)){
- for(const name of sheetMediaNames(sheet.source))totalMediaAttendanceRaw.set(name,(totalMediaAttendanceRaw.get(name)||0)+1);
-}
-addMediaPie('問い合わせ',groupedMediaCounts(totalMediaInquiryRaw),lineInboxReadOnly.status==='ready',totalMediaInquiryRaw,totalPieRow);
-addMediaPie('面接実施',groupedMediaCounts(totalMediaAttendanceRaw),storeMetricsSheetsStatus==='ready',totalMediaAttendanceRaw,totalPieRow);
-totalPiePanel.append(totalPieRow);
-const totalStorePanel=panel('');
-const totalLegend=document.createElement('div');
-totalLegend.style.cssText='display:flex;gap:18px;flex-wrap:wrap;font-weight:700;font-size:12px;color:#24354c;margin:4px 0 17px';
-for(const [label,color] of [['問い合わせ','#1688F0'],['面接実施','#F24D99']]){
- const item=document.createElement('span');item.style.cssText='display:inline-flex;align-items:center;gap:7px';
- const sw=document.createElement('i');sw.style.cssText='display:inline-block;width:12px;height:12px;border-radius:3px;background:'+color;
- item.append(sw,document.createTextNode(label));totalLegend.append(item);
-}
-totalStorePanel.append(totalLegend);
-const storeEntries=Object.entries(accounts);
-const totalStores=storeEntries.map(([name,id])=>{
- const history=storeMetricsHistoricalMonthly.filter(x=>String(x.month||'').slice(0,7)===month&&x.account_id===id);
- const historicCount=history.reduce((sum,x)=>sum+(Number(x.estimated_count)||0),0);
- const recentCount=storeMetricsRecentInquiryMonthly===null?null:(Number(storeMetricsRecentInquiryMonthly[id+':'+month])||0);
- let inquiries=null;
- if(id!=='busty'){
-  if(month==='2026-10')inquiries=history.length&&recentCount!==null?historicCount+recentCount:null;
-  else if(month>'2026-10')inquiries=recentCount;
-  else if(history.length)inquiries=historicCount;
-  else if(lineInboxReadOnly.status==='ready')inquiries=allMonthlyApplicants.filter(a=>a.accountId===id).length;
- }
- const matches=liveInterviewLists.rows.filter(x=>(x.shop===name||(name==='LUXY'&&x.shop==='LUXY OSAKA'))&&String(x.date||'').slice(0,7)===month);
- const interviewsCount=liveInterviewLists.status==='ready'&&(month>='2026-10'||matches.length)?matches.filter(x=>attendanceStatuses.has(x.status)).length:null;
- return {name,inquiries,interviewsCount};
-});
-const maxStoreCount=Math.max(1,...totalStores.flatMap(x=>[x.inquiries,x.interviewsCount].filter(x=>typeof x==='number')));
-const totalGraph=document.createElement('div');
-totalGraph.style.cssText='display:flex;flex-direction:column;justify-content:space-around;gap:17px;min-height:265px';
-for(const item of totalStores){
- const group=document.createElement('div');group.style.cssText='display:flex;flex-direction:column;gap:5px;min-width:0';
- const name=document.createElement('strong');name.textContent=item.name;name.style.cssText='font-size:12px;color:#25354b';group.append(name);
- for(const [key,color] of [['inquiries','#1688F0'],['interviewsCount','#F24D99']]){
-  const val=item[key],row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:9px';
-  const track=document.createElement('div');track.style.cssText='flex:1;min-width:0;height:11px;background:#edf2f7;border-radius:4px;overflow:hidden';
-  const bar=document.createElement('div');bar.style.cssText='width:'+(typeof val==='number'?val/maxStoreCount*100:0)+'%;height:100%;background:'+color+';border-radius:4px;box-shadow:inset 0 1px rgba(255,255,255,.3)';
-  const number=document.createElement('span');number.textContent=typeof val==='number'?val+'件':'—';number.style.cssText='width:44px;flex:none;text-align:right;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;color:#24354c';
-  row.title=item.name+' '+(key==='inquiries'?'問い合わせ':'面接実施')+'：'+(typeof val==='number'?val+'件':'未取得');
-  track.append(bar);row.append(track,number);group.append(row);
- }
- totalGraph.append(group);
-}
-totalStorePanel.append(totalGraph);
-totalSection.append(totalPiePanel,totalStorePanel);
-root.append(totalSection);
+
 }
 function showHome(){document.getElementById('storeMetrics').hidden=true; currentPage='今日の予定';refreshInterviewLists(); $('registrationPanel').hidden=true;registrationSelectionSync=null;$('applicantDetail').hidden=true;detailReturn=null;$('todayPanel').hidden=false;$('sharedPanel').hidden=true;document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('active',x.dataset.page==='今日の予定'));$('todayDate').textContent=dateKey(now)}function showCommon(page){if(page==='集計頁'){document.getElementById('myPagePanel').hidden=true;showStoreMetrics();return}document.getElementById('myPagePanel').hidden=true;document.getElementById('storeMetrics').hidden=true;if(page==='来世期待')refreshAfterlifeList();if(page==='LINE通知'){syncLineNewCount(true);updateSidebarCounts()}else refreshInterviewLists();$('registrationPanel').hidden=true;registrationSelectionSync=null;$('applicantDetail').hidden=true;detailReturn=null;currentPage=page;pageNumber=1;$('listShopFilter').value='all';$('todayPanel').hidden=true;$('sharedPanel').hidden=false;renderList()}document.getElementById('listShopFilter').addEventListener('change',()=>{pageNumber=1;renderList()});const $=id=>document.getElementById(id),dateKey=d=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
 
