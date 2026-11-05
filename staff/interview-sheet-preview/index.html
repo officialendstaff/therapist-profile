@@ -1150,28 +1150,24 @@ const mediaColors={
  'エステクイーン':'#526CE0','Richセラピ':'#F1C04D','エステアイ':'#38A8DC',
  'メンエスリクルート':'#76B66D','HP':'#2699C8','02':'#D77A58','X':'#6E7D91','その他':'#B885D4'
 };
-/* Media chart labels: abbreviations only; full keys retained for counts/colors/tooltips. */
-const mediaChartShortLabels={
- 'エステ魂':'魂',
- 'メンズエステワーク':'ワーク',
- 'エステラブワーク':'ラブワ',
- 'リラクジョブ':'リラクジ',
- 'エステクイーン':'クイーン',
- 'Richセラピ':'Rich',
- 'エステアイ':'アイ',
- 'メンエスリクルート':'リクルー',
- 'バニラ':'バニラ',
- '02':'02',
- 'X':'X',
- 'その他':'その他',
- 'HP':'HP',
- 'オフィシャルHP':'HP',
- '記載なし':'記載なし'
+/* Display the full publication names in the media comparison graph. */
+const mediaChartFullLabels={
+ 'エステ魂':'エステ魂',
+ 'メンズエステワーク':'メンズエステワーク',
+ 'エステラブワーク':'エステラブワーク',
+ 'リラクジョブ':'リラクジョブ',
+ 'エステクイーン':'エステクイーン',
+ 'Richセラピ':'Richセラピ',
+ 'エステアイ':'エステアイ',
+ 'メンエスリクルート':'メンエスリクルート',
+ 'HP':'ホームページ',
+ 'オフィシャルHP':'ホームページ',
+ 'X':'X（旧Twitter）'
 };
 function mediaChartLabel(name){
  const full=String(name||'');
  if(full.startsWith('その他（')||full.startsWith('その他('))return 'その他';
- return mediaChartShortLabels[full]||full;
+ return mediaChartFullLabels[full]||full;
 }
 function mediaColor(name){
  if(Object.prototype.hasOwnProperty.call(mediaColors,name))return mediaColors[name];
@@ -1247,7 +1243,7 @@ if(storeMetricsSheetsStatus==='ready'){
  if(comparisonMedia.length>14)graph.style.gridTemplateRows='repeat('+Math.ceil(comparisonMedia.length/2)+',minmax(39px,1fr))';
  for(const name of comparisonMedia){
   const item=document.createElement('div');item.style.cssText='min-width:0;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:3px;overflow:hidden';
-  const heading=document.createElement('div');heading.textContent=mediaChartLabel(name);heading.title=name;heading.style.cssText='font-size:12px;font-weight:800;line-height:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#24354a';
+  const heading=document.createElement('div');heading.textContent=mediaChartLabel(name);heading.title=name;heading.style.cssText='font-size:12px;font-weight:800;line-height:15px;white-space:nowrap;color:#24354a';
   item.append(heading);
   for(const [period,count,color] of [['先月',priorMedia.get(name)||0,'#AEB7C5'],['当月',attendedMedia.get(name)||0,mediaColor(name)]]){
    const line=document.createElement('div');line.style.cssText='display:flex;align-items:center;gap:5px;min-width:0;height:9px';
