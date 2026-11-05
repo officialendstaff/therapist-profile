@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BUSTY OSAKA｜出勤管理</title>
+<style>
+:root{font-family:"Noto Sans JP",Arial,sans-serif;color:#1e2c40;background:#f0f3f7}*{box-sizing:border-box}body{margin:0;min-width:1180px}button,input,select{font:inherit}button{cursor:pointer;padding:8px 11px;border:1px solid #b6c6d8;border-radius:7px;background:#fff;color:#1c3858}button:disabled{opacity:.45;cursor:not-allowed}.hide{display:none!important}
+header{background:#1b304c;color:#fff;padding:11px 22px;display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:66px;position:sticky;top:0;z-index:20}
+.brand{display:flex;align-items:baseline;gap:12px;white-space:nowrap}.brand h1{font-size:19px;letter-spacing:.04em;margin:0}.brand span{font-size:9px;opacity:.6;letter-spacing:.14em}
+.controls{display:flex;align-items:center;gap:9px}.controls label{font-size:11px;color:#cbd8e8}.controls select{background:#2d4664;color:white;padding:8px;border:1px solid #526781;border-radius:6px;min-width:155px}.month{display:flex;align-items:center;gap:5px}.month strong{min-width:92px;text-align:center;font-size:13px}.month button{background:#294563;color:white;border-color:#4e6885}
+.panel{background:white;border:1px solid #dde5ef;border-radius:12px;padding:12px;margin:11px 14px;box-shadow:0 2px 8px #1b304c08}
+button.primary{background:#28659a;color:#fff;border-color:#28659a}.muted{font-size:12px;color:#64748b}.notice{padding:10px 12px;background:#fff3da;color:#79541c;border-radius:8px;font-size:12px}
+.headerbtn{background:#294563;color:#fff;border-color:#4e6885;font-size:12px}
+.month-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.month-heading h2{font-size:16px;margin:0}.filter{display:flex;gap:1px;background:#edf1f5;border-radius:7px;padding:3px}.filter button{border:0;background:transparent;font-size:11px;padding:6px 14px}.filter button.active{background:white;box-shadow:0 1px 4px #12365724;font-weight:700}
+.scroll{overflow:auto;max-height:calc(100vh - 205px);min-height:330px}.shift{border-collapse:separate;border-spacing:0;width:max-content;table-layout:fixed;font-size:12px}.shift th,.shift td{border-bottom:1px solid #e5ebf2;border-right:1px solid #edf2f6;text-align:center;height:46px;min-width:82px;width:82px;padding:5px 4px;white-space:nowrap}.shift th{position:sticky;top:0;background:#deebf8;z-index:4}.shift th:first-child,.shift td:first-child{position:sticky;left:0;min-width:172px;width:172px;text-align:left;background:#fff;z-index:6;padding-left:10px}.shift th:first-child{background:#deebf8;z-index:8}.shift th:nth-child(n+2):nth-child(-n+5),.shift td:nth-child(n+2):nth-child(-n+5){min-width:52px;width:52px;background:#f5f8fd}.shift td:nth-child(2),.shift th:nth-child(2){position:sticky;left:172px;z-index:5}.shift td:nth-child(3),.shift th:nth-child(3){position:sticky;left:224px;z-index:5}.shift td:nth-child(4),.shift th:nth-child(4){position:sticky;left:276px;z-index:5}.shift td:nth-child(5),.shift th:nth-child(5){position:sticky;left:328px;z-index:5}.shift th:nth-child(n+2):nth-child(-n+5){z-index:7}.shift .today{background:#e8f3ff}.shift .dummy{background:#faf4f6}.shift .group td{background:#dde9f4!important;font-weight:bold;position:static;text-align:left}.shift .staff{font-weight:700;font-size:13px}.shift small{font-size:10px;color:#74869b;display:block}.empty{text-align:center;color:#64748b;padding:34px}
+#login{max-width:430px;margin:70px auto;padding:22px}#login h2{margin-top:0}#login input{display:block;width:100%;padding:11px;margin:6px 0 14px;border:1px solid #cbd4e1;border-radius:7px}.error{color:#b12639}
+.dialog{position:fixed;inset:0;background:#11213999;z-index:30;display:grid;place-items:center}.dialog>section{background:white;border-radius:12px;padding:20px;min-width:500px;max-height:90vh;overflow:auto}.timeline{border-collapse:collapse;width:100%}.timeline td,.timeline th{padding:7px;border:1px solid #e1e7ef;text-align:center}.timeline th{background:#e9f0f9}
+</style></head>
+<body>
+<header><div class="brand"><h1>出勤管理</h1><span>SHIFT MANAGEMENT</span></div><div class="controls">
+<label>店舗 <select id="storeSelect"><option value="grand-luxe">Grand Luxe</option><option value="luxy-osaka">LUXY OSAKA</option><option value="rose">薔薇と紳士</option><option value="un-secret">Un Secret</option><option value="busty-osaka">BUSTY OSAKA</option></select></label>
+<div class="month"><button id="prev">◀</button><strong id="monthLabel"></strong><button id="next">▶</button></div>
+<button class="primary" disabled title="店舗別EXA同期は未接続です">今すぐ更新</button>
+<button id="reload" class="headerbtn">保存データを再読込</button>
+<button id="logout" class="headerbtn hide">ログアウト</button></div></header>
+<section id="login" class="panel hide"><h2>スタッフログイン</h2><p class="muted">面接管理で使用する承認済み管理者アカウントでログインしてください。</p><form id="loginForm"><label>メールアドレス<input id="email" type="email" autocomplete="username" required></label><label>パスワード<input id="password" type="password" autocomplete="current-password" required></label><button class="primary">ログイン</button></form><p class="error" id="loginError"></p></section>
+<main id="app" class="hide">
+<div class="notice">この店舗の出勤管理ページは準備済みです。EXA直接同期・CSV取込・接客本数編集・画像登録・アンケート連携は未接続です。薔薇と紳士のデータにはアクセスしません。</div>
+<section class="panel"><div class="month-heading"><h2>月間シフト</h2><div class="filter"><button data-filter="real" class="active">実働</button><button data-filter="dummy">ダミー</button><button data-filter="all">全件</button></div></div>
+<p id="message" class="muted"></p><div class="scroll"><table id="monthly" class="shift"></table><div id="empty" class="empty hide">この店舗の登録データはありません。EXA連携は未設定です。</div></div></section>
+</main>
+<div id="dayPanel" class="dialog hide"><section><div class="month-heading"><h2 id="dayTitle">日別タイムチャート</h2><button id="closeDay">閉じる ×</button></div><div id="timeline"></div></section></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+"use strict";
+const code="busty",slug="busty-osaka";
+const $=id=>document.getElementById(id);
+const url="https://vjjnkflbfsjihwzjsjpr.supabase.co",key="sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos";
+const client=window.supabase?.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,storage:localStorage,storageKey:"mattan-recruit-auth"}});
+const jst=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+let month=jst().slice(0,7),filter="real",staff=[],shifts=[],performance=[],authorized=false;
+const pad=n=>String(n).padStart(2,"0");
+const dates=()=>{const [year,m]=month.split("-").map(Number);return Array.from({length:new Date(year,m,0).getDate()},(_,i)=>month+"-"+pad(i+1))};
+$("storeSelect").value=slug;
+$("storeSelect").onchange=()=>{const v=$("storeSelect").value;location.href=v==="rose"?"../": "../"+v+"/"};
+function shiftTime(v){if(v===null||v===undefined)return "";const h=Math.floor(v/60),m=v%60;return h+":"+pad(m)}
+function makeCell(row,value,tag="td",cls=""){const cell=document.createElement(tag);cell.textContent=value;cell.className=cls;row.append(cell);return cell}
+function render(){
+ $("monthLabel").textContent=month.replace("-","年")+"月";
+ const days=dates(),table=$("monthly");table.replaceChildren();
+ const head=document.createElement("tr");["源氏名","出勤","接客","当欠","評価",...days.map(d=>String(+d.slice(8))+"日")].forEach(x=>makeCell(head,x,"th"));table.append(head);
+ const wanted=staff.filter(t=>filter==="all"||(filter==="dummy"?["dummy","dummy_use"].includes(t.residency||t.operating_category):!["dummy","dummy_use"].includes(t.residency||t.operating_category)));
+ for(const person of wanted){
+  const row=document.createElement("tr");const id=person.exa_id;
+  makeCell(row,person.stage_name||"ID "+id,"td","staff");
+  const entries=shifts.filter(s=>s.exa_id===id);
+  const done=performance.filter(p=>p.exa_id===id);
+  makeCell(row,String(entries.length));makeCell(row,String(done.reduce((n,p)=>n+(Number(p.customer_count)||0),0)));
+  makeCell(row,String(done.filter(p=>p.attendance_status==="absent").length));
+  makeCell(row,person.evaluation_score==null?"—":String(person.evaluation_score));
+  for(const d of days){const s=entries.find(x=>x.work_date===d);const cell=makeCell(row,s?shiftTime(s.start_minutes)+"-"+shiftTime(s.end_minutes):"");if(d===jst())cell.classList.add("today")}
+  table.append(row);
+ }
+ $("empty").classList.toggle("hide",wanted.length!==0);
+}
+async function load(){
+ if(!authorized)return;
+ $("message").textContent="保存済みデータを確認しています…";
+ const start=month+"-01",days=dates(),end=days[days.length-1];
+ const results=await Promise.all([
+ client.from("exa_shift_therapists").select("exa_id,stage_name,residency,operating_category,evaluation_score").eq("store_code",code),
+ client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes").eq("store_code",code).gte("work_date",start).lte("work_date",end),
+ client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code",code).gte("work_date",start).lte("work_date",end)
+ ]);
+ const error=results.find(x=>x.error)?.error;
+ if(error){$("message").textContent="取得できませんでした："+error.message;staff=[];shifts=[];performance=[];render();return}
+ [staff,shifts,performance]=results.map(x=>x.data||[]);
+ $("message").textContent="";render();
+}
+async function loginCheck(){
+ if(!client){$("login").classList.remove("hide");$("loginError").textContent="認証ライブラリを読み込めません";return}
+ const {data:{session}}=await client.auth.getSession();
+ if(!session){$("login").classList.remove("hide");$("app").classList.add("hide");return}
+ const [profile,access]=await Promise.all([
+ client.from("recruit_staff_profiles").select("role,approved_at").eq("user_id",session.user.id).maybeSingle(),
+ client.rpc("can_link_therapist_interview")
+ ]);
+ if(profile.error||access.error||access.data!==true||!profile.data?.approved_at||!["master","full"].includes(profile.data.role)){
+  $("login").classList.remove("hide");$("app").classList.add("hide");$("loginError").textContent="このページへの権限がありません。";return
+ }
+ authorized=true;$("login").classList.add("hide");$("app").classList.remove("hide");$("logout").classList.remove("hide");await load();
+}
+$("loginForm").onsubmit=async e=>{e.preventDefault();$("loginError").textContent="認証中…";const {error}=await client.auth.signInWithPassword({email:$("email").value,password:$("password").value});if(error){$("loginError").textContent="ログインできません。入力情報をご確認ください。";return}$("loginError").textContent="";await loginCheck()};
+$("logout").onclick=async()=>{await client.auth.signOut();sessionStorage.removeItem("mattan-recruit-auth");location.reload()};
+$("prev").onclick=()=>{const [y,m]=month.split("-").map(Number),d=new Date(y,m-2,1);month=d.getFullYear()+"-"+pad(d.getMonth()+1);void load()};
+$("next").onclick=()=>{const [y,m]=month.split("-").map(Number),d=new Date(y,m,1);month=d.getFullYear()+"-"+pad(d.getMonth()+1);void load()};
+$("reload").onclick=()=>void load();
+document.querySelectorAll("[data-filter]").forEach(b=>b.onclick=()=>{filter=b.dataset.filter;document.querySelectorAll("[data-filter]").forEach(x=>x.classList.toggle("active",x===b));render()});
+$("closeDay").onclick=()=>$("dayPanel").classList.add("hide");
+$("dayPanel").onclick=e=>{if(e.target===$("dayPanel"))$("closeDay").click()};
+loginCheck();
+})();
+</script></body></html>
