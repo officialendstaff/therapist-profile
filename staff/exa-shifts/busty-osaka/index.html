@@ -359,7 +359,7 @@ footer{display:none}
 <button id="reload">保存データを再読込</button>
 <button id="unscheduledAdd" title="EXA登録画面でIDと源氏名を確認した人だけ追加。出勤データは変更しません">出勤予定なしのEXA登録者を追加</button>
 <button id="csvImport">EXA CSV取込・更新</button><input id="csvFile" type="file" accept=".csv,text/csv" style="display:none">
-<button id="serverTest" disabled title="BUSTYのサーバー認証が未設定です">サーバー30日検証</button>
+<button id="serverTest" title="BUSTY専用EXAサーバーログイン・30日分の読み取り専用検証">サーバー30日検証</button>
 <button id="autoSync" disabled title="BUSTY自動同期は未接続です">ブラウザ自動：OFF</button>
 </div></details><span id="authLabel" class="muted login-tag" style="color:#d5e1f1"></span><button id="logout" class="hide">ログアウト</button>
 </div></header>
@@ -901,7 +901,7 @@ $("prev").onclick=()=>{const d=new Date(month+"-01T00:00:00");d.setMonth(d.getMo
 $("next").onclick=()=>{const d=new Date(month+"-01T00:00:00");d.setMonth(d.getMonth()+1);month=[d.getFullYear(),String(d.getMonth()+1).padStart(2,"0")].join("-");load()};
 $("reload").onclick=load;
 // Direct EXA synchronization for BUSTY is intentionally not activated.
-$("exaSync").disabled=true;$("autoSync").disabled=true;$("serverTest").disabled=true;
+$("exaSync").disabled=true;$("autoSync").disabled=true;
 // Manual bridge for EXA registrations not included in a 30-day schedule snapshot.
 // It never changes existing rows, shifts or roster classifications.
 $("unscheduledAdd").onclick=async()=>{
@@ -929,6 +929,30 @@ $("unscheduledAdd").onclick=async()=>{
   showMsg("EXA ID "+id+"（"+name+"）を追加しました。出勤予定のない人は「実働外」と表示されます。");
  }catch(err){showMsg("EXA登録者の追加に失敗："+String(err.message||err),true);}
  finally{button.disabled=false;}
+};
+$("serverTest").onclick=async()=>{
+ if(!authorized)return;
+ const btn=$("serverTest");btn.disabled=true;
+ try{
+  showMsg("BUSTY EXAへ接続し、30日分を読み取り専用で確認しています…");
+  const {data:{session}}=await client.auth.getSession();
+  if(!session)throw Error("管理者ログインが必要です");
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),120000);
+  let res;
+  try{
+   res=await fetch(URL_SB+"/functions/v1/exa-busty-auth-check",{
+    method:"POST",signal:controller.signal,
+    headers:{"Content-Type":"application/json","apikey":KEY_SB,"Authorization":"Bearer "+session.access_token},
+    body:"{}"
+   });
+  }finally{clearTimeout(timer)}
+  const result=await res.json();
+  if(!res.ok)throw Error(result.error||"接続に失敗しました（HTTP "+res.status+"）");
+  if(!result.ok)throw Error(result.stage==="secrets_missing"?"BUSTY用Secretsを読み取れません":("段階："+(result.stage||"unknown")+"／日数："+(result.day||0)+"／原因："+(result.reason||"unknown")+(result.structure?"／画面診断："+JSON.stringify(result.structure):"")));
+  if(result.stage!=="snapshot_compared")throw Error("30日分の検証は未完了です");
+  showMsg("BUSTYの30日読取成功："+result.first+"〜"+result.last+"／"+result.imported+"件。保存済み"+result.existing+"件／新規"+result.additions+"件／変更"+result.updates+"件／取消候補"+result.removals+"件。書き込みはしていません。");
+ }catch(e){showMsg("BUSTYサーバー検証失敗："+(e.name==="AbortError"?"120秒でタイムアウトしました":String(e.message||e)),true)}
+ finally{btn.disabled=false}
 };
 $("csvImport").onclick=()=>{if(!authorized)return;$("csvFile").click()};
 $("csvFile").onchange=async e=>{
