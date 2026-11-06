@@ -38,6 +38,62 @@ main{max-width:1340px;margin:0 auto;padding:26px clamp(12px,3vw,36px) 40px}
 .list-wrap a{color:#2869a6;font-weight:700}.empty{color:#7488a0;text-align:center;padding:28px 10px!important}.pill{display:inline-block;border-radius:12px;background:#e8f0fb;padding:3px 9px;font-size:11px;color:#32649a}
 @media(max-width:850px){.dashboard{grid-template-columns:1fr}.panel{min-height:170px}.menus{gap:10px}main{padding-top:18px}}
 @media(max-width:530px){header{padding:14px}.brand{font-size:17px}.page-head h1{font-size:19px}.panel{padding:18px}.menu-card{padding:16px;min-height:116px}.menu-card strong{font-size:15px}.menu-card small{font-size:10px}.dialog-head{padding:15px}.filters{padding:10px}.list-wrap{padding:0 10px 14px}.list-wrap td{padding:11px 7px;font-size:11px}}
+
+/* B: Dark navy / champagne gold — presentation only; existing workflows unchanged */
+:root{--top-navy:#17283E;--top-navy-hover:#253C58;--top-gold:#C4A06A;--top-gold-soft:#E9DCC8;--top-canvas:#F6F5F2;--top-line:#E5DFD5;--top-muted:#746F68;background:var(--top-canvas);color:#283344}
+body{background:var(--top-canvas)}
+header{background:var(--top-navy);border-bottom:2px solid var(--top-gold);padding:19px clamp(18px,3vw,44px)}
+.brand{letter-spacing:.065em;font-size:22px}.brand small{color:#D6BB8C;font-size:10px;letter-spacing:.19em;margin-top:4px}
+.header-right span{color:#E0DACF}
+.header-right button{border:1px solid #8C806F;color:#F9F4ED;background:#27384C;border-radius:8px;min-height:40px;padding:9px 17px;font-weight:650}
+.header-right button:hover{background:#384D66;border-color:var(--top-gold)}
+main{max-width:1260px;padding:30px clamp(14px,3vw,36px) 52px}
+.page-head{margin-bottom:22px}.page-head h1{font-size:25px;letter-spacing:.015em;color:var(--top-navy)}
+.page-head p{margin-top:7px;color:#80796D}
+.refresh{min-height:42px;padding:9px 17px;background:#fff;color:#65543C;border:1px solid #D9CBB7;border-radius:8px;font-size:12px;font-weight:700;box-shadow:0 1px 4px #1422360c}
+.refresh:hover{border-color:var(--top-gold);background:#F8F3E9}
+.dashboard{gap:16px}
+.panel,.menu-card{border-color:var(--top-line);border-radius:13px;box-shadow:0 4px 14px #17283e0b,0 1px 2px #17283e09;background:#fff}
+.panel{padding:22px 23px 20px;gap:14px;min-height:218px;position:relative;overflow:hidden}
+.panel::before{content:"";position:absolute;inset:0 auto auto 0;width:100%;height:3px;background:#C4A06A}
+.panel:nth-child(1)::before{background:#BD8059}
+.panel:nth-child(2)::before{background:#8496A9}
+.panel:nth-child(3)::before{background:#C4A06A}
+.panel h2{display:flex;align-items:center;gap:8px;font-size:17px;font-weight:750;color:var(--top-navy)}
+.panel h2 span{font-size:22px;line-height:1.2;margin:0;color:var(--top-gold)}
+.panel:first-child h2 span{color:#B77F55}.panel:nth-child(2) h2 span{color:#7389A2}
+.panel .count{font-size:49px;line-height:1.04;letter-spacing:-.035em;color:var(--top-navy)}
+.panel .count small{font-size:14px;letter-spacing:0;color:#8B877F;margin-left:7px}
+.panel .sub{font-size:11px;color:#7B7A77;line-height:1.45;min-height:28px}
+.panel button{display:block;width:100%;min-height:44px;margin-top:auto;padding:11px 14px;background:var(--top-navy);color:#fff;border:1px solid var(--top-navy);border-radius:8px;font-size:13px;font-weight:750;letter-spacing:.035em;box-shadow:0 2px 6px #17283e1b;transition:background .15s,transform .15s,box-shadow .15s}
+.panel button:hover{background:var(--top-navy-hover);transform:translateY(-1px);box-shadow:0 4px 9px #17283e26}
+.panel button:focus-visible,.menu-card:focus-visible,.refresh:focus-visible{outline:3px solid #C7A673;outline-offset:3px}
+.section-heading{margin:31px 0 14px;color:#746044;font-size:12px;font-weight:800;letter-spacing:.13em}
+.menus{gap:16px}
+.menu-card{min-height:133px;padding:21px 24px;gap:10px;justify-content:center;overflow:hidden}
+.menu-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent;transition:background .15s}
+.menu-card:hover{border-color:#CBB797;background:#FFFDF9;box-shadow:0 8px 22px #17283e13;transform:translateY(-2px)}
+.menu-card:hover::before{background:var(--top-gold)}
+.menu-card .icon{display:flex;align-items:center;justify-content:center;width:39px;height:39px;border-radius:10px;background:#F4EDE2;color:#987648;font-size:24px;line-height:1}
+.menu-card strong{font-size:18px;color:var(--top-navy);font-weight:800;letter-spacing:.015em}
+.menu-card small{font-size:12px;color:#777974}
+.menu-card .arrow{top:25px;right:24px;color:#A58A62;font-size:18px}
+.login-wrap{background:var(--top-canvas)}
+.login-card{border-color:var(--top-line);box-shadow:0 18px 48px #17283e13}
+.login-card h1{color:var(--top-navy)}
+.login-card button{background:var(--top-navy);min-height:45px;border-radius:8px}
+.login-card button:hover{background:var(--top-navy-hover)}
+.dialog{border:1px solid #D8CFC2;box-shadow:0 20px 65px #111d31a1}
+.dialog-head{background:#FCFAF6;border-bottom-color:var(--top-line)}
+.dialog-head h2{color:var(--top-navy)}
+.close{border-color:#D1C3AD;color:#62523C;min-height:38px}
+.filters{background:#FFFDF9;border-bottom-color:var(--top-line)}
+.filters input:focus,.filters select:focus{outline:2px solid #B89B6D;outline-offset:1px}
+.list-wrap th{background:#EFEAE2;color:#65533C}
+.list-wrap tr:hover td{background:#FBF8F2}
+.list-wrap a{color:#8E6834}
+@media(max-width:850px){.dashboard{grid-template-columns:1fr}.panel{min-height:182px;gap:11px}.panel .sub{min-height:0}.menus{gap:12px}main{padding-top:22px}}
+@media(max-width:530px){header{padding:15px 14px}.brand{font-size:18px}.page-head h1{font-size:21px}.page-head{gap:8px}.refresh{font-size:11px;padding:8px 10px}.panel{padding:18px;min-height:175px}.panel .count{font-size:43px}.panel button{min-height:44px}.menu-card{padding:16px 17px;min-height:119px;gap:7px}.menu-card .icon{width:34px;height:34px;font-size:21px}.menu-card strong{font-size:15px}.menu-card small{font-size:10px}.menu-card .arrow{right:14px;top:17px}}
 </style></head>
 <body>
 <header><div class="brand">L GROUP<small>MANAGEMENT SYSTEM</small></div><div class="header-right"><span id="userName"></span><button id="logout" class="hidden">ログアウト</button></div></header>
