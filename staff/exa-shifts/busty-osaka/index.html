@@ -163,10 +163,7 @@ footer{display:none}
 .shift-table tbody tr.outside-roster td.today{
   box-shadow:inset 2px 0 #4380b7,inset -2px 0 #4380b7!important;
 }
-.outside-label{
-  display:inline-block;margin-top:3px;margin-left:2px;padding:1px 4px;
-  border-radius:3px;background:#d0d8e2;color:#485a6d;font-size:9px;font-weight:700;
-}
+.outside-label{display:none!important}
 .shift-table tbody tr:not(.group) td.stat-cell.score-high{background:#e0f3e8!important;color:#217048!important;font-weight:800}
 .shift-table tbody tr:not(.group) td.stat-cell.score-low{background:#fff0d9!important;color:#a4611d!important;font-weight:800}
 
@@ -998,7 +995,7 @@ $("unscheduledAdd").onclick=async()=>{
   const result=await client.from("exa_shift_therapists").insert({store_code:"busty",exa_id:id,stage_name:name}).select("exa_id,stage_name").single();
   if(result.error)throw result.error;
   await load();
-  showMsg("EXA ID "+id+"（"+name+"）を追加しました。出勤予定のない人は「実働外」と表示されます。");
+  showMsg("EXA ID "+id+"（"+name+"）を追加しました。出勤予定のない人は氏名セルの配色で判別できます。");
  }catch(err){showMsg("EXA登録者の追加に失敗："+String(err.message||err),true);}
  finally{button.disabled=false;}
 };
