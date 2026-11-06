@@ -523,7 +523,7 @@ let staffView="real";
 function renderMonthly(){
 const existing=staffById(), byId=new Map();
 for(const r of shifts){if(!byId.has(r.exa_id))byId.set(r.exa_id,new Map());byId.get(r.exa_id).set(r.work_date,r);}
-const real=therapists.filter(t=>t.operating_category!=="not_used"&&t.operating_category!=="dummy_use").sort((a,b)=>Number(byId.has(b.exa_id))-Number(byId.has(a.exa_id))||a.exa_id-b.exa_id);
+const real=therapists.filter(t=>t.operating_category!=="not_used"&&t.operating_category!=="dummy_use").sort((a,b)=>a.exa_id-b.exa_id);
 const dummy=therapists.filter(t=>t.operating_category==="dummy_use").sort((a,b)=>a.exa_id-b.exa_id);
 const per=new Map(performances.map(p=>[p.exa_id+"|"+p.work_date,p.customer_count]));
 const absence=new Set(performances.filter(p=>p.attendance_status==="absent").map(p=>p.exa_id+"|"+p.work_date));
