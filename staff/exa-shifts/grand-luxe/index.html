@@ -101,6 +101,7 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 .shift td.staff.state-unconfirmed{background:#fff6e5!important;box-shadow:inset 4px 0 #d39d34;color:#674b17}
 .shift td.staff.state-unconfirmed small{color:#a17831}
 .exa-hidden-flag{display:inline-block;margin-left:7px;color:#b13945;font-size:10px;font-weight:750}
+.shift td.pre-off,.shift td.pre-off.today{background:#f0e4fa!important;color:#6a338d!important;font-weight:800!important}
 </style></head>
 <body>
 <header class="lg-common-header"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ移動" aria-label="総合管理TOPへ移動"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span id="lgHeaderHomeLabel">総合 TOP</span></a><div class="controls">
@@ -155,10 +156,19 @@ function render(){
 
   const entries=shifts.filter(s=>s.exa_id===id);
   const done=performance.filter(p=>p.exa_id===id);
-  makeCell(row,String(entries.length));makeCell(row,performance.length?String(done.reduce((n,p)=>n+(Number(p.customer_count)||0),0)):"—");
+  makeCell(row,String(entries.filter(x=>!x.is_pre_off).length));makeCell(row,performance.length?String(done.reduce((n,p)=>n+(Number(p.customer_count)||0),0)):"—");
   makeCell(row,performance.length?String(done.filter(p=>p.attendance_status==="absent").length):"—");
   makeCell(row,person.evaluation_score==null?"—":String(person.evaluation_score));
-  for(const d of days){const s=entries.find(x=>x.work_date===d);const cell=makeCell(row,s?shiftTime(s.start_minutes)+"-"+shiftTime(s.end_minutes):"");if(d===jst())cell.classList.add("today")}
+  for(const d of days){
+   const entry=entries.find(x=>x.work_date===d);
+   const value=entry?(entry.is_pre_off?"事前":shiftTime(entry.start_minutes)+"-"+shiftTime(entry.end_minutes)):"";
+   const cell=makeCell(row,value);
+   if(entry?.is_pre_off){
+     cell.classList.add("pre-off");
+     cell.title="EXAで休みが選択され、事前に入力された時間枠";
+   }
+   if(d===jst())cell.classList.add("today");
+  }
   table.append(row);
  }
  $("empty").classList.toggle("hide",wanted.length!==0);
@@ -169,14 +179,15 @@ async function load(){
  const start=month+"-01",days=dates(),end=days[days.length-1];
  const results=await Promise.all([
  client.from("exa_shift_therapists").select("exa_id,stage_name,residency,operating_category,evaluation_score,exa_is_visible,exa_list_position").eq("store_code",code),
- client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes").eq("store_code",code).gte("work_date",start).lte("work_date",end),
+ client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_pre_off").eq("store_code",code).gte("work_date",start).lte("work_date",end),
  client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code",code).gte("work_date",start).lte("work_date",end)
  ]);
  const error=results.find(x=>x.error)?.error;
  if(error){$("message").textContent="取得できませんでした："+error.message;staff=[];shifts=[];performance=[];render();return}
  [staff,shifts,performance]=results.map(x=>x.data||[]);
  const unknownCount=staff.filter(isUnconfirmed).length,hiddenCount=staff.filter(t=>t.exa_is_visible===false).length;
- $("message").textContent=staff.length+"名登録 ｜ 未分類 "+unknownCount+"名 ｜ EXA非表示 "+hiddenCount+"名"+(shifts.length?" ｜ シフト "+shifts.length+"件":" ｜ シフト未取込");
+ const regularCount=shifts.filter(x=>!x.is_pre_off).length,preOffCount=shifts.filter(x=>x.is_pre_off).length;
+ $("message").textContent=staff.length+"名登録 ｜ 未分類 "+unknownCount+"名 ｜ EXA非表示 "+hiddenCount+"名 ｜ 確認済み出勤 "+regularCount+"件 ｜ 事前 "+preOffCount+"件";
  render();
 }
 async function loginCheck(){
