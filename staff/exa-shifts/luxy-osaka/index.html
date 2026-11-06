@@ -1022,19 +1022,11 @@ let autoEnabled=false;
 const asTokyoDate=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
 function paintAuto(){
  $("autoSync").textContent="ブラウザ自動：未接続";
- $("autoSync").title="この画面を開いている間に3時間おきにサーバー同期します。画面を閉じていても別途サーバー定期同期が動作します。";
+ $("autoSync").title="EXAサーバー認証が未設定のため自動更新は開始していません。";
  $("autoSync").setAttribute("aria-pressed",String(autoEnabled));
 }
 paintAuto();
-$("autoSync").onclick=()=>{
- autoEnabled=!autoEnabled;
- localStorage.setItem(AUTO_KEY,autoEnabled?"on":"off");
- if(autoEnabled && !localStorage.getItem(LAST_KEY)){
-   localStorage.setItem(LAST_KEY,String(Date.now()));
- }
- paintAuto();
- showMsg(autoEnabled?"3時間自動更新を有効にしました。このページを開いている間、3時間おきに更新します。":"3時間自動更新を停止しました。");
-};
+$("autoSync").onclick=()=>showMsg("EXAサーバー認証が未設定です。",true);
 
 const bridgeRequests=new Map();
 let syncAbortRequested=false;
