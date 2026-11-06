@@ -1025,7 +1025,7 @@ let autoEnabled=localStorage.getItem(AUTO_KEY)==="on";
 const asTokyoDate=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
 function paintAuto(){
  $("autoSync").textContent=autoEnabled?"ブラウザ自動：ON":"ブラウザ自動：OFF";
- $("autoSync").title="薔薇と紳士と同じ方式：このページを開いている間、3時間ごとにEXAサーバーへの同期を試みます。Grand LuxeのEXAサーバー接続は未検証で、ページを閉じた状態の定期実行は未設定です。";
+ $("autoSync").title="管理ページ表示中、3時間ごとにサーバー同期を試みます。サーバー読取に失敗した場合、Chrome拡張v1.1が導入済みなら代替読取を行います。画面を閉じた状態の定期実行は未設定です。";
  $("autoSync").setAttribute("aria-pressed",String(autoEnabled));
 }
 paintAuto();
