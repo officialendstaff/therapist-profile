@@ -1636,7 +1636,23 @@ window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===
   #adminAuthDialog button:focus-visible {outline:3px solid rgba(86,141,195,.45);outline-offset:2px;}
 }
 </style>
+<style id="lg-interview-account-menu-style-20261107">
+.header-actions{position:relative}
+.header-actions #adminAuthOpen.header-account-control{height:34px!important;min-height:34px!important;box-sizing:border-box!important;padding:0 12px!important;border:0!important;border-radius:5px!important;background:#e8edf5!important;color:#263c58!important;font-family:Arial,"Noto Sans JP",sans-serif!important;font-size:12px!important;font-weight:700!important;line-height:1.3!important}
+.header-actions #adminAuthOpen.header-account-control::after{content:" ▾";font-size:10px;color:#60748c}
+.header-actions .lg-interview-account-popup{position:absolute;z-index:1000;top:calc(100% + 9px);right:0;min-width:220px;box-sizing:border-box;padding:10px;border:1px solid #c9d6e5;border-radius:8px;background:#fff;color:#20344e;box-shadow:0 10px 30px #0f24354d;text-align:left;white-space:normal}
+.header-actions .lg-interview-account-popup[hidden]{display:none!important}
+.header-actions .lg-interview-account-popup strong{display:block;padding:8px 8px 11px;margin-bottom:7px;border-bottom:1px solid #dde5ee;color:#20344e;font-size:12px;font-weight:700}
+.header-actions .lg-interview-account-popup button{box-sizing:border-box;display:block!important;width:100%;min-height:36px;height:auto!important;margin:0!important;padding:9px 10px!important;border:0!important;border-radius:5px!important;background:transparent!important;color:#253b55!important;text-align:left;font-size:12px!important;font-weight:600!important;line-height:1.4!important;box-shadow:none!important;cursor:pointer}
+.header-actions .lg-interview-account-popup button:hover{background:#edf3fa!important}
+html.personal-mobile-embed .lg-interview-account-popup{display:none!important}
+</style>
 <button id="adminAuthOpen" type="button">ログイン</button>
+<div id="lgInterviewAccountMenu" class="lg-interview-account-popup" hidden role="group" aria-label="アカウント操作">
+<strong id="lgInterviewAccountIdentity">認証確認中</strong>
+<button type="button" id="lgInterviewAccountScreen">アカウント画面</button>
+<button type="button" id="lgInterviewAccountLogout">ログアウト</button>
+</div>
 <div id="adminAuthDialog" role="dialog" aria-modal="true" aria-label="面接管理ログイン"><div class="auth-card">
 <aside class="auth-brand-panel" aria-hidden="true">
 <div class="auth-brand-top"><div class="auth-brand-symbol">L</div><div class="auth-brand-name">L GROUP<small>INTERNAL MANAGEMENT</small></div></div>
@@ -1660,6 +1676,14 @@ window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===
  const auth=supabase.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,storage:window.localStorage,storageKey:'mattan-recruit-auth'}});
  const el=id=>document.getElementById(id),dialog=el('adminAuthDialog'),open=el('adminAuthOpen'),message=el('adminAuthMessage'),logout=el('adminAuthLogout'),form=el('adminAuthForm');
  document.querySelector('.header-actions')?.appendChild(open);open.classList.add('header-account-control');
+ const accountMenu=el('lgInterviewAccountMenu');
+ document.querySelector('.header-actions')?.appendChild(accountMenu);
+ const accountName=el('lgInterviewAccountIdentity');
+ const setAccountExpanded=expanded=>{accountMenu.hidden=!expanded;open.setAttribute('aria-expanded',String(expanded))};
+ document.addEventListener('click',event=>{if(!accountMenu.hidden&&!accountMenu.contains(event.target)&&event.target!==open)setAccountExpanded(false)});
+ document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!accountMenu.hidden){setAccountExpanded(false);open.focus()}});
+ el('lgInterviewAccountScreen').onclick=()=>{setAccountExpanded(false);dialog.classList.add('open')};
+ el('lgInterviewAccountLogout').onclick=()=>{setAccountExpanded(false);logout.click()};
  let mode='admin',role=null;
  const mobileEmbedded=new URLSearchParams(location.search).get('personalMobile')==='1'&&window.parent!==window;
  // The iframe remains independently authenticated by Supabase. Copy an existing
@@ -1704,11 +1728,14 @@ window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===
  }
  function choose(next){mode=next;const staff=mode==='staff';el('adminEmailRow').hidden=staff;el('adminPasswordRow').hidden=staff;el('staffPasswordRow').hidden=!staff;form.elements.email.disabled=staff;form.elements.password.disabled=staff;form.elements.staffPassword.disabled=!staff;el('authHelp').textContent=staff?'スタッフ共通PASSでログインしてください。':'個人面接管理ページと同じID・PASSを使用します。';el('chooseAdmin').style.background=staff?'#fff':'#d9e9f9';el('chooseStaff').style.background=staff?'#d9e9f9':'#fff';el('chooseAdmin').setAttribute('aria-pressed',String(!staff));el('chooseStaff').setAttribute('aria-pressed',String(staff));message.textContent=''}
  el('chooseAdmin').onclick=()=>choose('admin');el('chooseStaff').onclick=()=>choose('staff');choose('admin');
- function apply(next,name,profileKey){const avatar=document.getElementById('homeAvatar'),label=document.getElementById('homeLabel');const names={owner:'村上',president:'社長',ota:'オオタ',festival:'お祭り'};const key=profileKey||'';window.interviewCurrentProfileKey=next==='admin'?key:null;label.textContent=next==='admin'?(names[key]||name||'管理者')+' TOP':'TOP';avatar.src=next==='admin'&&key==='owner'?'./icons/murakami-pc.webp':'./icons/recruit-180.png';avatar.style.display='block';role=next;window.interviewAdminAuthorized=next==='admin';window.interviewStaffAuthorized=next==='staff';document.body.classList.toggle('interview-admin-locked',!next);window.dispatchEvent(new Event('interview-auth-ready'));open.textContent=next?'アカウント':'ログイン';open.style.display='';logout.hidden=!next;document.querySelectorAll('#nav button').forEach(b=>{if(b.dataset.page==='Interview Sheet'||b.dataset.page==='集計頁')b.hidden=next==='staff'});if(next==='staff'&&document.querySelector('.main-panel')?.classList.contains('sheet-mode')){document.querySelector('.main-panel').classList.remove('sheet-mode');window.interviewLocalHome?.()}}
+ function apply(next,name,profileKey){const avatar=document.getElementById('homeAvatar'),label=document.getElementById('homeLabel');const names={owner:'村上',president:'社長',ota:'オオタ',festival:'お祭り'};const key=profileKey||'';window.interviewCurrentProfileKey=next==='admin'?key:null;label.textContent=next==='admin'?(names[key]||name||'管理者')+' TOP':'TOP';avatar.src=next==='admin'&&key==='owner'?'./icons/murakami-pc.webp':'./icons/recruit-180.png';avatar.style.display='block';role=next;window.interviewAdminAuthorized=next==='admin';window.interviewStaffAuthorized=next==='staff';document.body.classList.toggle('interview-admin-locked',!next);window.dispatchEvent(new Event('interview-auth-ready'));open.textContent=next?'アカウント':'ログイン';open.style.display='';logout.hidden=!next;
+ setAccountExpanded(false);
+ const menuNames={owner:'村上',president:'社長',ota:'オオタ',festival:'お祭り'};
+ accountName.textContent=next==='admin'?(menuNames[key]||name||'管理者')+'｜管理者':'スタッフ｜閲覧専用';document.querySelectorAll('#nav button').forEach(b=>{if(b.dataset.page==='Interview Sheet'||b.dataset.page==='集計頁')b.hidden=next==='staff'});if(next==='staff'&&document.querySelector('.main-panel')?.classList.contains('sheet-mode')){document.querySelector('.main-panel').classList.remove('sheet-mode');window.interviewLocalHome?.()}}
  async function exchangeAdminToken(){const {data:{session}}=await auth.auth.getSession();if(!session?.access_token)throw Error('管理者セッションがありません');const res=await fetch(staffApi,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},cache:'no-store',body:JSON.stringify({action:'admin_exchange'})});const data=await res.json();if(!res.ok||!data.token)throw Error('データ接続の認証に失敗しました（HTTP '+res.status+' / '+String(data.error||'token_missing')+'）');sessionStorage.setItem('interview_staff_session_v2',data.token);localStorage.removeItem('interview_staff_session_v2');void Promise.allSettled([window.interviewMobileRefresh?.lists?.(),window.interviewNewLineReadOnly?.refresh?.(),window.interviewMobileRefresh?.sheets?.()]);return data.token}
  async function adminProfile(){const {data:{user}}=await auth.auth.getUser();if(!user)return null;const {data,error}=await auth.rpc('interview_my_profile');if(error)return null;const profile=Array.isArray(data)?data[0]:data;return ['president','ota','owner','festival'].includes(profile?.profile_key)?profile:null}
  async function restore(){const p=await adminProfile();if(p){try{await exchangeAdminToken();if(redirectMobileAdmin(p.profile_key))return true;apply('admin',p.display_name,p.profile_key);return true}catch(e){console.error('管理者データ認証',e);apply(null);message.textContent='データ接続の認証に失敗しました：'+String(e?.message||e);return false}}if(mobileEmbedded)return false;const token=sessionStorage.getItem('interview_staff_session_v2')||localStorage.getItem('interview_staff_session_v2');if(token){try{const res=await fetch(staffApi,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify',token})});if(res.ok){sessionStorage.setItem('interview_staff_session_v2',token);apply('staff');return true}}catch(e){}sessionStorage.removeItem('interview_staff_session_v2');localStorage.removeItem('interview_staff_session_v2')}apply(null);if(window.self===window.top){location.replace('/therapist-profile/staff/management-top/');return true}return false}
- open.onclick=()=>dialog.classList.add('open');el('adminAuthCancel').onclick=()=>{if(role)dialog.classList.remove('open');else message.textContent='ログインが必要です。'};
+ open.onclick=()=>{if(!role){dialog.classList.add('open');return;}setAccountExpanded(accountMenu.hidden)};el('adminAuthCancel').onclick=()=>{if(role)dialog.classList.remove('open');else message.textContent='ログインが必要です。'};
  form.onsubmit=async e=>{e.preventDefault();message.textContent='認証しています…';el('authSubmit').disabled=true;try{if(mode==='admin'){const {error}=await auth.auth.signInWithPassword({email:form.elements.email.value.trim(),password:form.elements.password.value});if(error)throw Error('IDまたはPASSが正しくありません。');const p=await adminProfile();if(!p){await auth.auth.signOut({scope:'local'});throw Error('管理者アカウントではありません。')}await exchangeAdminToken();if(redirectMobileAdmin(p.profile_key))return;location.href='../management-top/';return;}else{const res=await fetch(staffApi,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'login',password:form.elements.staffPassword.value})});const data=await res.json();if(!res.ok||!data.token)throw Error('スタッフ共通PASSが正しくありません。');sessionStorage.setItem('interview_staff_session_v2',data.token);localStorage.setItem('interview_staff_session_v2',data.token);apply('staff')}message.textContent='';form.reset();dialog.classList.remove('open')}catch(err){message.textContent=err.message||'ログインできませんでした。'}finally{el('authSubmit').disabled=false}};
  logout.onclick=async()=>{if(role==='admin'){await auth.auth.signOut({scope:'local'});sessionStorage.removeItem('mattan-recruit-auth')}sessionStorage.removeItem('interview_staff_session_v2');localStorage.removeItem('interview_staff_session_v2');apply(null);dialog.classList.add('open')};
  document.body.classList.add('interview-admin-locked');
@@ -1724,6 +1751,11 @@ window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===
   }
   if(mobileEmbedded){if(!ok){const paneReason=message.textContent||'管理者プロフィールまたは認証セッションを取得できませんでした。';showEmbeddedAuthError();const pane=document.getElementById('personalMobileAuthError');if(pane){const reason=document.createElement('small');reason.textContent='確認内容：'+paneReason;reason.style.cssText='max-width:340px;overflow-wrap:anywhere;color:#667085';pane.append(reason)}}return}
   dialog.classList.toggle('open',!ok);
+  if(ok&&new URLSearchParams(location.search).get('account')==='1'){
+   dialog.classList.add('open');
+   const url=new URL(location.href);url.searchParams.delete('account');
+   history.replaceState(history.state,'',url.pathname+url.search+url.hash);
+  }
  }).catch(error=>{
   console.error('面接管理の認証復元:',error);
   message.textContent='認証状態を確認できませんでした。';
