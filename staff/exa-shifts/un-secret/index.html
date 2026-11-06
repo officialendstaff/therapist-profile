@@ -121,7 +121,7 @@ $("dayPanel").onclick=e=>{if(e.target===$("dayPanel"))$("closeDay").click()};
 async function renderShiftAttention(){
  const summary=$("shiftAttentionSummary"),box=$("shiftAttentionBody");
  if(!summary||!box||!authorized)return;
- const date=today(),limit=5000;
+ const date=jst(),limit=5000;
  try{
   const [peopleResult,shiftResult]=await Promise.all([
    client.from("exa_shift_therapists").select("exa_id,stage_name,residency,employment_status,operating_category").eq("store_code","unsecret"),
