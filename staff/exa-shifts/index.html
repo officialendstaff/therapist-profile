@@ -350,6 +350,24 @@ footer{display:none}
 .staff-exa-id{display:inline-block;margin-left:5px;padding:1px 4px;border-radius:3px;background:#eaf1f9;color:#32618a;font-size:10px;font-weight:700;white-space:nowrap}
 
 
+
+/* B-3 vivid: name cell only, existing working state unchanged */
+.shift-status-legend{display:inline-flex;align-items:center;gap:13px;flex-wrap:wrap;margin-left:12px;font-size:11px;font-weight:650;color:#4d5c6c}
+.shift-status-legend span{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.shift-status-legend .swatch{display:inline-block;width:11px;height:11px;border-radius:2px;border:1px solid #ffffff88}
+.shift-status-legend .provisional{background:#E0A310}
+.shift-status-legend .paperwork{background:#D44F96}
+.shift-status-legend .leave{background:#35A77A}
+.shift-status-legend .outside{background:#81C784}
+.shift-status-legend .dummy{background:#8895A5}
+.shift-table tbody tr.outside-roster td.staff-name{background:#E4F7D9!important;color:#326D21!important;box-shadow:inset 4px 0 #78B95B}
+.shift-table tbody tr.outside-roster td.staff-name .name-editor{color:#326D21!important}
+.shift-table tbody tr:not(.group) td.staff-name.state-dummy{background:#E5E7EB!important;color:#4B5563!important;box-shadow:inset 4px 0 #8895A5}
+.shift-table tbody tr:not(.group) td.staff-name.state-dummy .name-editor{color:#4B5563!important}
+.shift-table tbody tr:not(.group) td.staff-name.state-provisional{background:#FFE8C2!important;color:#975500!important;box-shadow:inset 4px 0 #E0A310}
+.shift-table tbody tr:not(.group) td.staff-name.state-paperwork{background:#F8D1E5!important;color:#96365C!important;box-shadow:inset 4px 0 #D44F96}
+.shift-table tbody tr:not(.group) td.staff-name.state-leave{background:#D3F2E2!important;color:#237C55!important;box-shadow:inset 4px 0 #35A77A}
+@media(max-width:900px){.shift-status-legend{gap:6px;margin-left:6px;font-size:9px}}
 </style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
@@ -369,7 +387,7 @@ footer{display:none}
 
 <p id="message" class="muted" role="status" aria-live="polite"></p>
 
-<div class="panel monthly-panel"><div class="row space month-heading"><h2>月間シフト</h2><div class="staff-filter" role="group" aria-label="表示区分"><button type="button" data-show-staff="real" class="active">実働</button><button type="button" data-show-staff="dummy">ダミー</button><button type="button" data-show-staff="all">全件</button></div></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
+<div class="panel monthly-panel"><div class="row space month-heading"><h2>月間シフト</h2><div class="shift-status-legend" aria-label="区分別配色の凡例"><span><i class="swatch provisional"></i>仮登</span><span><i class="swatch paperwork"></i>書類</span><span><i class="swatch leave"></i>長休</span><span><i class="swatch outside"></i>実外</span><span><i class="swatch dummy"></i>ダミー</span></div><div class="staff-filter" role="group" aria-label="表示区分"><button type="button" data-show-staff="real" class="active">実働</button><button type="button" data-show-staff="dummy">ダミー</button><button type="button" data-show-staff="all">全件</button></div></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
 <div id="residencyModal" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="residencyTitle">
 <div id="residencyShade" class="day-modal-shade"></div>
 <div class="panel residency-dialog therapist-detail-dialog">
@@ -535,7 +553,7 @@ const latestDates=futureShifts.filter(r=>r.exa_id===t.exa_id&&!r.is_dummy_shift&
 const lastKnownDate=latestDates.length?latestDates[latestDates.length-1]:null;
 const days=[...entries.values()].filter(r=>!r.is_dummy_shift).length;
 const zeros=valid.filter(r=>!absence.has(t.exa_id+"|"+r.work_date)&&per.get(t.exa_id+"|"+r.work_date)===0).length;
-html+='<tr class="'+(outside?'outside-roster':'')+'"><td class="staff-name"><button type="button" class="name-editor" data-staff-id="'+t.exa_id+'" title="出勤管理区分を変更">'+safe(stageName)+'</button><span class="staff-exa-id" title="EXA管理ID">ID '+t.exa_id+'</span>'+(kana?'<span class="reading">'+safe(kana)+'</span>':'')+(outside?'<span class="outside-label">実働外</span>':'')+'</td>';
+html+='<tr class="'+(outside?'outside-roster':'')+'"><td class="staff-name '+(group==="dummy"?"state-dummy":"")+'"><button type="button" class="name-editor" data-staff-id="'+t.exa_id+'" title="出勤管理区分を変更">'+safe(stageName)+'</button><span class="staff-exa-id" title="EXA管理ID">ID '+t.exa_id+'</span>'+(kana?'<span class="reading">'+safe(kana)+'</span>':'')+(outside?'<span class="outside-label">実働外</span>':'')+'</td>';
 const surveyId=surveyLinks.find(l=>l.exa_id===t.exa_id)?.sheet_person_id;
 const survey=surveyScores.find(x=>x.sheet_person_id===surveyId);
 const responseCount=survey?.response_count??0;
