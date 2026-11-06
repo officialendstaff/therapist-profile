@@ -61,7 +61,12 @@ function render(){
  $("monthLabel").textContent=month.replace("-","年")+"月";
  const days=dates(),table=$("monthly");table.replaceChildren();
  const head=document.createElement("tr");["源氏名","出勤","接客","当欠","評価",...days.map(d=>String(+d.slice(8))+"日")].forEach(x=>makeCell(head,x,"th"));table.append(head);
- const wanted=staff.filter(t=>(filter==="all"&&t.operating_category!=="not_used")||(filter==="dummy"?["dummy","dummy_use"].includes(t.residency||t.operating_category):!["dummy","dummy_use","deleted","not_used"].includes(t.residency||t.operating_category)));
+ const wanted=staff.filter(t=>{
+  if(t.operating_category==="not_used"||t.residency==="deleted"||t.employment_status==="departed")return false;
+  if(filter==="all")return true;
+  if(filter==="dummy")return t.operating_category==="dummy_use"||t.residency==="dummy";
+  return filter==="real"&&t.operating_category!=="dummy_use"&&t.residency!=="dummy";
+ });
  for(const person of wanted){
   const row=document.createElement("tr");const id=person.exa_id;
   makeCell(row,person.stage_name||"ID "+id,"td","staff");
@@ -80,7 +85,7 @@ async function load(){
  $("message").textContent="保存済みデータを確認しています…";
  const start=month+"-01",days=dates(),end=days[days.length-1];
  const results=await Promise.all([
- client.from("exa_shift_therapists").select("exa_id,stage_name,residency,operating_category,evaluation_score").eq("store_code",code),
+ client.from("exa_shift_therapists").select("exa_id,stage_name,residency,operating_category,employment_status,evaluation_score").eq("store_code",code),
  client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes").eq("store_code",code).gte("work_date",start).lte("work_date",end),
  client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code",code).gte("work_date",start).lte("work_date",end)
  ]);
