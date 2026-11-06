@@ -434,11 +434,11 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 <header class="work-header lg-common-header"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ移動" aria-label="総合管理TOPへ移動"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span id="lgHeaderHomeLabel">総合 TOP</span></a><div class="head-controls">
 <label class="store-label">店舗 <select id="storeSelect" aria-label="店舗切替"><option value="grand-luxe">Grand Luxe</option><option value="luxy-osaka" selected>LUXY OSAKA</option><option value="rose">薔薇と紳士</option><option value="un-secret">Un Secret</option><option value="busty-osaka">BUSTY OSAKA</option></select></label>
 <div class="head-month"><button id="prev" title="前月">◀</button><strong id="monthLabel"></strong><button id="next" title="翌月">▶</button></div>
-<button id="exaSync" class="primary" disabled title="LUXY OSAKAのEXAサーバー連携は未設定です">今すぐ更新（未接続）</button>
+<button id="exaSync" class="primary" title="ログイン済みLUXY EXAからChrome拡張で30日分を読み取り、出勤管理へ反映します">今すぐ更新</button>
 <details class="settings-menu"><summary>その他 <span aria-hidden="true">▾</span></summary><div class="settings-panel">
 <button id="reload">保存データを再読込</button>
 <button id="unscheduledAdd" title="EXA登録画面でIDと源氏名を確認した人だけ追加。出勤データは変更しません">出勤予定なしのEXA登録者を追加</button>
-<button id="csvImport" title="LUXY OSAKAのEXA CSVファイルを登録">EXA CSV取込・更新</button><input id="csvFile" type="file" accept=".csv,text/csv" style="display:none">
+<button id="csvImport" title="LUXY専用EXA 30日JSONまたはCSVを取り込みます">EXA JSON/CSV取込</button><input id="csvFile" type="file" accept=".json,application/json,.csv,text/csv" style="display:none">
 <button id="serverTest" disabled title="EXAサーバー未接続">サーバー30日検証（未接続）</button>
 <button id="autoSync" disabled title="EXAサーバー未接続">ブラウザ自動：未接続</button>
 </div></details><span id="authLabel" class="muted login-tag" style="color:#d5e1f1"></span><button id="logout" class="hide">ログアウト</button>
@@ -1051,12 +1051,39 @@ window.addEventListener("message",event=>{
 async function fetchFromExaExtension(){
  const requestId=(crypto.randomUUID?.()||Math.random().toString(16).slice(2)+Date.now().toString(16));
  return new Promise((resolve,reject)=>{
-  const timer=setTimeout(()=>{bridgeRequests.delete(requestId);reject(new Error("90秒以内にChrome拡張機能から応答がありませんでした。EXAのタブと拡張機能の有効状態を確認してください。"));},90000);
+  const timer=setTimeout(()=>{bridgeRequests.delete(requestId);reject(new Error("180秒以内にChrome拡張機能から応答がありませんでした。EXAのタブと拡張機能の有効状態を確認してください。"));},180000);
   bridgeRequests.set(requestId,{resolve,reject,timer});
   window.postMessage({source:"exa-shift-page",action:"fetch-shifts",requestId},location.origin);
  });
 }
-async function synchronizeEXA(mode="manual"){showMsg("LUXY OSAKAのEXAサーバー接続は未設定です。",true);}
+async function synchronizeEXA(mode="manual"){
+ if(!authorized||extensionBusy)return;
+ extensionBusy=true;exaSyncStartedAt=Date.now();
+ const button=$("exaSync");button.disabled=true;button.textContent="EXA読取中…";
+ try{
+  showMsg("LUXY専用Chrome拡張でEXAから本日以降30日分を読取中…（EXAには書込みません）");
+  const payload=await fetchFromExaExtension();
+  if(!payload||payload.ok===false)throw Error(payload?.error||"EXAデータを取得できませんでした。LUXY専用Chrome拡張とEXAのログイン状態をご確認ください。");
+  if(payload.format!=="luxy-exa-readonly-v1"||payload.store_code!=="luxy"||
+     payload.days!==30||!Array.isArray(payload.rows)||!payload.rows.length||
+     payload.total_rows!==payload.rows.length||!Array.isArray(payload.daily_summary)||payload.daily_summary.length!==30)
+    throw Error("LUXY専用30日EXAデータではありません。別店舗の取込は禁止しています。");
+  if(payload.first!==asTokyoDate())throw Error("EXA開始日が本日ではありません（"+payload.first+"）。EXAのログイン画面をご確認ください。");
+  const {data:{session}}=await client.auth.getSession();
+  if(!session?.access_token)throw Error("管理画面のログイン期限が切れています");
+  showMsg("EXA30日読取："+payload.rows.length+"件。Supabaseに検証・登録中…");
+  const response=await fetch(URL_SB+"/functions/v1/exa-luxy-shift-import",{
+   method:"POST",headers:{"Content-Type":"application/json","apikey":KEY_SB,"Authorization":"Bearer "+session.access_token},
+   body:JSON.stringify({...payload,source:"extension_snapshot"})
+  });
+  const result=await response.json();
+  if(!response.ok||result.ok!==true)throw Error(result.error||"LUXY 30日取込に失敗しました（HTTP "+response.status+"）");
+  localStorage.setItem(LAST_KEY,String(Date.now()));
+  await load();
+  showMsg("LUXY EXA30日取込完了："+result.imported+"件（事前"+(result.preoff||0)+"件）。他店舗・EXA本体のデータは変更していません。");
+ }catch(error){showMsg("EXA更新失敗："+String(error.message||error),true);}
+ finally{extensionBusy=false;button.disabled=false;button.textContent="今すぐ更新";}
+}
 // Manual bridge for EXA registrations not included in a 30-day schedule snapshot.
 // It never changes existing rows, shifts or roster classifications.
 $("unscheduledAdd").onclick=async()=>{
@@ -1098,49 +1125,65 @@ async function checkAuto(){
  await synchronizeEXA("auto");
 }
 setInterval(checkAuto,60*1000);
-$("csvImport").onclick=()=>{if(!authorized)return;$("csvFile").click()};
+$("csvImport").onclick=()=>{if(authorized&&!extensionBusy)$("csvFile").click()};
 $("csvFile").onchange=async e=>{
  const file=e.target.files?.[0];if(!file)return;
  const button=$("csvImport");button.disabled=true;
  try{
-  if(file.size>1024*1024)throw Error("CSV容量が大きすぎます（上限1MB）");
+  if(file.size>2*1024*1024)throw Error("ファイル容量は2MB以内にしてください");
   const source=(await file.text()).replace(/^\uFEFF/,"").replace(/\r\n/g,"\n");
-  const lines=source.trim().split("\n").filter(Boolean);
-  const parseLine=line=>{
-   const parts=[];let buffer="",quoted=false;
-   for(let i=0;i<line.length;i++){
-    const c=line[i];
-    if(c==='"'){if(quoted&&line[i+1]==='"'){buffer+='"';i++}else quoted=!quoted}
-    else if(c===","&&!quoted){parts.push(buffer);buffer=""}
-    else buffer+=c;
-   }
-   if(quoted)throw Error("CSVの引用符が閉じられていません");
-   parts.push(buffer);return parts;
-  };
-  if(lines.length<2||lines.length>3001)throw Error("CSVの行数が不正です");
-  const head=parseLine(lines.shift()).map(x=>x.trim().replace(/^\uFEFF/,""));
-  const required=["出勤日","EXA ID","源氏名","出勤","退勤"];
-  const idx=required.map(h=>head.indexOf(h));
-  if(idx.some(i=>i<0))throw Error("CSVの列名が一致しません："+required.join("、"));
-  const rows=lines.map(line=>{
-   const vals=parseLine(line);
-   return {date:vals[idx[0]],id:Number(vals[idx[1]]),name:vals[idx[2]],start:vals[idx[3]],finish:vals[idx[4]]};
-  });
-  const agree=confirm("EXAシフト"+rows.length+"件をSupabaseに更新登録します。既存の接客本数とダミー区分は保持します。続行しますか？");
-  if(!agree)return;
   const {data:{session}}=await client.auth.getSession();
-  if(!session)throw Error("ログイン期限切れです。再ログインしてください");
-  showMsg("EXA CSV "+rows.length+"件を反映中…");
+  if(!session?.access_token)throw Error("ログイン期限が切れています。再ログインしてください");
+  let payload;
+  if(file.name.toLowerCase().endsWith(".json")){
+   payload=JSON.parse(source);
+   if(payload?.format!=="luxy-exa-readonly-v1"||payload?.store_code!=="luxy"||
+      payload?.days!==30||!Array.isArray(payload?.rows)||payload.rows.length===0||
+      !Array.isArray(payload?.daily_summary)||payload.daily_summary.length!==30||
+      payload.total_rows!==payload.rows.length)throw Error("LUXY専用の30日EXA JSONではありません");
+   if(!confirm("LUXY専用 EXA30日データを取り込みます。\n期間："+payload.first+"〜"+payload.last+
+      "\n件数："+payload.rows.length+"\nEXA本体や他店舗は変更しません。"))return;
+   payload={...payload,source:"extension_snapshot"};
+  }else if(file.name.toLowerCase().endsWith(".csv")){
+   const lines=source.trim().split("\n").filter(Boolean);
+   const parseLine=line=>{
+    const parts=[];let buffer="",quoted=false;
+    for(let i=0;i<line.length;i++){
+     const c=line[i];
+     if(c==='"'){if(quoted&&line[i+1]==='"'){buffer+='"';i++}else quoted=!quoted}
+     else if(c===","&&!quoted){parts.push(buffer);buffer=""}
+     else buffer+=c;
+    }
+    if(quoted)throw Error("CSVの引用符が閉じられていません");
+    parts.push(buffer);return parts;
+   };
+   if(lines.length<2||lines.length>3001)throw Error("CSVの行数が不正です");
+   const head=parseLine(lines.shift()).map(x=>x.trim().replace(/^\uFEFF/,""));
+   const required=["出勤日","EXA ID","源氏名","出勤","退勤"];
+   const idx=required.map(h=>head.indexOf(h));
+   if(idx.some(i=>i<0))throw Error("CSVの列名が一致しません："+required.join("、"));
+   const stateIndex=head.indexOf("状態");
+   const rows=lines.map(line=>{
+    const vals=parseLine(line);
+    const result={date:vals[idx[0]]?.trim(),id:Number(vals[idx[1]]),name:vals[idx[2]]?.trim(),
+      start:vals[idx[3]]?.trim(),finish:vals[idx[4]]?.trim()};
+    if(stateIndex>=0)result.state=vals[stateIndex]?.trim()||"出勤";
+    return result;
+   });
+   if(!confirm("LUXY専用EXA CSV "+rows.length+"件を登録します。\n未記載の出勤は削除せず、接客本数・既存の区分も保持します。"))return;
+   payload={rows,source:"csv"};
+  }else throw Error("JSONまたはCSVを選択してください");
+  showMsg("LUXYのEXA取込を検証・登録中…");
   const response=await fetch(URL_SB+"/functions/v1/exa-luxy-shift-import",{
    method:"POST",headers:{"Content-Type":"application/json","apikey":KEY_SB,"Authorization":"Bearer "+session.access_token},
-   body:JSON.stringify({rows})
+   body:JSON.stringify(payload)
   });
   const result=await response.json();
-  if(!response.ok||!result.ok)throw Error(result.error||"取込に失敗しました（HTTP "+response.status+"）");
+  if(!response.ok||result.ok!==true)throw Error(result.error||"取込失敗（HTTP "+response.status+"）");
   await load();
-  showMsg("取込完了："+result.imported+"件・"+result.days+"日分。EXA直接更新ではなくCSV取込です。");
- }catch(error){showMsg("取込失敗："+String(error.message||error),true)}
- finally{button.disabled=false;e.target.value=""}
+  showMsg("LUXY EXA取込完了："+result.imported+"件・"+result.days+"日分（事前"+(result.preoff||0)+"件）。他店舗は変更していません。");
+ }catch(error){showMsg("取込失敗："+String(error.message||error),true);}
+ finally{button.disabled=false;e.target.value="";}
 };
 $("closeDay").onclick=()=>{$("dayPanel").classList.add("hide")};
 $("dayBackdrop").onclick=$("closeDay").onclick;
