@@ -75,8 +75,10 @@ header.lg-common-header .lg-header-home:focus-visible{outline:2px solid #c4a06a;
 header.lg-common-header .head-controls,header.lg-common-header .controls,header.lg-common-header .header-menu{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;min-width:0}
 header.lg-common-header .header-menu{flex-wrap:nowrap}
 @media(max-width:650px){header.lg-common-header{height:60px!important;min-height:60px!important;max-height:60px!important;padding:0 12px!important}header.lg-common-header .lg-header-home{font-size:12px!important}header.lg-common-header .lg-header-home img{width:40px;height:40px}}
+</style><style id="lg-header-interview-label-match-20261107">
+header.lg-common-header .lg-header-home{font-size:17px!important;font-weight:700!important;letter-spacing:normal!important;line-height:1.35!important}
 </style></head>
-<body><div class="page"><header class="topbar lg-common-header"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ移動" aria-label="総合管理TOPへ移動"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span id="lgHeaderHomeLabel">総合 TOP</span></a><div style="display:flex;align-items:center;gap:8px"><a class="back" href="./">面接管理へ戻る</a></div></header>
+<body><div class="page"><header class="topbar lg-common-header"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ移動" aria-label="総合管理TOPへ移動"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span id="lgHeaderHomeLabel">TOP</span></a><div style="display:flex;align-items:center;gap:8px"><a class="back" href="./">面接管理へ戻る</a></div></header>
 <section id="metricsLogin" class="lg-interview-login metrics-login hidden"><div class="auth-card"><aside class="auth-brand-panel" aria-hidden="true"><div class="auth-brand-top"><div class="auth-brand-symbol">L</div><div class="auth-brand-name">L GROUP<small>INTERNAL MANAGEMENT</small></div></div><div class="auth-brand-middle"><span class="auth-brand-kicker">STAFF MANAGEMENT SYSTEM</span><h1 class="auth-brand-title">ANALYTICS<br>MANAGEMENT.</h1><p class="auth-brand-description">日々の管理業務を、もっとスマートに。<br>すべての情報をひとつの場所で。</p></div><div class="auth-brand-bottom"><span>STAFF PORTAL</span><span>L GROUP © 2026</span></div></aside><div class="auth-form-panel"><p class="auth-eyebrow">WELCOME BACK</p><h2>数値管理ログイン</h2><div class="auth-mode-label"><span>管理者</span></div><form id="metricsLoginForm"><p class="auth-help">既存の管理者アカウントと同じID・PASSを使用します。</p><label for="metricsEmail">ID（メールアドレス）<input id="metricsEmail" type="email" autocomplete="username" required></label><label for="metricsPassword">PASS<input id="metricsPassword" type="password" autocomplete="current-password" required></label><div id="metricsLoginError" role="alert"></div><button type="submit">ログイン</button></form><p class="auth-footnote">AUTHORIZED PERSONNEL ONLY</p></div></div></section>
 <iframe id="metricsFrame" class="frame hidden" title="数値管理ダッシュボード" allow="clipboard-write"></iframe></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -85,6 +87,31 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 const $=id=>document.getElementById(id);
 const client=window.supabase?.createClient("https://vjjnkflbfsjihwzjsjpr.supabase.co","sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos",{auth:{persistSession:true,autoRefreshToken:true,storage:localStorage,storageKey:"mattan-recruit-auth"}});
 function showLogin(message=""){location.replace("/therapist-profile/staff/management-top/")}
+async function syncInterviewHomeHeader(profileFallback){
+ let name=profileFallback||"管理",profileKey="";
+ try{
+  const {data,error}=await client.rpc("interview_my_profile");
+  if(!error){
+   const p=Array.isArray(data)?data[0]:data;
+   if(p&&["owner","president","ota","festival"].includes(p.profile_key)){
+    profileKey=p.profile_key;
+    name=({owner:"村上",president:"社長",ota:"オオタ",festival:"お祭り"})[profileKey];
+   }
+  }
+ }catch(e){console.warn("面接管理プロフィール取得失敗",e)}
+ const label=document.getElementById("lgHeaderHomeLabel");if(label)label.textContent=name+" TOP";
+ const icon=document.querySelector(".lg-header-home img");
+ if(icon)icon.src="/therapist-profile/staff/interview-sheet-preview/icons/"+
+   (profileKey==="owner"?"murakami-pc.webp":"recruit-180.png");
+}
+function syncStaffHomeHeader(){
+ const label=document.getElementById("lgHeaderHomeLabel");if(label)label.textContent="TOP";
+ const icon=document.querySelector(".lg-header-home img");
+ if(icon)icon.src="/therapist-profile/staff/interview-sheet-preview/icons/recruit-180.png";
+ const link=document.querySelector(".lg-header-home");
+ if(link){link.href="/therapist-profile/staff/interview-sheet-preview/";link.title="面接管理TOPへ移動";link.setAttribute("aria-label","面接管理TOPへ移動");}
+}
+
 async function staffMetricsView(){
  const token=sessionStorage.getItem("interview_staff_session_v2")||localStorage.getItem("interview_staff_session_v2");
  if(!token||!/^[0-9a-f]{64}$/.test(token))return false;
@@ -95,7 +122,7 @@ async function staffMetricsView(){
   });
   if(!r.ok||!(await r.json()).ok)return false;
   sessionStorage.setItem("interview_staff_session_v2",token);
-  const home=document.getElementById("lgHeaderHomeLabel");if(home)home.textContent="スタッフ TOP";
+  syncStaffHomeHeader();
   $("metricsLogin").classList.add("hidden");
   $("metricsFrame").classList.remove("hidden");
   if(!$("metricsFrame").getAttribute("src"))$("metricsFrame").src="./?standaloneMetrics=1";
@@ -115,7 +142,7 @@ async function check(){
   if(await staffMetricsView())return;
   showLogin("このページへの権限がありません。");return
  }
- const homeName=document.getElementById("lgHeaderHomeLabel");if(homeName)homeName.textContent=(profile.data.display_name||"管理")+" TOP";
+ await syncInterviewHomeHeader(profile.data.display_name);
  $("metricsLogin").classList.add("hidden");
  $("metricsFrame").classList.remove("hidden");
  if(!$("metricsFrame").getAttribute("src"))$("metricsFrame").src="./?standaloneMetrics=1";
