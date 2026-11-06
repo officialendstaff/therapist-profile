@@ -12,6 +12,58 @@
 .back:hover,.back:focus-visible{background:#314157}
 .frame{flex:1;width:100%;min-height:0;border:0;background:white}
 @media(max-width:650px){.topbar{padding:0 10px;height:54px}.brand{gap:7px;font-size:13px}.brand small{font-size:10px}.back{font-size:11px;padding:5px 8px}}
+
+/* L GROUP management shared sign-in */
+:root{--login-navy:#17283E;--login-gold:#C4A06A;--login-canvas:#F6F5F2}
+body{background:var(--login-canvas)}
+.topbar{background:var(--login-navy);border-bottom:2px solid var(--login-gold);height:64px}
+.brand span{font-size:20px}.brand small{color:#D6BB8C}
+.metrics-login{flex:1;display:grid;place-items:center;padding:24px 16px 55px;background:var(--login-canvas)}
+.metrics-login.hidden{display:none!important}
+.metrics-login .login-card{box-sizing:border-box;width:min(430px,100%);border:1px solid #E5DFD5;border-radius:15px;background:#fff;padding:32px;box-shadow:0 18px 48px #17283e13}
+.metrics-login h2{font-size:23px;color:var(--login-navy);margin:0 0 8px}
+.metrics-login p{color:#657991;font-size:12px;margin:0 0 26px}
+.metrics-login label{display:block;color:#283344;font-size:12px;font-weight:700;margin:14px 0}
+.metrics-login input{display:block;box-sizing:border-box;width:100%;margin-top:7px;border:1px solid #CBD8E6;border-radius:7px;background:#fff;padding:12px;min-height:44px;color:#20314A}
+.metrics-login input:focus{outline:2px solid #B89B6D;outline-offset:1px}
+.metrics-login button{width:100%;min-height:45px;background:var(--login-navy);color:#fff;border:0;border-radius:8px;padding:12px 18px;margin-top:18px;font-size:13px;font-weight:700;cursor:pointer}
+.metrics-login button:hover{background:#253C58}
+.metrics-login .login-error{min-height:17px;color:#AE3449;font-size:12px;margin:12px 0 0}
+.frame.hidden{display:none!important}
+@media(max-width:650px){.topbar{height:57px}.brand span{font-size:16px}.metrics-login .login-card{padding:25px 22px}}
 </style></head>
 <body><div class="page"><header class="topbar"><div class="brand"><span>L GROUP</span><small>数値管理 / ANALYTICS</small></div><div style="display:flex;align-items:center;gap:8px"><a class="back" href="../management-top/">総合TOP</a><a class="back" href="./">面接管理へ戻る</a></div></header>
-<iframe class="frame" src="./?standaloneMetrics=1" title="数値管理ダッシュボード" loading="eager" allow="clipboard-write"></iframe></div></body></html>
+<section id="metricsLogin" class="metrics-login hidden"><form id="metricsLoginForm" class="login-card"><h2>管理システム ログイン</h2><p>管理者アカウントでログインしてください。</p><label>メールアドレス<input id="metricsEmail" type="email" autocomplete="username" required></label><label>パスワード<input id="metricsPassword" type="password" autocomplete="current-password" required></label><button type="submit">ログイン</button><div id="metricsLoginError" class="login-error" role="alert"></div></form></section>
+<iframe id="metricsFrame" class="frame hidden" title="数値管理ダッシュボード" allow="clipboard-write"></iframe></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(()=>{"use strict";
+const $=id=>document.getElementById(id);
+const client=window.supabase?.createClient("https://vjjnkflbfsjihwzjsjpr.supabase.co","sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos",{auth:{persistSession:true,autoRefreshToken:true,storage:localStorage,storageKey:"mattan-recruit-auth"}});
+function showLogin(message=""){$("metricsFrame").classList.add("hidden");$("metricsLogin").classList.remove("hidden");$("metricsLoginError").textContent=message}
+async function check(){
+ if(!client){showLogin("認証処理を読み込めません。");return}
+ const {data:{session}}=await client.auth.getSession();
+ if(!session){showLogin();return}
+ const [profile,allowed]=await Promise.all([
+  client.from("recruit_staff_profiles").select("role,approved_at").eq("user_id",session.user.id).maybeSingle(),
+  client.rpc("can_link_therapist_interview")
+ ]);
+ if(profile.error||allowed.error||allowed.data!==true||!profile.data?.approved_at||!["master","full"].includes(profile.data.role)){
+  showLogin("このページへの権限がありません。");return
+ }
+ $("metricsLogin").classList.add("hidden");
+ $("metricsFrame").classList.remove("hidden");
+ if(!$("metricsFrame").getAttribute("src"))$("metricsFrame").src="./?standaloneMetrics=1";
+}
+$("metricsLoginForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ if(!client)return;
+ $("metricsLoginError").textContent="確認中…";
+ const {error}=await client.auth.signInWithPassword({email:$("metricsEmail").value.trim(),password:$("metricsPassword").value});
+ if(error){showLogin("ログインできません。入力内容をご確認ください。");return}
+ await check();
+});
+check();
+})();
+</script></body></html>
