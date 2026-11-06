@@ -98,6 +98,9 @@ header.lg-common-header .lg-header-home:focus-visible{outline:2px solid #c4a06a;
 header.lg-common-header .head-controls,header.lg-common-header .controls,header.lg-common-header .header-menu{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;min-width:0}
 header.lg-common-header .header-menu{flex-wrap:nowrap}
 @media(max-width:650px){header.lg-common-header{height:60px!important;min-height:60px!important;max-height:60px!important;padding:0 12px!important}header.lg-common-header .lg-header-home{font-size:12px!important}header.lg-common-header .lg-header-home img{width:40px;height:40px}}
+.shift td.staff.state-unconfirmed{background:#fff6e5!important;box-shadow:inset 4px 0 #d39d34;color:#674b17}
+.shift td.staff.state-unconfirmed small{color:#a17831}
+.exa-hidden-flag{display:inline-block;margin-left:7px;color:#b13945;font-size:10px;font-weight:750}
 </style></head>
 <body>
 <header class="lg-common-header"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ移動" aria-label="総合管理TOPへ移動"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span id="lgHeaderHomeLabel">総合 TOP</span></a><div class="controls">
@@ -108,10 +111,10 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 <button id="logout" class="headerbtn hide">ログアウト</button></div></header>
 <section id="login" class="lg-interview-login hide"><div class="auth-card"><aside class="auth-brand-panel" aria-hidden="true"><div class="auth-brand-top"><div class="auth-brand-symbol">L</div><div class="auth-brand-name">L GROUP<small>INTERNAL MANAGEMENT</small></div></div><div class="auth-brand-middle"><span class="auth-brand-kicker">STAFF MANAGEMENT SYSTEM</span><h1 class="auth-brand-title">SHIFT<br>MANAGEMENT.</h1><p class="auth-brand-description">日々の管理業務を、もっとスマートに。<br>すべての情報をひとつの場所で。</p></div><div class="auth-brand-bottom"><span>STAFF PORTAL</span><span>L GROUP © 2026</span></div></aside><div class="auth-form-panel"><p class="auth-eyebrow">WELCOME BACK</p><h2>出勤管理ログイン</h2><div class="auth-mode-label"><span>管理者</span></div><form id="loginForm"><p class="auth-help">既存の管理者アカウントと同じID・PASSを使用します。</p><label for="email">ID（メールアドレス）<input id="email" type="email" autocomplete="username" required></label><label for="password">PASS<input id="password" type="password" autocomplete="current-password" required></label><div id="loginError" role="alert"></div><button type="submit">ログイン</button></form><p class="auth-footnote">AUTHORIZED PERSONNEL ONLY</p></div></div></section>
 <main id="app" class="hide">
-<div class="notice">この店舗の出勤管理ページは準備済みです。EXA直接同期・CSV取込・接客本数編集・画像登録・アンケート連携は未接続です。薔薇と紳士のデータにはアクセスしません。</div>
 
-<section class="panel"><div class="month-heading"><h2>月間シフト</h2><div class="shift-status-legend" aria-label="区分別配色の凡例"><span><i class="swatch provisional"></i>仮登</span><span><i class="swatch paperwork"></i>書類</span><span><i class="swatch leave"></i>長休</span><span><i class="swatch outside"></i>実外</span><span><i class="swatch dummy"></i>ダミー</span></div><div class="filter"><button data-filter="real" class="active">実働</button><button data-filter="dummy">ダミー</button><button data-filter="all">全件</button></div></div>
-<p id="message" class="muted"></p><div class="scroll"><table id="monthly" class="shift"></table><div id="empty" class="empty hide">この店舗の登録データはありません。EXA連携は未設定です。</div></div></section>
+
+<section class="panel"><div class="month-heading"><h2>月間シフト</h2><div class="filter"><button data-filter="real">実働</button><button data-filter="dummy">ダミー</button><button data-filter="unconfirmed">未分類</button><button data-filter="all" class="active">全件</button></div></div>
+<p id="message" class="muted"></p><div class="scroll"><table id="monthly" class="shift"></table><div id="empty" class="empty hide">該当するセラピストはいません。</div></div></section>
 </main>
 <div id="dayPanel" class="dialog hide"><section><div class="month-heading"><h2 id="dayTitle">日別タイムチャート</h2><button id="closeDay">閉じる ×</button></div><div id="timeline"></div></section></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -123,7 +126,7 @@ const $=id=>document.getElementById(id);
 const url="https://vjjnkflbfsjihwzjsjpr.supabase.co",key="sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos";
 const client=window.supabase?.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,storage:localStorage,storageKey:"mattan-recruit-auth"}});
 const jst=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
-let month=jst().slice(0,7),filter="real",staff=[],shifts=[],performance=[],authorized=false;
+let month=jst().slice(0,7),filter="all",staff=[],shifts=[],performance=[],authorized=false;
 const pad=n=>String(n).padStart(2,"0");
 const dates=()=>{const [year,m]=month.split("-").map(Number);return Array.from({length:new Date(year,m,0).getDate()},(_,i)=>month+"-"+pad(i+1))};
 $("storeSelect").value=slug;
@@ -134,14 +137,24 @@ function render(){
  $("monthLabel").textContent=month.replace("-","年")+"月";
  const days=dates(),table=$("monthly");table.replaceChildren();
  const head=document.createElement("tr");["源氏名","出勤","接客","当欠","評価",...days.map(d=>String(+d.slice(8))+"日")].forEach(x=>makeCell(head,x,"th"));table.append(head);
- const wanted=staff.filter(t=>filter==="all"||(filter==="dummy"?["dummy","dummy_use"].includes(t.residency||t.operating_category):!["dummy","dummy_use"].includes(t.residency||t.operating_category))).sort((a,b)=>Number(a.exa_id)-Number(b.exa_id));
+ const isDummy=t=>t.residency==="dummy"||t.operating_category==="dummy_use";
+ const isUnconfirmed=t=>t.residency==="unconfirmed"||(!isDummy(t)&&t.operating_category==="unclassified");
+ const wanted=staff.filter(t=>{
+  const dummy=isDummy(t),unknown=isUnconfirmed(t);
+  return filter==="all"||(filter==="dummy"?dummy:filter==="unconfirmed"?unknown:!dummy&&!unknown)
+ }).sort((a,b)=>(a.exa_list_position??999999)-(b.exa_list_position??999999)||Number(a.exa_id)-Number(b.exa_id));
  for(const person of wanted){
   const row=document.createElement("tr");const id=person.exa_id;
-  const nameCell=makeCell(row,person.stage_name||"ID "+id,"td","staff");if(person.residency==="dummy"||person.operating_category==="dummy_use")nameCell.classList.add("state-dummy");
+  const nameCell=makeCell(row,person.stage_name||"ID "+id,"td","staff");
+  if(isDummy(person))nameCell.classList.add("state-dummy");
+  else if(isUnconfirmed(person))nameCell.classList.add("state-unconfirmed");
+  const idLabel=document.createElement("small");idLabel.textContent="EXA ID "+id;nameCell.append(idLabel);
+  if(person.exa_is_visible===false){const hidden=document.createElement("span");hidden.className="exa-hidden-flag";hidden.textContent="EXA非表示";nameCell.append(hidden)}
+
   const entries=shifts.filter(s=>s.exa_id===id);
   const done=performance.filter(p=>p.exa_id===id);
-  makeCell(row,String(entries.length));makeCell(row,String(done.reduce((n,p)=>n+(Number(p.customer_count)||0),0)));
-  makeCell(row,String(done.filter(p=>p.attendance_status==="absent").length));
+  makeCell(row,shifts.length?String(entries.length):"—");makeCell(row,performance.length?String(done.reduce((n,p)=>n+(Number(p.customer_count)||0),0)):"—");
+  makeCell(row,performance.length?String(done.filter(p=>p.attendance_status==="absent").length):"—");
   makeCell(row,person.evaluation_score==null?"—":String(person.evaluation_score));
   for(const d of days){const s=entries.find(x=>x.work_date===d);const cell=makeCell(row,s?shiftTime(s.start_minutes)+"-"+shiftTime(s.end_minutes):"");if(d===jst())cell.classList.add("today")}
   table.append(row);
@@ -153,14 +166,16 @@ async function load(){
  $("message").textContent="保存済みデータを確認しています…";
  const start=month+"-01",days=dates(),end=days[days.length-1];
  const results=await Promise.all([
- client.from("exa_shift_therapists").select("exa_id,stage_name,residency,operating_category,evaluation_score").eq("store_code",code),
+ client.from("exa_shift_therapists").select("exa_id,stage_name,residency,operating_category,evaluation_score,exa_is_visible,exa_list_position").eq("store_code",code),
  client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes").eq("store_code",code).gte("work_date",start).lte("work_date",end),
  client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code",code).gte("work_date",start).lte("work_date",end)
  ]);
  const error=results.find(x=>x.error)?.error;
  if(error){$("message").textContent="取得できませんでした："+error.message;staff=[];shifts=[];performance=[];render();return}
  [staff,shifts,performance]=results.map(x=>x.data||[]);
- $("message").textContent="";render();
+ const unknownCount=staff.filter(isUnconfirmed).length,hiddenCount=staff.filter(t=>t.exa_is_visible===false).length;
+ $("message").textContent=staff.length+"名登録 ｜ 未分類 "+unknownCount+"名 ｜ EXA非表示 "+hiddenCount+"名"+(shifts.length?" ｜ シフト "+shifts.length+"件":" ｜ シフト未取込");
+ render();
 }
 async function loginCheck(){
  if(!client){location.replace("/therapist-profile/staff/management-top/");$("loginError").textContent="認証ライブラリを読み込めません";return}
