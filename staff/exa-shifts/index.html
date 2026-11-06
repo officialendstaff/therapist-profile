@@ -518,10 +518,10 @@ const showMsg=(message,error=false)=>{
  if(message && !(/取得中|反映中|読み込み中/.test(message)))messageTimer=setTimeout(()=>{el.classList.remove("toast-visible");},error?10000:5200);
 };
 async function loginCheck(){if(!client){$("loginError").textContent="認証ライブラリを読み込めません";return;}
-const {data:{session}}=await client.auth.getSession();if(!session){authorized=false;$("app").classList.add("hide");$("login").classList.remove("hide");return;}
+const {data:{session}}=await client.auth.getSession();if(!session){authorized=false;$("app").classList.add("hide");location.replace("/therapist-profile/staff/management-top/");return;}
 const [{data,error},access]=await Promise.all([client.from("recruit_staff_profiles").select("role,approved_at").eq("user_id",session.user.id).maybeSingle(),client.rpc("can_link_therapist_interview")]);
 if(error||access.error||access.data!==true||!data||!data.approved_at||!["master","full"].includes(data.role)){
-  authorized=false;$("app").classList.add("hide");$("login").classList.remove("hide");$("loginError").textContent="このページへの権限がありません。";return;
+  authorized=false;$("app").classList.add("hide");location.replace("/therapist-profile/staff/management-top/");$("loginError").textContent="このページへの権限がありません。";return;
 }
 authorized=true;$("login").classList.add("hide");$("app").classList.remove("hide");$("logout").classList.remove("hide");$("authLabel").textContent="認証済み";await load();}
 $("loginForm").onsubmit=async e=>{e.preventDefault();$("loginError").textContent="確認中…";const {error}=await client.auth.signInWithPassword({email:$("email").value,password:$("password").value});if(error){$("loginError").textContent="ログインできません。入力情報をご確認ください。";return;}$("loginError").textContent="";await loginCheck()};
