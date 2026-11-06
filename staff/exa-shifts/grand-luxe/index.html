@@ -437,14 +437,15 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 <header class="work-header lg-common-header"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ移動" aria-label="総合管理TOPへ移動"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span id="lgHeaderHomeLabel">総合 TOP</span></a><div class="head-controls">
 <label class="store-label">店舗 <select id="storeSelect" aria-label="店舗切替"><option value="grand-luxe" selected>Grand Luxe</option><option value="luxy-osaka">LUXY OSAKA</option><option value="rose">薔薇と紳士</option><option value="un-secret">Un Secret</option><option value="busty-osaka">BUSTY OSAKA</option></select></label>
 <div class="head-month"><button id="prev" title="前月">◀</button><strong id="monthLabel"></strong><button id="next" title="翌月">▶</button></div>
-<button id="exaSync" class="primary" title="EXAサーバーから最新30日を直接取得・反映（サーバー認証が必要）">今すぐ更新</button>
-<details class="settings-menu"><summary>その他 <span aria-hidden="true">▾</span></summary><div class="settings-panel">
+<button id="exaSync" class="primary" title="ログイン済みGrand Luxe EXAの日別出勤表から30日分を取得し、Supabaseへ直接反映">今すぐ更新</button>
+<button id="autoSync" title="出勤管理ページとEXA日別出勤表を開いている間、3時間ごとに取得・反映">自動更新：OFF</button>
+<div class="gl-hidden-legacy-controls" style="display:none" aria-hidden="true">
 <button id="reload">保存データを再読込</button>
 <button id="unscheduledAdd" title="EXA登録画面でIDと源氏名を確認した人だけ追加。出勤データは変更しません">出勤予定なしのEXA登録者を追加</button>
 <button id="csvImport" title="Chrome拡張で取得したEXA 30日JSON・CSVを取り込みます">EXA JSON/CSV取込</button><button id="csvExportSaved" title="表示中の月の保存済み出勤をCSVで出力">保存済み出勤CSV出力</button><input id="csvFile" type="file" accept=".json,application/json,.csv,text/csv" style="display:none">
 <button id="serverTest" title="EXAサーバー接続と30日読取を検証（保存データは変更しません）">サーバー30日検証</button>
-<button id="autoSync" title="Chrome起動中の自動更新">ブラウザ自動：OFF</button>
-</div></details><span id="authLabel" class="muted login-tag" style="color:#d5e1f1"></span><button id="logout" class="hide">ログアウト</button>
+
+</div><span id="authLabel" class="muted login-tag" style="color:#d5e1f1"></span><button id="logout" class="hide">ログアウト</button>
 </div></header>
 <section id="login" class="lg-interview-login hide"><div class="auth-card"><aside class="auth-brand-panel" aria-hidden="true"><div class="auth-brand-top"><div class="auth-brand-symbol">L</div><div class="auth-brand-name">L GROUP<small>INTERNAL MANAGEMENT</small></div></div><div class="auth-brand-middle"><span class="auth-brand-kicker">STAFF MANAGEMENT SYSTEM</span><h1 class="auth-brand-title">SHIFT<br>MANAGEMENT.</h1><p class="auth-brand-description">日々の管理業務を、もっとスマートに。<br>すべての情報をひとつの場所で。</p></div><div class="auth-brand-bottom"><span>STAFF PORTAL</span><span>L GROUP © 2026</span></div></aside><div class="auth-form-panel"><p class="auth-eyebrow">WELCOME BACK</p><h2>出勤管理ログイン</h2><div class="auth-mode-label"><span>管理者</span></div><form id="loginForm"><p class="auth-help">既存の管理者アカウントと同じID・PASSを使用します。</p><label for="email">ID（メールアドレス）<input id="email" type="email" autocomplete="username" required></label><label for="password">PASS<input id="password" type="password" autocomplete="current-password" required></label><div id="loginError" role="alert"></div><button type="submit">ログイン</button></form><p class="auth-footnote">AUTHORIZED PERSONNEL ONLY</p></div></div></section>
 <main id="app" class="hide">
@@ -541,7 +542,7 @@ const query=new URL(location.href);
 if(query.searchParams.get("exa_sync")==="1"){
  query.searchParams.delete("exa_sync");
  history.replaceState(null,"",query.pathname+query.search+query.hash);
- void synchronizeEXA("manual");
+ void synchronizeEXA("panel");
 }
 }
 $("loginForm").onsubmit=async e=>{e.preventDefault();$("loginError").textContent="確認中…";const {error}=await client.auth.signInWithPassword({email:$("email").value,password:$("password").value});if(error){$("loginError").textContent="ログインできません。入力情報をご確認ください。";return;}$("loginError").textContent="";await loginCheck()};
@@ -1022,12 +1023,34 @@ $("prev").onclick=()=>{const d=new Date(month+"-01T00:00:00");d.setMonth(d.getMo
 $("next").onclick=()=>{const d=new Date(month+"-01T00:00:00");d.setMonth(d.getMonth()+1);month=[d.getFullYear(),String(d.getMonth()+1).padStart(2,"0")].join("-");load()};
 $("reload").onclick=load;
 let extensionBusy=false;
-let exaSyncStartedAt=0;
 const LAST_KEY="exa-grandluxe-last-sync-v1";
+const AUTO_KEY="exa-grandluxe-browser-auto-v2";
+const ATTEMPT_KEY="exa-grandluxe-auto-attempt-v2";
+const AUTO_MS=3*60*60*1000;
+const RETRY_MS=30*60*1000;
 const asTokyoDate=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
-$("autoSync").disabled=true;
-$("autoSync").textContent="ブラウザ自動：未接続";
-$("autoSync").title="Grand Luxeの定期サーバー同期は未接続です。手動取込を使用してください。";
+let autoEnabled=localStorage.getItem(AUTO_KEY)==="on";
+function paintAuto(){
+ const button=$("autoSync");
+ button.textContent=autoEnabled?"自動更新：ON":"自動更新：OFF";
+ button.title="出勤管理ページとログイン済みEXA日別出勤表をChromeで開いている間、3時間ごとに最新30日を取得してSupabaseへ反映します。サーバー無人同期とは別です。";
+ button.setAttribute("aria-pressed",String(autoEnabled));
+}
+paintAuto();
+$("autoSync").onclick=async()=>{
+ if(!authorized||extensionBusy)return;
+ if(!autoEnabled){
+  try{await waitForGrandLuxeExtension()}
+  catch(error){showMsg("自動更新を開始できません："+String(error.message||error),true);return}
+ }
+ autoEnabled=!autoEnabled;
+ localStorage.setItem(AUTO_KEY,autoEnabled?"on":"off");
+ paintAuto();
+ if(autoEnabled){
+  showMsg("自動更新：ON。EXAの日別出勤表を開いた状態で、3時間おきに最新30日を取得・反映します。");
+  void checkAuto();
+ }else showMsg("自動更新：OFF。ブラウザでの定期取得を停止しました。");
+};
 let grandLuxeExtensionReady=false;
 async function waitForGrandLuxeExtension(){
  if(grandLuxeExtensionReady)return;
@@ -1050,7 +1073,7 @@ function cancelEXASync(){
 }
 window.addEventListener("message",event=>{
  if(event.source!==window||event.origin!==location.origin||event.data?.source!=="exa-shift-extension")return;
- if(event.data.action==="ready"){grandLuxeExtensionReady=true;$("exaSync").title="サーバー更新を優先し、サーバー通信に失敗した場合はChrome拡張v1.1で30日分を取り込めます";}
+ if(event.data.action==="ready"){grandLuxeExtensionReady=true;$("exaSync").title="Grand Luxe EXAの最新30日分を読み取り、直接Supabaseへ反映します";}
  if(event.data.action==="fetch-shifts-result"){
   const request=bridgeRequests.get(event.data.requestId);
   if(!request)return;
@@ -1058,13 +1081,13 @@ window.addEventListener("message",event=>{
   request.resolve(event.data.result);
  }
 });
-async function fetchFromExaExtension(){
+async function fetchFromExaExtension(fresh=false){
  await waitForGrandLuxeExtension();
  const requestId=(crypto.randomUUID?.()||Math.random().toString(16).slice(2)+Date.now().toString(16));
  return new Promise((resolve,reject)=>{
   const timer=setTimeout(()=>{bridgeRequests.delete(requestId);reject(new Error("180秒以内にGrand Luxe Chrome拡張から応答がありませんでした。EXAのログイン状態と拡張機能v1.1を確認してください。"));},180000);
   bridgeRequests.set(requestId,{resolve,reject,timer});
-  window.postMessage({source:"exa-shift-page",action:"fetch-shifts",requestId},location.origin);
+  window.postMessage({source:"exa-shift-page",action:fresh?"refresh-shifts":"fetch-shifts",requestId},location.origin);
  });
 }
 async function synchronizeEXA(mode="manual"){
@@ -1076,7 +1099,7 @@ async function synchronizeEXA(mode="manual"){
   const {data:{session}}=await client.auth.getSession();
   if(!session?.access_token)throw Error("管理ページのログイン期限が切れています。");
   showMsg("Grand LuxeのEXA取得データを確認中…");
-  const payload=await fetchFromExaExtension();
+  const payload=await fetchFromExaExtension(mode!=="panel");
   if(!payload||payload.ok===false)throw Error(payload?.error||"Chrome拡張から取得データを受け取れませんでした。");
   if(payload.format!=="grandluxe-exa-readonly-v1"||
      payload.store_code!=="grandluxe"||payload.days!==30||
@@ -1084,7 +1107,7 @@ async function synchronizeEXA(mode="manual"){
      !Array.isArray(payload.daily_summary)||payload.daily_summary.length!==30||
      payload.total_rows!==payload.rows.length)
    throw Error("Grand Luxe専用30日データではありません。");
-  if(payload.first!==today())throw Error("取込データが本日取得分ではありません："+payload.first+"。EXA画面で30日取得をやり直してください。");
+  if(payload.first!==asTokyoDate())throw Error("取込データが本日取得分ではありません："+payload.first+"。EXAの日別出勤表を開いて再取得してください。");
   showMsg("Grand Luxe EXA30日分 "+payload.rows.length+"件を検証・登録中…");
   const response=await fetch(URL_SB+"/functions/v1/exa-grandluxe-shift-import",{
    method:"POST",
@@ -1096,13 +1119,24 @@ async function synchronizeEXA(mode="manual"){
    throw Error(result?.error||"Grand Luxeの出勤登録に失敗しました（HTTP "+response.status+"）");
   localStorage.setItem(LAST_KEY,String(Date.now()));
   await load();
-  showMsg("Grand Luxe 30日取込完了："+result.imported+"件（事前"+(result.preoff??0)+"件）。EXA・他店舗は変更していません。");
+  showMsg("Grand Luxe "+(mode==="auto"?"自動":"手動")+"更新完了：30日・"+result.imported+"件（事前"+(result.preoff??0)+"件）。EXA・他店舗は変更していません。");
  }catch(error){
   showMsg("Grand Luxeの更新は完了していません。原因："+String(error.message||error),true);
  }finally{
   extensionBusy=false;button.disabled=false;button.textContent="今すぐ更新";
  }
 }
+async function checkAuto(){
+ if(!autoEnabled||!authorized||extensionBusy)return;
+ const now=Date.now();
+ const last=Number(localStorage.getItem(LAST_KEY)||0);
+ const attempt=Number(localStorage.getItem(ATTEMPT_KEY)||0);
+ if(last>0&&now-last<AUTO_MS)return;
+ if(attempt>0&&now-attempt<RETRY_MS)return;
+ localStorage.setItem(ATTEMPT_KEY,String(now));
+ await synchronizeEXA("auto");
+}
+setInterval(checkAuto,60000);
 // Manual bridge for EXA registrations not included in a 30-day schedule snapshot.
 // It never changes existing rows, shifts or roster classifications.
 $("unscheduledAdd").onclick=async()=>{
