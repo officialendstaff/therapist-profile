@@ -350,21 +350,6 @@ footer{display:none}
 .staff-exa-id{display:inline-block;margin-left:5px;padding:1px 4px;border-radius:3px;background:#eaf1f9;color:#32618a;font-size:10px;font-weight:700;white-space:nowrap}
 
 
-.shift-attention{margin:7px 0 10px;border:1px solid #d2ddec;background:#fff;border-radius:9px;color:#273c53;overflow:hidden}
-.shift-attention>summary{cursor:pointer;padding:9px 12px;font-size:12px;font-weight:750;background:#eef4fb;list-style:none}
-.shift-attention>summary::-webkit-details-marker{display:none}
-.shift-attention>summary:before{content:"▸";padding-right:7px;color:#486784}
-.shift-attention[open]>summary:before{content:"▾"}
-.shift-attention-body{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:10px}
-.shift-attention-group{border:1px solid #dee6ef;border-radius:7px;padding:9px;min-width:0}
-.shift-attention-group h3{margin:0 0 8px;font-size:12px}
-.shift-attention-group.today-group h3{color:#a14c26}
-.shift-attention-row{font-size:11px;display:flex;gap:8px;justify-content:space-between;align-items:center;padding:6px 0;border-top:1px solid #edf1f5}
-.shift-attention-row b{font-size:12px}
-.shift-attention-row span{color:#52677e;text-align:right}
-.shift-attention-empty{font-size:11px;color:#77879b}
-.shift-attention-foot{font-size:10px;color:#62738b;padding:0 10px 9px}
-@media(max-width:800px){.shift-attention-body{grid-template-columns:1fr}}
 </style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
@@ -383,7 +368,7 @@ footer{display:none}
 <main id="app" class="hide">
 
 <p id="message" class="muted" role="status" aria-live="polite"></p>
-<details id="shiftAttention" class="shift-attention"><summary id="shiftAttentionSummary">シフト要確認｜読み込み中</summary><div id="shiftAttentionBody" class="shift-attention-body"></div><div id="shiftAttentionFoot" class="shift-attention-foot"></div></details>
+
 <div class="panel monthly-panel"><div class="row space month-heading"><h2>月間シフト</h2><div class="staff-filter" role="group" aria-label="表示区分"><button type="button" data-show-staff="real" class="active">実働</button><button type="button" data-show-staff="dummy">ダミー</button><button type="button" data-show-staff="all">全件</button></div></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
 <div id="residencyModal" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="residencyTitle">
 <div id="residencyShade" class="day-modal-shade"></div>
@@ -489,7 +474,7 @@ therapists=(a.data||[]).filter(t=>rosterIds.has(t.exa_id));shifts=b.data||[];per
 surveyScores=sv.data||[];surveyLinks=sl.data||[];
 $("monthLabel").textContent=month.replace("-","年")+"月";
 $("message").textContent="";
-renderMonthly();renderDay();void renderShiftAttention();}
+renderMonthly();renderDay();}
 // 2026-2027 public holidays/observed holidays from the Cabinet Office list.
 const japanHolidayDates=new Set((
 "2026-01-01 2026-01-12 2026-02-11 2026-02-23 2026-03-20 2026-04-29 2026-05-03 2026-05-04 2026-05-05 2026-05-06 2026-07-20 2026-08-11 2026-09-21 2026-09-22 2026-09-23 2026-10-12 2026-11-03 2026-11-23 "+
@@ -1140,50 +1125,6 @@ document.querySelectorAll("[data-show-staff]").forEach(b=>b.onclick=()=>{
  renderMonthly();
 });
 
-
-// Attention queue: derived from persisted EXA shifts only; never sends LINE messages.
-async function renderShiftAttention(){
- const summary=$("shiftAttentionSummary"),box=$("shiftAttentionBody");
- if(!summary||!box||!authorized)return;
- const date=today(),limit=5000;
- try{
-  const [peopleResult,shiftResult]=await Promise.all([
-   client.from("exa_shift_therapists").select("exa_id,stage_name,residency,employment_status,operating_category").eq("store_code","rose"),
-   client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_dummy_shift,is_pre_off").eq("store_code","rose").gte("work_date",date).order("work_date").limit(limit)
-  ]);
-  if(peopleResult.error||shiftResult.error)throw peopleResult.error||shiftResult.error;
-  const people=(peopleResult.data||[]).filter(t=>t.operating_category!=="dummy_use"&&t.operating_category!=="not_used"&&t.residency!=="dummy"&&t.residency!=="deleted"&&t.employment_status!=="departed");
-  // Rose uses the current EXA roster, rather than archived rows, for active alerts.
-  const activePeople=people.filter(t=>rosterIds.has(t.exa_id));
-  const futureById=new Map();
-  for(const s of shiftResult.data||[]){
-   if(s.is_dummy_shift||s.is_pre_off)continue;
-   if(!futureById.has(s.exa_id))futureById.set(s.exa_id,[]);
-   futureById.get(s.exa_id).push(s);
-  }
-  const lastToday=[],noFuture=[];
-  for(const person of activePeople){
-   const data=futureById.get(person.exa_id)||[];
-   if(data.some(x=>x.work_date>date))continue;
-   const todays=data.filter(x=>x.work_date===date);
-   if(todays.length)lastToday.push({person,end:Math.max(...todays.map(x=>x.end_minutes))});
-   else noFuture.push({person});
-  }
-  lastToday.sort((a,b)=>a.end-b.end||a.person.exa_id-b.person.exa_id);
-  noFuture.sort((a,b)=>a.person.exa_id-b.person.exa_id);
-  const escText=v=>String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
-  const clock=v=>{const h=Math.floor(v/60),m=v%60;return String(h%24).padStart(2,"0")+":"+String(m).padStart(2,"0")+(h>=24?"（翌日）":"")};
-  summary.textContent="シフト要確認｜本日最終 "+lastToday.length+"名・次回未定 "+noFuture.length+"名";
-  $("shiftAttention").open=lastToday.length+noFuture.length>0;
-  const row=(x,last)=>'<div class="shift-attention-row"><div><b>'+escText(x.person.stage_name||"ID "+x.person.exa_id)+'</b> <small> ID '+x.person.exa_id+'</small></div><span>'+(last?"本日 "+clock(x.end)+" 退勤前に確認":"今後のシフト登録なし・連絡対象")+'</span></div>';
-  box.innerHTML='<section class="shift-attention-group today-group"><h3>本日が最終出勤｜'+lastToday.length+'名</h3>'+(lastToday.length?lastToday.map(x=>row(x,true)).join(""):'<div class="shift-attention-empty">該当なし</div>')+'</section>'+
-   '<section class="shift-attention-group"><h3>今日以降のシフト未定｜'+noFuture.length+'名</h3>'+(noFuture.length?noFuture.map(x=>row(x,false)).join(""):'<div class="shift-attention-empty">該当なし</div>')+'</section>';
-  $("shiftAttentionFoot").textContent=(shiftResult.data||[]).length>=limit?"※取得上限に達したため判定が不完全な可能性があります。":"※EXA登録シフトに基づく要確認候補です。連絡済み・次回希望日は判定していません。";
- }catch(e){
-  summary.textContent="シフト要確認｜取得エラー";
-  box.textContent="候補を取得できません："+(e.message||String(e));
- }
-}
 
 loginCheck();
 </script></body></html>
