@@ -107,12 +107,14 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 <label>店舗 <select id="storeSelect"><option value="grand-luxe">Grand Luxe</option><option value="luxy-osaka">LUXY OSAKA</option><option value="rose">薔薇と紳士</option><option value="un-secret">Un Secret</option><option value="busty-osaka">BUSTY OSAKA</option></select></label>
 <div class="month"><button id="prev">◀</button><strong id="monthLabel"></strong><button id="next">▶</button></div>
 <button class="primary" disabled title="店舗別EXA同期は未接続です">今すぐ更新</button>
+<button id="csvImport" class="headerbtn" title="EXA日別データをCSVで安全に追記・更新。未記載のシフトは削除しません。">EXA CSV取込</button><input id="csvFile" type="file" accept=".csv,text/csv" class="hide">
 <button id="reload" class="headerbtn">保存データを再読込</button>
 <button id="logout" class="headerbtn hide">ログアウト</button></div></header>
 <section id="login" class="lg-interview-login hide"><div class="auth-card"><aside class="auth-brand-panel" aria-hidden="true"><div class="auth-brand-top"><div class="auth-brand-symbol">L</div><div class="auth-brand-name">L GROUP<small>INTERNAL MANAGEMENT</small></div></div><div class="auth-brand-middle"><span class="auth-brand-kicker">STAFF MANAGEMENT SYSTEM</span><h1 class="auth-brand-title">SHIFT<br>MANAGEMENT.</h1><p class="auth-brand-description">日々の管理業務を、もっとスマートに。<br>すべての情報をひとつの場所で。</p></div><div class="auth-brand-bottom"><span>STAFF PORTAL</span><span>L GROUP © 2026</span></div></aside><div class="auth-form-panel"><p class="auth-eyebrow">WELCOME BACK</p><h2>出勤管理ログイン</h2><div class="auth-mode-label"><span>管理者</span></div><form id="loginForm"><p class="auth-help">既存の管理者アカウントと同じID・PASSを使用します。</p><label for="email">ID（メールアドレス）<input id="email" type="email" autocomplete="username" required></label><label for="password">PASS<input id="password" type="password" autocomplete="current-password" required></label><div id="loginError" role="alert"></div><button type="submit">ログイン</button></form><p class="auth-footnote">AUTHORIZED PERSONNEL ONLY</p></div></div></section>
 <main id="app" class="hide">
 
 
+<div class="notice" style="margin:12px 14px 0">部分取込中：確認できた出勤分だけを表示しています。空欄は「休み」確定ではありません。EXAの30日自動同期は未接続です。</div>
 <section class="panel"><div class="month-heading"><h2>月間シフト</h2><div class="filter"><button data-filter="real">実働</button><button data-filter="dummy">ダミー</button><button data-filter="unconfirmed">未分類</button><button data-filter="all" class="active">全件</button></div></div>
 <p id="message" class="muted"></p><div class="scroll"><table id="monthly" class="shift"></table><div id="empty" class="empty hide">該当するセラピストはいません。</div></div></section>
 </main>
@@ -138,7 +140,7 @@ const isUnconfirmed=t=>t.residency==="unconfirmed"||(!isDummy(t)&&t.operating_ca
 function render(){
  $("monthLabel").textContent=month.replace("-","年")+"月";
  const days=dates(),table=$("monthly");table.replaceChildren();
- const head=document.createElement("tr");["源氏名","出勤","接客","当欠","評価",...days.map(d=>String(+d.slice(8))+"日")].forEach(x=>makeCell(head,x,"th"));table.append(head);
+ const head=document.createElement("tr");["源氏名","確認分","接客","当欠","評価",...days.map(d=>String(+d.slice(8))+"日")].forEach(x=>makeCell(head,x,"th"));table.append(head);
  const wanted=staff.filter(t=>{
   const dummy=isDummy(t),unknown=isUnconfirmed(t);
   return filter==="all"||(filter==="dummy"?dummy:filter==="unconfirmed"?unknown:!dummy&&!unknown)
@@ -153,7 +155,7 @@ function render(){
 
   const entries=shifts.filter(s=>s.exa_id===id);
   const done=performance.filter(p=>p.exa_id===id);
-  makeCell(row,shifts.length?String(entries.length):"—");makeCell(row,performance.length?String(done.reduce((n,p)=>n+(Number(p.customer_count)||0),0)):"—");
+  makeCell(row,String(entries.length));makeCell(row,performance.length?String(done.reduce((n,p)=>n+(Number(p.customer_count)||0),0)):"—");
   makeCell(row,performance.length?String(done.filter(p=>p.attendance_status==="absent").length):"—");
   makeCell(row,person.evaluation_score==null?"—":String(person.evaluation_score));
   for(const d of days){const s=entries.find(x=>x.work_date===d);const cell=makeCell(row,s?shiftTime(s.start_minutes)+"-"+shiftTime(s.end_minutes):"");if(d===jst())cell.classList.add("today")}
@@ -196,6 +198,53 @@ $("logout").onclick=async()=>{await client.auth.signOut();sessionStorage.removeI
 $("prev").onclick=()=>{const [y,m]=month.split("-").map(Number),d=new Date(y,m-2,1);month=d.getFullYear()+"-"+pad(d.getMonth()+1);void load()};
 $("next").onclick=()=>{const [y,m]=month.split("-").map(Number),d=new Date(y,m,1);month=d.getFullYear()+"-"+pad(d.getMonth()+1);void load()};
 $("reload").onclick=()=>void load();
+
+function readCsvLine(line){
+ const fields=[];let value="",quoted=false;
+ for(let i=0;i<line.length;i++){
+  const c=line[i];
+  if(c==='"'){if(quoted&&line[i+1]==='"'){value+='"';i++}else quoted=!quoted}
+  else if(c===","&&!quoted){fields.push(value);value=""}
+  else value+=c;
+ }
+ if(quoted)throw Error("CSVの引用符が閉じられていません");
+ fields.push(value);return fields;
+}
+$("csvImport").onclick=()=>{if(authorized)$("csvFile").click()};
+$("csvFile").onchange=async e=>{
+ const input=e.target,button=$("csvImport"),file=input.files?.[0];
+ if(!file||!authorized)return;
+ button.disabled=true;
+ try{
+  if(file.size>1024*1024)throw Error("CSV容量が大きすぎます（上限1MB）");
+  const lines=(await file.text()).replace(/^\uFEFF/,"").replace(/\r\n/g,"\n").trim().split("\n").filter(Boolean);
+  if(lines.length<2||lines.length>3001)throw Error("CSVは見出し＋1〜3000行で指定してください");
+  const header=readCsvLine(lines.shift()).map(x=>x.trim());
+  const keys=["出勤日","EXA ID","源氏名","出勤","退勤"],idx=keys.map(x=>header.indexOf(x));
+  if(idx.some(i=>i<0))throw Error("CSV見出しが一致しません："+keys.join("、"));
+  const rows=lines.map(line=>{
+    const cols=readCsvLine(line);
+    return {date:(cols[idx[0]]||"").trim(),id:Number(cols[idx[1]]),name:(cols[idx[2]]||"").trim(),start:(cols[idx[3]]||"").trim(),finish:(cols[idx[4]]||"").trim()};
+  });
+  const days=new Set(rows.map(r=>r.date));
+  if(!confirm("Grand Luxe のEXAシフト "+rows.length+"件（"+days.size+"日分）を取り込みます。\n未記載のシフトは削除しません。\n源氏名・IDが登録済み名簿と一致しない場合は登録を中止します。\n\n続行しますか？"))return;
+  const {data:{session}}=await client.auth.getSession();
+  if(!session)throw Error("認証期限切れです。再ログインしてください");
+  $("message").textContent="EXA CSV "+rows.length+"件を検証・取込中…";
+  const reply=await fetch(url+"/functions/v1/exa-grandluxe-shift-import",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","apikey":key,"Authorization":"Bearer "+session.access_token},
+    body:JSON.stringify({source:"csv",rows})
+  });
+  const response=await reply.json();
+  if(!reply.ok||!response.ok)throw Error(response.error||"取込失敗 (HTTP "+reply.status+")");
+  await load();
+  $("message").textContent+=" ｜ CSV取込成功 "+response.imported+"件・"+response.days+"日分";
+ }catch(error){
+  $("message").textContent="CSV取込失敗："+String(error.message||error);
+ }finally{button.disabled=false;input.value=""}
+};
+
 document.querySelectorAll("[data-filter]").forEach(b=>b.onclick=()=>{filter=b.dataset.filter;document.querySelectorAll("[data-filter]").forEach(x=>x.classList.toggle("active",x===b));render()});
 $("closeDay").onclick=()=>$("dayPanel").classList.add("hide");
 $("dayPanel").onclick=e=>{if(e.target===$("dayPanel"))$("closeDay").click()};
