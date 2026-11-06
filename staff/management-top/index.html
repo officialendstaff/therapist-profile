@@ -6,7 +6,7 @@
 button{cursor:pointer}a{text-decoration:none;color:inherit}.hidden{display:none!important}
 header{background:#1b304b;color:white;padding:17px clamp(18px,3vw,44px);display:flex;align-items:center;justify-content:space-between;gap:15px}
 .brand{font-size:20px;font-weight:800;letter-spacing:.05em}.brand small{display:block;margin-top:3px;color:#adc3dc;font-size:10px;letter-spacing:.17em;font-weight:500}
-.header-right{display:flex;gap:12px;align-items:center}.header-right span{font-size:12px;color:#d1ddeb}
+.header-right{display:flex;gap:12px;align-items:center}.header-right span{font-size:12px;color:#d1ddeb}.header-right #userName{display:none}
 .header-right button{background:transparent;color:#fff;border:1px solid #61748c;border-radius:7px;padding:9px 13px}
 main{max-width:1340px;margin:0 auto;padding:26px clamp(12px,3vw,36px) 40px}
 .page-head{display:flex;align-items:center;justify-content:space-between;margin:0 0 19px;gap:15px}.page-head h1{font-size:23px;margin:0}.page-head p{margin:5px 0 0;color:#728096;font-size:12px}
@@ -244,10 +244,10 @@ body:has(.lg-interview-login:not(.hide):not(.hidden)) .page>.topbar{display:none
 @media(max-width:650px){.dialog{width:calc(100vw - 18px)}.dialog-head{padding:13px 14px}.dialog-head h2{font-size:16px}.dialog-header-controls select{min-width:0;width:120px;padding:8px}.list-wrap{padding:0 10px 14px}.list-wrap th,.list-wrap td{padding:10px 8px;font-size:12px}}
 </style></head>
 <body>
-<header><div class="brand">L GROUP<small>MANAGEMENT SYSTEM</small></div><div class="header-right"><span id="asOf">集計基準日 —</span><span id="userName"></span><button id="logout" class="hidden">ログアウト</button></div></header>
+<header><div class="brand">L GROUP<small>MANAGEMENT SYSTEM</small></div><div class="header-right"><span id="asOf">集計基準日 —</span><span id="userName"></span><button class="refresh hidden" id="refresh" type="button">情報更新</button><button id="logout" class="hidden">ログアウト</button></div></header>
 <div id="login" class="lg-interview-login hidden"><div class="auth-card"><aside class="auth-brand-panel" aria-hidden="true"><div class="auth-brand-top"><div class="auth-brand-symbol">L</div><div class="auth-brand-name">L GROUP<small>INTERNAL MANAGEMENT</small></div></div><div class="auth-brand-middle"><span class="auth-brand-kicker">STAFF MANAGEMENT SYSTEM</span><h1 class="auth-brand-title">L GROUP<br>MANAGEMENT.</h1><p class="auth-brand-description">日々の管理業務を、もっとスマートに。<br>すべての情報をひとつの場所で。</p></div><div class="auth-brand-bottom"><span>STAFF PORTAL</span><span>L GROUP © 2026</span></div></aside><div class="auth-form-panel"><p class="auth-eyebrow">WELCOME BACK</p><h2>総合管理ログイン</h2><div class="auth-mode-label"><span>管理者</span></div><form id="loginForm"><p class="auth-help">既存の管理者アカウントと同じID・PASSを使用します。</p><label for="email">ID（メールアドレス）<input id="email" type="email" autocomplete="username" required></label><label for="password">PASS<input id="password" type="password" autocomplete="current-password" required></label><div id="loginError" role="alert"></div><button type="submit">ログイン</button></form><p class="auth-footnote">AUTHORIZED PERSONNEL ONLY</p></div></div></div>
 <main id="app" class="hidden">
- <div class="page-head"><div><h1>総合管理TOP</h1></div><button class="refresh" id="refresh">最新の情報に更新</button></div>
+ <div class="page-head"><div><h1>総合管理TOP</h1></div></div>
  <h2 class="section-heading action-section-heading">本日の対応事項</h2>
  <div class="dashboard action-dashboard">
   <section class="panel action-panel final-panel"><h2><span>◷</span>最終出勤</h2><div class="count" id="finalCount">—<small>名</small></div><div class="sub">退勤前に次回シフトを決める！</div><button data-open="final">対象者を確認</button></section>
@@ -285,7 +285,7 @@ let data={final_today:[],outside:[],birthday:[],connected_stores:[],unconnected_
 let contacts=new Map();let contactSaving=false;
 const text=(e,v)=>{e.textContent=String(v??"")};
 const mk=(tag,value)=>{const e=document.createElement(tag);text(e,value);return e};
-function showLogin(error=""){$("app").classList.add("hidden");$("staffApp").classList.add("hidden");$("login").classList.remove("hidden");$("logout").classList.add("hidden");text($("loginError"),error)}
+function showLogin(error=""){$("refresh").classList.add("hidden");$("app").classList.add("hidden");$("staffApp").classList.add("hidden");$("login").classList.remove("hidden");$("logout").classList.add("hidden");text($("loginError"),error)}
 async function authorize(){
  if(!client){showLogin("認証処理を読み込めません。");return}
  const s=await client.auth.getSession();
@@ -297,7 +297,7 @@ async function authorize(){
  if(profile.error||!profile.data?.approved_at){showLogin("このページへの権限がありません。");return}
  const staffOnly=profile.data.role==="custom"&&Array.isArray(profile.data.features)&&profile.data.features.includes("interview");
  if(staffOnly){
-   authorized=false;text($("userName"),profile.data.display_name||"スタッフ");
+   authorized=false;$("refresh").classList.add("hidden");text($("userName"),profile.data.display_name||"スタッフ");
    $("login").classList.add("hidden");$("app").classList.add("hidden");
    $("staffApp").classList.remove("hidden");$("logout").classList.remove("hidden");return;
  }
@@ -305,7 +305,7 @@ async function authorize(){
   showLogin("このページへの権限がありません。");return
  }
  $("staffApp").classList.add("hidden");
- authorized=true;text($("userName"),profile.data.display_name||"管理者");
+ authorized=true;$("refresh").classList.remove("hidden");text($("userName"),profile.data.display_name||"管理者");
  $("login").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");
  await load();
 }
