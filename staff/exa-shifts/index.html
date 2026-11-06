@@ -365,6 +365,25 @@ footer{display:none}
 .shift-table tbody tr:not(.group) td.staff-name.state-paperwork{background:#F8D1E5!important;color:#96365C!important;box-shadow:inset 4px 0 #D44F96}
 .shift-table tbody tr:not(.group) td.staff-name.state-leave{background:#D3F2E2!important;color:#237C55!important;box-shadow:inset 4px 0 #35A77A}
 @media(max-width:900px){.shift-status-legend{gap:6px;margin-left:6px;font-size:9px}}
+
+/* Shared L GROUP management sign-in visual system. Restricted to login state. */
+body:has(#login:not(.hide)){background:#F6F5F2!important}
+body:has(#login:not(.hide)) header{background:#17283E!important;border-bottom:2px solid #C4A06A!important}
+body:has(#login:not(.hide)) header .head-controls,
+body:has(#login:not(.hide)) header .controls,
+body:has(#login:not(.hide)) header .header-menu{display:none!important}
+#login.lg-login-shell:not(.hide){box-sizing:border-box!important;display:grid!important;place-items:center!important;min-height:calc(100vh - 73px)!important;max-width:none!important;width:100%!important;margin:0!important;padding:26px 16px 56px!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+#login.lg-login-shell .lg-login-card{box-sizing:border-box;width:min(430px,100%);background:#fff;border:1px solid #E5DFD5;border-radius:15px;padding:32px;box-shadow:0 18px 48px #17283e13}
+#login.lg-login-shell .lg-login-card h2{font-size:23px;font-weight:800;color:#17283E;line-height:1.4;margin:0 0 8px!important}
+#login.lg-login-shell .lg-login-card .lg-login-copy{font-size:12px;font-weight:400;color:#657991;line-height:1.55;margin:0 0 26px!important}
+#login.lg-login-shell #loginForm{display:block!important}
+#login.lg-login-shell #loginForm label{display:block!important;font-size:12px!important;font-weight:700!important;color:#283344!important;margin:14px 0!important}
+#login.lg-login-shell #loginForm input{box-sizing:border-box!important;display:block!important;width:100%!important;min-height:44px!important;background:#fff!important;color:#20314A!important;border:1px solid #CBD8E6!important;border-radius:7px!important;padding:12px!important;margin:7px 0 0!important;font-size:14px!important}
+#login.lg-login-shell #loginForm input:focus{outline:2px solid #B89B6D!important;outline-offset:1px}
+#login.lg-login-shell #loginForm button{box-sizing:border-box!important;display:block!important;width:100%!important;min-height:45px!important;background:#17283E!important;color:#fff!important;border:1px solid #17283E!important;border-radius:8px!important;padding:12px 18px!important;margin:18px 0 0!important;font-size:13px!important;font-weight:700!important;cursor:pointer!important}
+#login.lg-login-shell #loginForm button:hover{background:#253C58!important}
+#login.lg-login-shell #loginError{color:#AE3449!important;min-height:17px!important;font-size:12px!important;margin:12px 0 0!important}
+@media(max-width:530px){#login.lg-login-shell .lg-login-card{padding:25px 22px}#login.lg-login-shell:not(.hide){padding:16px 12px 42px!important}}
 </style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
@@ -380,7 +399,7 @@ footer{display:none}
 <button id="autoSync" title="Chrome起動中の自動更新">ブラウザ自動：OFF</button>
 </div></details><span id="authLabel" class="muted login-tag" style="color:#d5e1f1"></span><button id="logout" class="hide">ログアウト</button>
 </div></header>
-<section id="login" class="panel hide"><h2>スタッフログイン</h2><p class="muted">面接管理で使用しているSupabaseアカウントでログインしてください。閲覧は承認済み管理者に限定しています。</p><form id="loginForm"><label>メールアドレス<input id="email" type="email" autocomplete="username" required></label><label>パスワード<input id="password" type="password" autocomplete="current-password" required></label><button class="primary" type="submit">ログイン</button></form><p id="loginError" class="error"></p></section>
+<section id="login" class="lg-login-shell hide"><div class="lg-login-card"><h2>管理システム ログイン</h2><p class="lg-login-copy">管理者アカウントでログインしてください。</p><form id="loginForm"><label for="email">メールアドレス<input id="email" type="email" autocomplete="username" required></label><label for="password">パスワード<input id="password" type="password" autocomplete="current-password" required></label><button class="primary" type="submit">ログイン</button></form><p id="loginError" class="error" role="alert"></p></div></section>
 <main id="app" class="hide">
 
 <p id="message" class="muted" role="status" aria-live="polite"></p>
