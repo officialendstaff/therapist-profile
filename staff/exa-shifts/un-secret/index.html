@@ -429,19 +429,23 @@ header.lg-common-header .lg-header-home:focus-visible{outline:2px solid #c4a06a;
 header.lg-common-header .head-controls,header.lg-common-header .controls,header.lg-common-header .header-menu{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;min-width:0}
 header.lg-common-header .header-menu{flex-wrap:nowrap}
 @media(max-width:650px){header.lg-common-header{height:60px!important;min-height:60px!important;max-height:60px!important;padding:0 12px!important}header.lg-common-header .lg-header-home{font-size:12px!important}header.lg-common-header .lg-header-home img{width:40px;height:40px}}
+.shift-table tbody tr:not(.group) td.staff-name.state-unconfirmed{background:#fff2d7!important;color:#86500d!important;box-shadow:inset 4px 0 #d4a042}
+.shift-table tbody tr:not(.group) td.staff-name.state-unconfirmed .name-editor{color:#86500d!important}
+.exa-hide-note{font-size:9px;color:#ac3342;display:block;font-weight:750}
 </style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script></head>
 <body>
 <header class="work-header lg-common-header"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ移動" aria-label="総合管理TOPへ移動"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span id="lgHeaderHomeLabel">総合 TOP</span></a><div class="head-controls">
 <label class="store-label">店舗 <select id="storeSelect" aria-label="店舗切替"><option value="grand-luxe">Grand Luxe</option><option value="luxy-osaka">LUXY OSAKA</option><option value="rose">薔薇と紳士</option><option value="un-secret" selected>Un Secret</option><option value="busty-osaka">BUSTY OSAKA</option></select></label>
 <div class="head-month"><button id="prev" title="前月">◀</button><strong id="monthLabel"></strong><button id="next" title="翌月">▶</button></div>
-<button id="exaSync" class="primary" disabled title="Un SecretのEXAサーバー連携は未設定です">今すぐ更新（未接続）</button>
-<details class="settings-menu"><summary>その他 <span aria-hidden="true">▾</span></summary><div class="settings-panel">
+<button id="exaSync" class="primary" title="EXAサーバーから最新30日分を直接取得・反映">今すぐ更新</button>
+<button id="autoSync" title="この画面を開いている間は3時間ごとにサーバーから最新30日分を取得。PCを閉じてもサーバー定期同期は続きます">自動更新：OFF</button>
+<div class="hidden-management-tools" style="display:none" aria-hidden="true">
 <button id="reload">保存データを再読込</button>
 <button id="unscheduledAdd" title="EXA登録画面でIDと源氏名を確認した人だけ追加。出勤データは変更しません">出勤予定なしのEXA登録者を追加</button>
-<button id="csvImport" title="Un SecretのEXA CSVファイルを登録">EXA CSV取込・更新</button><input id="csvFile" type="file" accept=".csv,text/csv" style="display:none">
-<button id="serverTest" disabled title="EXAサーバー未接続">サーバー30日検証（未接続）</button>
-<button id="autoSync" disabled title="EXAサーバー未接続">ブラウザ自動：未接続</button>
-</div></details><span id="authLabel" class="muted login-tag" style="color:#d5e1f1"></span><button id="logout" class="hide">ログアウト</button>
+<button id="csvImport">EXA CSV取込・更新</button><input id="csvFile" type="file" accept=".csv,text/csv" style="display:none">
+<button id="serverTest" title="EXAサーバー接続と30日読取を検証（保存データは変更しません）">サーバー30日検証</button>
+
+</div><span id="authLabel" class="muted login-tag" style="color:#d5e1f1"></span><button id="logout" class="hide">ログアウト</button>
 </div></header>
 <section id="login" class="lg-interview-login hide"><div class="auth-card"><aside class="auth-brand-panel" aria-hidden="true"><div class="auth-brand-top"><div class="auth-brand-symbol">L</div><div class="auth-brand-name">L GROUP<small>INTERNAL MANAGEMENT</small></div></div><div class="auth-brand-middle"><span class="auth-brand-kicker">STAFF MANAGEMENT SYSTEM</span><h1 class="auth-brand-title">SHIFT<br>MANAGEMENT.</h1><p class="auth-brand-description">日々の管理業務を、もっとスマートに。<br>すべての情報をひとつの場所で。</p></div><div class="auth-brand-bottom"><span>STAFF PORTAL</span><span>L GROUP © 2026</span></div></aside><div class="auth-form-panel"><p class="auth-eyebrow">WELCOME BACK</p><h2>出勤管理ログイン</h2><div class="auth-mode-label"><span>管理者</span></div><form id="loginForm"><p class="auth-help">既存の管理者アカウントと同じID・PASSを使用します。</p><label for="email">ID（メールアドレス）<input id="email" type="email" autocomplete="username" required></label><label for="password">PASS<input id="password" type="password" autocomplete="current-password" required></label><div id="loginError" role="alert"></div><button type="submit">ログイン</button></form><p class="auth-footnote">AUTHORIZED PERSONNEL ONLY</p></div></div></section>
 <main id="app" class="hide">
@@ -476,7 +480,7 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
    <p class="muted">面接情報がないセラピストは、未紐づけのままで構いません。</p>
   </div>
   <div class="person-registry interview-match">
-   <strong>アンケート評価（未接続）</strong>
+   <strong>アンケート評価</strong>
    <p id="surveyLinkState" class="muted">評価データを確認中…</p>
    <button id="surveyLinkOpen" type="button" class="hide">アンケートIDを紐づける</button>
    <div id="surveyLinkPanel" class="hide">
@@ -514,7 +518,7 @@ const dayStr=n=>month+"-"+String(n).padStart(2,"0");
 const minutes=x=>{const h=Math.floor(x/60),m=x%60;return (h>=24?(h===24?"24":String(h-24)):String(h))+(m?":"+String(m).padStart(2,"0"):"")};
 const shiftTime=x=>{const h=Math.floor(x/60),m=x%60,clock=h>=24?h-24:h;return m===30?clock+".5":m===0?String(h===24?24:clock):clock+":"+String(m).padStart(2,"0");};
 const range=x=>shiftTime(x.start_minutes)+"-"+shiftTime(x.end_minutes);
-const isDummy=s=>s.residency==="dummy";
+const isDummy=s=>s.residency==="dummy"||s.operating_category==="dummy_use";
 const staffById=()=>new Map(therapists.map(t=>[t.exa_id,t]));
 const byDay=()=>{const m=new Map();for(const r of shifts){if(!m.has(r.work_date))m.set(r.work_date,[]);m.get(r.work_date).push(r);}return m;};
 let messageTimer=null;
@@ -533,14 +537,21 @@ if(error||access.error||access.data!==true||!data||!data.approved_at||!["master"
   authorized=false;$("app").classList.add("hide");location.replace("/therapist-profile/staff/management-top/");$("loginError").textContent="このページへの権限がありません。";return;
 }
 const homeName=document.getElementById("lgHeaderHomeLabel");if(homeName)homeName.textContent=(data.display_name||"管理")+" TOP";
-authorized=true;$("login").classList.add("hide");$("app").classList.remove("hide");$("logout").classList.remove("hide");$("authLabel").textContent="認証済み";await load();}
+authorized=true;$("login").classList.add("hide");$("app").classList.remove("hide");$("logout").classList.remove("hide");$("authLabel").textContent="認証済み";await load();
+const query=new URL(location.href);
+if(query.searchParams.get("exa_sync")==="1"){
+ query.searchParams.delete("exa_sync");
+ history.replaceState(null,"",query.pathname+query.search+query.hash);
+ void synchronizeEXA("panel");
+}
+}
 $("loginForm").onsubmit=async e=>{e.preventDefault();$("loginError").textContent="確認中…";const {error}=await client.auth.signInWithPassword({email:$("email").value,password:$("password").value});if(error){$("loginError").textContent="ログインできません。入力情報をご確認ください。";return;}$("loginError").textContent="";await loginCheck()};
 $("logout").onclick=async()=>{await client.auth.signOut();sessionStorage.removeItem("mattan-recruit-auth");location.reload()};
 async function load(){
 if(!authorized)return;showMsg("Supabaseを読み込み中…");
 const start=month+"-01",end=dayStr(daysIn());
 const [a,b,c,d,e,future,sv,sl,roster]=await Promise.all([
-client.from("exa_shift_therapists").select("exa_id,stage_name,residency,employment_status,operating_category,evaluation_score").eq("store_code","unsecret"),
+client.from("exa_shift_therapists").select("exa_id,stage_name,residency,employment_status,operating_category,evaluation_score,exa_is_visible,exa_list_position").eq("store_code","unsecret"),
 client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_dummy_shift,is_pre_off").eq("store_code","unsecret").gte("work_date",start).lte("work_date",end).order("work_date"),
 client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code","unsecret").gte("work_date",start).lte("work_date",end),
 client.from("exa_shift_sync_runs").select("finished_at,record_count,mode").eq("store_code","unsecret").eq("state","success").order("finished_at",{ascending:false}).limit(1),
@@ -586,18 +597,20 @@ let staffView="real";
 function renderMonthly(){
 const existing=staffById(), byId=new Map();
 for(const r of shifts){if(!byId.has(r.exa_id))byId.set(r.exa_id,new Map());byId.get(r.exa_id).set(r.work_date,r);}
-const real=therapists.filter(t=>t.operating_category!=="not_used"&&t.operating_category!=="dummy_use").sort((a,b)=>a.exa_id-b.exa_id);
-const dummy=therapists.filter(t=>t.operating_category==="dummy_use"||t.operating_category==="not_used").sort((a,b)=>a.exa_id-b.exa_id);
+const real=therapists.filter(t=>t.operating_category!=="not_used"&&!isDummy(t)).sort((a,b)=>a.exa_id-b.exa_id);
+const dummy=therapists.filter(t=>isDummy(t)||t.operating_category==="not_used").sort((a,b)=>a.exa_id-b.exa_id);
 const per=new Map(performances.map(p=>[p.exa_id+"|"+p.work_date,p.customer_count]));
 const absence=new Set(performances.filter(p=>p.attendance_status==="absent").map(p=>p.exa_id+"|"+p.work_date));
 const dayCounts=new Map();
 for(let n=1;n<=daysIn();n++){
  const date=dayStr(n);
  const r=shifts.filter(x=>x.work_date===date);
- const active=r.filter(x=>rosterIds.has(x.exa_id)&&existing.get(x.exa_id)?.operating_category!=="not_used"&&!x.is_dummy_shift&&!isDummy(existing.get(x.exa_id)||{})).length;
- const dummyTotal=r.filter(x=>rosterIds.has(x.exa_id)&&existing.get(x.exa_id)?.operating_category!=="not_used"&&(x.is_dummy_shift||isDummy(existing.get(x.exa_id)||{}))).length;
+ const active=r.filter(x=>rosterIds.has(x.exa_id)&&existing.get(x.exa_id)?.operating_category!=="not_used"&&!x.is_pre_off&&!x.is_dummy_shift&&!isDummy(existing.get(x.exa_id)||{})).length;
+ const dummyTotal=r.filter(x=>rosterIds.has(x.exa_id)&&existing.get(x.exa_id)?.operating_category!=="not_used"&&!x.is_pre_off&&(x.is_dummy_shift||isDummy(existing.get(x.exa_id)||{}))).length;
  dayCounts.set(date,{real:active,dummy:dummyTotal,all:active+dummyTotal});
 }
+const unconfirmed=real.filter(t=>t.residency==="unconfirmed"||t.operating_category==="unclassified").length;
+const verifiedReal=real.length-unconfirmed;
 const countHeader=staffView==="real"?"在籍（"+real.length+"名）":staffView==="dummy"?"退店（"+dummy.length+"名）":"在籍（"+real.length+"名）／退店（"+dummy.length+"名）";
 let html='<thead><tr><th class="staff-heading" rowspan="2"><span>'+countHeader+'</span></th>';
 if(staffView==="dummy")html+='<th class="stat-heading" rowspan="2">登録曜日</th><th class="stat-heading" rowspan="2">出勤</th><th class="stat-heading" rowspan="2">退勤</th>';
@@ -613,13 +626,13 @@ const rawName=String(t.stage_name||"ID "+t.exa_id);
 const nameParts=rawName.match(/^(.+?)-([^-]+)-$/);
 const stageName=nameParts?nameParts[1]:rawName,kana=nameParts?nameParts[2]:"";
 const upcoming=futureShifts.some(r=>r.exa_id===t.exa_id&&r.work_date>=today()&&!r.is_dummy_shift&&!r.is_pre_off);
-const outside=group==="real"&&!upcoming&&!["long_leave","pending_documents","provisional_hidden"].includes(t.operating_category);
+const outside=group==="real"&&!upcoming&&!["long_leave","pending_documents","provisional_hidden","unclassified"].includes(t.operating_category)&&t.residency!=="unconfirmed";
 const latestDates=futureShifts.filter(r=>r.exa_id===t.exa_id&&!r.is_dummy_shift&&!r.is_pre_off).map(r=>r.work_date).sort();
 const lastKnownDate=latestDates.length?latestDates[latestDates.length-1]:null;
-const days=[...entries.values()].filter(r=>!r.is_dummy_shift).length;
+const days=[...entries.values()].filter(r=>!r.is_dummy_shift&&!r.is_pre_off).length;
 const zeros=valid.filter(r=>!absence.has(t.exa_id+"|"+r.work_date)&&per.get(t.exa_id+"|"+r.work_date)===0).length;
-const categoryClass={provisional_hidden:"state-provisional",pending_documents:"state-paperwork",long_leave:"state-leave",dummy_use:"state-dummy"}[t.operating_category]||(group==="dummy"?"state-dummy":"");
-html+='<tr class="'+(outside?'outside-roster':'')+'"><td class="staff-name '+categoryClass+'"><button type="button" class="name-editor" data-staff-id="'+t.exa_id+'" title="出勤管理区分を変更">'+safe(stageName)+'</button><span class="staff-exa-id" title="EXA管理ID">ID '+t.exa_id+'</span>'+(kana?'<span class="reading">'+safe(kana)+'</span>':'')+'</td>';
+const categoryClass={unclassified:"state-unconfirmed",provisional_hidden:"state-provisional",pending_documents:"state-paperwork",long_leave:"state-leave",dummy_use:"state-dummy"}[t.operating_category]||(t.residency==="unconfirmed"?"state-unconfirmed":group==="dummy"?"state-dummy":"");
+html+='<tr class="'+(outside?'outside-roster':'')+'"><td class="staff-name '+categoryClass+'"><button type="button" class="name-editor" data-staff-id="'+t.exa_id+'" title="出勤管理区分を変更">'+safe(stageName)+'</button><span class="staff-exa-id" title="EXA管理ID">ID '+t.exa_id+'</span>'+(kana?'<span class="reading">'+safe(kana)+'</span>':'')+(t.exa_is_visible===false?'<span class="exa-hide-note">EXA非表示</span>':'')+'</td>';
 const surveyId=surveyLinks.find(l=>l.exa_id===t.exa_id)?.sheet_person_id;
 const survey=surveyScores.find(x=>x.sheet_person_id===surveyId);
 const responseCount=survey?.response_count??0;
@@ -853,10 +866,7 @@ $("interviewLinkConfirm").onclick=async()=>{
 // Survey scores are a read-only snapshot of the connected sheet's ID tab.
 // EXA and sheet IDs are only joined by a manager-confirmed mapping.
 async function loadSurveyLink(exaId){
- $("surveyLinkPanel").classList.add("hide");
- $("surveyLinkOpen").classList.add("hide");
- $("surveyLinkState").textContent="Un Secretのアンケート評価は未接続です。";
- return;
+ if(!surveyScores.length){$("surveyLinkPanel").classList.add("hide");$("surveyLinkOpen").classList.add("hide");$("surveyLinkState").textContent="Un Secret のアンケート連携は未設定です。";return;}
  const request=++surveyRequest;
  const status=$("surveyLinkState"),btn=$("surveyLinkOpen"),panel=$("surveyLinkPanel");
  panel.classList.add("hide");btn.classList.add("hide");
@@ -884,6 +894,7 @@ async function loadSurveyLink(exaId){
 }
 $("surveyLinkOpen").onclick=()=>{$("surveyLinkPanel").classList.toggle("hide")};
 $("surveyLinkSave").onclick=async()=>{
+ if(!surveyScores.length){showMsg("Un Secret のアンケート評価連携は未設定です。",true);return;}
  const exaId=editingResidency?.exaId;
  const sheetId=$("surveyPersonChoice").value;
  if(!authorized||!exaId||!sheetId)return;
@@ -1018,15 +1029,23 @@ const LAST_KEY="exa-unsecret-last-sync-v1";
 const ATTEMPT_KEY="exa-unsecret-auto-attempt-v1";
 const AUTO_MS=3*60*60*1000;
 const RETRY_MS=30*60*1000;
-let autoEnabled=false;
+let autoEnabled=localStorage.getItem(AUTO_KEY)==="on";
 const asTokyoDate=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
 function paintAuto(){
- $("autoSync").textContent="ブラウザ自動：未接続";
- $("autoSync").title="EXAサーバー認証が未設定のため自動更新は開始していません。";
+ $("autoSync").textContent=autoEnabled?"自動更新：ON":"自動更新：OFF";
+ $("autoSync").title="この画面を開いている間に3時間おきにサーバー同期します。画面を閉じていても別途サーバー定期同期が動作します。";
  $("autoSync").setAttribute("aria-pressed",String(autoEnabled));
 }
 paintAuto();
-$("autoSync").onclick=()=>showMsg("EXAサーバー認証が未設定です。",true);
+$("autoSync").onclick=()=>{
+ autoEnabled=!autoEnabled;
+ localStorage.setItem(AUTO_KEY,autoEnabled?"on":"off");
+ if(autoEnabled && !localStorage.getItem(LAST_KEY)){
+   localStorage.setItem(LAST_KEY,String(Date.now()));
+ }
+ paintAuto();
+ showMsg(autoEnabled?"3時間自動更新を有効にしました。このページを開いている間、3時間おきに更新します。":"3時間自動更新を停止しました。");
+};
 
 const bridgeRequests=new Map();
 let syncAbortRequested=false;
@@ -1056,7 +1075,41 @@ async function fetchFromExaExtension(){
   window.postMessage({source:"exa-shift-page",action:"fetch-shifts",requestId},location.origin);
  });
 }
-async function synchronizeEXA(mode="manual"){showMsg("Un SecretのEXAサーバー接続は未設定です。",true);}
+async function synchronizeEXA(mode="manual"){
+ if(!authorized||extensionBusy)return;
+ const automatic=mode==="auto";
+ extensionBusy=true;exaSyncStartedAt=Date.now();
+ $("exaSync").disabled=true;$("exaSync").textContent="更新中…";$("exaSync").title="EXAサーバーから直接30日分を同期しています";
+ $("autoSync").disabled=true;
+ try{
+  showMsg(automatic?"EXAのサーバー自動同期中…":"EXAサーバーから最新30日分を取得・反映中…");
+  const {data:{session}}=await client.auth.getSession();
+  if(!session)throw new Error("管理ページに再ログインしてください");
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),75000);
+  let res;
+  try{
+   res=await fetch(URL_SB+"/functions/v1/exa-unsecret-manual-sync",{
+    method:"POST",signal:controller.signal,
+    headers:{"Content-Type":"application/json","apikey":KEY_SB,"Authorization":"Bearer "+session.access_token},
+    body:"{}"
+   });
+  }finally{clearTimeout(timer)}
+  const data=await res.json();
+  if(!res.ok||!data.ok)throw new Error(data.error||"サーバー同期に失敗しました（HTTP "+res.status+"）");
+  localStorage.setItem(LAST_KEY,String(Date.now()));
+  await load();
+  showMsg((automatic?"自動更新":"手動更新")+"完了："+data.imported+"件・"+data.days+"日分。出勤取消："+data.removed+"件。");
+ }catch(err){
+  const timedOut=err?.name==="AbortError";
+  showMsg((automatic?"自動更新":"今すぐ更新")+"に失敗："+(timedOut?"サーバー応答が75秒を超えました。最新データ再読込で反映状況を確認してください。":String(err.message||err)),true);
+ }finally{
+  extensionBusy=false;exaSyncStartedAt=0;
+  $("exaSync").disabled=false;$("exaSync").textContent="今すぐ更新";
+  $("exaSync").title="EXAサーバー側で最新30日分のシフトを取得・反映";
+  $("autoSync").disabled=false;
+ }
+}
 // Manual bridge for EXA registrations not included in a 30-day schedule snapshot.
 // It never changes existing rows, shifts or roster classifications.
 $("unscheduledAdd").onclick=async()=>{
@@ -1085,7 +1138,50 @@ $("unscheduledAdd").onclick=async()=>{
  }catch(err){showMsg("EXA登録者の追加に失敗："+String(err.message||err),true);}
  finally{button.disabled=false;}
 };
-$("serverTest").onclick=()=>showMsg("Un SecretのEXAサーバー接続は未設定です。",true);
+$("serverTest").onclick=async()=>{
+ if(!authorized||extensionBusy)return;
+ const button=$("serverTest");
+ button.disabled=true;
+ try{
+  showMsg("Un Secret EXAのサーバー接続・30日画面を読み取り専用で検証中…");
+  const {data:{session}}=await client.auth.getSession();
+  if(!session)throw Error("管理ページに再ログインしてください");
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),120000);
+  let response;
+  try{
+   response=await fetch(URL_SB+"/functions/v1/exa-unsecret-auth-check",{
+    method:"POST",signal:controller.signal,
+    headers:{"Content-Type":"application/json","apikey":KEY_SB,"Authorization":"Bearer "+session.access_token},
+    body:"{}"
+   });
+  }finally{clearTimeout(timer)}
+  const result=await response.json();
+  if(result.stage==="secrets_missing")throw Error("Un Secret専用EXAログイン情報がSupabase Functions Secretsに未設定です。");
+  if(!response.ok||!result.ok){
+   const why={
+    credentials_missing:"EXAログイン情報がありません",
+    exa_home_request_failed:"EXAの入口へ通信できません（ネットワーク／リダイレクト）",
+    exa_home_http_403:"EXAの入口でアクセス拒否されました（HTTP 403）",
+    exa_home_http_404:"EXAの入口URLが見つかりません（HTTP 404）",
+    exa_login_form_request_failed:"EXAログイン画面を取得できません",
+    exa_login_html_too_large:"EXAログイン画面のデータ量が異常です",
+    login_action_outside_exa:"ログイン送信先が想定外のため停止しました",
+    login_form_fields_unrecognized:"EXAログインフォームの項目を識別できません",
+    exa_login_post_request_failed:"EXAへのログイン送信で通信エラー",
+    exa_session_not_authenticated:"EXA認証後のセッションを確認できません（認証情報またはログイン方式を確認）",
+    exa_member_request_failed:"ログイン後のEXA管理画面を取得できません",
+    exa_member_screen_unrecognized:"EXA管理画面の構造を識別できません"
+   };
+   const code=result.reason||result.error||"unknown";
+   throw Error("段階 "+(result.stage||"unknown")+"／"+(why[code]||"識別コード："+code)+"／"+(result.day||0)+"日目");
+  }
+  if(result.stage!=="snapshot_compared")throw Error("30日分の読取が未完了です。");
+  showMsg("Un Secret 30日読取成功："+result.first+"〜"+result.last+"／"+result.imported+"件（事前 "+result.preoff+"件）。保存済み"+result.existing+"件との差分：追加"+result.additions+"・変更"+result.updates+"・取消候補"+result.removals+"。書込はしていません。");
+ }catch(error){
+  showMsg("Un Secret EXA検証失敗："+(error?.name==="AbortError"?"120秒でタイムアウトしました":String(error.message||error)),true);
+ }finally{button.disabled=false}
+};
+
 $("exaSync").onclick=()=>synchronizeEXA("manual");
 async function checkAuto(){
  if(!autoEnabled||!authorized||extensionBusy)return;
@@ -1103,7 +1199,7 @@ $("csvFile").onchange=async e=>{
  const file=e.target.files?.[0];if(!file)return;
  const button=$("csvImport");button.disabled=true;
  try{
-  if(file.size>1024*1024)throw Error("CSV容量が大きすぎます（上限1MB）");
+  if(file.size>1024*1024)throw Error("ファイル容量が大きすぎます（上限1MB）");
   const source=(await file.text()).replace(/^\uFEFF/,"").replace(/\r\n/g,"\n");
   const lines=source.trim().split("\n").filter(Boolean);
   const parseLine=line=>{
@@ -1121,12 +1217,14 @@ $("csvFile").onchange=async e=>{
   const head=parseLine(lines.shift()).map(x=>x.trim().replace(/^\uFEFF/,""));
   const required=["出勤日","EXA ID","源氏名","出勤","退勤"];
   const idx=required.map(h=>head.indexOf(h));
+  const stateIdx=head.indexOf("状態");
   if(idx.some(i=>i<0))throw Error("CSVの列名が一致しません："+required.join("、"));
   const rows=lines.map(line=>{
    const vals=parseLine(line);
-   return {date:vals[idx[0]],id:Number(vals[idx[1]]),name:vals[idx[2]],start:vals[idx[3]],finish:vals[idx[4]]};
+   return {date:vals[idx[0]],id:Number(vals[idx[1]]),name:vals[idx[2]],start:vals[idx[3]],finish:vals[idx[4]],...(stateIdx<0?{}:{state:(vals[stateIdx]||"").trim()})};
   });
-  const agree=confirm("EXAシフト"+rows.length+"件をSupabaseに更新登録します。既存の接客本数とダミー区分は保持します。続行しますか？");
+  const preOffCount=rows.filter(r=>r.state==="事前").length;
+  const agree=confirm("Un SecretのEXAシフト "+rows.length+"件（事前 "+preOffCount+"件）をSupabaseに登録します。\nCSVに記載のない既存シフトは削除しません。続行しますか？");
   if(!agree)return;
   const {data:{session}}=await client.auth.getSession();
   if(!session)throw Error("ログイン期限切れです。再ログインしてください");
@@ -1138,7 +1236,7 @@ $("csvFile").onchange=async e=>{
   const result=await response.json();
   if(!response.ok||!result.ok)throw Error(result.error||"取込に失敗しました（HTTP "+response.status+"）");
   await load();
-  showMsg("取込完了："+result.imported+"件・"+result.days+"日分。EXA直接更新ではなくCSV取込です。");
+  showMsg("Un Secret取込完了："+result.imported+"件（事前 "+result.preoff+"件）・"+result.days+"日分。既存の未記載シフトは削除していません。");
  }catch(error){showMsg("取込失敗："+String(error.message||error),true)}
  finally{button.disabled=false;e.target.value=""}
 };
