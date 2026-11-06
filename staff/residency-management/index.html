@@ -69,8 +69,10 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 </style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script><style id="staff-readonly-residency-v1">
 body.staff-readonly #recordDeletion,body.staff-readonly .edit-form,body.staff-readonly #statusSave,
 body.staff-readonly #retiredRows button,body.staff-readonly .edit-actions {display:none!important}
+</style><style id="lg-header-interview-label-match-20261107">
+header.lg-common-header .lg-header-home{font-size:17px!important;font-weight:700!important;letter-spacing:normal!important;line-height:1.35!important}
 </style></head><body>
-<header class="lg-common-header"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ移動" aria-label="総合管理TOPへ移動"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span id="lgHeaderHomeLabel">総合 TOP</span></a><div class="header-menu"><a href="../interview-sheet-preview/">面接管理</a><a href="../exa-shifts/">出勤管理</a><span class="disabled">備品管理</span><a href="./" class="selected">在籍管理</a><button id="logout" class="hide">ログアウト</button></div></header>
+<header class="lg-common-header"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ移動" aria-label="総合管理TOPへ移動"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span id="lgHeaderHomeLabel">TOP</span></a><div class="header-menu"><a href="../interview-sheet-preview/">面接管理</a><a href="../exa-shifts/">出勤管理</a><span class="disabled">備品管理</span><a href="./" class="selected">在籍管理</a><button id="logout" class="hide">ログアウト</button></div></header>
 <section id="login" class="lg-interview-login hide"><div class="auth-card"><aside class="auth-brand-panel" aria-hidden="true"><div class="auth-brand-top"><div class="auth-brand-symbol">L</div><div class="auth-brand-name">L GROUP<small>INTERNAL MANAGEMENT</small></div></div><div class="auth-brand-middle"><span class="auth-brand-kicker">STAFF MANAGEMENT SYSTEM</span><h1 class="auth-brand-title">THERAPIST<br>MANAGEMENT.</h1><p class="auth-brand-description">日々の管理業務を、もっとスマートに。<br>すべての情報をひとつの場所で。</p></div><div class="auth-brand-bottom"><span>STAFF PORTAL</span><span>L GROUP © 2026</span></div></aside><div class="auth-form-panel"><p class="auth-eyebrow">WELCOME BACK</p><h2>在籍管理ログイン</h2><div class="auth-mode-label"><span>管理者</span></div><form id="loginForm"><p class="auth-help">既存の管理者アカウントと同じID・PASSを使用します。</p><label for="email">ID（メールアドレス）<input id="email" type="email" autocomplete="username" required></label><label for="password">PASS<input id="password" type="password" autocomplete="current-password" required></label><div id="loginError" role="alert"></div><button type="submit">ログイン</button></form><p class="auth-footnote">AUTHORIZED PERSONNEL ONLY</p></div></div></section>
 <main id="app" class="wrap hide"><div class="page-head"><div><h2>セラピスト一覧</h2><div class="sub">EXAを基準に、面接情報・写真・在籍履歴を確認できます。</div></div><button id="reload" class="refresh">最新データを取得</button></div><p id="message" class="message hide" role="status"></p>
 <div class="metrics"><div class="metric"><span>EXA登録数</span><strong id="countAll">—</strong></div><div class="metric"><span>実働区分</span><strong id="countReal">—</strong></div><div class="metric"><span>ダミー区分</span><strong id="countDummy">—</strong></div><div class="metric"><span>面接情報との紐づけ</span><strong id="countLinked">—</strong></div></div>
@@ -99,7 +101,7 @@ async function enterStaff(){
  try{await staffRead("verify")}catch{return false}
  staffReadOnly=true;authorized=true;document.body.classList.add("staff-readonly");
  $("login").classList.add("hide");$("app").classList.remove("hide");$("logout").classList.remove("hide");
- const h=document.getElementById("lgHeaderHomeLabel");if(h)h.textContent="スタッフ TOP";
+ syncStaffHomeHeader();
  await load();return true;
 }
 
@@ -110,6 +112,30 @@ const getStatus=t=>t.employment_status==="departed"?"left":getHistory(t)[0]?.sta
 const hasInterview=t=>interviewLinks.some(x=>x.person_id===getPerson(t))&&Boolean(getPerson(t));
 function alertMsg(s,error=false){const el=$("message");el.textContent=s;el.classList.remove("hide");el.classList.toggle("error",error);}
 function cleanMsg(){$("message").classList.add("hide");}
+async function syncInterviewHomeHeader(profileFallback){
+ let name=profileFallback||"管理",profileKey="";
+ try{
+  const {data,error}=await client.rpc("interview_my_profile");
+  if(!error){
+   const p=Array.isArray(data)?data[0]:data;
+   if(p&&["owner","president","ota","festival"].includes(p.profile_key)){
+    profileKey=p.profile_key;
+    name=({owner:"村上",president:"社長",ota:"オオタ",festival:"お祭り"})[profileKey];
+   }
+  }
+ }catch(e){console.warn("面接管理プロフィール取得失敗",e)}
+ const label=document.getElementById("lgHeaderHomeLabel");if(label)label.textContent=name+" TOP";
+ const icon=document.querySelector(".lg-header-home img");
+ if(icon)icon.src="/therapist-profile/staff/interview-sheet-preview/icons/"+
+   (profileKey==="owner"?"murakami-pc.webp":"recruit-180.png");
+}
+function syncStaffHomeHeader(){
+ const label=document.getElementById("lgHeaderHomeLabel");if(label)label.textContent="TOP";
+ const icon=document.querySelector(".lg-header-home img");
+ if(icon)icon.src="/therapist-profile/staff/interview-sheet-preview/icons/recruit-180.png";
+ const link=document.querySelector(".lg-header-home");
+ if(link){link.href="/therapist-profile/staff/interview-sheet-preview/";link.title="面接管理TOPへ移動";link.setAttribute("aria-label","面接管理TOPへ移動");}
+}
 async function checkLogin(){
  if(!client){location.replace("/therapist-profile/staff/management-top/");$("loginError").textContent="認証ライブラリを読み込めません。";return;}
  const {data:{session}}=await client.auth.getSession();
@@ -119,7 +145,7 @@ async function checkLogin(){
   if(await enterStaff())return;
   location.replace("/therapist-profile/staff/management-top/");$("app").classList.add("hide");$("loginError").textContent="在籍管理は4人の管理者専用です。";return;
  }
- const homeName=document.getElementById("lgHeaderHomeLabel");if(homeName)homeName.textContent=(prof.data.display_name||"管理")+" TOP";
+ await syncInterviewHomeHeader(prof.data.display_name);
  authorized=true;$("login").classList.add("hide");$("app").classList.remove("hide");$("logout").classList.remove("hide");await load();
 }
 $("loginForm").onsubmit=async e=>{e.preventDefault();$("loginError").textContent="認証中…";const {error}=await client.auth.signInWithPassword({email:$("email").value,password:$("password").value});if(error){$("loginError").textContent="ログインに失敗しました。";return;}$("loginError").textContent="";await checkLogin()};
