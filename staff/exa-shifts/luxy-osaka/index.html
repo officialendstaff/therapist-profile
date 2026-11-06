@@ -109,7 +109,7 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 <main id="app" class="hide">
 <div class="notice">この店舗の出勤管理ページは準備済みです。EXA直接同期・CSV取込・接客本数編集・画像登録・アンケート連携は未接続です。薔薇と紳士のデータにはアクセスしません。</div>
 
-<section class="panel"><div class="month-heading"><h2>月間シフト</h2><div class="shift-status-legend" aria-label="区分別配色の凡例"><span><i class="swatch provisional"></i>仮登</span><span><i class="swatch paperwork"></i>書類</span><span><i class="swatch leave"></i>長休</span><span><i class="swatch outside"></i>実外</span><span><i class="swatch dummy"></i>ダミー</span></div><div class="filter"><button data-filter="real" class="active">実働</button><button data-filter="dummy">ダミー</button><button data-filter="all">全件</button></div></div>
+<section class="panel"><div class="month-heading"><h2>月間シフト</h2><div class="shift-status-legend" aria-label="区分別配色の凡例"><span><i class="swatch provisional"></i>仮登</span><span><i class="swatch paperwork"></i>書類</span><span><i class="swatch leave"></i>長休</span><span><i class="swatch outside"></i>実外</span><span><i class="swatch dummy"></i>ダミー</span></div><div class="filter"><button data-filter="real" class="active">在籍</button><button data-filter="dummy">退店</button><button data-filter="all">全件</button></div></div>
 <p id="message" class="muted"></p><div class="scroll"><table id="monthly" class="shift"></table><div id="empty" class="empty hide">この店舗の登録データはありません。EXA連携は未設定です。</div></div></section>
 </main>
 <div id="dayPanel" class="dialog hide"><section><div class="month-heading"><h2 id="dayTitle">日別タイムチャート</h2><button id="closeDay">閉じる ×</button></div><div id="timeline"></div></section></div>
@@ -133,7 +133,8 @@ function render(){
  $("monthLabel").textContent=month.replace("-","年")+"月";
  const days=dates(),table=$("monthly");table.replaceChildren();
  const head=document.createElement("tr");["源氏名","出勤","接客","当欠","評価",...days.map(d=>String(+d.slice(8))+"日")].forEach(x=>makeCell(head,x,"th"));table.append(head);
- const wanted=staff.filter(t=>filter==="all"||(filter==="dummy"?["dummy","dummy_use"].includes(t.residency||t.operating_category):!["dummy","dummy_use"].includes(t.residency||t.operating_category))).sort((a,b)=>Number(a.exa_id)-Number(b.exa_id));
+ const isRetired=t=>t.operating_category==="not_used"||t.operating_category==="dummy_use"||t.residency==="dummy";
+ const wanted=staff.filter(t=>filter==="all"||(filter==="dummy"?isRetired(t):!isRetired(t))).sort((a,b)=>Number(a.exa_id)-Number(b.exa_id));
  for(const person of wanted){
   const row=document.createElement("tr");const id=person.exa_id;
   const nameCell=makeCell(row,person.stage_name||"ID "+id,"td","staff");if(person.residency==="dummy"||person.operating_category==="dummy_use")nameCell.classList.add("state-dummy");
