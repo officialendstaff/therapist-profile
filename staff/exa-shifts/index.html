@@ -429,6 +429,9 @@ header.lg-common-header .lg-header-home:focus-visible{outline:2px solid #c4a06a;
 header.lg-common-header .head-controls,header.lg-common-header .controls,header.lg-common-header .header-menu{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;min-width:0}
 header.lg-common-header .header-menu{flex-wrap:nowrap}
 @media(max-width:650px){header.lg-common-header{height:60px!important;min-height:60px!important;max-height:60px!important;padding:0 12px!important}header.lg-common-header .lg-header-home{font-size:12px!important}header.lg-common-header .lg-header-home img{width:40px;height:40px}}
+.shift-table tbody tr:not(.group) td.staff-name.state-unconfirmed{background:#fff2d7!important;color:#86500d!important;box-shadow:inset 4px 0 #d4a042}
+.shift-table tbody tr:not(.group) td.staff-name.state-unconfirmed .name-editor{color:#86500d!important}
+.exa-hide-note{font-size:9px;color:#ac3342;display:block;font-weight:750}
 </style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script></head>
 <body>
 <header class="work-header lg-common-header"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ移動" aria-label="総合管理TOPへ移動"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span id="lgHeaderHomeLabel">総合 TOP</span></a><div class="head-controls">
