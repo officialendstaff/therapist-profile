@@ -1,23 +1,354 @@
 <!doctype html>
-<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="ja"><head><link rel="icon" type="image/svg+xml" href="/therapist-profile/staff/assets/favicons/shift.svg?v=20261106-1"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Un Secret｜出勤管理</title>
 <style>
-:root{font-family:"Noto Sans JP",Arial,sans-serif;color:#1e2c40;background:#f0f3f7}*{box-sizing:border-box}body{margin:0;min-width:1180px}button,input,select{font:inherit}button{cursor:pointer;padding:8px 11px;border:1px solid #b6c6d8;border-radius:7px;background:#fff;color:#1c3858}button:disabled{opacity:.45;cursor:not-allowed}.hide{display:none!important}
-header{background:#1b304c;color:#fff;padding:11px 22px;display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:66px;position:sticky;top:0;z-index:20}
-.brand{display:flex;align-items:baseline;gap:12px;white-space:nowrap}.brand h1{font-size:19px;letter-spacing:.04em;margin:0}.brand span{font-size:9px;opacity:.6;letter-spacing:.14em}
-.controls{display:flex;align-items:center;gap:9px}.controls label{font-size:11px;color:#cbd8e8}.controls select{background:#2d4664;color:white;padding:8px;border:1px solid #526781;border-radius:6px;min-width:155px}.month{display:flex;align-items:center;gap:5px}.month strong{min-width:92px;text-align:center;font-size:13px}.month button{background:#294563;color:white;border-color:#4e6885}
-.panel{background:white;border:1px solid #dde5ef;border-radius:12px;padding:12px;margin:11px 14px;box-shadow:0 2px 8px #1b304c08}
-button.primary{background:#28659a;color:#fff;border-color:#28659a}.muted{font-size:12px;color:#64748b}.notice{padding:10px 12px;background:#fff3da;color:#79541c;border-radius:8px;font-size:12px}
-.headerbtn{background:#294563;color:#fff;border-color:#4e6885;font-size:12px}
-.month-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.month-heading h2{font-size:16px;margin:0}.filter{display:flex;gap:1px;background:#edf1f5;border-radius:7px;padding:3px}.filter button{border:0;background:transparent;font-size:11px;padding:6px 14px}.filter button.active{background:white;box-shadow:0 1px 4px #12365724;font-weight:700}
-.scroll{overflow:auto;max-height:calc(100vh - 205px);min-height:330px}.shift{border-collapse:separate;border-spacing:0;width:max-content;table-layout:fixed;font-size:12px}.shift th,.shift td{border-bottom:1px solid #e5ebf2;border-right:1px solid #edf2f6;text-align:center;height:46px;min-width:82px;width:82px;padding:5px 4px;white-space:nowrap}.shift th{position:sticky;top:0;background:#deebf8;z-index:4}.shift th:first-child,.shift td:first-child{position:sticky;left:0;min-width:172px;width:172px;text-align:left;background:#fff;z-index:6;padding-left:10px}.shift th:first-child{background:#deebf8;z-index:8}.shift th:nth-child(n+2):nth-child(-n+5),.shift td:nth-child(n+2):nth-child(-n+5){min-width:52px;width:52px;background:#f5f8fd}.shift td:nth-child(2),.shift th:nth-child(2){position:sticky;left:172px;z-index:5}.shift td:nth-child(3),.shift th:nth-child(3){position:sticky;left:224px;z-index:5}.shift td:nth-child(4),.shift th:nth-child(4){position:sticky;left:276px;z-index:5}.shift td:nth-child(5),.shift th:nth-child(5){position:sticky;left:328px;z-index:5}.shift th:nth-child(n+2):nth-child(-n+5){z-index:7}.shift .today{background:#e8f3ff}.shift .dummy{background:#faf4f6}.shift .group td{background:#dde9f4!important;font-weight:bold;position:static;text-align:left}.shift .staff{font-weight:700;font-size:13px}.shift small{font-size:10px;color:#74869b;display:block}.empty{text-align:center;color:#64748b;padding:34px}
-#login{max-width:430px;margin:70px auto;padding:22px}#login h2{margin-top:0}#login input{display:block;width:100%;padding:11px;margin:6px 0 14px;border:1px solid #cbd4e1;border-radius:7px}.error{color:#b12639}
-.dialog{position:fixed;inset:0;background:#11213999;z-index:30;display:grid;place-items:center}.dialog>section{background:white;border-radius:12px;padding:20px;min-width:500px;max-height:90vh;overflow:auto}.timeline{border-collapse:collapse;width:100%}.timeline td,.timeline th{padding:7px;border:1px solid #e1e7ef;text-align:center}.timeline th{background:#e9f0f9}
+:root{font-family:Arial,"Noto Sans JP",sans-serif;color:#1e2c40;background:#f3f6fa}*{box-sizing:border-box}body{margin:0}header{background:#1b304c;color:#fff;padding:17px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}header h1{font-size:19px;margin:0}button,input,select{font:inherit}button{cursor:pointer;padding:9px 13px;border:1px solid #b6c6d8;border-radius:8px;background:#fff;color:#1c3858}button:disabled{opacity:.45;cursor:not-allowed}button.primary{background:#28659a;color:white;border-color:#28659a}main{max-width:1500px;margin:18px auto;padding:0 14px}.panel{background:white;border:1px solid #dde5ef;border-radius:12px;margin-bottom:14px;padding:16px;box-shadow:0 2px 8px #1b304c08}.muted{color:#677991;font-size:12px}.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.space{justify-content:space-between}.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.kpi{background:#f0f5fa;padding:14px;border-radius:9px}.kpi strong{display:block;font-size:24px}.hide{display:none!important}.table-scroll{overflow:auto;max-height:68vh}.shift-table{width:max-content;min-width:100%;border-collapse:separate;border-spacing:0;font-size:12px}.shift-table th,.shift-table td{border-bottom:1px solid #e5ebf2;border-right:1px solid #eef2f7;padding:4px;text-align:center;min-width:48px;height:36px}.shift-table th{position:sticky;top:0;background:#e9f0f9;z-index:2}.shift-table th:first-child,.shift-table td:first-child{position:sticky;left:0;min-width:118px;text-align:left;background:#fff;z-index:3}.shift-table th:first-child{background:#dbe8f6;z-index:4}.shift-table th button{padding:3px 6px;font-size:11px}.shift-table td.dummy{background:#faf4f6;color:#956675}.shift-table td.today{background:#e8f3ff}.shift-table tr.group td{background:#dde9f4!important;font-weight:bold;text-align:left;position:static}.shift-table input{width:43px;padding:5px 2px;border:1px solid #b5cee6;border-radius:5px;text-align:center;font-size:13px}.shift-table input:focus{outline:2px solid #4891d0}.shift-table td small{color:#68819b}.chart-scroll{overflow:auto}.timeline{border-collapse:separate;border-spacing:2px;font-size:11px;min-width:900px;width:100%}.timeline th,.timeline td{text-align:center;padding:4px;min-width:32px}.timeline td:first-child,.timeline th:first-child{min-width:110px;text-align:left;position:sticky;left:0;background:white}.timeline td.on{background:#a8d5f2}.timeline td.off{background:#edf1f5}.timeline .sum td{font-weight:bold;background:#e1edf8}.timeline .dummy-on{background:#ecdce2}.notice{padding:10px;border-radius:8px;background:#fff3da;color:#79541c}.error{color:#b12639}#login{max-width:430px;margin:60px auto}#login input{width:100%;padding:11px;margin:6px 0 14px;border:1px solid #cbd4e1;border-radius:7px}#message{margin-top:10px}.tag{font-size:11px;background:#e1eaf5;padding:4px 7px;border-radius:12px}footer{padding:24px;font-size:11px;color:#7a8ba0;text-align:center}@media(max-width:720px){.kpis{grid-template-columns:repeat(2,1fr)}.panel{padding:10px}header{padding:12px}header h1{font-size:16px}}
+
+/* PC attendance dashboard */
+:root{font-family:"Noto Sans JP",Arial,sans-serif}
+body{min-width:1180px;background:#f0f3f7}
+.work-header{position:sticky;top:0;z-index:20;min-height:66px;padding:11px 22px;flex-wrap:nowrap;gap:20px}
+.brand{display:flex;align-items:baseline;gap:12px;white-space:nowrap}
+.brand h1{font-size:19px;letter-spacing:.04em}.brand-sub{font-size:9px;opacity:.52;letter-spacing:.14em}
+.head-controls{display:flex;gap:9px;align-items:center;justify-content:flex-end;flex-wrap:nowrap}
+.head-controls button{white-space:nowrap;font-size:12px;padding:8px 10px}
+.store-label{display:flex;align-items:center;gap:7px;font-size:11px;color:#cad9ea;white-space:nowrap}
+.store-label select{background:#2d4664;color:#fff;border:1px solid #526781;border-radius:6px;padding:8px 9px;font-size:12px;min-width:140px}
+.head-month{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.head-month strong{font-size:13px;min-width:88px;text-align:center}
+.head-month button{background:#294563;color:white;border:1px solid #4e6885}
+.settings-menu{position:relative}.settings-menu summary{list-style:none;cursor:pointer;border:1px solid #506985;background:#2b4360;border-radius:7px;padding:9px 12px;color:white;font-size:12px;white-space:nowrap}
+.settings-menu summary::-webkit-details-marker{display:none}
+.settings-panel{position:absolute;right:0;top:calc(100% + 8px);display:flex;flex-direction:column;gap:6px;min-width:210px;background:#fff;border:1px solid #dae3ee;box-shadow:0 8px 26px #0b27452b;border-radius:9px;padding:10px;z-index:30}
+.settings-panel button{text-align:left;color:#253b55;background:#fff;border:0;border-radius:5px}.settings-panel button:hover{background:#edf3fa}
+.login-tag{font-size:10px!important}
+main{max-width:none;margin:11px auto;padding:0 14px}
+.monthly-panel{padding:10px 12px;min-height:calc(100vh - 130px)}
+.month-heading{padding:0 2px 7px}.month-heading h2{font-size:16px;margin:0}.month-heading .muted{font-size:10px}
+.table-scroll{max-height:calc(100vh - 178px);overflow:auto}
+.shift-table{table-layout:fixed;width:100%;min-width:1180px;font-size:10px}
+.shift-table th,.shift-table td{height:29px;min-width:0;padding:2px 1px;white-space:nowrap;overflow:hidden;text-overflow:clip}
+.shift-table th:first-child,.shift-table td:first-child{width:125px;min-width:125px;padding-left:5px}
+.shift-table th:not(:first-child),.shift-table td:not(:first-child){font-size:9px}
+.shift-table th button{font-size:10px;border:none;background:transparent;padding:2px 1px;font-weight:600}
+.shift-table tr.group td{height:24px}
+.shift-table input{width:28px;padding:3px 1px;font-size:10px}
+.shift-table td.today{background:#e1edf9}
+.day-modal{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:25px}
+.day-modal-shade{position:absolute;inset:0;background:#11213999}
+.day-modal-content{position:relative;z-index:1;width:min(1500px,96vw);max-height:90vh;overflow:auto;box-shadow:0 20px 65px #081e3c40;padding:18px}
+.day-modal-content h2{font-size:17px;margin:0}
+#closeDay{background:#f3f6fa}
+footer{display:none}
+.count-panel{position:relative;z-index:1;width:345px;padding:22px}.count-panel h2{margin:0}.count-panel select{display:block;width:100%;height:255px;border:1px solid #cbd7e7;border-radius:7px;margin:14px 0;font-size:16px}.count-panel option{padding:7px}.shift-table .edit-count{width:100%;height:23px;padding:1px;border:1px solid #d6e2ee;border-radius:4px;background:#f8fbff;font-size:11px;color:#254467}.shift-table th:first-child,.shift-table td:first-child{width:164px;min-width:164px}
+.shift-table .staff-name{font-weight:500;line-height:1.1}
+.staff-name .reading{display:block;font-weight:400;color:#77879c;font-size:9px;margin-top:2px}
+.shift-table td.stat-cell{background:#f7f9fc;font-weight:600}
+.shift-table th:nth-last-child(-n+4),.shift-table td:nth-last-child(-n+4){min-width:35px}
+.staff-filter{display:flex;gap:1px;background:#edf1f5;border:1px solid #dce6ef;border-radius:7px;padding:2px;margin-left:auto}
+.staff-filter button{border:0;background:transparent;border-radius:5px;padding:5px 13px;font-size:11px;color:#526b88}
+.staff-filter button.active{background:#fff;color:#1b3653;box-shadow:0 1px 4px #12365724;font-weight:700}
+
+/* Scrolling monthly grid: fixed name + metrics on the left, days on the right */
+.table-scroll{overflow:auto;max-height:calc(100vh - 166px);scrollbar-gutter:stable}
+.shift-table{width:max-content;min-width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0;font-size:11px}
+.shift-table th,.shift-table td{height:40px;min-width:56px;width:56px;padding:3px 2px;white-space:nowrap;font-size:11px}
+.shift-table th:nth-child(1),.shift-table td:first-child{width:172px;min-width:172px}
+.shift-table tr:not(.group) td:nth-child(n+2):nth-child(-n+5){width:52px;min-width:52px}
+.shift-table thead tr:first-child th{position:sticky;top:0;z-index:8;height:28px;background:#deebf8}
+.shift-table thead tr.daily-totals th{position:sticky;top:28px;z-index:8;height:25px;background:#eff5fc;font-size:10px;font-weight:700;color:#346084}
+.shift-table thead .staff-heading{position:sticky;top:0;left:0;z-index:15!important;width:172px;min-width:172px;text-align:left;padding:5px 8px;font-size:11px}
+.staff-heading span{display:block;line-height:1.5}
+.shift-table thead th.stat-heading{width:52px;min-width:52px;z-index:12!important;text-align:center}
+.shift-table thead th:nth-child(2),.shift-table tbody tr:not(.group) td:nth-child(2){position:sticky;left:172px;z-index:5}
+.shift-table thead th:nth-child(3),.shift-table tbody tr:not(.group) td:nth-child(3){position:sticky;left:224px;z-index:5}
+.shift-table thead th:nth-child(4),.shift-table tbody tr:not(.group) td:nth-child(4){position:sticky;left:276px;z-index:5}
+.shift-table thead th:nth-child(5),.shift-table tbody tr:not(.group) td:nth-child(5){position:sticky;left:328px;z-index:5}
+.shift-table tbody tr:not(.group) td:first-child{z-index:6;left:0}
+.shift-table tbody tr:not(.group) td:nth-child(n+2):nth-child(-n+5){background:#f5f8fd}
+.shift-table thead .day-heading,.shift-table thead .day-total{min-width:56px;width:56px}
+.shift-table tr.group td{position:relative;z-index:4;height:26px}
+.shift-table .staff-name strong{font-size:13px}.shift-table .staff-name .reading{font-size:10px}
+.shift-table th button{font-size:11px}
+
+/* The second date-header row must scroll horizontally; only name and metrics stay pinned. */
+.shift-table thead tr.daily-totals th,
+.shift-table thead tr.daily-totals th:first-child,
+.shift-table thead tr.daily-totals th:nth-child(2),
+.shift-table thead tr.daily-totals th:nth-child(3),
+.shift-table thead tr.daily-totals th:nth-child(4),
+.shift-table thead tr.daily-totals th:nth-child(5){
+ left:auto!important;right:auto!important;width:56px!important;min-width:56px!important;z-index:8!important;
+}
+.shift-table thead tr:first-child .staff-heading{height:53px}
+
+/* Readability first: date columns scroll horizontally rather than shrinking text. */
+.table-scroll{overflow:auto;max-height:calc(100vh - 155px)}
+.shift-table{width:max-content!important;min-width:0!important;table-layout:fixed;font-size:13px}
+.shift-table th,.shift-table td{height:46px!important;padding:5px 4px!important}
+.shift-table thead tr:first-child th.day-heading,
+.shift-table thead tr.daily-totals th.day-total,
+.shift-table tbody tr:not(.group) td:nth-child(n+6){
+  width:82px!important;min-width:82px!important;max-width:82px!important;
+  font-size:13px!important;white-space:nowrap!important;overflow:visible!important;
+}
+.shift-table tbody tr:not(.group) td:nth-child(n+6){font-weight:500;letter-spacing:-.025em}
+.shift-table thead tr:first-child th.day-heading{height:32px!important}
+.shift-table thead tr.daily-totals th.day-total{
+  top:32px!important;height:29px!important;font-size:12px!important;
+}
+.shift-table thead tr:first-child .staff-heading{height:61px!important;font-size:12px!important}
+.shift-table th.day-heading button{font-size:13px!important;font-weight:700}
+.shift-table tbody tr:not(.group) td.staff-name{padding-left:9px!important}
+.shift-table .staff-name strong{font-size:14px!important}
+.shift-table .staff-name .reading{font-size:11px!important;margin-top:4px}
+.shift-table tbody tr:not(.group) td.stat-cell{font-size:13px!important}
+.shift-table td .edit-count{height:29px;font-size:13px!important;font-weight:650}
+.shift-table tr.group td{height:28px!important}
+
+/* Compact two-line therapist names and realign the four frozen summary columns. */
+.shift-table thead .staff-heading,
+.shift-table thead th:first-child,
+.shift-table tbody tr:not(.group) td:first-child{
+ width:116px!important;min-width:116px!important;max-width:116px!important;
+}
+.shift-table tbody tr:not(.group) td.staff-name{padding-left:7px!important;padding-right:4px!important;overflow:hidden!important}
+.shift-table .staff-name strong,.shift-table .staff-name .reading{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.shift-table thead tr:first-child th:nth-child(2),.shift-table tbody tr:not(.group) td:nth-child(2){left:116px!important}
+.shift-table thead tr:first-child th:nth-child(3),.shift-table tbody tr:not(.group) td:nth-child(3){left:168px!important}
+.shift-table thead tr:first-child th:nth-child(4),.shift-table tbody tr:not(.group) td:nth-child(4){left:220px!important}
+.shift-table thead tr:first-child th:nth-child(5),.shift-table tbody tr:not(.group) td:nth-child(5){left:272px!important}
+
+/* Status colours: subdued, high-contrast, independently readable. */
+.shift-table tbody tr:not(.group) td.stat-cell.unpaid-positive{
+  background:#ffe8e6!important;color:#a72d35!important;font-weight:800;
+}
+.shift-table .edit-count.absent-entry{
+  background:#ffdcd7!important;border-color:#d77474!important;color:#a92732!important;font-weight:800;
+}
+.shift-table thead tr:first-child th.day-heading.saturday,
+.shift-table thead tr.daily-totals th.day-total.saturday{
+  background:#dbeafe!important;color:#205b9c!important;
+}
+.shift-table thead tr:first-child th.day-heading.sunday,
+.shift-table thead tr.daily-totals th.day-total.sunday,
+.shift-table thead tr:first-child th.day-heading.holiday,
+.shift-table thead tr.daily-totals th.day-total.holiday{
+  background:#fce4e6!important;color:#a82e41!important;
+}
+.shift-table tbody tr:not(.group) td.saturday{background:#f1f7ff!important}
+.shift-table tbody tr:not(.group) td.sunday,
+.shift-table tbody tr:not(.group) td.holiday{background:#fff2f3!important}
+.shift-table tbody tr:not(.group) td.today{
+  background:#d7e9fa!important;
+  box-shadow:inset 2px 0 #4380b7,inset -2px 0 #4380b7;
+  border-bottom-color:#a4c5e6!important;
+}
+.shift-table thead tr:first-child th.today-marker,
+.shift-table thead tr.daily-totals th.today-marker{
+  background:#bcd8f2!important;color:#174673!important;
+  box-shadow:inset 2px 0 #4380b7,inset -2px 0 #4380b7;
+}
+.shift-table tbody tr:not(.group) td.last-scheduled{
+  box-shadow:inset 0 0 0 2px #bc8a36!important;
+  background:#fff2d8!important;
+}
+.shift-table tbody tr.outside-roster td:not(.last-scheduled){
+  background:#eceff3!important;color:#67778a!important;
+}
+.shift-table tbody tr.outside-roster td:first-child,
+.shift-table tbody tr.outside-roster td.stat-cell{
+  background:#e7ebf1!important;
+}
+.shift-table tbody tr.outside-roster td.today{
+  box-shadow:inset 2px 0 #4380b7,inset -2px 0 #4380b7!important;
+}
+.outside-label{display:none!important}
+.shift-table tbody tr:not(.group) td.stat-cell.score-high{background:#e0f3e8!important;color:#217048!important;font-weight:800}
+.shift-table tbody tr:not(.group) td.stat-cell.score-low{background:#fff0d9!important;color:#a4611d!important;font-weight:800}
+
+.shift-table tbody tr:not(.group) td.pre-off{background:#f0e4fa!important;color:#6a338d!important}
+.shift-table tbody tr:not(.group) td.pre-off .pre-off-label{font-size:12px;font-weight:800}
+.shift-table tbody tr.outside-roster td.pre-off{background:#ece0f6!important}
+
+/* Row two begins with the 1st day: there are no name/metrics cells in this row.
+   Override legacy first-child and sticky nth-child rules for every day total. */
+.shift-table thead tr.daily-totals > th.day-total,
+.shift-table thead tr.daily-totals > th.day-total:first-child,
+.shift-table thead tr.daily-totals > th.day-total:nth-child(n){
+  position:sticky!important;
+  top:32px!important;
+  left:auto!important;
+  right:auto!important;
+  width:82px!important;
+  min-width:82px!important;
+  max-width:82px!important;
+  box-sizing:border-box!important;
+  text-align:center!important;
+  z-index:8!important;
+}
+.residency-dialog{position:relative;z-index:1;width:410px;max-width:90vw;padding:22px}.residency-dialog h2{margin:0 0 12px;font-size:19px}.residency-dialog label{display:block;margin:14px 0 7px;font-size:13px;font-weight:700}.residency-dialog select{width:100%;padding:11px;border:1px solid #b6c6d8;border-radius:7px;background:#fff}.staff-name .name-editor{border:none;background:none;padding:0;color:inherit;font-weight:700;font-size:14px;text-align:left;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px}.staff-name .name-editor:hover,.staff-name .name-editor:focus-visible{color:#2466a3;text-decoration-color:#2466a3;outline-offset:2px}.staff-name .name-editor:after{content:" ✎";font-size:10px;color:#8299ad}
+/* Dummy EXA paste helpers, independent of public therapist pages. */
+.shift-table.dummy-layout thead tr:first-child th:nth-child(2),
+.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(2){width:100px!important;min-width:100px!important;left:116px!important}
+.shift-table.dummy-layout thead tr:first-child th:nth-child(3),
+.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(3){width:66px!important;min-width:66px!important;left:216px!important}
+.shift-table.dummy-layout thead tr:first-child th:nth-child(4),
+.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(4){width:66px!important;min-width:66px!important;left:282px!important}
+.shift-table.dummy-layout thead tr:first-child th:nth-child(5),
+.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(5){width:54px!important;min-width:54px!important;left:348px!important}
+.shift-table.dummy-layout td.weekday-cell{white-space:nowrap;font-size:11px!important;letter-spacing:-.04em}
+.shift-table .copy-exa{display:block;width:100%;border:1px solid #a8c9e9;border-radius:5px;background:#edf6ff;color:#185b91;padding:5px 1px;font-size:12px;font-weight:700}
+.shift-table .copy-exa:hover{background:#d4eafd;border-color:#5f9dca}
+.shift-table .copy-exa.copy-pair{font-size:10px}
+
+/* Dummy view has three metric columns, not four. */
+.shift-table.dummy-layout thead tr:first-child th.day-heading,
+.shift-table.dummy-layout thead tr.daily-totals th.day-total,
+.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(n+5){
+ width:82px!important;min-width:82px!important;max-width:82px!important;
+}
+.shift-table.dummy-layout thead tr:first-child th:nth-child(5),
+.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(5){
+ position:static!important;left:auto!important;background:inherit;
+}
+
+/* A copied time gives inline confirmation without moving the monthly table. */
+.shift-table .copy-exa{position:relative;transition:background-color .15s,border-color .15s,color .15s}
+.shift-table .copy-exa.copied-exa{
+ background:#e1f5e9!important;border-color:#39966b!important;color:#1b6848!important;
+}
+.shift-table .copy-exa.copied-exa::after{
+ content:"✓";position:absolute;right:2px;top:-6px;
+ display:grid;place-items:center;width:14px;height:14px;border-radius:50%;
+ background:#27875e;color:#fff;font-size:10px;line-height:1;
+ box-shadow:0 1px 3px #0002;pointer-events:none;
+}
+
+/* Final scheduled shift overrides today's blue highlight for real therapists. */
+.shift-table:not(.dummy-layout) tbody tr:not(.group) td.today.last-scheduled,
+.shift-table:not(.dummy-layout) tbody tr.outside-roster td.today.last-scheduled{
+  background:#fff0cf!important;
+  color:#67471c!important;
+  box-shadow:inset 0 0 0 2px #bd8429!important;
+  border-bottom-color:#bd8429!important;
+}
+
+/* Enlarged desktop day chart with group headcounts and chronological rows. */
+.day-modal{padding:12px!important}
+.day-modal-content{width:min(1740px,98vw)!important;height:94vh!important;max-height:94vh!important;display:flex;flex-direction:column;padding:16px 19px!important}
+.day-modal-content .row.space{flex-shrink:0;padding-bottom:13px;border-bottom:1px solid #dfe7f1;margin-bottom:10px}
+.timeline-heading{display:flex;align-items:baseline;gap:24px;flex-wrap:wrap}
+.day-headcount{font-size:14px;color:#214d79;font-weight:750}
+#timeline{min-height:0;flex:1;display:flex;flex-direction:column}
+#timeline .chart-scroll{flex:1;max-height:100%;overflow:auto}
+.timeline{min-width:1160px;border-spacing:1px;font-size:12px}
+.timeline th,.timeline td{height:30px;padding:6px 4px}
+.timeline thead th{position:sticky;top:0;z-index:6;background:#e5effa}
+.timeline thead th:first-child{z-index:7;background:#dbe8f5}
+.timeline .timeline-group th{position:sticky;left:0;z-index:3;text-align:left;background:#dce9f7;padding:9px 11px;font-size:13px}
+.timeline .timeline-name{font-weight:650;min-width:145px}
+.timeline .timeline-name small{display:block;font-size:10px;color:#64768c;font-weight:400}
+.timeline .sum td{font-weight:750;background:#dbeafa}
+
+/* Timeline: clear hourly and therapist-row grid lines. The last column is 4:00. */
+.timeline{border-collapse:separate!important;border-spacing:0!important;table-layout:fixed}
+.timeline thead th,.timeline tbody td,.timeline tbody th{
+ border-right:1px solid #cbd6e3!important;
+ border-bottom:1px solid #d5dee9!important;
+}
+.timeline thead th{border-bottom:2px solid #9db4cc!important}
+.timeline tbody tr:not(.timeline-group):not(.sum) td.timeline-name{
+ border-right:2px solid #a9bed4!important;
+}
+.timeline tbody tr.timeline-group th{
+ border-top:2px solid #b2c6da!important;
+ border-bottom:1px solid #b2c6da!important;
+}
+.timeline tbody tr.sum td{
+ border-top:2px solid #b4c7db!important;
+ border-bottom:2px solid #b4c7db!important;
+}
+
+/* Keep the total and real-attendance counts directly beneath hourly headings. */
+.timeline tr.sum.total-count td{background:#d4e7fa!important;color:#143e69!important;font-weight:800}
+.timeline tr.sum.real-count td{background:#e7f2ff!important;color:#1b4e7b!important;font-weight:700}
+.timeline tr.timeline-group.dummy-heading th{background:#f0e1e8!important;color:#673b51!important;text-align:center!important;font-weight:800}
+.timeline tr.timeline-group.dummy-heading th:first-child{text-align:left!important}
+.timeline tr.sum td:first-child{position:sticky;left:0;z-index:4;text-align:left}
+.timeline tr.sum.dummy-count td{background:#f3e4eb!important;color:#713b56!important;font-weight:700}
+
+/* Non-displacing notifications: success and error appear as fixed toasts. */
+#message{
+ position:fixed!important;
+ top:77px!important;
+ right:18px!important;
+ left:auto!important;
+ width:max-content!important;
+ max-width:min(560px,calc(100vw - 36px))!important;
+ margin:0!important;
+ padding:11px 15px!important;
+ border:1px solid #a9c3dc!important;
+ border-radius:8px!important;
+ background:#f2f8ff!important;
+ color:#204e79!important;
+ box-shadow:0 6px 22px #0b274529!important;
+ font-size:12px!important;
+ line-height:1.6!important;
+ z-index:120!important;
+ opacity:0;
+ visibility:hidden;
+ transform:translateY(-5px);
+ pointer-events:none;
+ transition:opacity .16s ease,transform .16s ease,visibility .16s;
+}
+#message.toast-visible{
+ opacity:1;
+ visibility:visible;
+ transform:translateY(0);
+}
+#message.error{
+ background:#fff1f1!important;
+ border-color:#e5a3a5!important;
+ color:#a72e39!important;
+}
+
+/* Internal therapist profile with a private, on-demand full-body photo. */
+.therapist-detail-dialog{width:min(770px,95vw)!important;max-height:90vh;overflow-y:auto}
+.therapist-detail-grid{display:grid;grid-template-columns:minmax(220px,1fr) minmax(225px,1.15fr);gap:22px;align-items:start}
+.therapist-photo-frame{width:100%;aspect-ratio:3/4;border:1px solid #d4dfe9;border-radius:9px;overflow:hidden;background:#edf2f7;display:flex;align-items:center;justify-content:center;color:#8391a0;font-size:13px}
+.therapist-photo-frame img{width:100%;height:100%;object-fit:contain}
+.therapist-photo-action{display:block;text-align:center;cursor:pointer;background:#edf5fd;color:#245b89;border:1px solid #b5cee7;border-radius:8px;padding:10px 8px;margin-top:9px;font-size:13px!important;font-weight:700}
+.therapist-photo-action:hover{background:#dfeefa}
+#therapistPhotoStatus{line-height:1.65;min-height:36px}
+.therapist-detail-controls label{margin-top:0}
+.therapist-detail-controls .row{margin-top:25px}
+@media(max-width:590px){.therapist-detail-grid{grid-template-columns:1fr}.therapist-photo-frame{max-height:400px}.therapist-detail-dialog{max-height:94vh}}
+
+.person-registry{border:1px solid #d8e3ef;border-radius:9px;background:#f7faff;padding:12px;margin:0 0 18px}
+.person-registry strong{font-size:13px;color:#254b71}
+.person-registry p{margin:8px 0;font-size:11px;line-height:1.6}
+#personRegister{background:#28659a;color:#fff;border-color:#28659a;font-size:12px;padding:9px 12px}
+#personRegistryState{overflow-wrap:anywhere}
+
+.interview-match{margin-bottom:18px}
+.interview-search-row{display:flex;flex-wrap:nowrap!important;gap:7px}
+.interview-search-row input{width:100%;min-width:0;border:1px solid #b9cbdc;border-radius:7px;padding:9px;font-size:12px}
+.interview-search-row button{white-space:nowrap;font-size:12px;padding:8px 11px}
+.interview-results{margin:8px 0;max-height:205px;overflow-y:auto}
+.interview-result{width:100%;display:block;text-align:left;margin:5px 0;padding:9px 10px;background:#fff;border:1px solid #cedbe8;border-radius:7px;color:#203750;font-size:12px}
+.interview-result small{display:block;color:#697e94;line-height:1.65;margin-top:3px}
+.interview-result.selected{border:2px solid #28659a;background:#eaf4ff;padding:8px 9px}
+#interviewLinkConfirm{font-size:12px;margin:7px 0;width:100%}
+#interviewLinkOpen{margin:5px 0 8px}
+
+#surveyPersonChoice{width:100%;max-width:100%;padding:9px;border:1px solid #bbcfe4;border-radius:7px;background:white;color:#253b53;font-size:12px}
+#surveyLinkOpen,#surveyLinkSave{font-size:12px;margin:5px 0}
+.staff-exa-id{display:inline-block;margin-left:5px;padding:1px 4px;border-radius:3px;background:#eaf1f9;color:#32618a;font-size:10px;font-weight:700;white-space:nowrap}
 
 
 
 /* B-3 vivid: name cell only, existing working state unchanged */
-.shift td.staff.state-dummy{background:#E5E7EB!important;color:#4B5563!important;box-shadow:inset 4px 0 #8895A5}
 .shift-status-legend{display:inline-flex;align-items:center;gap:13px;flex-wrap:wrap;margin-left:12px;font-size:11px;font-weight:650;color:#4d5c6c}
 .shift-status-legend span{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
 .shift-status-legend .swatch{display:inline-block;width:11px;height:11px;border-radius:2px;border:1px solid #ffffff88}
@@ -53,6 +384,7 @@ body:has(#login:not(.hide)) header .header-menu{display:none!important}
 #login.lg-login-shell #loginForm button:hover{background:#253C58!important}
 #login.lg-login-shell #loginError{color:#AE3449!important;min-height:17px!important;font-size:12px!important;margin:12px 0 0!important}
 @media(max-width:530px){#login.lg-login-shell .lg-login-card{padding:25px 22px}#login.lg-login-shell:not(.hide){padding:16px 12px 42px!important}}
+
 /* L GROUP interview-login design shared across management pages */
 body:has(.lg-interview-login:not(.hide):not(.hidden)){background:#101f33!important}
 body:has(.lg-interview-login:not(.hide):not(.hidden))>header,
@@ -97,95 +429,738 @@ header.lg-common-header .lg-header-home:focus-visible{outline:2px solid #c4a06a;
 header.lg-common-header .head-controls,header.lg-common-header .controls,header.lg-common-header .header-menu{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;min-width:0}
 header.lg-common-header .header-menu{flex-wrap:nowrap}
 @media(max-width:650px){header.lg-common-header{height:60px!important;min-height:60px!important;max-height:60px!important;padding:0 12px!important}header.lg-common-header .lg-header-home{font-size:12px!important}header.lg-common-header .lg-header-home img{width:40px;height:40px}}
-</style></head>
+</style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script></head>
 <body>
-<header class="lg-common-header"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ移動" aria-label="総合管理TOPへ移動"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span id="lgHeaderHomeLabel">総合 TOP</span></a><div class="controls">
-<label>店舗 <select id="storeSelect"><option value="grand-luxe">Grand Luxe</option><option value="luxy-osaka">LUXY OSAKA</option><option value="rose">薔薇と紳士</option><option value="un-secret">Un Secret</option><option value="busty-osaka">BUSTY OSAKA</option></select></label>
-<div class="month"><button id="prev">◀</button><strong id="monthLabel"></strong><button id="next">▶</button></div>
-<button class="primary" disabled title="店舗別EXA同期は未接続です">今すぐ更新</button>
-<button id="reload" class="headerbtn">保存データを再読込</button>
-<button id="logout" class="headerbtn hide">ログアウト</button></div></header>
+<header class="work-header lg-common-header"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ移動" aria-label="総合管理TOPへ移動"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span id="lgHeaderHomeLabel">総合 TOP</span></a><div class="head-controls">
+<label class="store-label">店舗 <select id="storeSelect" aria-label="店舗切替"><option value="grand-luxe">Grand Luxe</option><option value="luxy-osaka">LUXY OSAKA</option><option value="rose">薔薇と紳士</option><option value="un-secret" selected>Un Secret</option><option value="busty-osaka">BUSTY OSAKA</option></select></label>
+<div class="head-month"><button id="prev" title="前月">◀</button><strong id="monthLabel"></strong><button id="next" title="翌月">▶</button></div>
+<button id="exaSync" class="primary" disabled title="Un SecretのEXAサーバー連携は未設定です">今すぐ更新（未接続）</button>
+<details class="settings-menu"><summary>その他 <span aria-hidden="true">▾</span></summary><div class="settings-panel">
+<button id="reload">保存データを再読込</button>
+<button id="unscheduledAdd" title="EXA登録画面でIDと源氏名を確認した人だけ追加。出勤データは変更しません">出勤予定なしのEXA登録者を追加</button>
+<button id="csvImport" title="Un SecretのEXA CSVファイルを登録">EXA CSV取込・更新</button><input id="csvFile" type="file" accept=".csv,text/csv" style="display:none">
+<button id="serverTest" disabled title="EXAサーバー未接続">サーバー30日検証（未接続）</button>
+<button id="autoSync" disabled title="EXAサーバー未接続">ブラウザ自動：未接続</button>
+</div></details><span id="authLabel" class="muted login-tag" style="color:#d5e1f1"></span><button id="logout" class="hide">ログアウト</button>
+</div></header>
 <section id="login" class="lg-interview-login hide"><div class="auth-card"><aside class="auth-brand-panel" aria-hidden="true"><div class="auth-brand-top"><div class="auth-brand-symbol">L</div><div class="auth-brand-name">L GROUP<small>INTERNAL MANAGEMENT</small></div></div><div class="auth-brand-middle"><span class="auth-brand-kicker">STAFF MANAGEMENT SYSTEM</span><h1 class="auth-brand-title">SHIFT<br>MANAGEMENT.</h1><p class="auth-brand-description">日々の管理業務を、もっとスマートに。<br>すべての情報をひとつの場所で。</p></div><div class="auth-brand-bottom"><span>STAFF PORTAL</span><span>L GROUP © 2026</span></div></aside><div class="auth-form-panel"><p class="auth-eyebrow">WELCOME BACK</p><h2>出勤管理ログイン</h2><div class="auth-mode-label"><span>管理者</span></div><form id="loginForm"><p class="auth-help">既存の管理者アカウントと同じID・PASSを使用します。</p><label for="email">ID（メールアドレス）<input id="email" type="email" autocomplete="username" required></label><label for="password">PASS<input id="password" type="password" autocomplete="current-password" required></label><div id="loginError" role="alert"></div><button type="submit">ログイン</button></form><p class="auth-footnote">AUTHORIZED PERSONNEL ONLY</p></div></div></section>
 <main id="app" class="hide">
-<div class="notice">この店舗の出勤管理ページは準備済みです。EXA直接同期・CSV取込・接客本数編集・画像登録・アンケート連携は未接続です。薔薇と紳士のデータにはアクセスしません。</div>
 
-<section class="panel"><div class="month-heading"><h2>月間シフト</h2><div class="shift-status-legend" aria-label="区分別配色の凡例"><span><i class="swatch provisional"></i>仮登</span><span><i class="swatch paperwork"></i>書類</span><span><i class="swatch leave"></i>長休</span><span><i class="swatch outside"></i>実外</span><span><i class="swatch dummy"></i>ダミー</span></div><div class="filter"><button data-filter="real" class="active">在籍</button><button data-filter="dummy">退店</button><button data-filter="all">全件</button></div></div>
-<p id="message" class="muted"></p><div class="scroll"><table id="monthly" class="shift"></table><div id="empty" class="empty hide">この店舗の登録データはありません。EXA連携は未設定です。</div></div></section>
-</main>
-<div id="dayPanel" class="dialog hide"><section><div class="month-heading"><h2 id="dayTitle">日別タイムチャート</h2><button id="closeDay">閉じる ×</button></div><div id="timeline"></div></section></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<p id="message" class="muted" role="status" aria-live="polite"></p>
+
+<div class="panel monthly-panel"><div class="row space month-heading"><h2>月間シフト</h2><div class="shift-status-legend" aria-label="区分別配色の凡例"><span><i class="swatch provisional"></i>仮登</span><span><i class="swatch paperwork"></i>書類</span><span><i class="swatch leave"></i>長休</span><span><i class="swatch outside"></i>実外</span><span><i class="swatch dummy"></i>ダミー</span></div><div class="staff-filter" role="group" aria-label="表示区分"><button type="button" data-show-staff="real" class="active">在籍</button><button type="button" data-show-staff="dummy">退店</button><button type="button" data-show-staff="all">全件</button></div></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
+<div id="residencyModal" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="residencyTitle">
+<div id="residencyShade" class="day-modal-shade"></div>
+<div class="panel residency-dialog therapist-detail-dialog">
+<h2 id="residencyTitle">セラピスト詳細</h2>
+<p id="residencyInfo" class="muted"></p>
+<div class="therapist-detail-grid">
+ <div class="therapist-photo-pane">
+  <div class="therapist-photo-frame"><img id="therapistPhoto" alt="セラピスト管理用画像" class="hide"><span id="therapistPhotoEmpty">画像未登録</span></div>
+  <label class="therapist-photo-action" for="therapistPhotoInput">画像を登録・差し替え</label>
+  <input id="therapistPhotoInput" type="file" accept="image/jpeg,image/png,image/webp" class="hide">
+  <p id="therapistPhotoStatus" class="muted" aria-live="polite">非公開・スタッフ専用。WebPに変換して保存します。</p>
+ </div>
+ <div class="therapist-detail-controls">
+  <div class="person-registry interview-match">
+   <strong>面接情報</strong>
+   <p id="personRegistryState" class="muted">面接情報を確認中…</p>
+   <button id="interviewLinkOpen" type="button" class="hide">面接情報と紐づける</button>
+   <div id="interviewLinkPanel" class="hide">
+    <label for="interviewSearchInput">Interviewを検索</label>
+    <div class="row interview-search-row"><input id="interviewSearchInput" type="search" placeholder="本名・フリガナ・源氏名・電話番号"><button type="button" id="interviewSearchButton">検索</button></div>
+    <p class="muted">同一人物だと確認できた面接シートを選択してください。</p>
+    <div id="interviewResults" class="interview-results" aria-live="polite"></div>
+    <button id="interviewLinkConfirm" type="button" class="primary hide">選択した面接情報と紐づける</button>
+   </div>
+   <p class="muted">面接情報がないセラピストは、未紐づけのままで構いません。</p>
+  </div>
+  <div class="person-registry interview-match">
+   <strong>アンケート評価（未接続）</strong>
+   <p id="surveyLinkState" class="muted">評価データを確認中…</p>
+   <button id="surveyLinkOpen" type="button" class="hide">アンケートIDを紐づける</button>
+   <div id="surveyLinkPanel" class="hide">
+    <label for="surveyPersonChoice">スプレッドシートの管理ID／源氏名</label>
+    <select id="surveyPersonChoice"><option value="">選択してください</option></select>
+    <p class="muted">EXA IDと管理IDは異なります。本人を確認してから確定してください。回答3件以下は評価欄に表示しません。</p>
+    <button id="surveyLinkSave" type="button" class="primary">本人確認して紐づける</button>
+   </div>
+  </div>
+  <label for="residencyChoice">出勤管理区分</label>
+  <select id="residencyChoice">
+   <option value="unclassified" disabled>区分未判定</option>
+   <option value="provisional_hidden">仮登録</option>
+   <option value="pending_documents">未入店</option>
+   <option value="real_working">在籍実働</option>
+   <option value="long_leave">長期休暇</option>
+   <option value="dummy_use">ダミー使用</option>
+  </select>
+  <p class="muted">「実働外」は今後の出勤予定がない場合に自動判定します。区分変更は出勤管理内の登録内容のみ更新し、EXA本体の表示設定は変更しません。EXAの表示／非表示情報との自動同期は未接続です。</p>
+  <div class="row space"><button id="residencyCancel" type="button">閉じる</button><button id="residencySave" class="primary" type="button">区分変更を確定</button></div>
+ </div>
+</div>
+</div></div>
+<div id="countModal" class="day-modal hide" role="dialog" aria-modal="true"><div id="countShade" class="day-modal-shade"></div><div class="panel count-panel"><h2 id="countTitle">接客本数</h2><p class="muted">当欠は0本とは別に記録します。</p><select id="countSelect" size="8"><option value="absent">当欠</option><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select><div class="row space"><button id="countCancel">キャンセル</button><button id="countConfirm" class="primary">確定</button></div></div></div><div id="dayPanel" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="dayTitle"><div class="day-modal-shade" id="dayBackdrop"></div><div class="day-modal-content panel"><div class="row space"><div class="timeline-heading"><h2 id="dayTitle">日別タイムチャート</h2><strong id="dayHeadcount" class="day-headcount"></strong></div><button id="closeDay" type="button" aria-label="閉じる">閉じる ×</button></div><div id="timeline"></div></div></div>
+</main><footer>EXA管理ページの登録内容は変更しません。接客本数のみSupabaseへ保存します。</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.10/dist/umd/supabase.min.js"></script>
 <script>
-(function(){
-"use strict";
-const code="unsecret",slug="un-secret";
-const $=id=>document.getElementById(id);
-const url="https://vjjnkflbfsjihwzjsjpr.supabase.co",key="sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos";
-const client=window.supabase?.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,storage:localStorage,storageKey:"mattan-recruit-auth"}});
-const jst=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
-let month=jst().slice(0,7),filter="real",staff=[],shifts=[],performance=[],authorized=false;
-const pad=n=>String(n).padStart(2,"0");
-const dates=()=>{const [year,m]=month.split("-").map(Number);return Array.from({length:new Date(year,m,0).getDate()},(_,i)=>month+"-"+pad(i+1))};
-$("storeSelect").value=slug;
-$("storeSelect").onchange=()=>{const v=$("storeSelect").value;location.href=v==="rose"?"../": "../"+v+"/"};
-function shiftTime(v){if(v===null||v===undefined)return "";const h=Math.floor(v/60),m=v%60;return h+":"+pad(m)}
-function makeCell(row,value,tag="td",cls=""){const cell=document.createElement(tag);cell.textContent=value;cell.className=cls;row.append(cell);return cell}
-function render(){
- $("monthLabel").textContent=month.replace("-","年")+"月";
- const days=dates(),table=$("monthly");table.replaceChildren();
- const head=document.createElement("tr");["源氏名","出勤","接客","当欠","評価",...days.map(d=>String(+d.slice(8))+"日")].forEach(x=>makeCell(head,x,"th"));table.append(head);
- const isRetired=t=>t.operating_category==="not_used"||t.operating_category==="dummy_use"||t.residency==="dummy";
- const wanted=staff.filter(t=>filter==="all"||(filter==="dummy"?isRetired(t):!isRetired(t))).sort((a,b)=>Number(a.exa_id)-Number(b.exa_id));
- for(const person of wanted){
-  const row=document.createElement("tr");const id=person.exa_id;
-  const nameCell=makeCell(row,person.stage_name||"ID "+id,"td","staff");if(person.residency==="dummy"||person.operating_category==="dummy_use")nameCell.classList.add("state-dummy");
-  const entries=shifts.filter(s=>s.exa_id===id);
-  const done=performance.filter(p=>p.exa_id===id);
-  makeCell(row,String(entries.length));makeCell(row,String(done.reduce((n,p)=>n+(Number(p.customer_count)||0),0)));
-  makeCell(row,String(done.filter(p=>p.attendance_status==="absent").length));
-  makeCell(row,person.evaluation_score==null?"—":String(person.evaluation_score));
-  for(const d of days){const s=entries.find(x=>x.work_date===d);const cell=makeCell(row,s?shiftTime(s.start_minutes)+"-"+shiftTime(s.end_minutes):"");if(d===jst())cell.classList.add("today")}
-  table.append(row);
- }
- $("empty").classList.toggle("hide",wanted.length!==0);
+const URL_SB="https://vjjnkflbfsjihwzjsjpr.supabase.co",KEY_SB="sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos";
+const client=window.supabase?.createClient(URL_SB,KEY_SB,{auth:{persistSession:true,autoRefreshToken:true,storage:localStorage,storageKey:"mattan-recruit-auth"}});
+const $=id=>document.getElementById(id), today=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+const initial=today();let month=initial.slice(0,7),selected=initial,therapists=[],shifts=[],futureShifts=[],performances=[],historyPerformances=[],authorized=false,rosterIds=new Set();
+const safe=(v)=>{const e=document.createElement("span");e.textContent=String(v??"");return e.innerHTML;};
+const daysIn=()=>new Date(Number(month.slice(0,4)),Number(month.slice(5,7)),0).getDate();
+const dayStr=n=>month+"-"+String(n).padStart(2,"0");
+const minutes=x=>{const h=Math.floor(x/60),m=x%60;return (h>=24?(h===24?"24":String(h-24)):String(h))+(m?":"+String(m).padStart(2,"0"):"")};
+const shiftTime=x=>{const h=Math.floor(x/60),m=x%60,clock=h>=24?h-24:h;return m===30?clock+".5":m===0?String(h===24?24:clock):clock+":"+String(m).padStart(2,"0");};
+const range=x=>shiftTime(x.start_minutes)+"-"+shiftTime(x.end_minutes);
+const isDummy=s=>s.residency==="dummy";
+const staffById=()=>new Map(therapists.map(t=>[t.exa_id,t]));
+const byDay=()=>{const m=new Map();for(const r of shifts){if(!m.has(r.work_date))m.set(r.work_date,[]);m.get(r.work_date).push(r);}return m;};
+let messageTimer=null;
+const showMsg=(message,error=false)=>{
+ const el=$("message");
+ clearTimeout(messageTimer);
+ el.textContent=message;
+ el.className=error?"error":"muted";
+ el.classList.toggle("toast-visible",Boolean(message));
+ if(message && !(/取得中|反映中|読み込み中/.test(message)))messageTimer=setTimeout(()=>{el.classList.remove("toast-visible");},error?10000:5200);
+};
+async function loginCheck(){if(!client){location.replace("/therapist-profile/staff/management-top/");return;}
+const {data:{session}}=await client.auth.getSession();if(!session){authorized=false;$("app").classList.add("hide");location.replace("/therapist-profile/staff/management-top/");return;}
+const [{data,error},access]=await Promise.all([client.from("recruit_staff_profiles").select("display_name,role,approved_at").eq("user_id",session.user.id).maybeSingle(),client.rpc("can_link_therapist_interview")]);
+if(error||access.error||access.data!==true||!data||!data.approved_at||!["master","full"].includes(data.role)){
+  authorized=false;$("app").classList.add("hide");location.replace("/therapist-profile/staff/management-top/");$("loginError").textContent="このページへの権限がありません。";return;
 }
-async function load(){
- if(!authorized)return;
- $("message").textContent="保存済みデータを確認しています…";
- const start=month+"-01",days=dates(),end=days[days.length-1];
- const results=await Promise.all([
- client.from("exa_shift_therapists").select("exa_id,stage_name,residency,operating_category,evaluation_score").eq("store_code",code),
- client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes").eq("store_code",code).gte("work_date",start).lte("work_date",end),
- client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code",code).gte("work_date",start).lte("work_date",end)
- ]);
- const error=results.find(x=>x.error)?.error;
- if(error){$("message").textContent="取得できませんでした："+error.message;staff=[];shifts=[];performance=[];render();return}
- [staff,shifts,performance]=results.map(x=>x.data||[]);
- $("message").textContent="";render();
-}
-async function loginCheck(){
- if(!client){location.replace("/therapist-profile/staff/management-top/");$("loginError").textContent="認証ライブラリを読み込めません";return}
- const {data:{session}}=await client.auth.getSession();
- if(!session){location.replace("/therapist-profile/staff/management-top/");$("app").classList.add("hide");return}
- const [profile,access]=await Promise.all([
- client.from("recruit_staff_profiles").select("display_name,role,approved_at").eq("user_id",session.user.id).maybeSingle(),
- client.rpc("can_link_therapist_interview")
- ]);
- if(profile.error||access.error||access.data!==true||!profile.data?.approved_at||!["master","full"].includes(profile.data.role)){
-  location.replace("/therapist-profile/staff/management-top/");$("app").classList.add("hide");$("loginError").textContent="このページへの権限がありません。";return
- }
-const homeName=document.getElementById("lgHeaderHomeLabel");if(homeName)homeName.textContent=(profile.data.display_name||"管理")+" TOP";
- authorized=true;$("login").classList.add("hide");$("app").classList.remove("hide");$("logout").classList.remove("hide");await load();
-}
-$("loginForm").onsubmit=async e=>{e.preventDefault();$("loginError").textContent="認証中…";const {error}=await client.auth.signInWithPassword({email:$("email").value,password:$("password").value});if(error){$("loginError").textContent="ログインできません。入力情報をご確認ください。";return}$("loginError").textContent="";await loginCheck()};
+const homeName=document.getElementById("lgHeaderHomeLabel");if(homeName)homeName.textContent=(data.display_name||"管理")+" TOP";
+authorized=true;$("login").classList.add("hide");$("app").classList.remove("hide");$("logout").classList.remove("hide");$("authLabel").textContent="認証済み";await load();}
+$("loginForm").onsubmit=async e=>{e.preventDefault();$("loginError").textContent="確認中…";const {error}=await client.auth.signInWithPassword({email:$("email").value,password:$("password").value});if(error){$("loginError").textContent="ログインできません。入力情報をご確認ください。";return;}$("loginError").textContent="";await loginCheck()};
 $("logout").onclick=async()=>{await client.auth.signOut();sessionStorage.removeItem("mattan-recruit-auth");location.reload()};
-$("prev").onclick=()=>{const [y,m]=month.split("-").map(Number),d=new Date(y,m-2,1);month=d.getFullYear()+"-"+pad(d.getMonth()+1);void load()};
-$("next").onclick=()=>{const [y,m]=month.split("-").map(Number),d=new Date(y,m,1);month=d.getFullYear()+"-"+pad(d.getMonth()+1);void load()};
-$("reload").onclick=()=>void load();
-document.querySelectorAll("[data-filter]").forEach(b=>b.onclick=()=>{filter=b.dataset.filter;document.querySelectorAll("[data-filter]").forEach(x=>x.classList.toggle("active",x===b));render()});
-$("closeDay").onclick=()=>$("dayPanel").classList.add("hide");
-$("dayPanel").onclick=e=>{if(e.target===$("dayPanel"))$("closeDay").click()};
+async function load(){
+if(!authorized)return;showMsg("Supabaseを読み込み中…");
+const start=month+"-01",end=dayStr(daysIn());
+const [a,b,c,d,e,future,sv,sl,roster]=await Promise.all([
+client.from("exa_shift_therapists").select("exa_id,stage_name,residency,employment_status,operating_category,evaluation_score").eq("store_code","unsecret"),
+client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_dummy_shift,is_pre_off").eq("store_code","unsecret").gte("work_date",start).lte("work_date",end).order("work_date"),
+client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code","unsecret").gte("work_date",start).lte("work_date",end),
+client.from("exa_shift_sync_runs").select("finished_at,record_count,mode").eq("store_code","unsecret").eq("state","success").order("finished_at",{ascending:false}).limit(1),
+client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code","unsecret").lt("work_date",today()).limit(5000),
+client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_dummy_shift,is_pre_off").eq("store_code","unsecret").order("work_date").limit(5000),
+Promise.resolve({data:[],error:null}),
+Promise.resolve({data:[],error:null}),
+client.from("exa_shift_therapists").select("exa_id").eq("store_code","unsecret")
+]);
+const err=[a,b,c,d,e,future,sv,sl,roster].find(r=>r.error)?.error;
+if(err){showMsg("読み込みエラー："+err.message,true);return;}
+rosterIds=new Set((roster.data||[]).map(r=>r.exa_id));
+therapists=(a.data||[]).filter(t=>rosterIds.has(t.exa_id)||t.operating_category==="not_used");shifts=b.data||[];performances=c.data||[];historyPerformances=e.data||[];futureShifts=future.data||[];
+surveyScores=sv.data||[];surveyLinks=sl.data||[];
+$("monthLabel").textContent=month.replace("-","年")+"月";
+$("message").textContent="";
+renderMonthly();renderDay();}
+// 2026-2027 public holidays/observed holidays from the Cabinet Office list.
+const japanHolidayDates=new Set((
+"2026-01-01 2026-01-12 2026-02-11 2026-02-23 2026-03-20 2026-04-29 2026-05-03 2026-05-04 2026-05-05 2026-05-06 2026-07-20 2026-08-11 2026-09-21 2026-09-22 2026-09-23 2026-10-12 2026-11-03 2026-11-23 "+
+"2027-01-01 2027-01-11 2027-02-11 2027-02-23 2027-03-21 2027-03-22 2027-04-29 2027-05-03 2027-05-04 2027-05-05 2027-07-19 2027-08-11 2027-09-20 2027-09-23 2027-10-11 2027-11-03 2027-11-23"
+).split(" "));
+const dayType=date=>{
+ const weekday=new Date(date+"T00:00:00Z").getUTCDay();
+ return japanHolidayDates.has(date)?"holiday":weekday===0?"sunday":weekday===6?"saturday":"weekday";
+};
+const exaFourDigit=minutes=>String(Math.floor(minutes/60)).padStart(2,"0")+String(minutes%60).padStart(2,"0");
+const weekdayNames=["日","月","火","水","木","金","土"];
+function dummyPattern(id){
+ const rows=futureShifts.filter(r=>r.exa_id===id&&!r.is_pre_off);
+ if(!rows.length)return {weekdays:"—",start:null,end:null,multiple:false};
+ const weekdaySet=[...new Set(rows.map(r=>new Date(r.work_date+"T00:00:00Z").getUTCDay()))];
+ weekdaySet.sort((a,b)=>(a+6)%7-(b+6)%7);
+ const times=[...new Set(rows.map(r=>r.start_minutes+"/"+r.end_minutes))];
+ return {
+  weekdays:weekdaySet.map(x=>weekdayNames[x]).join("・"),
+  start:times.length===1?exaFourDigit(rows[0].start_minutes):null,
+  end:times.length===1?exaFourDigit(rows[0].end_minutes):null,
+  multiple:times.length>1
+ };
+}
+let staffView="real";
+function renderMonthly(){
+const existing=staffById(), byId=new Map();
+for(const r of shifts){if(!byId.has(r.exa_id))byId.set(r.exa_id,new Map());byId.get(r.exa_id).set(r.work_date,r);}
+const real=therapists.filter(t=>t.operating_category!=="not_used"&&t.operating_category!=="dummy_use").sort((a,b)=>a.exa_id-b.exa_id);
+const dummy=therapists.filter(t=>t.operating_category==="dummy_use"||t.operating_category==="not_used").sort((a,b)=>a.exa_id-b.exa_id);
+const per=new Map(performances.map(p=>[p.exa_id+"|"+p.work_date,p.customer_count]));
+const absence=new Set(performances.filter(p=>p.attendance_status==="absent").map(p=>p.exa_id+"|"+p.work_date));
+const dayCounts=new Map();
+for(let n=1;n<=daysIn();n++){
+ const date=dayStr(n);
+ const r=shifts.filter(x=>x.work_date===date);
+ const active=r.filter(x=>rosterIds.has(x.exa_id)&&existing.get(x.exa_id)?.operating_category!=="not_used"&&!x.is_dummy_shift&&!isDummy(existing.get(x.exa_id)||{})).length;
+ const dummyTotal=r.filter(x=>rosterIds.has(x.exa_id)&&existing.get(x.exa_id)?.operating_category!=="not_used"&&(x.is_dummy_shift||isDummy(existing.get(x.exa_id)||{}))).length;
+ dayCounts.set(date,{real:active,dummy:dummyTotal,all:active+dummyTotal});
+}
+const countHeader=staffView==="real"?"在籍（"+real.length+"名）":staffView==="dummy"?"退店（"+dummy.length+"名）":"在籍（"+real.length+"名）／退店（"+dummy.length+"名）";
+let html='<thead><tr><th class="staff-heading" rowspan="2"><span>'+countHeader+'</span></th>';
+if(staffView==="dummy")html+='<th class="stat-heading" rowspan="2">登録曜日</th><th class="stat-heading" rowspan="2">出勤</th><th class="stat-heading" rowspan="2">退勤</th>';
+else html+='<th class="stat-heading" rowspan="2">稼働</th><th class="stat-heading" rowspan="2">出勤</th><th class="stat-heading" rowspan="2">無報</th><th class="stat-heading" rowspan="2">評価</th>';
+for(let n=1;n<=daysIn();n++){const d=dayStr(n),kind=dayType(d);html+='<th class="day-heading '+kind+(d===today()?" today-marker":"")+'"><button type="button" data-day="'+d+'">'+n+'日</button></th>';}
+html+='</tr><tr class="daily-totals">';
+for(let n=1;n<=daysIn();n++){const d=dayStr(n),kind=dayType(d);html+='<th class="day-total '+kind+(d===today()?" today-marker":"")+'" title="その日の出勤人数">'+dayCounts.get(d)[staffView]+'人</th>';}
+html+='</tr></thead><tbody>';
+for(const [label,list,group] of [["在籍",real,"real"],["退店",dummy,"dummy"]]){if(staffView!=="all"&&staffView!==group)continue;
+if(staffView==="all")html+='<tr class="group"><td colspan="'+(daysIn()+5)+'">'+label+"（"+list.length+"名）</td></tr>";
+for(const t of list){const entries=byId.get(t.exa_id)||new Map(),valid=[...entries.values()].filter(r=>r.work_date<today()&&(!isDummy(t))&&!r.is_dummy_shift&&per.has(t.exa_id+"|"+r.work_date));const historical=historyPerformances.filter(p=>p.exa_id===t.exa_id&&p.attendance_status!=="absent");const avg=historical.length?(historical.reduce((sum,p)=>sum+p.customer_count,0)/historical.length).toFixed(1):"—";
+const rawName=String(t.stage_name||"ID "+t.exa_id);
+const nameParts=rawName.match(/^(.+?)-([^-]+)-$/);
+const stageName=nameParts?nameParts[1]:rawName,kana=nameParts?nameParts[2]:"";
+const upcoming=futureShifts.some(r=>r.exa_id===t.exa_id&&r.work_date>=today()&&!r.is_dummy_shift&&!r.is_pre_off);
+const outside=group==="real"&&!upcoming&&!["long_leave","pending_documents","provisional_hidden"].includes(t.operating_category);
+const latestDates=futureShifts.filter(r=>r.exa_id===t.exa_id&&!r.is_dummy_shift&&!r.is_pre_off).map(r=>r.work_date).sort();
+const lastKnownDate=latestDates.length?latestDates[latestDates.length-1]:null;
+const days=[...entries.values()].filter(r=>!r.is_dummy_shift).length;
+const zeros=valid.filter(r=>!absence.has(t.exa_id+"|"+r.work_date)&&per.get(t.exa_id+"|"+r.work_date)===0).length;
+const categoryClass={provisional_hidden:"state-provisional",pending_documents:"state-paperwork",long_leave:"state-leave",dummy_use:"state-dummy"}[t.operating_category]||(group==="dummy"?"state-dummy":"");
+html+='<tr class="'+(outside?'outside-roster':'')+'"><td class="staff-name '+categoryClass+'"><button type="button" class="name-editor" data-staff-id="'+t.exa_id+'" title="出勤管理区分を変更">'+safe(stageName)+'</button><span class="staff-exa-id" title="EXA管理ID">ID '+t.exa_id+'</span>'+(kana?'<span class="reading">'+safe(kana)+'</span>':'')+'</td>';
+const surveyId=surveyLinks.find(l=>l.exa_id===t.exa_id)?.sheet_person_id;
+const survey=surveyScores.find(x=>x.sheet_person_id===surveyId);
+const responseCount=survey?.response_count??0;
+const evaluation=responseCount>=4&&survey?.score_100!==null&&Number.isFinite(Number(survey?.score_100))?Number(survey.score_100):null;
+const scoreClass=evaluation===null?"":evaluation>=95?"score-high":"score-low";
+const scoreText=evaluation===null?"—":evaluation.toFixed(1);
+const scoreTitle=!survey?"アンケート未連携":responseCount<=3?"回答数 "+responseCount+"件：4件未満のため点数非表示":"回答数 "+responseCount+"件／アンケート平均（100点満点）";
+if(staffView==="dummy"){
+ const pattern=dummyPattern(t.exa_id);
+ const timeButton=(v,label)=>v?'<button type="button" class="copy-exa" data-copy-exa="'+v+'" title="'+label+' '+v+' をコピー">'+v+'</button>':'—';
+ html+='<td class="stat-cell weekday-cell" title="保存済みシフトから抽出した曜日">'+safe(pattern.weekdays)+'</td>';
+ html+='<td class="stat-cell">'+timeButton(pattern.start,"出勤")+'</td>';
+ html+='<td class="stat-cell">'+timeButton(pattern.end,"退勤")+'</td>';
+}else{
+ html+='<td class="stat-cell"><strong>'+avg+'</strong></td><td class="stat-cell">'+days+'</td><td class="stat-cell '+(zeros>0?'unpaid-positive':'')+'">'+zeros+'</td><td class="stat-cell '+scoreClass+'" title="'+safe(scoreTitle)+'">'+scoreText+'</td>';
+}
+for(let n=1;n<=daysIn();n++){const day=dayStr(n),r=entries.get(day),value=per.get(t.exa_id+"|"+day),past=day<today();
+const cellClasses=[group==="dummy"?"dummy":"",day===today()?"today":"",dayType(day),
+ lastKnownDate===day?"last-scheduled":"",r?.is_pre_off?"pre-off":"",outside?"outside-cell":""].filter(Boolean).join(" ");
+html+='<td class="'+cellClasses+'">';
+if(r?.is_pre_off)html+="<strong class='pre-off-label'>事前</strong>";
+else if(r&&past&&group==="real"&&!r.is_dummy_shift)html+='<button type="button" class="edit-count '+(absence.has(t.exa_id+"|"+day)?"absent-entry":"")+'" data-id="'+t.exa_id+'" data-date="'+day+'">'+(absence.has(t.exa_id+"|"+day)?"当欠":value===undefined?"＋":value)+'</button>';
+else if(r&&!past)html+=safe(range(r));
+else if(r&&past&&group==="dummy")html+="—";
+else if(r&&past&&r.is_dummy_shift)html+="—";
+else html+='<small> </small>';
+html+="</td>";
+}
+html+='</tr>';
+}}
+html+="</tbody>";$("monthly").innerHTML=html;
+$("monthly").querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{selected=b.dataset.day;renderDay();$("dayPanel").classList.remove("hide")});
+$("monthly").querySelectorAll(".edit-count").forEach(input=>input.onclick=()=>openCount(input));
+$("monthly").querySelectorAll("[data-staff-id]").forEach(button=>button.onclick=()=>openResidency(button));
+ $("monthly").classList.toggle("dummy-layout",staffView==="dummy");
+ $("monthly").querySelectorAll("[data-copy-exa]").forEach(button=>button.onclick=async()=>{
+  const text=button.dataset.copyExa;
+  try{
+   await navigator.clipboard.writeText(text);
+   button.classList.add("copied-exa");
+   button.setAttribute("aria-label",text+" コピー済み");
+   clearTimeout(button._copyReset);
+   button._copyReset=setTimeout(()=>{
+    if(!button.isConnected)return;
+    button.classList.remove("copied-exa");
+    button.removeAttribute("aria-label");
+   },1600);
+  }catch(e){showMsg("コピーできませんでした。Chromeのクリップボード権限をご確認ください。",true)}
+ });
+}
+const PHOTO_BUCKET="therapist-internal-photos";
+let photoRequest=0,photoBusy=false;
+async function showTherapistPhoto(exaId){
+ const request=++photoRequest;
+ $("therapistPhoto").classList.add("hide");
+ $("therapistPhoto").removeAttribute("src");
+ $("therapistPhotoEmpty").textContent="画像を確認中…";
+ $("therapistPhotoEmpty").classList.remove("hide");
+ $("therapistPhotoStatus").textContent="非公開画像を読み込んでいます。";
+ try{
+  const {data,error}=await client.from("exa_therapist_photos").select("storage_path").eq("store_code","unsecret").eq("exa_id",exaId).maybeSingle();
+  if(error)throw error;
+  if(request!==photoRequest)return;
+  if(!data){
+   $("therapistPhotoEmpty").textContent="画像未登録";
+   $("therapistPhotoStatus").textContent="画像を選択すると、このスタッフ専用画面に登録されます。";
+   return;
+  }
+  const signed=await client.storage.from(PHOTO_BUCKET).createSignedUrl(data.storage_path,120);
+  if(signed.error)throw signed.error;
+  if(request!==photoRequest)return;
+  $("therapistPhoto").onload=()=>{if(request===photoRequest){$("therapistPhotoEmpty").classList.add("hide");$("therapistPhoto").classList.remove("hide")}};
+  $("therapistPhoto").onerror=()=>{if(request===photoRequest){$("therapistPhoto").classList.add("hide");$("therapistPhotoEmpty").textContent="画像を表示できません"}};
+  $("therapistPhoto").src=signed.data.signedUrl;
+  $("therapistPhotoStatus").textContent="登録済み・非公開";
+ }catch(e){
+  if(request!==photoRequest)return;
+  $("therapistPhotoEmpty").textContent="画像を読み込めません";
+  $("therapistPhotoStatus").textContent="確認失敗："+(e.message||String(e));
+ }
+}
+async function makePhotoWebp(file){
+ if(!["image/jpeg","image/png","image/webp"].includes(file.type))throw Error("JPEG・PNG・WebPの画像を選択してください。");
+ if(file.size>20*1024*1024)throw Error("元画像は20MB以下にしてください。");
+ const image=await createImageBitmap(file);
+ try{
+  const maxWidth=1200,maxHeight=1600,scale=Math.min(1,maxWidth/image.width,maxHeight/image.height);
+  const canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(image.width*scale));canvas.height=Math.max(1,Math.round(image.height*scale));
+  canvas.getContext("2d").drawImage(image,0,0,canvas.width,canvas.height);
+  const blob=await new Promise((resolve,reject)=>canvas.toBlob(v=>v?resolve(v):reject(Error("画像変換に失敗しました。")),"image/webp",0.78));
+  if(blob.size>2097152)throw Error("圧縮後の画像が2MBを超えました。別の画像を選択してください。");
+  return blob;
+ }finally{image.close();}
+}
+$("therapistPhotoInput").onchange=async()=>{
+ const file=$("therapistPhotoInput").files?.[0],editing=editingResidency;
+ if(!file||!editing||!authorized||photoBusy)return;
+ const exaId=editing.exaId;
+ if(!confirm(editing.name+" の全身画像を登録・差し替えしますか？\n画像はスタッフ用非公開Storageに保存されます。")){$("therapistPhotoInput").value="";return;}
+ photoBusy=true;$("therapistPhotoInput").disabled=true;
+ $("therapistPhotoStatus").textContent="画像を圧縮して保存しています…";
+ let newPath=null;
+ try{
+  const blob=await makePhotoWebp(file);
+  const {data:old,error:readError}=await client.from("exa_therapist_photos").select("storage_path").eq("store_code","unsecret").eq("exa_id",exaId).maybeSingle();
+  if(readError)throw readError;
+  newPath="unsecret/"+exaId+"/"+crypto.randomUUID().replace(/-/g,"")+".webp";
+  const uploaded=await client.storage.from(PHOTO_BUCKET).upload(newPath,blob,{contentType:"image/webp",upsert:false});
+  if(uploaded.error)throw uploaded.error;
+  const user=(await client.auth.getUser()).data.user;
+  if(!user)throw Error("ログイン状態を確認できません。");
+  const result=await client.from("exa_therapist_photos").upsert({store_code:"unsecret",exa_id:exaId,storage_path:newPath,updated_by:user.id,updated_at:new Date().toISOString()},{onConflict:"store_code,exa_id"});
+  if(result.error)throw result.error;
+  if(old?.storage_path && old.storage_path!==newPath)await client.storage.from(PHOTO_BUCKET).remove([old.storage_path]);
+  newPath=null;
+  if(editingResidency?.exaId===exaId)await showTherapistPhoto(exaId);
+  showMsg(editing.name+" の画像を登録しました。");
+ }catch(e){
+  if(newPath)await client.storage.from(PHOTO_BUCKET).remove([newPath]);
+  $("therapistPhotoStatus").textContent="登録失敗："+(e.message||String(e));
+  showMsg("画像を保存できませんでした："+(e.message||String(e)),true);
+ }finally{photoBusy=false;$("therapistPhotoInput").disabled=false;$("therapistPhotoInput").value="";}
+};
+let surveyScores=[],surveyLinks=[],surveyRequest=0;
+let registryRequest=0,selectedInterviewId=null,registryAdmin=false,linkingInterview=false;
+let searchInterviewItems=[];
+async function loadPersonRegistry(exaId){
+ const request=++registryRequest;
+ selectedInterviewId=null;searchInterviewItems=[];
+ $("interviewLinkOpen").classList.add("hide");
+ $("interviewLinkPanel").classList.add("hide");
+ $("interviewLinkConfirm").classList.add("hide");
+ $("interviewResults").replaceChildren();
+ $("interviewSearchInput").value="";
+ $("personRegistryState").textContent="面接情報を確認中…";
+ try{
+  const allowed=await client.rpc("can_link_therapist_interview");
+  if(allowed.error)throw allowed.error;
+  registryAdmin=allowed.data===true;
+  const link=await client.from("therapist_exa_links").select("person_id").eq("store_code","unsecret").eq("exa_id",exaId).maybeSingle();
+  if(link.error)throw link.error;
+  if(request!==registryRequest)return;
+  if(link.data){
+   const matches=await client.from("therapist_interview_links").select("interview_applicant_id").eq("person_id",link.data.person_id).limit(20);
+   if(matches.error)throw matches.error;
+   if(request!==registryRequest)return;
+   if(matches.data.length){
+    const ids=matches.data.map(x=>x.interview_applicant_id);
+    const found=await client.from("interview_applicants").select("id,name,stage_name,shop,hire_shop,status").in("id",ids);
+    if(found.error)throw found.error;
+    if(request!==registryRequest)return;
+    $("personRegistryState").textContent="紐づけ済み："+(found.data||[]).map(x=>[x.name||"氏名未登録",x.status||"状態未記録"].join("／")).join("、");
+    return;
+   }
+  }
+  const person=therapists.find(t=>t.exa_id===exaId);
+  if(person?.residency==="dummy"){
+   $("personRegistryState").textContent="面接情報：未紐づけ（ダミー区分）";
+  }else if(!registryAdmin){
+   $("personRegistryState").textContent="面接情報：未紐づけ（紐づけ操作は指定管理者のみ）";
+  }else{
+   $("personRegistryState").textContent="面接情報：未紐づけ";
+   $("interviewLinkOpen").classList.remove("hide");
+  }
+ }catch(e){
+  if(request!==registryRequest)return;
+  $("personRegistryState").textContent="面接情報の確認に失敗しました："+(e.message||String(e));
+ }
+}
+$("interviewLinkOpen").onclick=()=>{
+ $("interviewLinkPanel").classList.toggle("hide");
+ if(!$("interviewLinkPanel").classList.contains("hide"))$("interviewSearchInput").focus();
+};
+async function searchInterview(){
+ if(!authorized||!registryAdmin||!editingResidency)return;
+ const term=$("interviewSearchInput").value.trim();
+ selectedInterviewId=null;$("interviewLinkConfirm").classList.add("hide");
+ const out=$("interviewResults");out.replaceChildren();
+ if(term.length<2){out.textContent="2文字以上入力して検索してください。";return;}
+ const cleaned=term.replace(/[%_,().\\]/g,"").slice(0,60);
+ if(cleaned.length<2){out.textContent="検索文字を確認してください。";return;}
+ const currentExa=editingResidency.exaId,request=registryRequest;
+ out.textContent="検索しています…";
+ const pattern="%"+cleaned+"%";
+ try{
+  const query=client.from("interview_applicants")
+   .select("id,name,kana,stage_name,phone,shop,hire_shop,status,submitted_at")
+   .or("name.ilike."+pattern+",kana.ilike."+pattern+",stage_name.ilike."+pattern+",phone.ilike."+pattern)
+   .order("submitted_at",{ascending:false}).limit(30);
+  const result=await query;
+  if(result.error)throw result.error;
+  if(request!==registryRequest||editingResidency?.exaId!==currentExa)return;
+  searchInterviewItems=result.data||[];
+  out.replaceChildren();
+  if(!searchInterviewItems.length){out.textContent="一致する面接シートはありません。";return;}
+  searchInterviewItems.forEach(item=>{
+   const b=document.createElement("button");
+   b.type="button";b.className="interview-result";
+   const name=document.createElement("strong");name.textContent=item.name||"氏名未登録";b.appendChild(name);
+   const detail=document.createElement("small");
+   const phone=item.phone?("電話末尾："+String(item.phone).slice(-4)):"電話未登録";
+   detail.textContent=[item.kana,item.stage_name?("源氏名："+item.stage_name):"",item.hire_shop||item.shop||"店舗未登録",item.status||"状態未登録",phone].filter(Boolean).join("／");
+   b.appendChild(detail);
+   b.onclick=()=>{
+    selectedInterviewId=item.id;
+    out.querySelectorAll(".interview-result").forEach(el=>el.classList.remove("selected"));
+    b.classList.add("selected");
+    $("interviewLinkConfirm").classList.remove("hide");
+   };
+   out.appendChild(b);
+  });
+ }catch(e){if(request===registryRequest)out.textContent="検索失敗："+(e.message||String(e));}
+}
+$("interviewSearchButton").onclick=searchInterview;
+$("interviewSearchInput").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();searchInterview();}};
+$("interviewLinkConfirm").onclick=async()=>{
+ if(!authorized||!registryAdmin||linkingInterview||!editingResidency||!selectedInterviewId)return;
+ const exaId=editingResidency.exaId,exaName=editingResidency.name;
+ const item=searchInterviewItems.find(x=>x.id===selectedInterviewId);
+ if(!item)return;
+ if(!confirm("EXA："+exaName+"（ID "+exaId+"）\nInterview："+(item.name||"氏名未登録")+"（"+(item.hire_shop||item.shop||"店舗未登録")+"）\n\n同一人物であることを確認しましたか？\n確定すると面接情報が紐づきます。"))return;
+ linkingInterview=true;$("interviewLinkConfirm").disabled=true;
+ try{
+  const result=await client.rpc("link_unsecret_therapist_interview",{p_exa_id:exaId,p_applicant_id:item.id});
+  if(result.error)throw result.error;
+  if(editingResidency?.exaId===exaId)await loadPersonRegistry(exaId);
+  showMsg(exaName+" の面接情報を紐づけました。");
+ }catch(e){showMsg("面接情報の紐づけに失敗しました："+(e.message||String(e)),true);}
+ finally{linkingInterview=false;$("interviewLinkConfirm").disabled=false;}
+};
+// Survey scores are a read-only snapshot of the connected sheet's ID tab.
+// EXA and sheet IDs are only joined by a manager-confirmed mapping.
+async function loadSurveyLink(exaId){
+ $("surveyLinkPanel").classList.add("hide");
+ $("surveyLinkOpen").classList.add("hide");
+ $("surveyLinkState").textContent="Un Secretのアンケート評価は未接続です。";
+ return;
+ const request=++surveyRequest;
+ const status=$("surveyLinkState"),btn=$("surveyLinkOpen"),panel=$("surveyLinkPanel");
+ panel.classList.add("hide");btn.classList.add("hide");
+ status.textContent="評価情報を確認中…";
+ const linked=surveyLinks.find(x=>x.exa_id===exaId);
+ const score=linked&&surveyScores.find(x=>x.sheet_person_id===linked.sheet_person_id);
+ if(score){
+  status.textContent=score.sheet_person_id+"｜"+(score.rose_stage_name||"源氏名なし")+"｜回答 "+score.response_count+"件｜"+(score.response_count>=4&&score.score_100!==null?Number(score.score_100).toFixed(1)+"点":"4件未満・点数非表示");
+ }else{
+  status.textContent=linked?"評価データを取得できません":"アンケート評価：未紐づけ";
+ }
+ try{
+  const allowed=await client.rpc("can_link_therapist_interview");
+  if(allowed.error)throw allowed.error;
+  if(request!==surveyRequest)return;
+  if(!allowed.data||linked)return;
+  const used=new Set(surveyLinks.map(x=>x.sheet_person_id));
+  const choice=$("surveyPersonChoice");choice.replaceChildren();
+  const first=document.createElement("option");first.value="";first.textContent="管理ID・源氏名を選択";choice.appendChild(first);
+  for(const row of surveyScores.filter(x=>x.rose_stage_name&&!used.has(x.sheet_person_id)).sort((a,b)=>a.sheet_person_id.localeCompare(b.sheet_person_id))){
+   const o=document.createElement("option");o.value=row.sheet_person_id;o.textContent=row.sheet_person_id+"｜"+row.rose_stage_name+"（回答"+row.response_count+"件）";choice.appendChild(o);
+  }
+  btn.classList.remove("hide");
+ }catch(e){if(request===surveyRequest)status.textContent+="｜権限確認失敗："+(e.message||String(e))}
+}
+$("surveyLinkOpen").onclick=()=>{$("surveyLinkPanel").classList.toggle("hide")};
+$("surveyLinkSave").onclick=async()=>{
+ const exaId=editingResidency?.exaId;
+ const sheetId=$("surveyPersonChoice").value;
+ if(!authorized||!exaId||!sheetId)return;
+ const staff=therapists.find(t=>t.exa_id===exaId),score=surveyScores.find(x=>x.sheet_person_id===sheetId);
+ if(!staff||!score)return;
+ if(!confirm("EXA："+staff.stage_name+"（ID "+exaId+"）\nアンケート："+score.rose_stage_name+"（"+sheetId+"）\n\n同一人物であることを確認しましたか？\n別人との誤連携防止のため、確認後に確定してください。"))return;
+ const button=$("surveyLinkSave");button.disabled=true;
+ try{
+  const {data:{user}}=await client.auth.getUser();
+  if(!user)throw Error("管理者ログインを確認できません");
+  const r=await client.from("exa_survey_links").insert({store_code:"unsecret",exa_id:exaId,sheet_person_id:sheetId,linked_by:user.id});
+  if(r.error)throw r.error;
+  await load();
+  if(editingResidency?.exaId===exaId)await loadSurveyLink(exaId);
+  showMsg("アンケートIDを紐づけました。回答4件以上の評価点のみ表示します。");
+ }catch(e){showMsg("アンケート紐づけ失敗："+(e.message||String(e)),true)}
+ finally{button.disabled=false}
+};
+let editingResidency=null;
+function openResidency(button){
+ const exaId=Number(button.dataset.staffId);
+ const person=therapists.find(t=>t.exa_id===exaId);
+ if(!person)return;
+ editingResidency={exaId,old:person.operating_category,name:person.stage_name};
+ $("residencyTitle").textContent="セラピスト詳細";
+ $("residencyInfo").textContent=person.stage_name+"（EXA ID："+exaId+"）／区分："+({unclassified:"未判定",provisional_hidden:"仮登録",pending_documents:"未入店（書類未完備）",real_working:"在籍実働",real_outside:"実働外（旧区分）",long_leave:"長期休暇",dummy_use:"ダミー使用",not_used:"対象外"}[person.operating_category]||"未設定");
+ $("residencyChoice").value=["provisional_hidden","pending_documents","real_working","long_leave","dummy_use"].includes(person.operating_category)?person.operating_category:"unclassified";
+ $("residencyModal").classList.remove("hide");
+ showTherapistPhoto(exaId);
+ loadPersonRegistry(exaId);
+ loadSurveyLink(exaId);
+}
+function closeResidency(){
+ photoRequest++;
+ registryRequest++;
+ surveyRequest++;
+ $("residencyModal").classList.add("hide");
+ editingResidency=null;
+}
+$("residencyCancel").onclick=closeResidency;
+$("residencyShade").onclick=closeResidency;
+$("residencySave").onclick=async()=>{
+ if(!editingResidency||!authorized)return;
+ const category=$("residencyChoice").value;
+ const labels={provisional_hidden:"仮登録（EXA非表示）",pending_documents:"未入店（書類未完備）",real_working:"在籍実働",long_leave:"長期休暇",dummy_use:"ダミー使用"};
+ if(!Object.prototype.hasOwnProperty.call(labels,category))return;
+ const person=therapists.find(t=>t.exa_id===editingResidency.exaId);
+ if(!person)return;
+ if(person.operating_category===category){closeResidency();return;}
+ if(!confirm(person.stage_name+"（EXA ID："+person.exa_id+"）を「"+labels[category]+"」に変更しますか？\\nEXA本体や過去の出勤実績には影響しません。"))return;
+ const button=$("residencySave");button.disabled=true;
+ try{
+  const {data,error}=await client.rpc("set_unsecret_operating_category",{p_exa_id:person.exa_id,p_category:category});
+  if(error)throw error;
+  if(!Array.isArray(data)||!data.length||data[0].operating_category!==category)throw Error("区分変更を確認できませんでした");
+  closeResidency();await load();
+  showMsg(person.stage_name+"を「"+labels[category]+"」に変更しました。");
+ }catch(e){showMsg("区分変更に失敗："+String(e.message||e),true)}
+ finally{button.disabled=false;}
+};
+let editingCount=null;
+function openCount(button){
+ const id=Number(button.dataset.id),date=button.dataset.date;
+ const old=performances.find(p=>p.exa_id===id&&p.work_date===date);
+ editingCount={id,date};
+ $("countTitle").textContent=(therapists.find(t=>t.exa_id===id)?.stage_name||"セラピスト")+"｜"+date;
+ $("countSelect").selectedIndex=-1;
+ if(old)$("countSelect").value=old.attendance_status==="absent"?"absent":String(old.customer_count);
+ $("countModal").classList.remove("hide");
+}
+function closeCount(){$("countModal").classList.add("hide");editingCount=null;}
+$("countCancel").onclick=closeCount;
+$("countShade").onclick=closeCount;
+$("countConfirm").onclick=async()=>{
+ if(!editingCount)return;
+ const selected=$("countSelect").value;
+ if(!["absent","0","1","2","3","4","5","6"].includes(selected)){showMsg("当欠または0〜6を選択してください",true);return;}
+ const button=$("countConfirm");button.disabled=true;
+ try{
+  const {error}=await client.from("exa_shift_performance").upsert({
+   store_code:"unsecret",exa_id:editingCount.id,work_date:editingCount.date,
+   customer_count:selected==="absent"?0:Number(selected),
+   attendance_status:selected==="absent"?"absent":"worked"
+  },{onConflict:"store_code,exa_id,work_date"});
+  if(error)throw error;
+  closeCount();await load();showMsg("接客本数を確定しました。");
+ }catch(e){showMsg("保存失敗："+String(e.message||e),true)}
+ finally{button.disabled=false}
+};
+function renderDay(){
+ if(!selected.startsWith(month))selected=month+"-01";
+ const map=staffById(),day=shifts.filter(r=>r.work_date===selected&&!r.is_pre_off&&rosterIds.has(r.exa_id)&&map.get(r.exa_id)?.operating_category!=="not_used");
+ const byStartThenEnd=(a,b)=>a.start_minutes-b.start_minutes||a.end_minutes-b.end_minutes||a.exa_id-b.exa_id;
+ const real=day.filter(r=>!isDummy(map.get(r.exa_id)||{})&&!r.is_dummy_shift).sort(byStartThenEnd);
+ const dummy=day.filter(r=>isDummy(map.get(r.exa_id)||{})||r.is_dummy_shift).sort(byStartThenEnd);
+ $("dayTitle").textContent=selected+"｜日別タイムチャート";
+ $("dayHeadcount").textContent="合計 "+(real.length+dummy.length)+"名（実働 "+real.length+"名・ダミー "+dummy.length+"名）";
+ const slots=Array.from({length:18},(_,i)=>600+i*60);
+ let html='<div class="chart-scroll"><table class="timeline"><thead><tr><th>セラピスト</th>'+slots.map(x=>"<th>"+minutes(x)+"</th>").join("")+"</tr></thead><tbody>";
+ const activeAt=(r,s)=>r.start_minutes<s+60&&r.end_minutes>s;
+ const countRow=(label,rows,extraClass)=>'<tr class="sum '+extraClass+'"><td>'+label+'</td>'+slots.map(slot=>'<td>'+rows.filter(r=>activeAt(r,slot)).length+'</td>').join('')+'</tr>';
+ // Place the overall headcount and real attendance directly below the hour labels.
+ html+=countRow('合計',day,'total-count');
+ html+=countRow('実出勤',real,'real-count');
+ html+=countRow('ダミー',dummy,'dummy-count');
+ function addRows(rows,kind){
+  html+='<tr class="timeline-group'+(kind==="ダミー"?" dummy-heading":"")+'"><th colspan="'+(slots.length+1)+'">'+kind+'（'+rows.length+'名）</th></tr>';
+  for(const r of rows){
+   const t=map.get(r.exa_id);
+   const name=String(t?.stage_name||"ID "+r.exa_id).replace(/-([^-]+)-$/,"");
+   html+='<tr><td class="timeline-name">'+safe(name)+'<small>'+safe(range(r))+'</small></td>';
+   for(const slot of slots){
+    const working=activeAt(r,slot);
+    html+='<td class="'+(working?(kind==="ダミー"?"dummy-on":"on"):"off")+'">'+(working?"●":"")+"</td>";
+   }
+   html+="</tr>";
+  }
+
+ }
+ addRows(real,"実出勤");
+ addRows(dummy,"ダミー");
+ html+="</tbody></table></div>";
+ $("timeline").innerHTML=day.length?html:'<p class="notice">この日付のシフトは保存されていません。未取得か出勤0件かは区別できません。</p>';
+}
+$("prev").onclick=()=>{const d=new Date(month+"-01T00:00:00");d.setMonth(d.getMonth()-1);month=[d.getFullYear(),String(d.getMonth()+1).padStart(2,"0")].join("-");load()};
+$("next").onclick=()=>{const d=new Date(month+"-01T00:00:00");d.setMonth(d.getMonth()+1);month=[d.getFullYear(),String(d.getMonth()+1).padStart(2,"0")].join("-");load()};
+$("reload").onclick=load;
+let extensionBusy=false;
+let exaSyncStartedAt=0;
+const AUTO_KEY="exa-unsecret-auto-sync-v1";
+const LAST_KEY="exa-unsecret-last-sync-v1";
+const ATTEMPT_KEY="exa-unsecret-auto-attempt-v1";
+const AUTO_MS=3*60*60*1000;
+const RETRY_MS=30*60*1000;
+let autoEnabled=false;
+const asTokyoDate=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+function paintAuto(){
+ $("autoSync").textContent="ブラウザ自動：未接続";
+ $("autoSync").title="この画面を開いている間に3時間おきにサーバー同期します。画面を閉じていても別途サーバー定期同期が動作します。";
+ $("autoSync").setAttribute("aria-pressed",String(autoEnabled));
+}
+paintAuto();
+$("autoSync").onclick=()=>{
+ autoEnabled=!autoEnabled;
+ localStorage.setItem(AUTO_KEY,autoEnabled?"on":"off");
+ if(autoEnabled && !localStorage.getItem(LAST_KEY)){
+   localStorage.setItem(LAST_KEY,String(Date.now()));
+ }
+ paintAuto();
+ showMsg(autoEnabled?"3時間自動更新を有効にしました。このページを開いている間、3時間おきに更新します。":"3時間自動更新を停止しました。");
+};
+
+const bridgeRequests=new Map();
+let syncAbortRequested=false;
+function cancelEXASync(){
+ syncAbortRequested=true;
+ for(const [requestId,pending] of bridgeRequests){
+  clearTimeout(pending.timer);
+  pending.reject(new Error("EXAの取得を中止しました。"));
+  bridgeRequests.delete(requestId);
+ }
+}
+window.addEventListener("message",event=>{
+ if(event.source!==window||event.origin!==location.origin||event.data?.source!=="exa-shift-extension")return;
+ if(event.data.action==="ready"){$("exaSync").title="拡張機能を検出しました";}
+ if(event.data.action==="fetch-shifts-result"){
+  const request=bridgeRequests.get(event.data.requestId);
+  if(!request)return;
+  clearTimeout(request.timer);bridgeRequests.delete(event.data.requestId);
+  request.resolve(event.data.result);
+ }
+});
+async function fetchFromExaExtension(){
+ const requestId=(crypto.randomUUID?.()||Math.random().toString(16).slice(2)+Date.now().toString(16));
+ return new Promise((resolve,reject)=>{
+  const timer=setTimeout(()=>{bridgeRequests.delete(requestId);reject(new Error("90秒以内にChrome拡張機能から応答がありませんでした。EXAのタブと拡張機能の有効状態を確認してください。"));},90000);
+  bridgeRequests.set(requestId,{resolve,reject,timer});
+  window.postMessage({source:"exa-shift-page",action:"fetch-shifts",requestId},location.origin);
+ });
+}
+async function synchronizeEXA(mode="manual"){showMsg("Un SecretのEXAサーバー接続は未設定です。",true);}
+// Manual bridge for EXA registrations not included in a 30-day schedule snapshot.
+// It never changes existing rows, shifts or roster classifications.
+$("unscheduledAdd").onclick=async()=>{
+ if(!authorized)return;
+ const allowed=await client.rpc("can_link_therapist_interview");
+ if(allowed.error||allowed.data!==true){showMsg("この登録操作は指定された4人の管理者のみ可能です。",true);return;}
+ const idText=prompt("EXAのセラピスト登録画面に表示されているIDを入力してください。\n出勤予定がない人も登録できます。");
+ if(idText===null)return;
+ const trimmed=idText.trim();
+ if(!/^\d{1,6}$/.test(trimmed)||Number(trimmed)<1||Number(trimmed)>100000){showMsg("EXA IDは1～100000の整数で入力してください。",true);return;}
+ const id=Number(trimmed);
+ const nameInput=prompt("EXAに登録されている源氏名を入力してください。\nEXAの登録画面と同じ表記で入力してください。");
+ if(nameInput===null)return;
+ const name=nameInput.trim();
+ if(!name||name.length>100){showMsg("源氏名は1～100文字で入力してください。",true);return;}
+ const existing=await client.from("exa_shift_therapists").select("exa_id,stage_name").eq("store_code","unsecret").eq("exa_id",id).maybeSingle();
+ if(existing.error){showMsg("登録確認に失敗："+existing.error.message,true);return;}
+ if(existing.data){showMsg("EXA ID "+id+" は既に登録済みです："+existing.data.stage_name,true);return;}
+ if(!confirm("EXAの登録内容と一致することを確認してください。\nEXA ID："+id+"\n源氏名："+name+"\n\nこの人物を出勤管理に手動追加します。シフトは作成・変更しません。"))return;
+ const button=$("unscheduledAdd");button.disabled=true;
+ try{
+  const result=await client.rpc("add_unsecret_exa_therapist",{p_exa_id:id,p_stage_name:name});
+  if(result.error)throw result.error;
+  await load();
+  showMsg("EXA ID "+id+"（"+name+"）を追加しました。出勤予定のない人は氏名セルの配色で判別できます。");
+ }catch(err){showMsg("EXA登録者の追加に失敗："+String(err.message||err),true);}
+ finally{button.disabled=false;}
+};
+$("serverTest").onclick=()=>showMsg("Un SecretのEXAサーバー接続は未設定です。",true);
+$("exaSync").onclick=()=>synchronizeEXA("manual");
+async function checkAuto(){
+ if(!autoEnabled||!authorized||extensionBusy)return;
+ const now=Date.now();
+ const last=Number(localStorage.getItem(LAST_KEY)||0);
+ const attempt=Number(localStorage.getItem(ATTEMPT_KEY)||0);
+ if(!last){localStorage.setItem(LAST_KEY,String(now));return}
+ if(now-last<AUTO_MS||now-attempt<RETRY_MS)return;
+ localStorage.setItem(ATTEMPT_KEY,String(now));
+ await synchronizeEXA("auto");
+}
+setInterval(checkAuto,60*1000);
+$("csvImport").onclick=()=>{if(!authorized)return;$("csvFile").click()};
+$("csvFile").onchange=async e=>{
+ const file=e.target.files?.[0];if(!file)return;
+ const button=$("csvImport");button.disabled=true;
+ try{
+  if(file.size>1024*1024)throw Error("CSV容量が大きすぎます（上限1MB）");
+  const source=(await file.text()).replace(/^\uFEFF/,"").replace(/\r\n/g,"\n");
+  const lines=source.trim().split("\n").filter(Boolean);
+  const parseLine=line=>{
+   const parts=[];let buffer="",quoted=false;
+   for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(c==='"'){if(quoted&&line[i+1]==='"'){buffer+='"';i++}else quoted=!quoted}
+    else if(c===","&&!quoted){parts.push(buffer);buffer=""}
+    else buffer+=c;
+   }
+   if(quoted)throw Error("CSVの引用符が閉じられていません");
+   parts.push(buffer);return parts;
+  };
+  if(lines.length<2||lines.length>3001)throw Error("CSVの行数が不正です");
+  const head=parseLine(lines.shift()).map(x=>x.trim().replace(/^\uFEFF/,""));
+  const required=["出勤日","EXA ID","源氏名","出勤","退勤"];
+  const idx=required.map(h=>head.indexOf(h));
+  if(idx.some(i=>i<0))throw Error("CSVの列名が一致しません："+required.join("、"));
+  const rows=lines.map(line=>{
+   const vals=parseLine(line);
+   return {date:vals[idx[0]],id:Number(vals[idx[1]]),name:vals[idx[2]],start:vals[idx[3]],finish:vals[idx[4]]};
+  });
+  const agree=confirm("EXAシフト"+rows.length+"件をSupabaseに更新登録します。既存の接客本数とダミー区分は保持します。続行しますか？");
+  if(!agree)return;
+  const {data:{session}}=await client.auth.getSession();
+  if(!session)throw Error("ログイン期限切れです。再ログインしてください");
+  showMsg("EXA CSV "+rows.length+"件を反映中…");
+  const response=await fetch(URL_SB+"/functions/v1/exa-unsecret-shift-import",{
+   method:"POST",headers:{"Content-Type":"application/json","apikey":KEY_SB,"Authorization":"Bearer "+session.access_token},
+   body:JSON.stringify({rows})
+  });
+  const result=await response.json();
+  if(!response.ok||!result.ok)throw Error(result.error||"取込に失敗しました（HTTP "+response.status+"）");
+  await load();
+  showMsg("取込完了："+result.imported+"件・"+result.days+"日分。EXA直接更新ではなくCSV取込です。");
+ }catch(error){showMsg("取込失敗："+String(error.message||error),true)}
+ finally{button.disabled=false;e.target.value=""}
+};
+$("closeDay").onclick=()=>{$("dayPanel").classList.add("hide")};
+$("dayBackdrop").onclick=$("closeDay").onclick;
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("dayPanel").classList.add("hide");closeCount();closeResidency();}});
+$("storeSelect").value="un-secret";
+$("storeSelect").onchange=()=>{const store=$("storeSelect").value;if(store!=="un-secret")location.href=store==="rose"?"../":"../"+store+"/";};
+document.querySelectorAll("[data-show-staff]").forEach(b=>b.onclick=()=>{
+ staffView=b.dataset.showStaff;
+ document.querySelectorAll("[data-show-staff]").forEach(x=>x.classList.toggle("active",x===b));
+ renderMonthly();
+});
 
 
 loginCheck();
-})();
 </script></body></html>
