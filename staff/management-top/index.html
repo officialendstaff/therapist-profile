@@ -332,7 +332,7 @@ const configs={
 };
 function render(){
  if(!mode)return;const cfg=configs[mode],q=mode==="birthday"?$("search").value.trim().toLowerCase():"",store=$("storeFilter").value;
- $("storeFilter").classList.toggle("hidden",mode==="final");
+ $("storeFilter").classList.remove("hidden");
  $("dialogFilters").classList.toggle("hidden",mode!=="birthday");
  const rows=(data[cfg.key]||[]).filter(r=>(store==="all"||r.store===store)&&(!q||String(r.name||"").toLowerCase().includes(q)||String(r.exa_id||"").includes(q))).sort((a,b)=>{
   if(mode==="final"){
