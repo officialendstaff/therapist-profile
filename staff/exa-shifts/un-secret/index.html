@@ -542,7 +542,7 @@ const query=new URL(location.href);
 if(query.searchParams.get("exa_sync")==="1"){
  query.searchParams.delete("exa_sync");
  history.replaceState(null,"",query.pathname+query.search+query.hash);
- void synchronizeEXA("panel");
+ void importExtensionSnapshot();
 }
 }
 $("loginForm").onsubmit=async e=>{e.preventDefault();$("loginError").textContent="確認中…";const {error}=await client.auth.signInWithPassword({email:$("email").value,password:$("password").value});if(error){$("loginError").textContent="ログインできません。入力情報をご確認ください。";return;}$("loginError").textContent="";await loginCheck()};
@@ -1074,6 +1074,42 @@ async function fetchFromExaExtension(){
   bridgeRequests.set(requestId,{resolve,reject,timer});
   window.postMessage({source:"exa-shift-page",action:"fetch-shifts",requestId},location.origin);
  });
+}
+async function importExtensionSnapshot(){
+ if(!authorized||extensionBusy)return;
+ extensionBusy=true;
+ $("exaSync").disabled=true;
+ const oldText=$("exaSync").textContent;
+ $("exaSync").textContent="反映準備中…";
+ try{
+  showMsg("Chrome拡張が取得したUn Secretの30日分を検証中…");
+  const data=await fetchFromExaExtension();
+  if(!data?.ok)throw Error(data?.error||"EXA30日分のデータがありません");
+  if(data.format!=="unsecret-exa-readonly-v1"||data.store_code!=="unsecret"||
+     data.days!==30||!Array.isArray(data.rows)||!Array.isArray(data.daily_summary)||
+     data.daily_summary.length!==30||data.total_rows!==data.rows.length)
+   throw Error("Un Secretの30日取得データとして検証できません");
+  if(data.first!==asTokyoDate())throw Error("EXAの取得開始日が本日と一致しません："+data.first);
+  const endDate=new Date(Date.parse(data.first+"T00:00:00Z")+29*86400000).toISOString().slice(0,10);
+  if(data.last!==endDate)throw Error("30日分の終了日が一致しません");
+  const preoff=data.rows.filter(r=>r.is_pre_off===true).length;
+  if(!confirm("Un Secret EXAから取得したシフトを反映しますか？\\n対象："+data.first+"〜"+data.last+
+   "（30日）\\nシフト："+data.total_rows+"件／事前："+preoff+
+   "件\\n\\nEXA本体は変更しません。登録後に30日スナップショットで取消も照合されます。"))return;
+  const {data:{session}}=await client.auth.getSession();
+  if(!session)throw Error("管理画面に再ログインしてください");
+  showMsg("Un Secret EXAの30日データをSupabaseへ反映中…");
+  const res=await fetch(URL_SB+"/functions/v1/exa-unsecret-shift-import",{
+   method:"POST",headers:{"Content-Type":"application/json","apikey":KEY_SB,"Authorization":"Bearer "+session.access_token},
+   body:JSON.stringify({...data,source:"extension_snapshot"})
+  });
+  const result=await res.json();
+  if(!res.ok||!result.ok)throw Error(result.error||"EXA取込に失敗しました（HTTP "+res.status+"）");
+  await load();
+  showMsg("Un Secret EXA取込完了："+result.imported+"件（事前"+(result.preoff??preoff)+
+    "件）、30日分。出勤取消："+(result.removed??0)+"件。");
+ }catch(e){showMsg("Un Secret EXA取込失敗："+String(e.message||e),true)}
+ finally{extensionBusy=false;$("exaSync").disabled=false;$("exaSync").textContent=oldText;}
 }
 async function synchronizeEXA(mode="manual"){
  if(!authorized||extensionBusy)return;
