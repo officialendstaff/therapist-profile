@@ -70,7 +70,7 @@ function render(){
  $("monthLabel").textContent=month.replace("-","年")+"月";
  const days=dates(),table=$("monthly");table.replaceChildren();
  const head=document.createElement("tr");["源氏名","出勤","接客","当欠","評価",...days.map(d=>String(+d.slice(8))+"日")].forEach(x=>makeCell(head,x,"th"));table.append(head);
- const wanted=staff.filter(t=>filter==="all"||(filter==="dummy"?["dummy","dummy_use"].includes(t.residency||t.operating_category):!["dummy","dummy_use"].includes(t.residency||t.operating_category)));
+ const wanted=staff.filter(t=>filter==="all"||(filter==="dummy"?["dummy","dummy_use"].includes(t.residency||t.operating_category):!["dummy","dummy_use"].includes(t.residency||t.operating_category))).sort((a,b)=>Number(a.exa_id)-Number(b.exa_id));
  for(const person of wanted){
   const row=document.createElement("tr");const id=person.exa_id;
   const nameCell=makeCell(row,person.stage_name||"ID "+id,"td","staff");if(person.residency==="dummy"||person.operating_category==="dummy_use")nameCell.classList.add("state-dummy");
