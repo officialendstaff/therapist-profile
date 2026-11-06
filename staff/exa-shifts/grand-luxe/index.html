@@ -1164,7 +1164,24 @@ $("serverTest").onclick=async()=>{
   }finally{clearTimeout(timer)}
   const result=await response.json();
   if(result.stage==="secrets_missing")throw Error("Grand Luxe専用EXAログイン情報がSupabase Functions Secretsに未設定です。");
-  if(!response.ok||!result.ok)throw Error("検証失敗：段階 "+(result.stage||"unknown")+"／理由 "+(result.reason||result.error||"unknown")+"／"+(result.day||0)+"日目");
+  if(!response.ok||!result.ok){
+   const why={
+    credentials_missing:"EXAログイン情報がありません",
+    exa_home_request_failed:"EXAの入口へ通信できません（ネットワーク／リダイレクト）",
+    exa_home_http_403:"EXAの入口でアクセス拒否されました（HTTP 403）",
+    exa_home_http_404:"EXAの入口URLが見つかりません（HTTP 404）",
+    exa_login_form_request_failed:"EXAログイン画面を取得できません",
+    exa_login_html_too_large:"EXAログイン画面のデータ量が異常です",
+    login_action_outside_exa:"ログイン送信先が想定外のため停止しました",
+    login_form_fields_unrecognized:"EXAログインフォームの項目を識別できません",
+    exa_login_post_request_failed:"EXAへのログイン送信で通信エラー",
+    exa_session_not_authenticated:"EXA認証後のセッションを確認できません（認証情報またはログイン方式を確認）",
+    exa_member_request_failed:"ログイン後のEXA管理画面を取得できません",
+    exa_member_screen_unrecognized:"EXA管理画面の構造を識別できません"
+   };
+   const code=result.reason||result.error||"unknown";
+   throw Error("段階 "+(result.stage||"unknown")+"／"+(why[code]||"識別コード："+code)+"／"+(result.day||0)+"日目");
+  }
   if(result.stage!=="snapshot_compared")throw Error("30日分の読取が未完了です。");
   showMsg("Grand Luxe 30日読取成功："+result.first+"〜"+result.last+"／"+result.imported+"件（事前 "+result.preoff+"件）。保存済み"+result.existing+"件との差分：追加"+result.additions+"・変更"+result.updates+"・取消候補"+result.removals+"。書込はしていません。");
  }catch(error){
