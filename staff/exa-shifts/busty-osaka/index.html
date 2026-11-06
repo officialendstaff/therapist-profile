@@ -1107,6 +1107,7 @@ async function renderShiftAttention(){
   const escText=v=>String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
   const clock=v=>{const h=Math.floor(v/60),m=v%60;return String(h%24).padStart(2,"0")+":"+String(m).padStart(2,"0")+(h>=24?"（翌日）":"")};
   summary.textContent="シフト要確認｜本日最終 "+lastToday.length+"名・次回未定 "+noFuture.length+"名";
+  $("shiftAttention").open=lastToday.length+noFuture.length>0;
   const row=(x,last)=>'<div class="shift-attention-row"><div><b>'+escText(x.person.stage_name||"ID "+x.person.exa_id)+'</b> <small> ID '+x.person.exa_id+'</small></div><span>'+(last?"本日 "+clock(x.end)+" 退勤前に確認":"今後のシフト登録なし・連絡対象")+'</span></div>';
   box.innerHTML='<section class="shift-attention-group today-group"><h3>本日が最終出勤｜'+lastToday.length+'名</h3>'+(lastToday.length?lastToday.map(x=>row(x,true)).join(""):'<div class="shift-attention-empty">該当なし</div>')+'</section>'+
    '<section class="shift-attention-group"><h3>今日以降のシフト未定｜'+noFuture.length+'名</h3>'+(noFuture.length?noFuture.map(x=>row(x,false)).join(""):'<div class="shift-attention-empty">該当なし</div>')+'</section>';
