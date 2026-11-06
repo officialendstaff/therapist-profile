@@ -494,7 +494,6 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
    <option value="real_working">在籍実働</option>
    <option value="long_leave">長期休暇</option>
    <option value="dummy_use">ダミー使用</option>
-   <option value="not_used">HPから削除（退店）</option>
   </select>
   <p class="muted">「実働外」は今後の出勤予定がない場合に自動判定します。区分変更は出勤管理内の登録内容のみ更新し、EXA本体の表示設定は変更しません。EXAの表示／非表示情報との自動同期は未接続です。</p>
   <div class="row space"><button id="residencyCancel" type="button">閉じる</button><button id="residencySave" class="primary" type="button">区分変更を確定</button></div>
@@ -906,8 +905,8 @@ function openResidency(button){
  if(!person)return;
  editingResidency={exaId,old:person.operating_category,name:person.stage_name};
  $("residencyTitle").textContent="セラピスト詳細";
- $("residencyInfo").textContent=person.stage_name+"（EXA ID："+exaId+"）／区分："+({unclassified:"未判定",provisional_hidden:"仮登録",pending_documents:"未入店（書類未完備）",real_working:"在籍実働",real_outside:"実働外（旧区分）",long_leave:"長期休暇",dummy_use:"ダミー使用",not_used:"HPから削除（退店）"}[person.operating_category]||"未設定");
- $("residencyChoice").value=["provisional_hidden","pending_documents","real_working","long_leave","dummy_use","not_used"].includes(person.operating_category)?person.operating_category:"unclassified";
+ $("residencyInfo").textContent=person.stage_name+"（EXA ID："+exaId+"）／区分："+({unclassified:"未判定",provisional_hidden:"仮登録",pending_documents:"未入店（書類未完備）",real_working:"在籍実働",real_outside:"実働外（旧区分）",long_leave:"長期休暇",dummy_use:"ダミー使用",not_used:"対象外"}[person.operating_category]||"未設定");
+ $("residencyChoice").value=["provisional_hidden","pending_documents","real_working","long_leave","dummy_use"].includes(person.operating_category)?person.operating_category:"unclassified";
  $("residencyModal").classList.remove("hide");
  showTherapistPhoto(exaId);
  loadPersonRegistry(exaId);
@@ -925,7 +924,7 @@ $("residencyShade").onclick=closeResidency;
 $("residencySave").onclick=async()=>{
  if(!editingResidency||!authorized)return;
  const category=$("residencyChoice").value;
- const labels={provisional_hidden:"仮登録（EXA非表示）",pending_documents:"未入店（書類未完備）",real_working:"在籍実働",long_leave:"長期休暇",dummy_use:"ダミー使用",not_used:"HPから削除（退店）"};
+ const labels={provisional_hidden:"仮登録（EXA非表示）",pending_documents:"未入店（書類未完備）",real_working:"在籍実働",long_leave:"長期休暇",dummy_use:"ダミー使用"};
  if(!Object.prototype.hasOwnProperty.call(labels,category))return;
  const person=therapists.find(t=>t.exa_id===editingResidency.exaId);
  if(!person)return;
