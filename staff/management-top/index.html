@@ -148,6 +148,7 @@ body:has(.lg-interview-login:not(.hide):not(.hidden)) .page>.topbar{display:none
   <a class="menu-card" href="../residency-management/"><span class="icon">♙</span><strong>在籍管理</strong><small>在籍区分・退店管理</small><span class="arrow">↗</span></a>
  </nav>
 </main>
+<main id="staffApp" class="hidden" style="max-width:820px"><div class="page-head"><div><h1>スタッフ管理</h1><p>許可された面接管理ページへ移動できます。</p></div></div><nav class="menus" aria-label="スタッフメニュー" style="grid-template-columns:1fr"><a class="menu-card" href="../interview-management/"><span class="icon">▤</span><strong>面接管理</strong><small>担当店舗の応募・面接情報</small><span class="arrow">↗</span></a></nav></main>
 <div id="overlay" class="overlay hidden" role="presentation">
  <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
   <div class="dialog-head"><div><h2 id="dialogTitle">一覧</h2><p id="dialogSub"></p></div><button class="close" id="close" aria-label="閉じる">閉じる ×</button></div>
@@ -168,18 +169,26 @@ const links={rose:"../exa-shifts/",busty:"../exa-shifts/busty-osaka/",grandluxe:
 let data={final_today:[],outside:[],birthday:[],connected_stores:[],unconnected_stores:[]},mode=null,authorized=false;
 const text=(e,v)=>{e.textContent=String(v??"")};
 const mk=(tag,value)=>{const e=document.createElement(tag);text(e,value);return e};
-function showLogin(error=""){$("app").classList.add("hidden");$("login").classList.remove("hidden");$("logout").classList.add("hidden");text($("loginError"),error)}
+function showLogin(error=""){$("app").classList.add("hidden");$("staffApp").classList.add("hidden");$("login").classList.remove("hidden");$("logout").classList.add("hidden");text($("loginError"),error)}
 async function authorize(){
  if(!client){showLogin("認証処理を読み込めません。");return}
  const s=await client.auth.getSession();
  if(!s.data?.session){showLogin();return}
  const [profile,can]=await Promise.all([
-  client.from("recruit_staff_profiles").select("display_name,role,approved_at").eq("user_id",s.data.session.user.id).maybeSingle(),
+  client.from("recruit_staff_profiles").select("display_name,role,approved_at,features").eq("user_id",s.data.session.user.id).maybeSingle(),
   client.rpc("can_link_therapist_interview")
  ]);
- if(profile.error||can.error||can.data!==true||!profile.data?.approved_at||!["master","full"].includes(profile.data.role)){
+ if(profile.error||!profile.data?.approved_at){showLogin("このページへの権限がありません。");return}
+ const staffOnly=profile.data.role==="custom"&&Array.isArray(profile.data.features)&&profile.data.features.includes("interview");
+ if(staffOnly){
+   authorized=false;text($("userName"),profile.data.display_name||"スタッフ");
+   $("login").classList.add("hidden");$("app").classList.add("hidden");
+   $("staffApp").classList.remove("hidden");$("logout").classList.remove("hidden");return;
+ }
+ if(can.error||can.data!==true||!["master","full"].includes(profile.data.role)){
   showLogin("このページへの権限がありません。");return
  }
+ $("staffApp").classList.add("hidden");
  authorized=true;text($("userName"),profile.data.display_name||"管理者");
  $("login").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");
  await load();
