@@ -18,7 +18,7 @@ main{max-width:1340px;margin:0 auto;padding:26px clamp(12px,3vw,36px) 40px}
 .panel .sub{color:#66778e;font-size:12px;min-height:16px}
 .panel button{margin-top:auto;border:1px solid #c5d8eb;background:#edf5ff;border-radius:7px;color:#275a89;padding:11px;font-size:12px;font-weight:750}
 .panel button:hover{background:#dcecfb}.panel button:disabled{opacity:.6;cursor:wait}
-.coverage{font-size:12px;background:#fff8e9;border:1px solid #f1dfb3;color:#8a6118;margin:15px 0 23px;padding:12px 15px;border-radius:8px}
+
 .section-heading{margin:24px 0 12px;font-size:15px;color:#41546f}
 .menus{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .menu-card{min-height:126px;padding:23px;display:flex;flex-direction:column;gap:9px;position:relative;transition:transform .15s,border-color .15s}
@@ -49,7 +49,7 @@ main{max-width:1340px;margin:0 auto;padding:26px clamp(12px,3vw,36px) 40px}
   <section class="panel"><h2><span>◫</span>実働外</h2><div class="count" id="outsideCount">—<small>名</small></div><div class="sub">取得済みシフトに次回登録なし（長期休暇等は除外）</div><button data-open="outside">一覧を確認</button></section>
   <section class="panel"><h2><span>♧</span>誕生日</h2><div class="count" id="birthdayCount">—<small>名</small></div><div class="sub">誕生日の前後3日間・Interview Sheet連携</div><button data-open="birthday">一覧を確認</button></section>
  </div>
- <div class="coverage" id="coverage">出勤データの連携状況を確認しています。</div>
+
  <h2 class="section-heading">管理メニュー</h2>
  <nav class="menus" aria-label="管理メニュー">
   <a class="menu-card" href="../interview-sheet-preview/"><span class="icon">▤</span><strong>面接管理</strong><small>応募・面接・LINE通知</small><span class="arrow">↗</span></a>
@@ -104,12 +104,8 @@ async function load(){
   for(const [category,element] of [["final_today","finalCount"],["outside","outsideCount"],["birthday","birthdayCount"]])
    $(element).innerHTML=String((data[category]||[]).length)+'<small>名</small>';
   text($("asOf"),"集計基準日 "+(data.as_of||"—"));
-  const missing=data.unconnected_stores||[];
-  text($("coverage"),missing.length?
-   "出勤連携は現在2店舗（薔薇と紳士・BUSTY OSAKA）。未連携："+missing.map(s=>names[s]||s).join("、")+"。上記の最終出勤・実働外は連携済み店舗の保存済みシフト範囲で判定（EXAの全未来予定を保証するものではありません）。誕生日はInterview Sheetと本人紐づけ済みのみ表示。":
-   "出勤状況は全5店舗の保存済みシフト範囲で集計。誕生日はInterview Sheetと本人紐づけ済みのみ表示。");
   if(mode)render();
- }catch(e){text($("coverage"),"データを取得できません："+(e.message||e));for(const id of ["finalCount","outsideCount","birthdayCount"])$(id).textContent="—"}
+ }catch(e){text($("asOf"),"データ取得エラー："+(e.message||e));for(const id of ["finalCount","outsideCount","birthdayCount"])$(id).textContent="—"}
  finally{$("refresh").disabled=false}
 }
 const configs={
