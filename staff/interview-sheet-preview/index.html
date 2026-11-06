@@ -809,7 +809,7 @@ function openPendingActionPage(label,record,mode='登録',returnPage=null){
  const panel=$('registrationPanel');if(!panel)return;
  // Only the interview currently being rescheduled may reuse its reserved time.
  panel.dataset.editInterviewId=(mode==='変更'||mode==='修正')?String(record.interviewId||''):'';
- panel.replaceChildren();renderChart();panel.hidden=false;$('sharedPanel').hidden=true;$('todayPanel').hidden=true;$('applicantDetail').hidden=true;
+ panel.replaceChildren();panel.hidden=false;renderChart();$('sharedPanel').hidden=true;$('todayPanel').hidden=true;$('applicantDetail').hidden=true;
  const wrap=document.createElement('section');wrap.className='main-panel';
  const titleRow=document.createElement('div');titleRow.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%';
  const heading=document.createElement('h1');heading.textContent=label;heading.style.margin='0';
