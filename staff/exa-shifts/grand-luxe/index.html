@@ -441,7 +441,7 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 <details class="settings-menu"><summary>その他 <span aria-hidden="true">▾</span></summary><div class="settings-panel">
 <button id="reload">保存データを再読込</button>
 <button id="unscheduledAdd" title="EXA登録画面でIDと源氏名を確認した人だけ追加。出勤データは変更しません">出勤予定なしのEXA登録者を追加</button>
-<button id="csvImport" title="Chrome拡張で取得したEXA 30日JSON・CSVを取り込みます">EXA JSON/CSV取込</button><input id="csvFile" type="file" accept=".json,application/json,.csv,text/csv" style="display:none">
+<button id="csvImport" title="Chrome拡張で取得したEXA 30日JSON・CSVを取り込みます">EXA JSON/CSV取込</button><button id="csvExportSaved" title="表示中の月の保存済み出勤をCSVで出力">保存済み出勤CSV出力</button><input id="csvFile" type="file" accept=".json,application/json,.csv,text/csv" style="display:none">
 <button id="serverTest" title="EXAサーバー接続と30日読取を検証（保存データは変更しません）">サーバー30日検証</button>
 <button id="autoSync" title="Chrome起動中の自動更新">ブラウザ自動：OFF</button>
 </div></details><span id="authLabel" class="muted login-tag" style="color:#d5e1f1"></span><button id="logout" class="hide">ログアウト</button>
@@ -536,7 +536,14 @@ if(error||access.error||access.data!==true||!data||!data.approved_at||!["master"
   authorized=false;$("app").classList.add("hide");location.replace("/therapist-profile/staff/management-top/");$("loginError").textContent="このページへの権限がありません。";return;
 }
 const homeName=document.getElementById("lgHeaderHomeLabel");if(homeName)homeName.textContent=(data.display_name||"管理")+" TOP";
-authorized=true;$("login").classList.add("hide");$("app").classList.remove("hide");$("logout").classList.remove("hide");$("authLabel").textContent="認証済み";await load();}
+authorized=true;$("login").classList.add("hide");$("app").classList.remove("hide");$("logout").classList.remove("hide");$("authLabel").textContent="認証済み";await load();
+const query=new URL(location.href);
+if(query.searchParams.get("exa_sync")==="1"){
+ query.searchParams.delete("exa_sync");
+ history.replaceState(null,"",query.pathname+query.search+query.hash);
+ void synchronizeEXA("manual");
+}
+}
 $("loginForm").onsubmit=async e=>{e.preventDefault();$("loginError").textContent="確認中…";const {error}=await client.auth.signInWithPassword({email:$("email").value,password:$("password").value});if(error){$("loginError").textContent="ログインできません。入力情報をご確認ください。";return;}$("loginError").textContent="";await loginCheck()};
 $("logout").onclick=async()=>{await client.auth.signOut();sessionStorage.removeItem("mattan-recruit-auth");location.reload()};
 async function load(){
@@ -1016,27 +1023,11 @@ $("next").onclick=()=>{const d=new Date(month+"-01T00:00:00");d.setMonth(d.getMo
 $("reload").onclick=load;
 let extensionBusy=false;
 let exaSyncStartedAt=0;
-const AUTO_KEY="exa-grandluxe-server-auto-v1";
 const LAST_KEY="exa-grandluxe-last-sync-v1";
-const ATTEMPT_KEY="exa-grandluxe-auto-attempt-v1";
-const AUTO_MS=3*60*60*1000;
-const RETRY_MS=30*60*1000;
-let autoEnabled=localStorage.getItem(AUTO_KEY)==="on";
 const asTokyoDate=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
-function paintAuto(){
- $("autoSync").textContent=autoEnabled?"ブラウザ自動：ON":"ブラウザ自動：OFF";
- $("autoSync").title="管理ページ表示中、3時間ごとにサーバー同期を試みます。サーバー読取に失敗した場合、Chrome拡張v1.1が導入済みなら代替読取を行います。画面を閉じた状態の定期実行は未設定です。";
- $("autoSync").setAttribute("aria-pressed",String(autoEnabled));
-}
-paintAuto();
-$("autoSync").onclick=()=>{
- if(!authorized)return;
- autoEnabled=!autoEnabled;
- localStorage.setItem(AUTO_KEY,autoEnabled?"on":"off");
- if(autoEnabled&&!localStorage.getItem(LAST_KEY))localStorage.setItem(LAST_KEY,String(Date.now()));
- paintAuto();
- showMsg(autoEnabled?"ブラウザ自動：ON。薔薇と紳士と同じく画面表示中に3時間間隔で同期を試みます。ただしEXAサーバー接続は未検証で、成功は保証されません。":"ブラウザ自動：OFF。画面表示中の3時間自動同期を停止しました。");
-};
+$("autoSync").disabled=true;
+$("autoSync").textContent="ブラウザ自動：未接続";
+$("autoSync").title="Grand Luxeの定期サーバー同期は未接続です。手動取込を使用してください。";
 let grandLuxeExtensionReady=false;
 async function waitForGrandLuxeExtension(){
  if(grandLuxeExtensionReady)return;
@@ -1045,7 +1036,7 @@ async function waitForGrandLuxeExtension(){
   await new Promise(resolve=>setTimeout(resolve,150));
   if(grandLuxeExtensionReady)return;
  }
- throw Error("Grand Luxe Chrome拡張v1.1が見つかりません。v1.1をインストールし、この管理ページを再読み込みしてください。代わりに「EXA JSON/CSV取込」で保存済み30日JSONを取り込めます。");
+ throw Error("Grand Luxe専用Chrome拡張が見つかりません。EXA画面右下で30日分を取得した後、出勤管理を再読込してください。");
 }
 const bridgeRequests=new Map();
 let syncAbortRequested=false;
@@ -1078,76 +1069,40 @@ async function fetchFromExaExtension(){
 }
 async function synchronizeEXA(mode="manual"){
  if(!authorized||extensionBusy)return;
- const automatic=mode==="auto";
  extensionBusy=true;
  const button=$("exaSync");
  button.disabled=true;button.textContent="更新中…";
- $("autoSync").disabled=true;
  try{
   const {data:{session}}=await client.auth.getSession();
-  if(!session)throw Error("管理ページに再ログインしてください");
-  showMsg("Grand Luxe EXAサーバーから最新30日分を取得中…");
-  const controller=new AbortController();
-  const timer=setTimeout(()=>controller.abort(),120000);
-  let response;
-  try{
-   response=await fetch(URL_SB+"/functions/v1/exa-grandluxe-manual-sync",{
-    method:"POST",signal:controller.signal,
-    headers:{"Content-Type":"application/json","apikey":KEY_SB,"Authorization":"Bearer "+session.access_token},
-    body:"{}"
-   });
-  }finally{clearTimeout(timer)}
-  let result=await response.json();
-  let updateMode="サーバー";
-  if(!response.ok||!result?.ok){
-   // The EXA host currently rejects Supabase server-side reads.
-   // Fall back ONLY for upstream failures, never for auth/authorization errors.
-   if(response.status!==502||result?.error!=="server_sync_failed")
-    throw Error(result?.error||"EXAサーバー更新に失敗しました（HTTP "+response.status+"）");
-   showMsg("サーバーからEXAを読み取れませんでした。ログイン済みEXAをChrome拡張v1.1で読取中…");
-   const payload=await fetchFromExaExtension();
-   if(!payload||payload.ok===false)throw Error(payload?.error||"Chrome拡張で30日分を読み取れませんでした");
-   if(payload.format!=="grandluxe-exa-readonly-v1"||
-      payload.store_code!=="grandluxe"||payload.days!==30||
-      !Array.isArray(payload.rows)||!Array.isArray(payload.daily_summary)||
-      payload.daily_summary.length!==30||payload.total_rows!==payload.rows.length||
-      payload.rows.length<1)
-     throw Error("Chrome拡張v1.1の取得結果が30日データの仕様に一致しません");
-   if(payload.first!==today())
-     throw Error("EXA取得開始日が今日と一致しません："+payload.first);
-   showMsg("Chrome拡張で30日分を読取完了。Grand Luxe専用APIへ登録中…");
-   const fallback=await fetch(URL_SB+"/functions/v1/exa-grandluxe-shift-import",{
-    method:"POST",
-    headers:{"Content-Type":"application/json","apikey":KEY_SB,"Authorization":"Bearer "+session.access_token},
-    body:JSON.stringify({...payload,source:"extension_snapshot"})
-   });
-   result=await fallback.json();
-   if(!fallback.ok||!result?.ok)
-      throw Error(result?.error||"Grand Luxeの30日取込に失敗しました（HTTP "+fallback.status+"）");
-   updateMode="Chrome拡張（サーバー失敗時の代替）";
-  }
+  if(!session?.access_token)throw Error("管理ページのログイン期限が切れています。");
+  showMsg("Grand LuxeのEXA取得データを確認中…");
+  const payload=await fetchFromExaExtension();
+  if(!payload||payload.ok===false)throw Error(payload?.error||"Chrome拡張から取得データを受け取れませんでした。");
+  if(payload.format!=="grandluxe-exa-readonly-v1"||
+     payload.store_code!=="grandluxe"||payload.days!==30||
+     !Array.isArray(payload.rows)||payload.rows.length<1||
+     !Array.isArray(payload.daily_summary)||payload.daily_summary.length!==30||
+     payload.total_rows!==payload.rows.length)
+   throw Error("Grand Luxe専用30日データではありません。");
+  if(payload.first!==today())throw Error("取込データが本日取得分ではありません："+payload.first+"。EXA画面で30日取得をやり直してください。");
+  showMsg("Grand Luxe EXA30日分 "+payload.rows.length+"件を検証・登録中…");
+  const response=await fetch(URL_SB+"/functions/v1/exa-grandluxe-shift-import",{
+   method:"POST",
+   headers:{"Content-Type":"application/json","apikey":KEY_SB,"Authorization":"Bearer "+session.access_token},
+   body:JSON.stringify({...payload,source:"extension_snapshot"})
+  });
+  const result=await response.json();
+  if(!response.ok||result?.ok!==true)
+   throw Error(result?.error||"Grand Luxeの出勤登録に失敗しました（HTTP "+response.status+"）");
   localStorage.setItem(LAST_KEY,String(Date.now()));
   await load();
-  showMsg("Grand Luxe "+(automatic?"自動":"手動")+"更新完了｜"+updateMode+"："+
-    result.imported+"件・"+result.days+"日分（事前 "+(result.preoff??0)+"件）。");
+  showMsg("Grand Luxe 30日取込完了："+result.imported+"件（事前"+(result.preoff??0)+"件）。EXA・他店舗は変更していません。");
  }catch(error){
-  const timeout=error?.name==="AbortError";
-  showMsg("Grand Luxeの更新は完了していません。"+
-    (timeout?"EXAサーバーの応答が120秒を超えました。":"原因："+String(error.message||error)),true);
+  showMsg("Grand Luxeの更新は完了していません。原因："+String(error.message||error),true);
  }finally{
-  extensionBusy=false;button.disabled=false;button.textContent="今すぐ更新";$("autoSync").disabled=false;
+  extensionBusy=false;button.disabled=false;button.textContent="今すぐ更新";
  }
 }
-async function checkAuto(){
- if(!autoEnabled||!authorized||extensionBusy)return;
- const now=Date.now(),last=Number(localStorage.getItem(LAST_KEY)||0),attempt=Number(localStorage.getItem(ATTEMPT_KEY)||0);
- if(!last){localStorage.setItem(LAST_KEY,String(now));return}
- if(now-last<AUTO_MS||now-attempt<RETRY_MS)return;
- localStorage.setItem(ATTEMPT_KEY,String(now));
- await synchronizeEXA("auto");
-}
-setInterval(checkAuto,60000);
-
 // Manual bridge for EXA registrations not included in a 30-day schedule snapshot.
 // It never changes existing rows, shifts or roster classifications.
 $("unscheduledAdd").onclick=async()=>{
@@ -1221,6 +1176,21 @@ $("serverTest").onclick=async()=>{
 };
 $("exaSync").onclick=()=>synchronizeEXA("manual");
 
+$("csvExportSaved").onclick=()=>{
+ if(!authorized)return;
+ const staffNames=new Map(therapists.map(t=>[t.exa_id,t.stage_name||""]));
+ const rows=shifts.slice().sort((a,b)=>a.work_date.localeCompare(b.work_date)||a.exa_id-b.exa_id);
+ if(!rows.length){showMsg("表示中の月の出勤データはありません。",true);return;}
+ const four=value=>String(Math.floor(value/60)).padStart(2,"0")+String(value%60).padStart(2,"0");
+ const quote=value=>'"'+String(value??"").replace(/"/g,'""')+'"';
+ const columns=["店舗","出勤日","EXA ID","源氏名","出勤","退勤","状態"];
+ const data=rows.map(r=>["Grand Luxe",r.work_date,r.exa_id,staffNames.get(r.exa_id)||"ID "+r.exa_id,four(r.start_minutes),four(r.end_minutes),r.is_pre_off?"事前":"出勤"]);
+ const csv="\uFEFF"+[columns,...data].map(record=>record.map(quote).join(",")).join("\r\n");
+ const url=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
+ const link=document.createElement("a");link.href=url;link.download="GrandLuxe_保存済みEXA出勤_"+month+".csv";document.body.appendChild(link);link.click();link.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1500);
+ showMsg("Grand Luxeの保存済み出勤"+rows.length+"件をCSV出力しました。EXA原本の直接出力ではありません。");
+};
 $("csvImport").onclick=()=>{if(!authorized)return;$("csvFile").click()};
 $("csvFile").onchange=async e=>{
  const file=e.target.files?.[0];if(!file)return;
