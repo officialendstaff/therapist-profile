@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>L GROUP｜総合管理TOP</title>
+<style>
+:root{font-family:Arial,"Noto Sans JP",sans-serif;color:#20314a;background:#f3f6fb}*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}
+button{cursor:pointer}a{text-decoration:none;color:inherit}.hidden{display:none!important}
+header{background:#1b304b;color:white;padding:17px clamp(18px,3vw,44px);display:flex;align-items:center;justify-content:space-between;gap:15px}
+.brand{font-size:20px;font-weight:800;letter-spacing:.05em}.brand small{display:block;margin-top:3px;color:#adc3dc;font-size:10px;letter-spacing:.17em;font-weight:500}
+.header-right{display:flex;gap:12px;align-items:center}.header-right span{font-size:12px;color:#d1ddeb}
+.header-right button{background:transparent;color:#fff;border:1px solid #61748c;border-radius:7px;padding:9px 13px}
+main{max-width:1340px;margin:0 auto;padding:26px clamp(12px,3vw,36px) 40px}
+.page-head{display:flex;align-items:center;justify-content:space-between;margin:0 0 19px;gap:15px}.page-head h1{font-size:23px;margin:0}.page-head p{margin:5px 0 0;color:#728096;font-size:12px}
+.refresh{padding:9px 15px;background:#fff;color:#345277;border:1px solid #d4dfeb;border-radius:7px}
+.dashboard{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.panel,.menu-card{background:#fff;border:1px solid #dce5f1;border-radius:12px;box-shadow:0 3px 16px #1d34520a}
+.panel{padding:22px;display:flex;flex-direction:column;gap:16px;min-height:210px}
+.panel h2{font-size:17px;margin:0}.panel h2 span{display:inline-block;font-size:22px;margin-right:7px}.panel .count{font-size:43px;line-height:1;font-weight:800;font-variant-numeric:tabular-nums;color:#1c3652}.panel .count small{font-size:15px;color:#8494a8;font-weight:500;margin-left:5px}
+.panel .sub{color:#66778e;font-size:12px;min-height:16px}
+.panel button{margin-top:auto;border:1px solid #c5d8eb;background:#edf5ff;border-radius:7px;color:#275a89;padding:11px;font-size:12px;font-weight:750}
+.panel button:hover{background:#dcecfb}.panel button:disabled{opacity:.6;cursor:wait}
+.coverage{font-size:12px;background:#fff8e9;border:1px solid #f1dfb3;color:#8a6118;margin:15px 0 23px;padding:12px 15px;border-radius:8px}
+.section-heading{margin:24px 0 12px;font-size:15px;color:#41546f}
+.menus{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.menu-card{min-height:126px;padding:23px;display:flex;flex-direction:column;gap:9px;position:relative;transition:transform .15s,border-color .15s}
+.menu-card:hover{transform:translateY(-2px);border-color:#88abcf}.menu-card .icon{font-size:24px}.menu-card strong{font-size:18px}.menu-card small{color:#72849b;font-size:12px}.menu-card .arrow{position:absolute;right:20px;top:21px;color:#7692b1}
+.login-wrap{min-height:calc(100vh - 60px);display:grid;place-items:center;padding:20px}.login-card{width:min(430px,100%);background:#fff;border-radius:15px;padding:32px;box-shadow:0 12px 45px #142a461b;border:1px solid #dce5f1}
+.login-card h1{font-size:23px;margin:0 0 8px}.login-card p{font-size:12px;color:#657991;margin-bottom:26px}.login-card label{display:block;font-size:12px;font-weight:bold;margin:14px 0}.login-card input{width:100%;display:block;border:1px solid #cbd8e6;border-radius:7px;padding:12px;margin-top:7px}
+.login-card button{width:100%;border:0;border-radius:7px;background:#28659a;color:#fff;padding:13px;margin-top:13px;font-weight:700}.error{font-size:12px;color:#ae3449;min-height:19px}
+.overlay{position:fixed;inset:0;background:#16263dc0;z-index:50;display:grid;place-items:center;padding:16px}
+.dialog{width:min(920px,100%);max-height:min(83vh,950px);display:flex;flex-direction:column;background:white;border-radius:13px;overflow:hidden;box-shadow:0 16px 60px #091b2c66}
+.dialog-head{padding:19px 22px;border-bottom:1px solid #e3e9f2;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.dialog-head h2{font-size:19px;margin:0}.dialog-head p{font-size:11px;color:#75859a;margin:5px 0 0}
+.close{border:1px solid #cad6e6;background:white;color:#405b76;border-radius:7px;padding:7px 13px}
+.filters{display:flex;gap:10px;align-items:center;padding:14px 21px;border-bottom:1px solid #e8edf4}
+.filters input,.filters select{border:1px solid #cdd9e7;background:white;color:#22354b;border-radius:7px;padding:10px;font-size:13px}
+.filters input{flex:1;min-width:0}.filters select{width:min(190px,42%)}
+.list-wrap{overflow:auto;padding:0 20px 20px;flex:1}.list-wrap table{border-collapse:collapse;width:100%;font-size:13px}.list-wrap th{position:sticky;top:0;background:#eff4fa;text-align:left;color:#526b86;font-size:11px;padding:13px 10px;white-space:nowrap}.list-wrap td{border-bottom:1px solid #e8edf4;padding:13px 10px}.list-wrap tr:hover td{background:#f9fbfe}
+.list-wrap a{color:#2869a6;font-weight:700}.empty{color:#7488a0;text-align:center;padding:28px 10px!important}.pill{display:inline-block;border-radius:12px;background:#e8f0fb;padding:3px 9px;font-size:11px;color:#32649a}
+@media(max-width:850px){.dashboard{grid-template-columns:1fr}.panel{min-height:170px}.menus{gap:10px}main{padding-top:18px}}
+@media(max-width:530px){header{padding:14px}.brand{font-size:17px}.page-head h1{font-size:19px}.panel{padding:18px}.menu-card{padding:16px;min-height:116px}.menu-card strong{font-size:15px}.menu-card small{font-size:10px}.dialog-head{padding:15px}.filters{padding:10px}.list-wrap{padding:0 10px 14px}.list-wrap td{padding:11px 7px;font-size:11px}}
+</style></head>
+<body>
+<header><div class="brand">L GROUP<small>MANAGEMENT SYSTEM</small></div><div class="header-right"><span id="userName"></span><button id="logout" class="hidden">ログアウト</button></div></header>
+<div id="login" class="login-wrap hidden"><form class="login-card" id="loginForm"><h1>管理システム ログイン</h1><p>管理者アカウントでログインしてください。</p><label>メールアドレス<input id="email" type="email" autocomplete="username" required></label><label>パスワード<input id="password" type="password" autocomplete="current-password" required></label><button type="submit">ログイン</button><div id="loginError" class="error" role="alert"></div></form></div>
+<main id="app" class="hidden">
+ <div class="page-head"><div><h1>総合管理TOP</h1><p id="asOf">各店舗の管理状況</p></div><button class="refresh" id="refresh">最新の情報に更新</button></div>
+ <div class="dashboard">
+  <section class="panel"><h2><span>◷</span>最終出勤</h2><div class="count" id="finalCount">—<small>名</small></div><div class="sub">本日が最終出勤日・翌日以降未定</div><button data-open="final">一覧を確認</button></section>
+  <section class="panel"><h2><span>◫</span>実働外</h2><div class="count" id="outsideCount">—<small>名</small></div><div class="sub">今後のシフトなし（長期休暇・ダミー等は除外）</div><button data-open="outside">一覧を確認</button></section>
+  <section class="panel"><h2><span>♧</span>誕生日</h2><div class="count" id="birthdayCount">—<small>名</small></div><div class="sub">誕生日の前後3日間・Interview Sheet連携</div><button data-open="birthday">一覧を確認</button></section>
+ </div>
+ <div class="coverage" id="coverage">出勤データの連携状況を確認しています。</div>
+ <h2 class="section-heading">管理メニュー</h2>
+ <nav class="menus" aria-label="管理メニュー">
+  <a class="menu-card" href="../interview-sheet-preview/"><span class="icon">▤</span><strong>面接管理</strong><small>応募・面接・LINE通知</small><span class="arrow">↗</span></a>
+  <a class="menu-card" href="../interview-sheet-preview/metrics.html"><span class="icon">▥</span><strong>数値管理</strong><small>面接数値・店舗数値</small><span class="arrow">↗</span></a>
+  <a class="menu-card" href="../exa-shifts/"><span class="icon">▦</span><strong>出勤管理</strong><small>月間シフト・日別タイムチャート</small><span class="arrow">↗</span></a>
+  <a class="menu-card" href="../residency-management/"><span class="icon">♙</span><strong>在籍管理</strong><small>在籍区分・退店管理</small><span class="arrow">↗</span></a>
+ </nav>
+</main>
+<div id="overlay" class="overlay hidden" role="presentation">
+ <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+  <div class="dialog-head"><div><h2 id="dialogTitle">一覧</h2><p id="dialogSub"></p></div><button class="close" id="close" aria-label="閉じる">閉じる ×</button></div>
+  <div class="filters"><input id="search" type="search" placeholder="源氏名・EXA IDで検索" aria-label="一覧内を検索"><select id="storeFilter" aria-label="店舗を絞り込む">
+   <option value="all">全店舗</option><option value="rose">薔薇と紳士</option><option value="busty">BUSTY OSAKA</option><option value="grandluxe">Grand Luxe</option><option value="luxy">LUXY OSAKA</option><option value="unsecret">Un Secret</option></select></div>
+  <div class="list-wrap"><table><thead id="listHead"></thead><tbody id="listBody"></tbody></table></div>
+ </section>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(()=>{"use strict";
+const $=id=>document.getElementById(id);
+const url="https://vjjnkflbfsjihwzjsjpr.supabase.co";
+const key="sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos";
+const client=window.supabase?.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,storage:localStorage,storageKey:"mattan-recruit-auth"}});
+const names={rose:"薔薇と紳士",busty:"BUSTY OSAKA",grandluxe:"Grand Luxe",luxy:"LUXY OSAKA",unsecret:"Un Secret"};
+const links={rose:"../exa-shifts/",busty:"../exa-shifts/busty-osaka/",grandluxe:"../exa-shifts/grand-luxe/",luxy:"../exa-shifts/luxy-osaka/",unsecret:"../exa-shifts/un-secret/"};
+let data={final_today:[],outside:[],birthday:[],connected_stores:[],unconnected_stores:[]},mode=null,authorized=false;
+const text=(e,v)=>{e.textContent=String(v??"")};
+const mk=(tag,value)=>{const e=document.createElement(tag);text(e,value);return e};
+function showLogin(error=""){$("app").classList.add("hidden");$("login").classList.remove("hidden");$("logout").classList.add("hidden");text($("loginError"),error)}
+async function authorize(){
+ if(!client){showLogin("認証処理を読み込めません。");return}
+ const s=await client.auth.getSession();
+ if(!s.data?.session){showLogin();return}
+ const [profile,can]=await Promise.all([
+  client.from("recruit_staff_profiles").select("display_name,role,approved_at").eq("user_id",s.data.session.user.id).maybeSingle(),
+  client.rpc("can_link_therapist_interview")
+ ]);
+ if(profile.error||can.error||can.data!==true||!profile.data?.approved_at||!["master","full"].includes(profile.data.role)){
+  showLogin("このページへの権限がありません。");return
+ }
+ authorized=true;text($("userName"),profile.data.display_name||"管理者");
+ $("login").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");
+ await load();
+}
+async function load(){
+ if(!authorized)return;
+ $("refresh").disabled=true;
+ try{
+  const r=await client.rpc("management_top_overview");
+  if(r.error)throw r.error;
+  data=r.data||data;
+  for(const [category,element] of [["final_today","finalCount"],["outside","outsideCount"],["birthday","birthdayCount"]])
+   $(element).innerHTML=String((data[category]||[]).length)+'<small>名</small>';
+  text($("asOf"),"集計基準日 "+(data.as_of||"—"));
+  const missing=data.unconnected_stores||[];
+  text($("coverage"),missing.length?
+   "出勤連携は現在2店舗（薔薇と紳士・BUSTY OSAKA）。未連携："+missing.map(s=>names[s]||s).join("、")+"。上記の最終出勤・実働外の件数は連携済み店舗のみ。誕生日はInterview Sheetと本人紐づけ済みのみ表示。":
+   "出勤状況は全5店舗を集計。誕生日はInterview Sheetと本人紐づけ済みのみ表示。");
+  if(mode)render();
+ }catch(e){text($("coverage"),"データを取得できません："+(e.message||e));for(const id of ["finalCount","outsideCount","birthdayCount"])$(id).textContent="—"}
+ finally{$("refresh").disabled=false}
+}
+const configs={
+ final:{title:"最終出勤",sub:"本日が最終出勤日で、翌日以降にシフト登録がないセラピスト",key:"final_today",last:"本日の退勤"},
+ outside:{title:"実働外",sub:"今後のシフト登録がないセラピスト。長期休暇・ダミー・退店者・本日最終出勤者を除く",key:"outside",last:"最終出勤日"},
+ birthday:{title:"誕生日",sub:"Interview Sheetと本人紐づけ済み・誕生日の前後3日間",key:"birthday",last:"誕生日"}
+};
+function render(){
+ if(!mode)return;const cfg=configs[mode],q=$("search").value.trim().toLowerCase(),store=$("storeFilter").value;
+ const rows=(data[cfg.key]||[]).filter(r=>(store==="all"||r.store===store)&&(!q||String(r.name||"").toLowerCase().includes(q)||String(r.exa_id||"").includes(q)));
+ text($("dialogTitle"),cfg.title+"｜"+rows.length+"名");text($("dialogSub"),cfg.sub);
+ const tr=document.createElement("tr");
+ for(const h of ["店舗","源氏名 / EXA ID",cfg.last,"操作"])tr.append(mk("th",h));
+ $("listHead").replaceChildren(tr);$("listBody").replaceChildren();
+ if(!rows.length){const r=document.createElement("tr"),d=mk("td","該当者はいません。");d.colSpan=4;d.className="empty";r.append(d);$("listBody").append(r);return}
+ for(const person of rows){
+  const row=document.createElement("tr");
+  row.append(mk("td",names[person.store]||person.store),mk("td",(person.name||"名称未設定")+"｜ID "+person.exa_id));
+  let v="—";
+  if(mode==="final"&&person.end_minutes!==null){const minutes=Number(person.end_minutes);const hours=Math.floor(minutes/60);v=String(hours%24).padStart(2,"0")+":"+String(minutes%60).padStart(2,"0")+(hours>=24?"（翌日）":"")}
+  if(mode==="outside")v=person.last_date||"記録なし";
+  if(mode==="birthday"){const offset=Number(person.offset);v=(person.birthday||"—")+(offset===0?"（当日）":offset<0?"（"+Math.abs(offset)+"日前）":"（"+offset+"日後）")}
+  row.append(mk("td",v));
+  const cell=document.createElement("td"),a=document.createElement("a");
+  a.href=mode==="birthday"?"../residency-management/":(links[person.store]||"../exa-shifts/");
+  a.textContent=mode==="birthday"?"在籍管理へ":"出勤管理へ";cell.append(a);row.append(cell);$("listBody").append(row);
+ }
+}
+function open(type){mode=type;$("search").value="";$("storeFilter").value="all";$("overlay").classList.remove("hidden");render();$("search").focus()}
+function close(){mode=null;$("overlay").classList.add("hidden")}
+document.querySelectorAll("[data-open]").forEach(b=>b.addEventListener("click",()=>open(b.dataset.open)));
+$("search").addEventListener("input",render);$("storeFilter").addEventListener("change",render);
+$("close").addEventListener("click",close);$("overlay").addEventListener("click",e=>{if(e.target===$("overlay"))close()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&mode)close()});
+$("refresh").addEventListener("click",load);
+$("loginForm").addEventListener("submit",async e=>{e.preventDefault();if(!client)return;text($("loginError"),"確認中…");
+ const r=await client.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});
+ if(r.error){text($("loginError"),"ログインできません。入力内容をご確認ください。");return}
+ await authorize();
+});
+$("logout").addEventListener("click",async()=>{await client.auth.signOut({scope:"local"});authorized=false;data={final_today:[],outside:[],birthday:[]};showLogin()});
+authorize();
+})();
+</script></body></html>
