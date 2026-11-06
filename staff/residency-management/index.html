@@ -81,12 +81,12 @@ const hasInterview=t=>interviewLinks.some(x=>x.person_id===getPerson(t))&&Boolea
 function alertMsg(s,error=false){const el=$("message");el.textContent=s;el.classList.remove("hide");el.classList.toggle("error",error);}
 function cleanMsg(){$("message").classList.add("hide");}
 async function checkLogin(){
- if(!client){$("login").classList.remove("hide");$("loginError").textContent="認証ライブラリを読み込めません。";return;}
+ if(!client){location.replace("/therapist-profile/staff/management-top/");$("loginError").textContent="認証ライブラリを読み込めません。";return;}
  const {data:{session}}=await client.auth.getSession();
- if(!session){$("login").classList.remove("hide");$("app").classList.add("hide");$("logout").classList.add("hide");return;}
+ if(!session){location.replace("/therapist-profile/staff/management-top/");$("app").classList.add("hide");$("logout").classList.add("hide");return;}
  const [prof,can]=await Promise.all([client.from("recruit_staff_profiles").select("role,approved_at").eq("user_id",session.user.id).maybeSingle(),client.rpc("can_link_therapist_interview")]);
  if(prof.error||can.error||!prof.data?.approved_at||can.data!==true){
-  $("login").classList.remove("hide");$("app").classList.add("hide");$("loginError").textContent="在籍管理は4人の管理者専用です。";return;
+  location.replace("/therapist-profile/staff/management-top/");$("app").classList.add("hide");$("loginError").textContent="在籍管理は4人の管理者専用です。";return;
  }
  authorized=true;$("login").classList.add("hide");$("app").classList.remove("hide");$("logout").classList.remove("hide");await load();
 }
