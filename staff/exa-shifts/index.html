@@ -348,6 +348,19 @@ footer{display:none}
 #surveyPersonChoice{width:100%;max-width:100%;padding:9px;border:1px solid #bbcfe4;border-radius:7px;background:white;color:#253b53;font-size:12px}
 #surveyLinkOpen,#surveyLinkSave{font-size:12px;margin:5px 0}
 .staff-exa-id{display:inline-block;margin-left:5px;padding:1px 4px;border-radius:3px;background:#eaf1f9;color:#32618a;font-size:10px;font-weight:700;white-space:nowrap}
+
+/* Shared five-store departure archive. Never infer departure from an empty shift. */
+.exa-departure-wrap{padding:8px 2px 15px}
+.exa-departure-info{font-size:12px;color:#51657d;line-height:1.7;margin:7px 0 12px}
+.exa-departure-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.exa-departure-tools button{font-size:12px}
+.exa-departure-table{width:100%;border-collapse:collapse;font-size:12px}
+.exa-departure-table th,.exa-departure-table td{padding:10px 8px;text-align:left;border-bottom:1px solid #dbe5ef;white-space:normal}
+.exa-departure-table th{background:#e8f0f9;color:#1b3552}
+.exa-departure-table td button{margin-right:6px;margin-bottom:3px;padding:5px 9px;font-size:11px}
+.exa-departure-state{font-weight:700;color:#8b5817}
+.exa-departure-error{color:#b3263a;font-size:12px;white-space:pre-wrap}
+.exa-departure-empty{padding:26px 9px;color:#697b8e;text-align:center}
 </style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
@@ -366,7 +379,7 @@ footer{display:none}
 <main id="app" class="hide">
 
 <p id="message" class="muted" role="status" aria-live="polite"></p>
-<div class="panel monthly-panel"><div class="row space month-heading"><h2>月間シフト</h2><div class="staff-filter" role="group" aria-label="表示区分"><button type="button" data-show-staff="real" class="active">実働</button><button type="button" data-show-staff="dummy">ダミー</button><button type="button" data-show-staff="all">全件</button></div></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
+<div class="panel monthly-panel"><div class="row space month-heading"><h2>月間シフト</h2><div class="staff-filter" role="group" aria-label="表示区分"><button type="button" data-show-staff="real" class="active">実働</button><button type="button" data-show-staff="dummy">ダミー</button><button type="button" data-show-staff="all">全件</button><button type="button" data-show-staff="retired">退店者</button></div></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
 <div id="residencyModal" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="residencyTitle">
 <div id="residencyShade" class="day-modal-shade"></div>
 <div class="panel residency-dialog therapist-detail-dialog">
@@ -1121,5 +1134,85 @@ document.querySelectorAll("[data-show-staff]").forEach(b=>b.onclick=()=>{
  document.querySelectorAll("[data-show-staff]").forEach(x=>x.classList.toggle("active",x===b));
  renderMonthly();
 });
+
+// Shared retirement archive and reversible human-reviewed EXA deletion records.
+(function initDepartureArchive(){
+ const STORE="rose",FILTER_ATTR="data-show-staff";
+ const list=document.getElementById("monthly"),panel=list?.closest(".panel");
+ if(!list||!panel)return;
+ const currentHeader=panel.querySelector(".month-heading h2");
+ const normalHeading=currentHeader?.textContent||"月間シフト";
+ const tableWrap=list.closest(".table-scroll, .scroll")||list.parentElement;
+ const archive=document.createElement("div");archive.className="exa-departure-wrap hide";
+ archive.innerHTML='<div class="exa-departure-info">EXAから削除されたことを管理者が確認し、ダミー利用も終了した退店者を保管します。削除を検出しただけでは退店確定しません。過去のシフト・接客履歴は削除しません。</div><div class="exa-departure-tools"><button type="button" id="exaDepartureDetect">EXA削除を記録</button><button type="button" id="exaDepartureRefresh">一覧を更新</button></div><div id="exaDepartureMessage" role="status" aria-live="polite"></div><div style="overflow:auto"><table class="exa-departure-table"><thead><tr><th>源氏名・EXA ID</th><th>状態</th><th>記録日時</th><th>操作</th></tr></thead><tbody id="exaDepartureRows"></tbody></table></div>';
+ panel.append(archive);
+ const msg=archive.querySelector("#exaDepartureMessage"),tbody=archive.querySelector("#exaDepartureRows");
+ const selected=()=>[...document.querySelectorAll("["+FILTER_ATTR+"]")].find(b=>b.classList.contains("active"))?.getAttribute(FILTER_ATTR)==="retired";
+ const dateFmt=x=>x?new Date(x).toLocaleString("ja-JP",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}):"—";
+ const el=(tag,textValue)=>{const node=document.createElement(tag);node.textContent=textValue;return node};
+ const button=(label,onclick)=>{const b=el("button",label);b.type="button";b.onclick=onclick;return b};
+ async function manage(id,action,label){
+  let note;
+  if(action==="detected"){
+   note=prompt("EXAの在籍一覧から削除されたことを確認した根拠を記入してください。\n※シフト未登録だけでは退店と判定できません。");
+   if(note===null)return;
+  }else if(action==="confirm"){
+   if(!confirm("EXAから削除済み、かつダミー利用もしないことを確認しましたか？\n確定すると通常の実働・ダミー・全件一覧から除外します。履歴は残ります。"))return;
+   note=prompt("退店確定の記録（確認日・理由など）を入力してください。");
+   if(note===null)return;
+  }else{
+   if(!confirm("退店記録を復帰状態に変更し、通常一覧へ戻しますか？\n過去の履歴は保持します。"))return;
+   note=prompt("復帰理由を入力してください。");if(note===null)return;
+  }
+  note=note.trim();
+  if(!note){msg.textContent="確認内容の入力が必要です。";msg.className="exa-departure-error";return;}
+  try{
+   msg.textContent="保存しています…";msg.className="";
+   const result=await client.rpc("exa_departure_manage",{p_store:STORE,p_exa_id:id,p_action:action,p_note:note});
+   if(result.error)throw result.error;
+   await refresh();
+  }catch(e){msg.textContent="保存に失敗しました："+(e.message||String(e));msg.className="exa-departure-error";}
+ }
+ async function refresh(){
+  msg.textContent="退店記録を確認中…";msg.className="";tbody.replaceChildren();
+  try{
+   const {data,error}=await client.from("exa_departure_records")
+    .select("exa_id,stage_name_snapshot,state,detected_at,confirmed_at,detected_source")
+    .eq("store_code",STORE).in("state",["deleted_detected","confirmed_departed"]).order("updated_at",{ascending:false});
+   if(error)throw error;
+   const records=data||[];
+   msg.textContent="退店確定："+records.filter(x=>x.state==="confirmed_departed").length+"名／EXA削除確認待ち："+records.filter(x=>x.state==="deleted_detected").length+"名";
+   if(!records.length){const tr=document.createElement("tr"),td=el("td","記録された退店者はいません。シフト未登録者は自動的に退店とは判定しません。");td.colSpan=4;td.className="exa-departure-empty";tr.append(td);tbody.append(tr);return;}
+   for(const r of records){
+    const tr=document.createElement("tr");
+    tr.append(el("td",(r.stage_name_snapshot||"未記入")+"｜ID "+r.exa_id));
+    const state=el("td",r.state==="confirmed_departed"?"退店確定":"EXA削除確認待ち");state.className="exa-departure-state";tr.append(state);
+    tr.append(el("td",dateFmt(r.confirmed_at||r.detected_at)));
+    const actions=document.createElement("td");
+    if(r.state==="deleted_detected")actions.append(button("退店確定",()=>manage(r.exa_id,"confirm")));
+    actions.append(button("記録を取り消し・復帰",()=>manage(r.exa_id,"restore")));
+    tr.append(actions);tbody.append(tr);
+   }
+  }catch(e){msg.textContent="取得に失敗しました："+(e.message||String(e));msg.className="exa-departure-error";}
+ }
+ archive.querySelector("#exaDepartureDetect").onclick=async()=>{
+  const s=prompt("EXAで削除されたセラピストのEXA IDを入力してください。");if(s===null)return;
+  if(!/^\d{1,6}$/.test(s.trim())||Number(s)<1){msg.textContent="EXA IDを正しく入力してください。";return;}
+  await manage(Number(s),"detected");
+ };
+ archive.querySelector("#exaDepartureRefresh").onclick=refresh;
+ const empty=document.getElementById("empty");
+ function show(){
+  const retired=selected();
+  archive.classList.toggle("hide",!retired);
+  if(tableWrap)tableWrap.classList.toggle("hide",retired);
+  if(empty&&empty!==tableWrap)empty.classList.toggle("hide",retired||!empty.classList.contains("hide"));
+  if(currentHeader)currentHeader.textContent=retired?"退店者アーカイブ":normalHeading;
+  if(retired)void refresh();
+ }
+ document.querySelectorAll("["+FILTER_ATTR+"]").forEach(b=>b.addEventListener("click",()=>setTimeout(show,0)));
+ show();
+})();
+
 loginCheck();
 </script></body></html>
