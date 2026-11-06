@@ -441,7 +441,7 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 <details class="settings-menu"><summary>その他 <span aria-hidden="true">▾</span></summary><div class="settings-panel">
 <button id="reload">保存データを再読込</button>
 <button id="unscheduledAdd" title="EXA登録画面でIDと源氏名を確認した人だけ追加。出勤データは変更しません">出勤予定なしのEXA登録者を追加</button>
-<button id="csvImport">EXA CSV取込・更新</button><input id="csvFile" type="file" accept=".csv,text/csv" style="display:none">
+<button id="csvImport" title="Chrome拡張で取得したEXA 30日JSON・CSVを取り込みます">EXA JSON/CSV取込</button><input id="csvFile" type="file" accept=".json,application/json,.csv,text/csv" style="display:none">
 <button id="serverTest" title="読み取り専用で30日分検証">サーバー30日検証</button>
 <button id="autoSync" title="Chrome起動中の自動更新">ブラウザ自動：OFF</button>
 </div></details><span id="authLabel" class="muted login-tag" style="color:#d5e1f1"></span><button id="logout" class="hide">ログアウト</button>
@@ -1195,7 +1195,30 @@ $("csvFile").onchange=async e=>{
  const file=e.target.files?.[0];if(!file)return;
  const button=$("csvImport");button.disabled=true;
  try{
-  if(file.size>1024*1024)throw Error("CSV容量が大きすぎます（上限1MB）");
+  if(file.size>1024*1024)throw Error("ファイル容量が大きすぎます（上限1MB）");
+  if(file.name.toLowerCase().endsWith(".json")){
+   const payload=JSON.parse((await file.text()).replace(/^\uFEFF/,""));
+   if(payload?.format!=="grandluxe-exa-readonly-v1"||payload.store_code!=="grandluxe"||
+      payload.days!==30||!Array.isArray(payload.rows)||payload.rows.length<1||
+      payload.total_rows!==payload.rows.length||!Array.isArray(payload.daily_summary)||
+      payload.daily_summary.length!==30)
+       throw Error("Grand Luxe専用30日JSONではありません。Chrome拡張の保存データを選んでください。");
+   const count=payload.rows.filter(r=>r.is_pre_off===true).length;
+   if(!confirm("Grand LuxeのEXA 30日データを取り込みます。\n期間："+payload.first+"〜"+payload.last+
+    "\n予定："+payload.rows.length+"件（事前 "+count+"件）\n未記載の既存予定は削除しません。\n\n続行しますか？"))return;
+   const {data:{session}}=await client.auth.getSession();
+   if(!session)throw Error("ログイン期限切れです。再ログインしてください");
+   showMsg("EXA 30日JSONを検証して登録中…");
+   const response=await fetch(URL_SB+"/functions/v1/exa-grandluxe-shift-import",{
+     method:"POST",headers:{"Content-Type":"application/json","apikey":KEY_SB,"Authorization":"Bearer "+session.access_token},
+     body:JSON.stringify({...payload,source:"extension_snapshot"})
+   });
+   const result=await response.json();
+   if(!response.ok||!result.ok)throw Error(result.error||"30日JSONの登録に失敗しました（HTTP "+response.status+"）");
+   await load();
+   showMsg("Grand Luxe 30日取込完了："+result.imported+"件（事前 "+result.preoff+"件）、"+result.days+"日分。その他の店舗は変更していません。");
+   return;
+  }
   const source=(await file.text()).replace(/^\uFEFF/,"").replace(/\r\n/g,"\n");
   const lines=source.trim().split("\n").filter(Boolean);
   const parseLine=line=>{
