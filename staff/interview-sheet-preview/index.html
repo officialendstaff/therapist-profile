@@ -553,6 +553,9 @@ html.metrics-standalone body>.main{position:fixed!important;top:0!important;left
 html.metrics-standalone .main-panel{min-height:100%!important;height:100%!important;padding:10px 12px!important}
 html.metrics-standalone #storeMetrics{height:100%!important;min-height:100%!important}
 html.metrics-standalone #storeMetricsBody{height:calc(100% - 65px)!important;overflow:auto!important}
+html.metrics-standalone #storeMetricsHeader .store-metrics-controls{display:none!important}
+html.metrics-standalone #storeMetricsHeader{padding-bottom:5px!important}
+html.metrics-standalone #storeMetricsBody{height:calc(100% - 41px)!important}
 html.metrics-standalone body.interview-admin-locked>.main{visibility:hidden!important}
 html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!important;pointer-events:auto!important}
 </style><script id="metrics-standalone-init">if(new URLSearchParams(location.search).get('standaloneMetrics')==='1')document.documentElement.classList.add('metrics-standalone');</script><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script></head><body>
