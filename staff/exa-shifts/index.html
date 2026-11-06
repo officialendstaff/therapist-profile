@@ -427,11 +427,14 @@ footer{display:none}
   </div>
   <label for="residencyChoice">出勤管理区分</label>
   <select id="residencyChoice">
-   <option value="unclassified">仮登録（実働一覧に表示）</option>
-   <option value="real_working">実在籍・実働</option>
-   <option value="dummy_use">退店・ダミーとして使用</option>
+   <option value="unclassified" disabled>区分未判定（従来登録・要確認）</option>
+   <option value="provisional_hidden">仮登録（EXA非表示）</option>
+   <option value="pending_documents">未入店（在籍書類が揃っていない）</option>
+   <option value="real_working">在籍実働</option>
+   <option value="long_leave">長期休暇</option>
+   <option value="dummy_use">ダミー使用</option>
   </select>
-  <p class="muted">「実働外」は実在籍で今後の出勤予定がない場合に自動表示します。EXAの最新一覧にないIDは通常一覧から自動除外します。EXA本体・過去の記録は変更しません。</p>
+  <p class="muted">「実働外」は今後の出勤予定がない場合に自動判定します。区分変更は出勤管理内の登録内容のみ更新し、EXA本体の表示設定は変更しません。EXAの表示／非表示情報との自動同期は未接続です。</p>
   <div class="row space"><button id="residencyCancel" type="button">閉じる</button><button id="residencySave" class="primary" type="button">区分変更を確定</button></div>
  </div>
 </div>
@@ -548,12 +551,13 @@ const rawName=String(t.stage_name||"ID "+t.exa_id);
 const nameParts=rawName.match(/^(.+?)-([^-]+)-$/);
 const stageName=nameParts?nameParts[1]:rawName,kana=nameParts?nameParts[2]:"";
 const upcoming=futureShifts.some(r=>r.exa_id===t.exa_id&&r.work_date>=today()&&!r.is_dummy_shift&&!r.is_pre_off);
-const outside=group==="real"&&!upcoming;
+const outside=group==="real"&&!upcoming&&!["long_leave","pending_documents","provisional_hidden"].includes(t.operating_category);
 const latestDates=futureShifts.filter(r=>r.exa_id===t.exa_id&&!r.is_dummy_shift&&!r.is_pre_off).map(r=>r.work_date).sort();
 const lastKnownDate=latestDates.length?latestDates[latestDates.length-1]:null;
 const days=[...entries.values()].filter(r=>!r.is_dummy_shift).length;
 const zeros=valid.filter(r=>!absence.has(t.exa_id+"|"+r.work_date)&&per.get(t.exa_id+"|"+r.work_date)===0).length;
-html+='<tr class="'+(outside?'outside-roster':'')+'"><td class="staff-name '+(group==="dummy"?"state-dummy":"")+'"><button type="button" class="name-editor" data-staff-id="'+t.exa_id+'" title="出勤管理区分を変更">'+safe(stageName)+'</button><span class="staff-exa-id" title="EXA管理ID">ID '+t.exa_id+'</span>'+(kana?'<span class="reading">'+safe(kana)+'</span>':'')+(outside?'<span class="outside-label">実働外</span>':'')+'</td>';
+const categoryClass={provisional_hidden:"state-provisional",pending_documents:"state-paperwork",long_leave:"state-leave",dummy_use:"state-dummy"}[t.operating_category]||(group==="dummy"?"state-dummy":"");
+html+='<tr class="'+(outside?'outside-roster':'')+'"><td class="staff-name '+categoryClass+'"><button type="button" class="name-editor" data-staff-id="'+t.exa_id+'" title="出勤管理区分を変更">'+safe(stageName)+'</button><span class="staff-exa-id" title="EXA管理ID">ID '+t.exa_id+'</span>'+(kana?'<span class="reading">'+safe(kana)+'</span>':'')'</td>';
 const surveyId=surveyLinks.find(l=>l.exa_id===t.exa_id)?.sheet_person_id;
 const survey=surveyScores.find(x=>x.sheet_person_id===surveyId);
 const responseCount=survey?.response_count??0;
@@ -839,8 +843,8 @@ function openResidency(button){
  if(!person)return;
  editingResidency={exaId,old:person.operating_category,name:person.stage_name};
  $("residencyTitle").textContent="セラピスト詳細";
- $("residencyInfo").textContent=person.stage_name+"（EXA ID："+exaId+"）／区分："+({unclassified:"仮登録",real_working:"実在籍",real_outside:"実在籍",dummy_use:"退店・ダミー使用",not_used:"対象外"}[person.operating_category]||"未設定");
- $("residencyChoice").value=person.operating_category||"unclassified";
+ $("residencyInfo").textContent=person.stage_name+"（EXA ID："+exaId+"）／区分："+({unclassified:"未判定",provisional_hidden:"仮登録",pending_documents:"未入店（書類未完備）",real_working:"在籍実働",real_outside:"実働外（旧区分）",long_leave:"長期休暇",dummy_use:"ダミー使用",not_used:"対象外"}[person.operating_category]||"未設定");
+ $("residencyChoice").value=["provisional_hidden","pending_documents","real_working","long_leave","dummy_use"].includes(person.operating_category)?person.operating_category:"unclassified";
  $("residencyModal").classList.remove("hide");
  showTherapistPhoto(exaId);
  loadPersonRegistry(exaId);
@@ -858,7 +862,7 @@ $("residencyShade").onclick=closeResidency;
 $("residencySave").onclick=async()=>{
  if(!editingResidency||!authorized)return;
  const category=$("residencyChoice").value;
- const labels={unclassified:"仮登録（実働側）",real_working:"実在籍",dummy_use:"退店・ダミーとして使用"};
+ const labels={provisional_hidden:"仮登録（EXA非表示）",pending_documents:"未入店（書類未完備）",real_working:"在籍実働",long_leave:"長期休暇",dummy_use:"ダミー使用"};
  if(!Object.prototype.hasOwnProperty.call(labels,category))return;
  const person=therapists.find(t=>t.exa_id===editingResidency.exaId);
  if(!person)return;
