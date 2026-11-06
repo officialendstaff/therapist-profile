@@ -437,12 +437,12 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 <header class="work-header lg-common-header"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ移動" aria-label="総合管理TOPへ移動"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span id="lgHeaderHomeLabel">総合 TOP</span></a><div class="head-controls">
 <label class="store-label">店舗 <select id="storeSelect" aria-label="店舗切替"><option value="grand-luxe" selected>Grand Luxe</option><option value="luxy-osaka">LUXY OSAKA</option><option value="rose">薔薇と紳士</option><option value="un-secret">Un Secret</option><option value="busty-osaka">BUSTY OSAKA</option></select></label>
 <div class="head-month"><button id="prev" title="前月">◀</button><strong id="monthLabel"></strong><button id="next" title="翌月">▶</button></div>
-<button id="exaSync" class="primary" title="Grand Luxe Chrome拡張v1.1でログイン済みEXAから30日取得しSupabaseへ反映">今すぐ更新</button>
+<button id="exaSync" class="primary" title="EXAサーバーから最新30日を直接取得・反映（サーバー認証が必要）">今すぐ更新</button>
 <details class="settings-menu"><summary>その他 <span aria-hidden="true">▾</span></summary><div class="settings-panel">
 <button id="reload">保存データを再読込</button>
 <button id="unscheduledAdd" title="EXA登録画面でIDと源氏名を確認した人だけ追加。出勤データは変更しません">出勤予定なしのEXA登録者を追加</button>
 <button id="csvImport" title="Chrome拡張で取得したEXA 30日JSON・CSVを取り込みます">EXA JSON/CSV取込</button><input id="csvFile" type="file" accept=".json,application/json,.csv,text/csv" style="display:none">
-<button id="serverTest" disabled title="サーバー直接同期は未検証です。Grand Luxe Chrome拡張方式を使用します">サーバー直結（未対応）</button>
+<button id="serverTest" title="EXAサーバー接続と30日読取を検証（保存データは変更しません）">サーバー30日検証</button>
 <button id="autoSync" title="Chrome起動中の自動更新">ブラウザ自動：OFF</button>
 </div></details><span id="authLabel" class="muted login-tag" style="color:#d5e1f1"></span><button id="logout" class="hide">ログアウト</button>
 </div></header>
@@ -1016,7 +1016,7 @@ $("next").onclick=()=>{const d=new Date(month+"-01T00:00:00");d.setMonth(d.getMo
 $("reload").onclick=load;
 let extensionBusy=false;
 let exaSyncStartedAt=0;
-const AUTO_KEY="exa-grandluxe-auto-sync-v1";
+const AUTO_KEY="exa-grandluxe-server-auto-v1";
 const LAST_KEY="exa-grandluxe-last-sync-v1";
 const ATTEMPT_KEY="exa-grandluxe-auto-attempt-v1";
 const AUTO_MS=3*60*60*1000;
@@ -1026,33 +1026,28 @@ const asTokyoDate=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",yea
 function paintAuto(){
  $("autoSync").disabled=false;
  $("autoSync").textContent=autoEnabled?"ブラウザ自動：ON":"ブラウザ自動：OFF";
- $("autoSync").title="Chrome拡張v1.1を使用。管理ページを表示中、3時間ごとにログイン済みEXAを読み取り反映します（サーバー定期同期ではありません）";
+ $("autoSync").title="薔薇と紳士と同様に、管理ページ表示中は3時間ごとにEXAサーバー同期APIを呼び出します。接続が検証できるまではONにできません。";
  $("autoSync").setAttribute("aria-pressed",String(autoEnabled));
 }
 paintAuto();
 $("autoSync").onclick=async()=>{
  if(!authorized)return;
  if(!autoEnabled){
-  try{await waitForGrandLuxeExtension();}
-  catch(e){showMsg(String(e.message||e),true);return;}
+  const {data,error}=await client.rpc("exa_server_sync_is_permitted",{p_store:"grandluxe"});
+  if(error||data!==true){
+   autoEnabled=false;
+   localStorage.setItem(AUTO_KEY,"off");
+   paintAuto();
+   showMsg("Grand Luxeのサーバー同期は接続未検証のため、自動更新は有効にできません。",true);
+   return;
+  }
  }
  autoEnabled=!autoEnabled;
  localStorage.setItem(AUTO_KEY,autoEnabled?"on":"off");
  if(autoEnabled&&!localStorage.getItem(LAST_KEY))localStorage.setItem(LAST_KEY,String(Date.now()));
  paintAuto();
- showMsg(autoEnabled?"Grand Luxe Chrome拡張を使う3時間自動更新を有効にしました。管理ページ表示中・EXAログイン中のみ動作します。":"Grand Luxeのブラウザ自動更新を停止しました。");
+ showMsg(autoEnabled?"3時間自動更新を有効にしました。管理ページ表示中、EXAサーバーへ更新を要求します。":"3時間自動更新を停止しました。");
 };
-
-let grandLuxeExtensionReady=false;
-async function waitForGrandLuxeExtension(){
- if(grandLuxeExtensionReady)return;
- window.postMessage({source:"exa-shift-page",action:"probe"},location.origin);
- for(let i=0;i<12;i++){
-  await new Promise(resolve=>setTimeout(resolve,150));
-  if(grandLuxeExtensionReady)return;
- }
- throw Error("Grand Luxe Chrome拡張 v1.1 が検出されません。v1.0を削除しv1.1を導入して、この画面を再読込してください。");
-}
 const bridgeRequests=new Map();
 let syncAbortRequested=false;
 function cancelEXASync(){
@@ -1087,35 +1082,36 @@ async function synchronizeEXA(mode="manual"){
  const automatic=mode==="auto";
  extensionBusy=true;
  const button=$("exaSync");
- button.disabled=true;
- button.textContent="更新中…";
+ button.disabled=true;button.textContent="更新中…";
  $("autoSync").disabled=true;
  try{
-  showMsg("Grand Luxe Chrome拡張でEXA30日分を読取中…（EXAへの書込なし）");
+  showMsg(automatic?"EXAサーバーの自動同期中…":"EXAサーバーから最新30日分を取得・反映中…");
   const {data:{session}}=await client.auth.getSession();
   if(!session)throw Error("管理ページに再ログインしてください");
-  const payload=await fetchFromExaExtension();
-  if(!payload||payload.ok===false)throw Error(payload?.error||"Chrome拡張からEXAデータを取得できませんでした");
-  if(payload.format!=="grandluxe-exa-readonly-v1"||
-     payload.store_code!=="grandluxe"||payload.days!==30||
-     !Array.isArray(payload.rows)||!Array.isArray(payload.daily_summary)||
-     payload.daily_summary.length!==30||payload.total_rows!==payload.rows.length||
-     payload.rows.length<1)
-     throw Error("Chrome拡張の30日データ形式が一致しません。v1.1を再導入してください");
-  if(payload.first!==today())throw Error("EXAの取得開始日が今日ではありません（"+payload.first+"）。EXAのトップ画面とログイン状態を確認してください");
-  showMsg("EXA30日読取完了："+payload.rows.length+"件。Supabaseへ検証・登録中…");
-  const response=await fetch(URL_SB+"/functions/v1/exa-grandluxe-shift-import",{
-   method:"POST",
-   headers:{"Content-Type":"application/json","apikey":KEY_SB,"Authorization":"Bearer "+session.access_token},
-   body:JSON.stringify({...payload,source:"extension_snapshot"})
-  });
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),120000);
+  let response;
+  try{
+   response=await fetch(URL_SB+"/functions/v1/exa-grandluxe-manual-sync",{
+    method:"POST",signal:controller.signal,
+    headers:{"Content-Type":"application/json","apikey":KEY_SB,"Authorization":"Bearer "+session.access_token},
+    body:"{}"
+   });
+  }finally{clearTimeout(timeout)}
   const result=await response.json();
-  if(!response.ok||!result.ok)throw Error(result.error||"Grand Luxeの30日取込に失敗しました（HTTP "+response.status+"）");
+  if(!response.ok||!result.ok){
+   const errors={
+    credentials_not_configured:"Grand LuxeのEXAサーバーログイン情報が未設定です。",
+    manager_only:"指定された4名の管理者のみ更新できます。",
+    server_sync_failed:"EXAサーバーとの通信または30日分の読取に失敗しました。「サーバー30日検証」で原因を確認してください。"
+   };
+   throw Error(errors[result.error]||result.error||"EXAサーバー同期失敗（HTTP "+response.status+"）");
+  }
   localStorage.setItem(LAST_KEY,String(Date.now()));
   await load();
-  showMsg("Grand Luxe "+(automatic?"自動更新":"今すぐ更新")+"完了："+result.imported+"件・"+result.days+"日分（事前 "+result.preoff+"件）。他店舗・未記載予定は変更していません。");
+  showMsg("Grand Luxe "+(automatic?"自動":"手動")+"更新完了："+result.imported+"件・"+result.days+"日分（事前 "+result.preoff+"件）。");
  }catch(error){
-  showMsg("Grand Luxe "+(automatic?"ブラウザ自動更新":"今すぐ更新")+"失敗："+String(error.message||error),true);
+  showMsg("Grand Luxe "+(automatic?"自動":"今すぐ")+"更新失敗："+(error?.name==="AbortError"?"サーバー応答が120秒を超えました":String(error.message||error)),true);
  }finally{
   extensionBusy=false;button.disabled=false;button.textContent="今すぐ更新";$("autoSync").disabled=false;
  }
