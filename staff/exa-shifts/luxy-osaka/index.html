@@ -432,7 +432,20 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 .shift-table tbody tr:not(.group) td.staff-name.state-unconfirmed{background:#fff2d7!important;color:#86500d!important;box-shadow:inset 4px 0 #d4a042}
 .shift-table tbody tr:not(.group) td.staff-name.state-unconfirmed .name-editor{color:#86500d!important}
 .exa-hide-note{font-size:9px;color:#ac3342;display:block;font-weight:750}
-</style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script></head>
+</style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script><style id="staff-readonly-shift-v1">
+ body.staff-readonly #exaSync,body.staff-readonly #autoSync,body.staff-readonly #unscheduledAdd,
+ body.staff-readonly #csvImport,body.staff-readonly #serverTest,body.staff-readonly #residencySave,
+ body.staff-readonly #countConfirm,body.staff-readonly .therapist-photo-action,
+ body.staff-readonly #therapistPhotoInput,body.staff-readonly #interviewLinkOpen,
+ body.staff-readonly #interviewLinkPanel,body.staff-readonly #interviewLinkConfirm,
+ body.staff-readonly #surveyLinkOpen,body.staff-readonly #surveyLinkPanel,
+ body.staff-readonly #surveyLinkSave {display:none!important}
+ body.staff-readonly #residencyChoice,body.staff-readonly #countSelect {
+   pointer-events:none!important;opacity:1!important;background:#f2f6fb!important;
+ }
+ body.staff-readonly #residencyChoice {cursor:default!important}
+ body.staff-readonly #authLabel::after {content:" ・閲覧専用"}
+ </style></head>
 <body>
 <header class="work-header lg-common-header"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ移動" aria-label="総合管理TOPへ移動"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span id="lgHeaderHomeLabel">総合 TOP</span></a><div class="head-controls">
 <label class="store-label">店舗 <select id="storeSelect" aria-label="店舗切替"><option value="grand-luxe">Grand Luxe</option><option value="luxy-osaka" selected>LUXY OSAKA</option><option value="rose">薔薇と紳士</option><option value="un-secret">Un Secret</option><option value="busty-osaka">BUSTY OSAKA</option></select></label>
@@ -511,6 +524,40 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 const URL_SB="https://vjjnkflbfsjihwzjsjpr.supabase.co",KEY_SB="sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos";
 const client=window.supabase?.createClient(URL_SB,KEY_SB,{auth:{persistSession:true,autoRefreshToken:true,storage:localStorage,storageKey:"mattan-recruit-auth"}});
 const $=id=>document.getElementById(id), today=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+
+let staffReadOnly=false;
+const readonlyApi=URL_SB+"/functions/v1/group-management-readonly";
+async function staffRead(action,params={}){
+ const token=sessionStorage.getItem("interview_staff_session_v2")||localStorage.getItem("interview_staff_session_v2");
+ if(!token||!/^[0-9a-f]{64}$/.test(token))throw Error("スタッフログインが必要です");
+ const r=await fetch(readonlyApi,{method:"POST",headers:{"Content-Type":"application/json","apikey":KEY_SB},cache:"no-store",
+  body:JSON.stringify({action,token,...params})});
+ const result=await r.json();
+ if(!r.ok||!result.ok)throw Error(result.error||"閲覧データを取得できませんでした");
+ return result;
+}
+async function staffReadOnlyLogin(){
+ try{await staffRead("verify");}catch{return false}
+ staffReadOnly=true;authorized=true;document.body.classList.add("staff-readonly");
+ $("login").classList.add("hide");$("app").classList.remove("hide");$("logout").classList.remove("hide");
+ $("authLabel").textContent="スタッフ・閲覧専用";
+ const home=document.getElementById("lgHeaderHomeLabel");if(home)home.textContent="スタッフ TOP";
+ await load();return true;
+}
+async function staffShowPhoto(exaId){
+ const request=++photoRequest;
+ $("therapistPhoto").classList.add("hide");$("therapistPhoto").removeAttribute("src");
+ $("therapistPhotoEmpty").classList.remove("hide");$("therapistPhotoEmpty").textContent="画像を確認中…";
+ $("therapistPhotoStatus").textContent="閲覧専用";
+ try{
+  const result=await staffRead("photo",{store:"luxy",exaId});
+  if(request!==photoRequest)return;
+  if(!result.url){$("therapistPhotoEmpty").textContent="画像未登録";return}
+  $("therapistPhoto").onload=()=>{if(request===photoRequest){$("therapistPhotoEmpty").classList.add("hide");$("therapistPhoto").classList.remove("hide")}};
+  $("therapistPhoto").onerror=()=>{if(request===photoRequest)$("therapistPhotoEmpty").textContent="画像を表示できません"};
+  $("therapistPhoto").src=result.url;
+ }catch{if(request===photoRequest)$("therapistPhotoEmpty").textContent="画像を取得できません"}
+}
 const initial=today();let month=initial.slice(0,7),selected=initial,therapists=[],shifts=[],futureShifts=[],performances=[],historyPerformances=[],authorized=false,rosterIds=new Set();
 const safe=(v)=>{const e=document.createElement("span");e.textContent=String(v??"");return e.innerHTML;};
 const daysIn=()=>new Date(Number(month.slice(0,4)),Number(month.slice(5,7)),0).getDate();
@@ -531,9 +578,10 @@ const showMsg=(message,error=false)=>{
  if(message && !(/取得中|反映中|読み込み中/.test(message)))messageTimer=setTimeout(()=>{el.classList.remove("toast-visible");},error?10000:5200);
 };
 async function loginCheck(){if(!client){location.replace("/therapist-profile/staff/management-top/");return;}
-const {data:{session}}=await client.auth.getSession();if(!session){authorized=false;$("app").classList.add("hide");location.replace("/therapist-profile/staff/management-top/");return;}
+const {data:{session}}=await client.auth.getSession();if(!session){if(await staffReadOnlyLogin())return;authorized=false;$("app").classList.add("hide");location.replace("/therapist-profile/staff/interview-sheet-preview/");return;}
 const [{data,error},access]=await Promise.all([client.from("recruit_staff_profiles").select("display_name,role,approved_at").eq("user_id",session.user.id).maybeSingle(),client.rpc("can_link_therapist_interview")]);
 if(error||access.error||access.data!==true||!data||!data.approved_at||!["master","full"].includes(data.role)){
+  if(await staffReadOnlyLogin())return;
   authorized=false;$("app").classList.add("hide");location.replace("/therapist-profile/staff/management-top/");$("loginError").textContent="このページへの権限がありません。";return;
 }
 const homeName=document.getElementById("lgHeaderHomeLabel");if(homeName)homeName.textContent=(data.display_name||"管理")+" TOP";
@@ -550,7 +598,7 @@ $("logout").onclick=async()=>{await client.auth.signOut();sessionStorage.removeI
 async function load(){
 if(!authorized)return;showMsg("Supabaseを読み込み中…");
 const start=month+"-01",end=dayStr(daysIn());
-const [a,b,c,d,e,future,sv,sl,roster]=await Promise.all([
+const responses=staffReadOnly?(await staffRead("shift",{store:"luxy",month})).rows.map(data=>({data,error:null})):await Promise.all([
 client.from("exa_shift_therapists").select("exa_id,stage_name,residency,employment_status,operating_category,evaluation_score,exa_is_visible,exa_list_position").eq("store_code","luxy"),
 client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_dummy_shift,is_pre_off").eq("store_code","luxy").gte("work_date",start).lte("work_date",end).order("work_date"),
 client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code","luxy").gte("work_date",start).lte("work_date",end),
@@ -561,6 +609,7 @@ Promise.resolve({data:[],error:null}),
 Promise.resolve({data:[],error:null}),
 client.from("exa_shift_therapists").select("exa_id").eq("store_code","luxy")
 ]);
+const [a,b,c,d,e,future,sv,sl,roster]=responses;
 const err=[a,b,c,d,e,future,sv,sl,roster].find(r=>r.error)?.error;
 if(err){showMsg("読み込みエラー："+err.message,true);return;}
 rosterIds=new Set((roster.data||[]).map(r=>r.exa_id));
@@ -923,6 +972,14 @@ function openResidency(button){
  $("residencyInfo").textContent=person.stage_name+"（EXA ID："+exaId+"）／区分："+({unclassified:"未判定",provisional_hidden:"仮登録",pending_documents:"未入店（書類未完備）",real_working:"在籍実働",real_outside:"実働外（旧区分）",long_leave:"長期休暇",dummy_use:"ダミー使用",not_used:"対象外"}[person.operating_category]||"未設定");
  $("residencyChoice").value=["provisional_hidden","pending_documents","real_working","long_leave","dummy_use"].includes(person.operating_category)?person.operating_category:"unclassified";
  $("residencyModal").classList.remove("hide");
+ if(staffReadOnly){
+  $("residencyChoice").disabled=true;
+  $("personRegistryState").textContent="閲覧専用（面接情報の変更不可）";
+  $("surveyLinkState").textContent="閲覧専用";
+  void staffShowPhoto(exaId);
+  return;
+ }
+ $("residencyChoice").disabled=false;
  showTherapistPhoto(exaId);
  loadPersonRegistry(exaId);
  loadSurveyLink(exaId);
@@ -937,7 +994,7 @@ function closeResidency(){
 $("residencyCancel").onclick=closeResidency;
 $("residencyShade").onclick=closeResidency;
 $("residencySave").onclick=async()=>{
- if(!editingResidency||!authorized)return;
+ if(!editingResidency||!authorized||staffReadOnly)return;
  const category=$("residencyChoice").value;
  const labels={provisional_hidden:"仮登録（EXA非表示）",pending_documents:"未入店（書類未完備）",real_working:"在籍実働",long_leave:"長期休暇",dummy_use:"ダミー使用"};
  if(!Object.prototype.hasOwnProperty.call(labels,category))return;
@@ -969,7 +1026,7 @@ function closeCount(){$("countModal").classList.add("hide");editingCount=null;}
 $("countCancel").onclick=closeCount;
 $("countShade").onclick=closeCount;
 $("countConfirm").onclick=async()=>{
- if(!editingCount)return;
+ if(!editingCount||staffReadOnly)return;
  const selected=$("countSelect").value;
  if(!["absent","0","1","2","3","4","5","6"].includes(selected)){showMsg("当欠または0〜6を選択してください",true);return;}
  const button=$("countConfirm");button.disabled=true;
@@ -1184,7 +1241,7 @@ $("serverTest").onclick=async()=>{
 
 $("exaSync").onclick=()=>synchronizeEXA("manual");
 async function checkAuto(){
- if(!autoEnabled||!authorized||extensionBusy)return;
+ if(staffReadOnly||!autoEnabled||!authorized||extensionBusy)return;
  const now=Date.now();
  const last=Number(localStorage.getItem(LAST_KEY)||0);
  const attempt=Number(localStorage.getItem(ATTEMPT_KEY)||0);
@@ -1253,4 +1310,13 @@ document.querySelectorAll("[data-show-staff]").forEach(b=>b.onclick=()=>{
 
 
 loginCheck();
+document.addEventListener("click",event=>{
+ if(!staffReadOnly)return;
+ const button=event.target.closest("button,label");
+ if(!button)return;
+ const editIds=new Set(["exaSync","autoSync","unscheduledAdd","csvImport","serverTest","residencySave","countConfirm","interviewLinkOpen","interviewLinkConfirm","surveyLinkOpen","surveyLinkSave"]);
+ if(editIds.has(button.id)||button.classList.contains("therapist-photo-action")){
+  event.preventDefault();event.stopImmediatePropagation();
+ }
+},true);
 </script></body></html>
