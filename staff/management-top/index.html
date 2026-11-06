@@ -148,47 +148,42 @@ body:has(.lg-interview-login:not(.hide):not(.hidden)) .page>.topbar{display:none
 .dialog-head p:empty{display:none}
 @media(max-width:530px){.dialog-action{padding:13px 15px}.dialog-action strong{font-size:16px}}
 
-/* Operations-first management dashboard. Layout only; data and permissions unchanged. */
-#app{max-width:1240px}
+/* Balanced operational home: equal priority cards, compact birthday strip, usable navigation */
+#app{max-width:1190px}
 #app .page-head{margin-bottom:8px}
-#app .action-section-heading{margin:19px 0 13px;font-size:15px;letter-spacing:.035em;color:#29384d}
-#app .action-dashboard{grid-template-columns:minmax(0,5fr) minmax(0,5fr) minmax(185px,2.35fr);align-items:stretch;gap:15px}
-#app .action-dashboard .panel{min-height:268px;padding:22px 23px 20px;gap:14px}
-#app .action-dashboard .panel h2{font-size:18px}
-#app .action-dashboard .panel .count{font-size:55px}
-#app .action-dashboard .action-panel .sub{display:flex;align-items:center;border-radius:8px;padding:15px 15px;min-height:72px;font-size:15px;line-height:1.5;font-weight:850}
-#app .action-dashboard .final-panel .sub{background:#963D28;color:white;box-shadow:inset 0 1px rgba(255,255,255,.15)}
-#app .action-dashboard .outside-panel .sub{background:#1D5276;color:white;box-shadow:inset 0 1px rgba(255,255,255,.15)}
-#app .action-dashboard .panel button{min-height:45px;font-size:13px}
-#app .action-dashboard .birthday-panel{padding:21px 16px 19px;gap:13px}
-#app .action-dashboard .birthday-panel h2{font-size:15px}
-#app .action-dashboard .birthday-panel .count{font-size:44px}
-#app .action-dashboard .birthday-panel .sub{font-size:12px;font-weight:500;min-height:0;color:#777974}
-#app .action-dashboard .birthday-panel button{background:#fff;color:#344b62;border:1px solid #C9D3E0;box-shadow:none;font-size:12px;white-space:nowrap;padding-inline:7px}
+#app .action-section-heading{margin:18px 0 13px;font-size:15px;letter-spacing:.02em;color:#29384d}
+#app .action-dashboard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:stretch}
+#app .action-dashboard .action-panel{min-height:218px;padding:19px 22px 18px;gap:11px}
+#app .action-dashboard .action-panel h2{font-size:17px}
+#app .action-dashboard .action-panel .count{font-size:46px}
+#app .action-dashboard .action-panel .sub{display:flex;align-items:center;min-height:44px;padding:10px 12px;font-size:15px;font-weight:800;line-height:1.45;border-radius:5px;box-shadow:none}
+#app .action-dashboard .final-panel .sub{background:#FBEEE9;color:#9A3F29;border-left:4px solid #C16D49}
+#app .action-dashboard .outside-panel .sub{background:#EAF2F9;color:#22567A;border-left:4px solid #5A86AA}
+#app .action-dashboard .action-panel button{min-height:43px;margin-top:auto;font-size:13px}
+#app .action-dashboard .birthday-panel{grid-column:1/-1;min-height:82px;padding:16px 22px;display:flex;align-items:center;gap:19px;flex-direction:row}
+#app .action-dashboard .birthday-panel::before{height:2px}
+#app .action-dashboard .birthday-panel h2{font-size:15px;min-width:95px;flex:0 0 auto}
+#app .action-dashboard .birthday-panel h2 span{font-size:20px}
+#app .action-dashboard .birthday-panel .count{font-size:33px;line-height:1.2;flex:0 0 auto}
+#app .action-dashboard .birthday-panel .sub{font-size:12px;min-height:0;flex:1;color:#777974;white-space:nowrap}
+#app .action-dashboard .birthday-panel button{display:block;width:170px;flex:0 0 170px;min-height:40px;margin:0;background:#fff;color:#344b62;border:1px solid #C9D3E0;box-shadow:none;font-size:12px}
 #app .action-dashboard .birthday-panel button:hover{background:#F4F7FA}
-#app .menus{grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
-#app .menu-card{min-height:132px;padding:17px;gap:8px;align-items:flex-start}
-#app .menu-card .icon{width:43px;height:43px;font-size:24px}
-#app .menu-card strong{font-size:16px}
-#app .menu-card .arrow{right:15px;top:17px}
-#app .section-heading:not(.action-section-heading){font-size:15px;letter-spacing:.035em;margin:25px 0 13px;color:#29384d}
-@media(max-width:960px){
- #app .action-dashboard{grid-template-columns:repeat(2,minmax(0,1fr))}
- #app .birthday-panel{grid-column:span 2}
- #app .action-dashboard .birthday-panel{min-height:130px;display:grid;grid-template-columns:1fr auto;align-items:center}
- #app .action-dashboard .birthday-panel .sub{grid-column:1}
- #app .action-dashboard .birthday-panel button{grid-column:2;grid-row:1 / span 3;width:140px;margin:0}
- #app .menus{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-@media(max-width:600px){
+#app .section-heading:not(.action-section-heading){font-size:15px;letter-spacing:.02em;margin:24px 0 13px;color:#29384d}
+#app .menus{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+#app .menu-card{min-height:132px;padding:19px 22px;gap:9px;align-items:flex-start}
+#app .menu-card .icon{width:42px;height:42px;font-size:24px}
+#app .menu-card strong{font-size:17px}
+#app .menu-card .arrow{right:20px;top:19px}
+@media(max-width:700px){
  #app .action-dashboard{grid-template-columns:1fr}
- #app .action-dashboard .panel{min-height:220px}
- #app .birthday-panel{grid-column:span 1}
- #app .action-dashboard .action-panel .sub{font-size:14px;min-height:58px;padding:12px}
- #app .action-dashboard .birthday-panel{grid-template-columns:1fr auto;min-height:120px}
- #app .action-dashboard .birthday-panel button{width:120px}
- #app .menus{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #app .action-dashboard .action-panel{min-height:200px}
+ #app .action-dashboard .birthday-panel{grid-column:1;padding:14px 16px;gap:10px;flex-wrap:wrap}
+ #app .action-dashboard .birthday-panel h2{min-width:auto}
+ #app .action-dashboard .birthday-panel .sub{min-width:60px}
+ #app .action-dashboard .birthday-panel button{width:100%;flex:1 0 100%;margin-top:0}
+ #app .menus{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
  #app .menu-card{min-height:118px;padding:14px}
+ #app .menu-card strong{font-size:15px}
 }
 </style></head>
 <body>
