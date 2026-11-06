@@ -230,7 +230,7 @@ body:has(.lg-interview-login:not(.hide):not(.hidden)) .page>.topbar{display:none
 .list-wrap{padding:0 22px 22px}
 .list-wrap th{font-size:12px;padding:15px 13px}
 .list-wrap td{font-size:14px;padding:14px 13px}
-.therapist-name-cell strong{display:block;font-size:15px;color:#213a56}
+.therapist-name-cell strong{display:block;font-size:16px;color:#213a56;font-weight:750;line-height:1.5;overflow-wrap:anywhere}
 .therapist-name-cell small{display:block;font-size:12px;color:#788a9e;margin-top:1px}
 .therapist-name-cell span{display:block;font-size:11px;color:#7f91a4;margin-top:3px}
 .contact-status-cell{min-width:170px}
@@ -353,49 +353,46 @@ function render(){
  text($("dialogActionTitle"),cfg.action||"");
  text($("dialogActionNote"),cfg.note||"");
  const tr=document.createElement("tr");
- const heads=mode==="outside"?["店舗","源氏名","最終出勤日","対応状況","最終対応日時"]:["店舗","源氏名 / EXA ID",cfg.last,"操作"];
+ const heads=mode==="birthday"?["店舗","源氏名","誕生日","確認"]:["店舗","源氏名",cfg.last,"対応状況","最終対応日時"];
  for(const h of heads)tr.append(mk("th",h));
  $("listHead").replaceChildren(tr);$("listBody").replaceChildren();
  if(!rows.length){const row=document.createElement("tr"),cell=mk("td","該当者はいません。");cell.colSpan=heads.length;cell.className="empty";row.append(cell);$("listBody").append(row);return}
  for(const person of rows){
   const row=document.createElement("tr");
   row.append(mk("td",names[person.store]||person.store));
-  if(mode==="outside"){
-   const nameCell=document.createElement("td");nameCell.className="therapist-name-cell";
-   const raw=person.name||"名称未設定";
-   const match=/^(.+?)[-－ー]([ぁ-んァ-ヶ\s]+)[-－ー]$/.exec(raw);
-   const name=match?match[1]:raw;
-   const main=mk("strong",name);nameCell.append(main);
-   if(match){nameCell.append(mk("small",match[2].trim()))}
-   nameCell.append(mk("span","ID "+person.exa_id));
-   row.append(nameCell);
-   row.append(mk("td",person.last_date||"記録なし"));
+  const nameCell=document.createElement("td");nameCell.className="therapist-name-cell";
+  nameCell.append(mk("strong",person.name||"名称未設定"));
+  row.append(nameCell);
+  if(mode==="birthday"){
+   const offset=Number(person.offset);
+   const birthday=(person.birthday||"—")+(offset===0?"（当日）":offset<0?"（"+Math.abs(offset)+"日前）":"（"+offset+"日後）");
+   row.append(mk("td",birthday));
+   const cell=document.createElement("td"),a=document.createElement("a");a.href="../residency-management/";a.textContent="在籍管理へ";cell.append(a);row.append(cell);
+  }else{
+   let dateText=person.last_date||"記録なし";
+   if(mode==="final"){
+    dateText="—";
+    if(person.end_minutes!=null){
+     const minutes=Number(person.end_minutes),hours=Math.floor(minutes/60);
+     dateText=String(hours%24).padStart(2,"0")+":"+String(minutes%60).padStart(2,"0")+(hours>=24?"（翌日）":"");
+    }
+   }
+   row.append(mk("td",dateText));
    const status=document.createElement("td");status.className="contact-status-cell";
-   const contactKey=person.store+":"+person.exa_id;
-   const at=contacts.get(contactKey);
-   const overdue=at&&Date.now()-Date.parse(at)>=24*60*60*1000;
+   const at=contacts.get(person.store+":"+person.exa_id);
+   const overdue=mode==="outside"&&at&&Date.now()-Date.parse(at)>=24*60*60*1000;
    const label=document.createElement("label");label.className="contact-check";
    const check=document.createElement("input");check.type="checkbox";check.checked=!!at;check.disabled=contactSaving;
    check.dataset.contactStore=person.store;check.dataset.contactExaId=String(person.exa_id);
-   label.append(check,mk("span","連絡済み"));status.append(label);
-   const note=mk("div",!at?"未対応":overdue?"再連絡が必要":"連絡済み・未確定");
-   note.className="contact-state "+(!at?"state-pending":overdue?"state-overdue":"state-followup");
-   status.append(note);
+   label.append(check,mk("span",mode==="final"?"対応済み":"連絡済み"));status.append(label);
+   const description=!at?"未対応":overdue?"再連絡が必要":mode==="final"?"対応済み・次回未定":"連絡済み・未確定";
+   const note=mk("div",description);note.className="contact-state "+(!at?"state-pending":overdue?"state-overdue":"state-followup");status.append(note);
    if(overdue){
     const again=mk("button","再連絡済みにする");again.type="button";again.className="recontact-button";again.disabled=contactSaving;
     again.dataset.recontactStore=person.store;again.dataset.recontactExaId=String(person.exa_id);status.append(again);
    }
    row.append(status);
    const timeCell=mk("td",at?formatContactTime(at):"—");timeCell.className="contact-time";row.append(timeCell);
-  }else{
-   row.append(mk("td",(person.name||"名称未設定")+"｜ID "+person.exa_id));
-   let v="—";
-   if(mode==="final"&&person.end_minutes!==null){const minutes=Number(person.end_minutes);const hours=Math.floor(minutes/60);v=String(hours%24).padStart(2,"0")+":"+String(minutes%60).padStart(2,"0")+(hours>=24?"（翌日）":"")}
-   if(mode==="birthday"){const offset=Number(person.offset);v=(person.birthday||"—")+(offset===0?"（当日）":offset<0?"（"+Math.abs(offset)+"日前）":"（"+offset+"日後）")}
-   row.append(mk("td",v));
-   const cell=document.createElement("td"),a=document.createElement("a");
-   a.href=mode==="birthday"?"../residency-management/":(links[person.store]||"../exa-shifts/");
-   a.textContent=mode==="birthday"?"在籍管理へ":"出勤管理へ";cell.append(a);row.append(cell);
   }
   $("listBody").append(row);
  }
