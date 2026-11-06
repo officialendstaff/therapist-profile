@@ -369,7 +369,7 @@ footer{display:none}
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
 <a href="../management-top/" style="color:#fff;border:1px solid #56718d;border-radius:5px;padding:7px 10px;font-size:11px;text-decoration:none;font-weight:700">総合TOP</a>
-<label class="store-label">店舗 <select id="storeSelect" aria-label="店舗切替"><option value="grand-luxe">Grand Luxe</option><option value="luxy-osaka">LUXY OSAKA</option><option value="rose">薔薇と紳士</option><option value="un-secret">Un Secret</option><option value="busty-osaka">BUSTY OSAKA</option></select></label>
+<label class="store-label">店舗 <select id="storeSelect" aria-label="店舗切替"><option value="grand-luxe">Grand Luxe</option><option value="luxy-osaka">LUXY OSAKA</option><option value="rose" selected>薔薇と紳士</option><option value="un-secret">Un Secret</option><option value="busty-osaka">BUSTY OSAKA</option></select></label>
 <div class="head-month"><button id="prev" title="前月">◀</button><strong id="monthLabel"></strong><button id="next" title="翌月">▶</button></div>
 <button id="exaSync" class="primary" title="EXAサーバーから30日分を直接取得・反映">今すぐ更新</button>
 <details class="settings-menu"><summary>その他 <span aria-hidden="true">▾</span></summary><div class="settings-panel">
@@ -1138,6 +1138,7 @@ $("csvFile").onchange=async e=>{
 $("closeDay").onclick=()=>{$("dayPanel").classList.add("hide")};
 $("dayBackdrop").onclick=$("closeDay").onclick;
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){$("dayPanel").classList.add("hide");closeCount();closeResidency();}});
+$("storeSelect").value="rose";
 $("storeSelect").onchange=()=>{const store=$("storeSelect").value;if(store!=="rose")location.href="./"+store+"/";};
 document.querySelectorAll("[data-show-staff]").forEach(b=>b.onclick=()=>{
  staffView=b.dataset.showStaff;
