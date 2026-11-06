@@ -533,7 +533,14 @@ if(error||access.error||access.data!==true||!data||!data.approved_at||!["master"
   authorized=false;$("app").classList.add("hide");location.replace("/therapist-profile/staff/management-top/");$("loginError").textContent="このページへの権限がありません。";return;
 }
 const homeName=document.getElementById("lgHeaderHomeLabel");if(homeName)homeName.textContent=(data.display_name||"管理")+" TOP";
-authorized=true;$("login").classList.add("hide");$("app").classList.remove("hide");$("logout").classList.remove("hide");$("authLabel").textContent="認証済み";await load();}
+authorized=true;$("login").classList.add("hide");$("app").classList.remove("hide");$("logout").classList.remove("hide");$("authLabel").textContent="認証済み";await load();
+// LUXY EXA Chrome panel opens this page with a one-use sync request; authorization is checked above.
+const params=new URL(location.href);
+if(params.searchParams.get("exa_sync")==="1"){
+  params.searchParams.delete("exa_sync");history.replaceState(null,"",params.pathname+params.search+params.hash);
+  void synchronizeEXA("manual");
+}
+}
 $("loginForm").onsubmit=async e=>{e.preventDefault();$("loginError").textContent="確認中…";const {error}=await client.auth.signInWithPassword({email:$("email").value,password:$("password").value});if(error){$("loginError").textContent="ログインできません。入力情報をご確認ください。";return;}$("loginError").textContent="";await loginCheck()};
 $("logout").onclick=async()=>{await client.auth.signOut();sessionStorage.removeItem("mattan-recruit-auth");location.reload()};
 async function load(){
