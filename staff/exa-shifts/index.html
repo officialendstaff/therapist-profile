@@ -448,7 +448,7 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 
 <p id="message" class="muted" role="status" aria-live="polite"></p>
 
-<div class="panel monthly-panel"><div class="row space month-heading"><h2>月間シフト</h2><div class="shift-status-legend" aria-label="区分別配色の凡例"><span><i class="swatch provisional"></i>仮登</span><span><i class="swatch paperwork"></i>書類</span><span><i class="swatch leave"></i>長休</span><span><i class="swatch outside"></i>実外</span><span><i class="swatch dummy"></i>ダミー</span></div><div class="staff-filter" role="group" aria-label="表示区分"><button type="button" data-show-staff="real" class="active">実働</button><button type="button" data-show-staff="dummy">ダミー</button><button type="button" data-show-staff="all">全件</button></div></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
+<div class="panel monthly-panel"><div class="row space month-heading"><h2>月間シフト</h2><div class="shift-status-legend" aria-label="区分別配色の凡例"><span><i class="swatch provisional"></i>仮登</span><span><i class="swatch paperwork"></i>書類</span><span><i class="swatch leave"></i>長休</span><span><i class="swatch outside"></i>実外</span><span><i class="swatch dummy"></i>ダミー</span></div><div class="staff-filter" role="group" aria-label="表示区分"><button type="button" data-show-staff="real" class="active">在籍</button><button type="button" data-show-staff="dummy">退店</button><button type="button" data-show-staff="all">全件</button></div></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
 <div id="residencyModal" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="residencyTitle">
 <div id="residencyShade" class="day-modal-shade"></div>
 <div class="panel residency-dialog therapist-detail-dialog">
@@ -494,6 +494,7 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
    <option value="real_working">在籍実働</option>
    <option value="long_leave">長期休暇</option>
    <option value="dummy_use">ダミー使用</option>
+   <option value="not_used">HPから削除（退店）</option>
   </select>
   <p class="muted">「実働外」は今後の出勤予定がない場合に自動判定します。区分変更は出勤管理内の登録内容のみ更新し、EXA本体の表示設定は変更しません。EXAの表示／非表示情報との自動同期は未接続です。</p>
   <div class="row space"><button id="residencyCancel" type="button">閉じる</button><button id="residencySave" class="primary" type="button">区分変更を確定</button></div>
@@ -553,7 +554,7 @@ client.from("exa_rose_roster_current").select("exa_id,roster_name")
 const err=[a,b,c,d,e,future,sv,sl,roster].find(r=>r.error)?.error;
 if(err){showMsg("読み込みエラー："+err.message,true);return;}
 rosterIds=new Set((roster.data||[]).map(r=>r.exa_id));
-therapists=(a.data||[]).filter(t=>rosterIds.has(t.exa_id));shifts=b.data||[];performances=c.data||[];historyPerformances=e.data||[];futureShifts=future.data||[];
+therapists=(a.data||[]).filter(t=>rosterIds.has(t.exa_id)||t.operating_category==="not_used");shifts=b.data||[];performances=c.data||[];historyPerformances=e.data||[];futureShifts=future.data||[];
 surveyScores=sv.data||[];surveyLinks=sl.data||[];
 $("monthLabel").textContent=month.replace("-","年")+"月";
 $("message").textContent="";
@@ -587,7 +588,7 @@ function renderMonthly(){
 const existing=staffById(), byId=new Map();
 for(const r of shifts){if(!byId.has(r.exa_id))byId.set(r.exa_id,new Map());byId.get(r.exa_id).set(r.work_date,r);}
 const real=therapists.filter(t=>t.operating_category!=="not_used"&&t.operating_category!=="dummy_use").sort((a,b)=>a.exa_id-b.exa_id);
-const dummy=therapists.filter(t=>t.operating_category==="dummy_use").sort((a,b)=>a.exa_id-b.exa_id);
+const dummy=therapists.filter(t=>t.operating_category==="dummy_use"||t.operating_category==="not_used").sort((a,b)=>a.exa_id-b.exa_id);
 const per=new Map(performances.map(p=>[p.exa_id+"|"+p.work_date,p.customer_count]));
 const absence=new Set(performances.filter(p=>p.attendance_status==="absent").map(p=>p.exa_id+"|"+p.work_date));
 const dayCounts=new Map();
@@ -598,7 +599,7 @@ for(let n=1;n<=daysIn();n++){
  const dummyTotal=r.filter(x=>rosterIds.has(x.exa_id)&&existing.get(x.exa_id)?.operating_category!=="not_used"&&(x.is_dummy_shift||isDummy(existing.get(x.exa_id)||{}))).length;
  dayCounts.set(date,{real:active,dummy:dummyTotal,all:active+dummyTotal});
 }
-const countHeader=staffView==="real"?"実働（"+real.length+"名）":staffView==="dummy"?"ダミー（"+dummy.length+"名）":"実働（"+real.length+"名）／ダミー（"+dummy.length+"名）";
+const countHeader=staffView==="real"?"在籍（"+real.length+"名）":staffView==="dummy"?"退店（"+dummy.length+"名）":"在籍（"+real.length+"名）／退店（"+dummy.length+"名）";
 let html='<thead><tr><th class="staff-heading" rowspan="2"><span>'+countHeader+'</span></th>';
 if(staffView==="dummy")html+='<th class="stat-heading" rowspan="2">登録曜日</th><th class="stat-heading" rowspan="2">出勤</th><th class="stat-heading" rowspan="2">退勤</th>';
 else html+='<th class="stat-heading" rowspan="2">稼働</th><th class="stat-heading" rowspan="2">出勤</th><th class="stat-heading" rowspan="2">無報</th><th class="stat-heading" rowspan="2">評価</th>';
@@ -606,7 +607,7 @@ for(let n=1;n<=daysIn();n++){const d=dayStr(n),kind=dayType(d);html+='<th class=
 html+='</tr><tr class="daily-totals">';
 for(let n=1;n<=daysIn();n++){const d=dayStr(n),kind=dayType(d);html+='<th class="day-total '+kind+(d===today()?" today-marker":"")+'" title="その日の出勤人数">'+dayCounts.get(d)[staffView]+'人</th>';}
 html+='</tr></thead><tbody>';
-for(const [label,list,group] of [["実働",real,"real"],["ダミー",dummy,"dummy"]]){if(staffView!=="all"&&staffView!==group)continue;
+for(const [label,list,group] of [["在籍",real,"real"],["退店",dummy,"dummy"]]){if(staffView!=="all"&&staffView!==group)continue;
 if(staffView==="all")html+='<tr class="group"><td colspan="'+(daysIn()+5)+'">'+label+"（"+list.length+"名）</td></tr>";
 for(const t of list){const entries=byId.get(t.exa_id)||new Map(),valid=[...entries.values()].filter(r=>r.work_date<today()&&(!isDummy(t))&&!r.is_dummy_shift&&per.has(t.exa_id+"|"+r.work_date));const historical=historyPerformances.filter(p=>p.exa_id===t.exa_id&&p.attendance_status!=="absent");const avg=historical.length?(historical.reduce((sum,p)=>sum+p.customer_count,0)/historical.length).toFixed(1):"—";
 const rawName=String(t.stage_name||"ID "+t.exa_id);
@@ -905,8 +906,8 @@ function openResidency(button){
  if(!person)return;
  editingResidency={exaId,old:person.operating_category,name:person.stage_name};
  $("residencyTitle").textContent="セラピスト詳細";
- $("residencyInfo").textContent=person.stage_name+"（EXA ID："+exaId+"）／区分："+({unclassified:"未判定",provisional_hidden:"仮登録",pending_documents:"未入店（書類未完備）",real_working:"在籍実働",real_outside:"実働外（旧区分）",long_leave:"長期休暇",dummy_use:"ダミー使用",not_used:"対象外"}[person.operating_category]||"未設定");
- $("residencyChoice").value=["provisional_hidden","pending_documents","real_working","long_leave","dummy_use"].includes(person.operating_category)?person.operating_category:"unclassified";
+ $("residencyInfo").textContent=person.stage_name+"（EXA ID："+exaId+"）／区分："+({unclassified:"未判定",provisional_hidden:"仮登録",pending_documents:"未入店（書類未完備）",real_working:"在籍実働",real_outside:"実働外（旧区分）",long_leave:"長期休暇",dummy_use:"ダミー使用",not_used:"HPから削除（退店）"}[person.operating_category]||"未設定");
+ $("residencyChoice").value=["provisional_hidden","pending_documents","real_working","long_leave","dummy_use","not_used"].includes(person.operating_category)?person.operating_category:"unclassified";
  $("residencyModal").classList.remove("hide");
  showTherapistPhoto(exaId);
  loadPersonRegistry(exaId);
@@ -924,7 +925,7 @@ $("residencyShade").onclick=closeResidency;
 $("residencySave").onclick=async()=>{
  if(!editingResidency||!authorized)return;
  const category=$("residencyChoice").value;
- const labels={provisional_hidden:"仮登録（EXA非表示）",pending_documents:"未入店（書類未完備）",real_working:"在籍実働",long_leave:"長期休暇",dummy_use:"ダミー使用"};
+ const labels={provisional_hidden:"仮登録（EXA非表示）",pending_documents:"未入店（書類未完備）",real_working:"在籍実働",long_leave:"長期休暇",dummy_use:"ダミー使用",not_used:"HPから削除（退店）"};
  if(!Object.prototype.hasOwnProperty.call(labels,category))return;
  const person=therapists.find(t=>t.exa_id===editingResidency.exaId);
  if(!person)return;
