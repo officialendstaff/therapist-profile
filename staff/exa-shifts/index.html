@@ -557,7 +557,7 @@ const lastKnownDate=latestDates.length?latestDates[latestDates.length-1]:null;
 const days=[...entries.values()].filter(r=>!r.is_dummy_shift).length;
 const zeros=valid.filter(r=>!absence.has(t.exa_id+"|"+r.work_date)&&per.get(t.exa_id+"|"+r.work_date)===0).length;
 const categoryClass={provisional_hidden:"state-provisional",pending_documents:"state-paperwork",long_leave:"state-leave",dummy_use:"state-dummy"}[t.operating_category]||(group==="dummy"?"state-dummy":"");
-html+='<tr class="'+(outside?'outside-roster':'')+'"><td class="staff-name '+categoryClass+'"><button type="button" class="name-editor" data-staff-id="'+t.exa_id+'" title="出勤管理区分を変更">'+safe(stageName)+'</button><span class="staff-exa-id" title="EXA管理ID">ID '+t.exa_id+'</span>'+(kana?'<span class="reading">'+safe(kana)+'</span>':'')'</td>';
+html+='<tr class="'+(outside?'outside-roster':'')+'"><td class="staff-name '+categoryClass+'"><button type="button" class="name-editor" data-staff-id="'+t.exa_id+'" title="出勤管理区分を変更">'+safe(stageName)+'</button><span class="staff-exa-id" title="EXA管理ID">ID '+t.exa_id+'</span>'+(kana?'<span class="reading">'+safe(kana)+'</span>':'')+'</td>';
 const surveyId=surveyLinks.find(l=>l.exa_id===t.exa_id)?.sheet_person_id;
 const survey=surveyScores.find(x=>x.sheet_person_id===surveyId);
 const responseCount=survey?.response_count??0;
