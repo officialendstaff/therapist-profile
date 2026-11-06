@@ -135,6 +135,18 @@ body:has(.lg-interview-login:not(.hide):not(.hidden)) .page>.topbar{display:none
 .dashboard .panel:nth-child(3) .sub{font-size:12px;font-weight:500;color:#777974}
 #dialogSub{font-size:14px;font-weight:750;line-height:1.6;color:#244C70}
 #overlay:has(#dialogTitle:not(:empty)) .dialog-head{align-items:flex-start}
+
+/* Clearly differentiated staff action guidance in operational popups. */
+.dialog-action{display:flex;flex-direction:column;gap:5px;padding:17px 22px 16px;border-bottom:1px solid #e4eaf1;border-left:5px solid #446a92;background:#edf4fb}
+.dialog-action strong{font-size:18px;line-height:1.45;font-weight:850;letter-spacing:.015em;color:#244b72}
+.dialog-action span{font-size:12px;line-height:1.5;color:#435c76}
+.dialog-action.urgent{background:#fff1ed;border-left-color:#cf6844;border-bottom-color:#f4d7cb}
+.dialog-action.urgent strong{color:#ae3e25}
+.dialog-action.urgent span{color:#874a3b}
+.dialog-action.followup{background:#eef5fd;border-left-color:#477da8}
+.dialog-action.followup strong{color:#285c86}
+.dialog-head p:empty{display:none}
+@media(max-width:530px){.dialog-action{padding:13px 15px}.dialog-action strong{font-size:16px}}
 </style></head>
 <body>
 <header><div class="brand">L GROUP<small>MANAGEMENT SYSTEM</small></div><div class="header-right"><span id="userName"></span><button id="logout" class="hidden">ログアウト</button></div></header>
@@ -159,6 +171,7 @@ body:has(.lg-interview-login:not(.hide):not(.hidden)) .page>.topbar{display:none
 <div id="overlay" class="overlay hidden" role="presentation">
  <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
   <div class="dialog-head"><div><h2 id="dialogTitle">一覧</h2><p id="dialogSub"></p></div><button class="close" id="close" aria-label="閉じる">閉じる ×</button></div>
+  <div id="dialogAction" class="dialog-action hidden" role="note"><strong id="dialogActionTitle"></strong><span id="dialogActionNote"></span></div>
   <div class="filters"><input id="search" type="search" placeholder="源氏名・EXA IDで検索" aria-label="一覧内を検索"><select id="storeFilter" aria-label="店舗を絞り込む">
    <option value="all">全店舗</option><option value="rose">薔薇と紳士</option><option value="busty">BUSTY OSAKA</option><option value="grandluxe">Grand Luxe</option><option value="luxy">LUXY OSAKA</option><option value="unsecret">Un Secret</option></select></div>
   <div class="list-wrap"><table><thead id="listHead"></thead><tbody id="listBody"></tbody></table></div>
@@ -215,14 +228,20 @@ async function load(){
  finally{$("refresh").disabled=false}
 }
 const configs={
- final:{title:"最終出勤",sub:"退勤までに、必ず次回シフトを確認してください。",key:"final_today",last:"本日の退勤"},
- outside:{title:"実働外",sub:"本人に連絡し、次回出勤予定を確保してください。",key:"outside",last:"最終出勤日"},
+ final:{title:"本日が最終出勤",sub:"",action:"退勤までに次回シフトを決める！",note:"退勤時刻を確認し、本人と次回の出勤日を調整してください。",key:"final_today",last:"本日の退勤"},
+ outside:{title:"次回出勤未定",sub:"",action:"本人に連絡して次回出勤を確保！",note:"対象者に連絡し、次回出勤の予定を確認してください。",key:"outside",last:"最終出勤日"},
  birthday:{title:"誕生日",sub:"誕生日の前後3日間",key:"birthday",last:"誕生日"}
 };
 function render(){
  if(!mode)return;const cfg=configs[mode],q=$("search").value.trim().toLowerCase(),store=$("storeFilter").value;
  const rows=(data[cfg.key]||[]).filter(r=>(store==="all"||r.store===store)&&(!q||String(r.name||"").toLowerCase().includes(q)||String(r.exa_id||"").includes(q)));
- text($("dialogTitle"),cfg.title+"｜"+rows.length+"名");text($("dialogSub"),cfg.sub);
+ text($("dialogTitle"),cfg.title+"｜"+rows.length+"名");text($("dialogSub"),cfg.sub||"");
+ const actionBox=$("dialogAction");
+ actionBox.classList.toggle("hidden",!cfg.action);
+ actionBox.classList.toggle("urgent",mode==="final");
+ actionBox.classList.toggle("followup",mode==="outside");
+ text($("dialogActionTitle"),cfg.action||"");
+ text($("dialogActionNote"),cfg.note||"");
  const tr=document.createElement("tr");
  for(const h of ["店舗","源氏名 / EXA ID",cfg.last,"操作"])tr.append(mk("th",h));
  $("listHead").replaceChildren(tr);$("listBody").replaceChildren();
