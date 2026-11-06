@@ -34,6 +34,25 @@ button.primary{background:#28659a;color:#fff;border-color:#28659a}.muted{font-si
 .shift-table tbody tr:not(.group) td.staff-name.state-paperwork{background:#F8D1E5!important;color:#96365C!important;box-shadow:inset 4px 0 #D44F96}
 .shift-table tbody tr:not(.group) td.staff-name.state-leave{background:#D3F2E2!important;color:#237C55!important;box-shadow:inset 4px 0 #35A77A}
 @media(max-width:900px){.shift-status-legend{gap:6px;margin-left:6px;font-size:9px}}
+
+/* Shared L GROUP management sign-in visual system. Restricted to login state. */
+body:has(#login:not(.hide)){background:#F6F5F2!important}
+body:has(#login:not(.hide)) header{background:#17283E!important;border-bottom:2px solid #C4A06A!important}
+body:has(#login:not(.hide)) header .head-controls,
+body:has(#login:not(.hide)) header .controls,
+body:has(#login:not(.hide)) header .header-menu{display:none!important}
+#login.lg-login-shell:not(.hide){box-sizing:border-box!important;display:grid!important;place-items:center!important;min-height:calc(100vh - 73px)!important;max-width:none!important;width:100%!important;margin:0!important;padding:26px 16px 56px!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+#login.lg-login-shell .lg-login-card{box-sizing:border-box;width:min(430px,100%);background:#fff;border:1px solid #E5DFD5;border-radius:15px;padding:32px;box-shadow:0 18px 48px #17283e13}
+#login.lg-login-shell .lg-login-card h2{font-size:23px;font-weight:800;color:#17283E;line-height:1.4;margin:0 0 8px!important}
+#login.lg-login-shell .lg-login-card .lg-login-copy{font-size:12px;font-weight:400;color:#657991;line-height:1.55;margin:0 0 26px!important}
+#login.lg-login-shell #loginForm{display:block!important}
+#login.lg-login-shell #loginForm label{display:block!important;font-size:12px!important;font-weight:700!important;color:#283344!important;margin:14px 0!important}
+#login.lg-login-shell #loginForm input{box-sizing:border-box!important;display:block!important;width:100%!important;min-height:44px!important;background:#fff!important;color:#20314A!important;border:1px solid #CBD8E6!important;border-radius:7px!important;padding:12px!important;margin:7px 0 0!important;font-size:14px!important}
+#login.lg-login-shell #loginForm input:focus{outline:2px solid #B89B6D!important;outline-offset:1px}
+#login.lg-login-shell #loginForm button{box-sizing:border-box!important;display:block!important;width:100%!important;min-height:45px!important;background:#17283E!important;color:#fff!important;border:1px solid #17283E!important;border-radius:8px!important;padding:12px 18px!important;margin:18px 0 0!important;font-size:13px!important;font-weight:700!important;cursor:pointer!important}
+#login.lg-login-shell #loginForm button:hover{background:#253C58!important}
+#login.lg-login-shell #loginError{color:#AE3449!important;min-height:17px!important;font-size:12px!important;margin:12px 0 0!important}
+@media(max-width:530px){#login.lg-login-shell .lg-login-card{padding:25px 22px}#login.lg-login-shell:not(.hide){padding:16px 12px 42px!important}}
 </style></head>
 <body>
 <header><div class="brand"><h1>出勤管理</h1><span>SHIFT MANAGEMENT</span></div><div class="controls">
@@ -43,7 +62,7 @@ button.primary{background:#28659a;color:#fff;border-color:#28659a}.muted{font-si
 <button class="primary" disabled title="店舗別EXA同期は未接続です">今すぐ更新</button>
 <button id="reload" class="headerbtn">保存データを再読込</button>
 <button id="logout" class="headerbtn hide">ログアウト</button></div></header>
-<section id="login" class="panel hide"><h2>スタッフログイン</h2><p class="muted">面接管理で使用する承認済み管理者アカウントでログインしてください。</p><form id="loginForm"><label>メールアドレス<input id="email" type="email" autocomplete="username" required></label><label>パスワード<input id="password" type="password" autocomplete="current-password" required></label><button class="primary">ログイン</button></form><p class="error" id="loginError"></p></section>
+<section id="login" class="lg-login-shell hide"><div class="lg-login-card"><h2>管理システム ログイン</h2><p class="lg-login-copy">管理者アカウントでログインしてください。</p><form id="loginForm"><label for="email">メールアドレス<input id="email" type="email" autocomplete="username" required></label><label for="password">パスワード<input id="password" type="password" autocomplete="current-password" required></label><button class="primary" type="submit">ログイン</button></form><p id="loginError" class="error" role="alert"></p></div></section>
 <main id="app" class="hide">
 <div class="notice">この店舗の出勤管理ページは準備済みです。EXA直接同期・CSV取込・接客本数編集・画像登録・アンケート連携は未接続です。薔薇と紳士のデータにはアクセスしません。</div>
 
