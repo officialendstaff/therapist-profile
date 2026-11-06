@@ -1024,29 +1024,18 @@ const RETRY_MS=30*60*1000;
 let autoEnabled=localStorage.getItem(AUTO_KEY)==="on";
 const asTokyoDate=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
 function paintAuto(){
- $("autoSync").disabled=false;
  $("autoSync").textContent=autoEnabled?"ブラウザ自動：ON":"ブラウザ自動：OFF";
- $("autoSync").title="薔薇と紳士と同様に、管理ページ表示中は3時間ごとにEXAサーバー同期APIを呼び出します。接続が検証できるまではONにできません。";
+ $("autoSync").title="薔薇と紳士と同じ方式：このページを開いている間、3時間ごとにEXAサーバーへの同期を試みます。Grand LuxeのEXAサーバー接続は未検証で、ページを閉じた状態の定期実行は未設定です。";
  $("autoSync").setAttribute("aria-pressed",String(autoEnabled));
 }
 paintAuto();
-$("autoSync").onclick=async()=>{
+$("autoSync").onclick=()=>{
  if(!authorized)return;
- if(!autoEnabled){
-  const {data,error}=await client.rpc("exa_server_sync_is_permitted",{p_store:"grandluxe"});
-  if(error||data!==true){
-   autoEnabled=false;
-   localStorage.setItem(AUTO_KEY,"off");
-   paintAuto();
-   showMsg("Grand Luxeのサーバー同期は接続未検証のため、自動更新は有効にできません。",true);
-   return;
-  }
- }
  autoEnabled=!autoEnabled;
  localStorage.setItem(AUTO_KEY,autoEnabled?"on":"off");
  if(autoEnabled&&!localStorage.getItem(LAST_KEY))localStorage.setItem(LAST_KEY,String(Date.now()));
  paintAuto();
- showMsg(autoEnabled?"3時間自動更新を有効にしました。管理ページ表示中、EXAサーバーへ更新を要求します。":"3時間自動更新を停止しました。");
+ showMsg(autoEnabled?"ブラウザ自動：ON。薔薇と紳士と同じく画面表示中に3時間間隔で同期を試みます。ただしEXAサーバー接続は未検証で、成功は保証されません。":"ブラウザ自動：OFF。画面表示中の3時間自動同期を停止しました。");
 };
 const bridgeRequests=new Map();
 let syncAbortRequested=false;
@@ -1117,7 +1106,7 @@ async function synchronizeEXA(mode="manual"){
  }
 }
 async function checkAuto(){
- if(!authorized||!autoEnabled||extensionBusy||document.hidden)return;
+ if(!autoEnabled||!authorized||extensionBusy)return;
  const now=Date.now(),last=Number(localStorage.getItem(LAST_KEY)||0),attempt=Number(localStorage.getItem(ATTEMPT_KEY)||0);
  if(!last){localStorage.setItem(LAST_KEY,String(now));return}
  if(now-last<AUTO_MS||now-attempt<RETRY_MS)return;
