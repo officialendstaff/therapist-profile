@@ -120,7 +120,7 @@ $("dayPanel").onclick=e=>{if(e.target===$("dayPanel"))$("closeDay").click()};
  const normalHeading=currentHeader?.textContent||"月間シフト";
  const tableWrap=list.closest(".table-scroll, .scroll")||list.parentElement;
  const archive=document.createElement("div");archive.className="exa-departure-wrap hide";
- archive.innerHTML='<div class="exa-departure-info">EXAから削除されたことを管理者が確認し、ダミー利用も終了した退店者を保管します。削除を検出しただけでは退店確定しません。過去のシフト・接客履歴は削除しません。</div><div class="exa-departure-tools"><button type="button" id="exaDepartureDetect">EXA削除を記録</button><button type="button" id="exaDepartureRefresh">一覧を更新</button></div><div id="exaDepartureMessage" role="status" aria-live="polite"></div><div style="overflow:auto"><table class="exa-departure-table"><thead><tr><th>源氏名・EXA ID</th><th>状態</th><th>記録日時</th><th>操作</th></tr></thead><tbody id="exaDepartureRows"></tbody></table></div>';
+ archive.innerHTML='<div class="exa-departure-info">EXAから削除されたことを管理者が確認し、ダミー利用も終了した退店者を保管します。削除を検出しただけでは退店確定しません。過去のシフト・接客履歴は削除しません。</div><div class="exa-departure-tools"><button type="button" id="exaDepartureDetect">EXA削除を記録</button><button type="button" id="exaDepartureRefresh">一覧を更新</button></div><div id="exaDepartureMessage" role="status" aria-live="polite"></div><div style="overflow:auto"><table class="exa-departure-table"><thead><tr><th>源氏名・EXA ID</th><th>状態</th><th>記録日時</th><th>過去出勤</th><th>接客本数</th><th>当欠</th><th>評価</th><th>操作</th></tr></thead><tbody id="exaDepartureRows"></tbody></table></div>';
  panel.append(archive);
  const msg=archive.querySelector("#exaDepartureMessage"),tbody=archive.querySelector("#exaDepartureRows");
  const selected=()=>[...document.querySelectorAll("["+FILTER_ATTR+"]")].find(b=>b.classList.contains("active"))?.getAttribute(FILTER_ATTR)==="retired";
@@ -157,13 +157,21 @@ $("dayPanel").onclick=e=>{if(e.target===$("dayPanel"))$("closeDay").click()};
     .eq("store_code",STORE).in("state",["deleted_detected","confirmed_departed"]).order("updated_at",{ascending:false});
    if(error)throw error;
    const records=data||[];
+   const historical=await client.rpc("exa_departure_archive_summary",{p_store:STORE});
+   if(historical.error)throw historical.error;
+   const metrics=new Map((historical.data||[]).map(x=>[Number(x.exa_id),x]));
    msg.textContent="退店確定："+records.filter(x=>x.state==="confirmed_departed").length+"名／EXA削除確認待ち："+records.filter(x=>x.state==="deleted_detected").length+"名";
-   if(!records.length){const tr=document.createElement("tr"),td=el("td","記録された退店者はいません。シフト未登録者は自動的に退店とは判定しません。");td.colSpan=4;td.className="exa-departure-empty";tr.append(td);tbody.append(tr);return;}
+   if(!records.length){const tr=document.createElement("tr"),td=el("td","記録された退店者はいません。シフト未登録者は自動的に退店とは判定しません。");td.colSpan=8;td.className="exa-departure-empty";tr.append(td);tbody.append(tr);return;}
    for(const r of records){
     const tr=document.createElement("tr");
     tr.append(el("td",(r.stage_name_snapshot||"未記入")+"｜ID "+r.exa_id));
     const state=el("td",r.state==="confirmed_departed"?"退店確定":"EXA削除確認待ち");state.className="exa-departure-state";tr.append(state);
     tr.append(el("td",dateFmt(r.confirmed_at||r.detected_at)));
+    const m=metrics.get(Number(r.exa_id))||{};
+    tr.append(el("td",String(m.shift_days??0)+"日"));
+    tr.append(el("td",String(m.total_customers??0)+"本"));
+    tr.append(el("td",String(m.absent_days??0)+"日"));
+    tr.append(el("td",m.evaluation_score==null?"—":String(m.evaluation_score)));
     const actions=document.createElement("td");
     if(r.state==="deleted_detected")actions.append(button("退店確定",()=>manage(r.exa_id,"confirm")));
     actions.append(button("記録を取り消し・復帰",()=>manage(r.exa_id,"restore")));
