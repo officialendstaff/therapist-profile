@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>L GROUP 予約チャット｜画面試作</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Yu Gothic",sans-serif;color:#27272a;background:#f4f4f5}*{box-sizing:border-box}body{margin:0}main{max-width:500px;margin:0 auto;min-height:100vh;background:white;display:flex;flex-direction:column}header{padding:18px;background:#17202d;color:#fff;display:flex;align-items:center;justify-content:space-between}header small{display:block;color:#b8c5d1;margin-top:5px}select{padding:8px;border:1px solid #a3a3a3;border-radius:8px;background:#fff}#thread{padding:18px;flex:1;min-height:50vh;display:flex;flex-direction:column;gap:14px;overflow-y:auto;background:#f6f7f9}.msg{max-width:87%;border-radius:15px;padding:12px 14px;white-space:pre-wrap;line-height:1.65;font-size:14px;overflow-wrap:anywhere}.shop{align-self:flex-start;background:white;border:1px solid #e3e5e8}.guest{align-self:flex-end;background:#dcefe7}.foot{border-top:1px solid #eee;padding:12px}form{display:flex;gap:8px}textarea{resize:vertical;min-height:45px;max-height:130px;flex:1;border:1px solid #bbb;border-radius:10px;padding:11px;font:inherit;font-size:14px}button{background:#17202d;color:white;border:0;border-radius:10px;padding:10px 17px;font-weight:bold;cursor:pointer}button:disabled{opacity:.45}.note{font-size:11px;line-height:1.65;color:#71717a;margin:0 0 10px}#notice{padding:10px 18px;font-size:12px;background:#fff6d9;color:#6c4e13;border-bottom:1px solid #eee}.tools{padding:12px 18px;display:flex;gap:10px;align-items:center}.tools button{font-size:12px;background:#52525b}#mode{font-size:11px;color:#71717a}a{color:#315b9c}
+</style></head><body><main>
+<header><div><strong id="storeTitle">Grand Luxe</strong><small>ご予約・お問い合わせ</small></div><select id="store" aria-label="店舗切替"></select></header>
+<div id="notice">試作画面です。実際の店舗には送信されません。氏名・電話番号などの個人情報を入力しないでください。</div>
+<div class="tools"><span id="mode">登録不要でお問い合わせできます</span><button type="button" id="reset">試作履歴を削除</button></div>
+<section id="thread" role="log" aria-label="チャット履歴" aria-live="polite"></section>
+<div class="foot"><p class="note">予約はメッセージ送信だけでは確定しません。実運用では店舗スタッフが予約時に氏名・携帯番号を確認し、新規のお客様には電話確認を行います。</p>
+<form id="composer"><textarea id="message" maxlength="1000" placeholder="お問い合わせ内容を入力" required></textarea><button id="send" type="submit">送信</button></form></div>
+</main><script>
+"use strict";
+const stores=[["grand-luxe","Grand Luxe"],["luxy-osaka","LUXY OSAKA"],["bara-to-shinshi","薔薇と紳士"],["un-secret","Un Secret"],["busty-osaka","BUSTY OSAKA"]];
+const query=new URLSearchParams(location.search);
+const storeSelect=document.getElementById("store"), thread=document.getElementById("thread");
+for(const [id,name] of stores){const option=document.createElement("option");option.value=id;option.textContent=name;storeSelect.append(option)}
+const initial=query.get("store");storeSelect.value=stores.some(x=>x[0]===initial)?initial:stores[0][0];
+function key(){return "lgroup-chat-prototype:"+storeSelect.value}
+function read(){try{const data=JSON.parse(localStorage.getItem(key())||"[]");return Array.isArray(data)?data.filter(x=>["guest","shop"].includes(x.who)&&typeof x.text==="string").slice(-100):[]}catch{return []}}
+function write(data){try{localStorage.setItem(key(),JSON.stringify(data.slice(-100)))}catch{}}
+function bubble(who,value){const el=document.createElement("div");el.className="msg "+who;el.textContent=value;thread.appendChild(el)}
+function render(){const name=stores.find(x=>x[0]===storeSelect.value)[1];document.getElementById("storeTitle").textContent=name;thread.replaceChildren();bubble("shop","お問い合わせありがとうございます。\nご予約・ご質問はこちらからどうぞ。");read().forEach(m=>bubble(m.who,m.text));thread.scrollTop=thread.scrollHeight;const url=new URL(location.href);url.searchParams.set("store",storeSelect.value);history.replaceState(null,"",url)}
+storeSelect.addEventListener("change",render);
+document.getElementById("reset").addEventListener("click",()=>{if(confirm("この端末の試作履歴を削除しますか？")){localStorage.removeItem(key());render()}});
+document.getElementById("composer").addEventListener("submit",event=>{event.preventDefault();const input=document.getElementById("message");const value=input.value.trim();if(!value)return;const data=read();data.push({who:"guest",text:value});write(data);input.value="";render()});
+render();
+</script></body></html>
