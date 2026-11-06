@@ -133,12 +133,12 @@ $("storeSelect").value=slug;
 $("storeSelect").onchange=()=>{const v=$("storeSelect").value;location.href=v==="rose"?"../": "../"+v+"/"};
 function shiftTime(v){if(v===null||v===undefined)return "";const h=Math.floor(v/60),m=v%60;return h+":"+pad(m)}
 function makeCell(row,value,tag="td",cls=""){const cell=document.createElement(tag);cell.textContent=value;cell.className=cls;row.append(cell);return cell}
+const isDummy=t=>t.residency==="dummy"||t.operating_category==="dummy_use";
+const isUnconfirmed=t=>t.residency==="unconfirmed"||(!isDummy(t)&&t.operating_category==="unclassified");
 function render(){
  $("monthLabel").textContent=month.replace("-","年")+"月";
  const days=dates(),table=$("monthly");table.replaceChildren();
  const head=document.createElement("tr");["源氏名","出勤","接客","当欠","評価",...days.map(d=>String(+d.slice(8))+"日")].forEach(x=>makeCell(head,x,"th"));table.append(head);
- const isDummy=t=>t.residency==="dummy"||t.operating_category==="dummy_use";
- const isUnconfirmed=t=>t.residency==="unconfirmed"||(!isDummy(t)&&t.operating_category==="unclassified");
  const wanted=staff.filter(t=>{
   const dummy=isDummy(t),unknown=isUnconfirmed(t);
   return filter==="all"||(filter==="dummy"?dummy:filter==="unconfirmed"?unknown:!dummy&&!unknown)
