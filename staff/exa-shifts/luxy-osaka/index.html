@@ -445,9 +445,11 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
  }
  body.staff-readonly #residencyChoice {cursor:default!important}
  body.staff-readonly #authLabel::after {content:" ・閲覧専用"}
- </style></head>
+ </style><style id="lg-header-interview-label-match-20261107">
+header.lg-common-header .lg-header-home{font-size:17px!important;font-weight:700!important;letter-spacing:normal!important;line-height:1.35!important}
+</style></head>
 <body>
-<header class="work-header lg-common-header"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ移動" aria-label="総合管理TOPへ移動"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span id="lgHeaderHomeLabel">総合 TOP</span></a><div class="head-controls">
+<header class="work-header lg-common-header"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ移動" aria-label="総合管理TOPへ移動"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span id="lgHeaderHomeLabel">TOP</span></a><div class="head-controls">
 <label class="store-label">店舗 <select id="storeSelect" aria-label="店舗切替"><option value="grand-luxe">Grand Luxe</option><option value="luxy-osaka" selected>LUXY OSAKA</option><option value="rose">薔薇と紳士</option><option value="un-secret">Un Secret</option><option value="busty-osaka">BUSTY OSAKA</option></select></label>
 <div class="head-month"><button id="prev" title="前月">◀</button><strong id="monthLabel"></strong><button id="next" title="翌月">▶</button></div>
 <button id="exaSync" class="primary" title="EXAサーバーから最新30日分を直接取得・反映">今すぐ更新</button>
@@ -541,7 +543,7 @@ async function staffReadOnlyLogin(){
  staffReadOnly=true;authorized=true;document.body.classList.add("staff-readonly");
  $("login").classList.add("hide");$("app").classList.remove("hide");$("logout").classList.remove("hide");
  $("authLabel").textContent="スタッフ・閲覧専用";
- const home=document.getElementById("lgHeaderHomeLabel");if(home)home.textContent="スタッフ TOP";
+ syncStaffHomeHeader();
  await load();return true;
 }
 async function staffShowPhoto(exaId){
@@ -577,6 +579,30 @@ const showMsg=(message,error=false)=>{
  el.classList.toggle("toast-visible",Boolean(message));
  if(message && !(/取得中|反映中|読み込み中/.test(message)))messageTimer=setTimeout(()=>{el.classList.remove("toast-visible");},error?10000:5200);
 };
+async function syncInterviewHomeHeader(profileFallback){
+ let name=profileFallback||"管理",profileKey="";
+ try{
+  const {data,error}=await client.rpc("interview_my_profile");
+  if(!error){
+   const p=Array.isArray(data)?data[0]:data;
+   if(p&&["owner","president","ota","festival"].includes(p.profile_key)){
+    profileKey=p.profile_key;
+    name=({owner:"村上",president:"社長",ota:"オオタ",festival:"お祭り"})[profileKey];
+   }
+  }
+ }catch(e){console.warn("面接管理プロフィール取得失敗",e)}
+ const label=document.getElementById("lgHeaderHomeLabel");if(label)label.textContent=name+" TOP";
+ const icon=document.querySelector(".lg-header-home img");
+ if(icon)icon.src="/therapist-profile/staff/interview-sheet-preview/icons/"+
+   (profileKey==="owner"?"murakami-pc.webp":"recruit-180.png");
+}
+function syncStaffHomeHeader(){
+ const label=document.getElementById("lgHeaderHomeLabel");if(label)label.textContent="TOP";
+ const icon=document.querySelector(".lg-header-home img");
+ if(icon)icon.src="/therapist-profile/staff/interview-sheet-preview/icons/recruit-180.png";
+ const link=document.querySelector(".lg-header-home");
+ if(link){link.href="/therapist-profile/staff/interview-sheet-preview/";link.title="面接管理TOPへ移動";link.setAttribute("aria-label","面接管理TOPへ移動");}
+}
 async function loginCheck(){if(!client){location.replace("/therapist-profile/staff/management-top/");return;}
 const {data:{session}}=await client.auth.getSession();if(!session){if(await staffReadOnlyLogin())return;authorized=false;$("app").classList.add("hide");location.replace("/therapist-profile/staff/interview-sheet-preview/");return;}
 const [{data,error},access]=await Promise.all([client.from("recruit_staff_profiles").select("display_name,role,approved_at").eq("user_id",session.user.id).maybeSingle(),client.rpc("can_link_therapist_interview")]);
@@ -584,7 +610,7 @@ if(error||access.error||access.data!==true||!data||!data.approved_at||!["master"
   if(await staffReadOnlyLogin())return;
   authorized=false;$("app").classList.add("hide");location.replace("/therapist-profile/staff/management-top/");$("loginError").textContent="このページへの権限がありません。";return;
 }
-const homeName=document.getElementById("lgHeaderHomeLabel");if(homeName)homeName.textContent=(data.display_name||"管理")+" TOP";
+await syncInterviewHomeHeader(data.display_name);
 authorized=true;$("login").classList.add("hide");$("app").classList.remove("hide");$("logout").classList.remove("hide");$("authLabel").textContent="認証済み";await load();
 const query=new URL(location.href);
 if(query.searchParams.get("exa_sync")==="1"){
