@@ -1037,6 +1037,16 @@ $("autoSync").onclick=()=>{
  paintAuto();
  showMsg(autoEnabled?"ブラウザ自動：ON。薔薇と紳士と同じく画面表示中に3時間間隔で同期を試みます。ただしEXAサーバー接続は未検証で、成功は保証されません。":"ブラウザ自動：OFF。画面表示中の3時間自動同期を停止しました。");
 };
+let grandLuxeExtensionReady=false;
+async function waitForGrandLuxeExtension(){
+ if(grandLuxeExtensionReady)return;
+ window.postMessage({source:"exa-shift-page",action:"probe"},location.origin);
+ for(let i=0;i<12;i++){
+  await new Promise(resolve=>setTimeout(resolve,150));
+  if(grandLuxeExtensionReady)return;
+ }
+ throw Error("Grand Luxe Chrome拡張v1.1が見つかりません。v1.1をインストールし、この管理ページを再読み込みしてください。代わりに「EXA JSON/CSV取込」で保存済み30日JSONを取り込めます。");
+}
 const bridgeRequests=new Map();
 let syncAbortRequested=false;
 function cancelEXASync(){
@@ -1049,7 +1059,7 @@ function cancelEXASync(){
 }
 window.addEventListener("message",event=>{
  if(event.source!==window||event.origin!==location.origin||event.data?.source!=="exa-shift-extension")return;
- if(event.data.action==="ready"){grandLuxeExtensionReady=true;$("exaSync").title="Grand Luxe Chrome拡張を検出しました。クリックするとEXAから30日分を取得・登録します";}
+ if(event.data.action==="ready"){grandLuxeExtensionReady=true;$("exaSync").title="サーバー更新を優先し、サーバー通信に失敗した場合はChrome拡張v1.1で30日分を取り込めます";}
  if(event.data.action==="fetch-shifts-result"){
   const request=bridgeRequests.get(event.data.requestId);
   if(!request)return;
@@ -1074,11 +1084,11 @@ async function synchronizeEXA(mode="manual"){
  button.disabled=true;button.textContent="更新中…";
  $("autoSync").disabled=true;
  try{
-  showMsg(automatic?"EXAサーバーの自動同期中…":"EXAサーバーから最新30日分を取得・反映中…");
   const {data:{session}}=await client.auth.getSession();
   if(!session)throw Error("管理ページに再ログインしてください");
+  showMsg("Grand Luxe EXAサーバーから最新30日分を取得中…");
   const controller=new AbortController();
-  const timeout=setTimeout(()=>controller.abort(),120000);
+  const timer=setTimeout(()=>controller.abort(),120000);
   let response;
   try{
    response=await fetch(URL_SB+"/functions/v1/exa-grandluxe-manual-sync",{
@@ -1086,21 +1096,44 @@ async function synchronizeEXA(mode="manual"){
     headers:{"Content-Type":"application/json","apikey":KEY_SB,"Authorization":"Bearer "+session.access_token},
     body:"{}"
    });
-  }finally{clearTimeout(timeout)}
-  const result=await response.json();
-  if(!response.ok||!result.ok){
-   const errors={
-    credentials_not_configured:"Grand LuxeのEXAサーバーログイン情報が未設定です。",
-    manager_only:"指定された4名の管理者のみ更新できます。",
-    server_sync_failed:"EXAサーバーとの通信または30日分の読取に失敗しました。「サーバー30日検証」で原因を確認してください。"
-   };
-   throw Error(errors[result.error]||result.error||"EXAサーバー同期失敗（HTTP "+response.status+"）");
+  }finally{clearTimeout(timer)}
+  let result=await response.json();
+  let updateMode="サーバー";
+  if(!response.ok||!result?.ok){
+   // The EXA host currently rejects Supabase server-side reads.
+   // Fall back ONLY for upstream failures, never for auth/authorization errors.
+   if(response.status!==502||result?.error!=="server_sync_failed")
+    throw Error(result?.error||"EXAサーバー更新に失敗しました（HTTP "+response.status+"）");
+   showMsg("サーバーからEXAを読み取れませんでした。ログイン済みEXAをChrome拡張v1.1で読取中…");
+   const payload=await fetchFromExaExtension();
+   if(!payload||payload.ok===false)throw Error(payload?.error||"Chrome拡張で30日分を読み取れませんでした");
+   if(payload.format!=="grandluxe-exa-readonly-v1"||
+      payload.store_code!=="grandluxe"||payload.days!==30||
+      !Array.isArray(payload.rows)||!Array.isArray(payload.daily_summary)||
+      payload.daily_summary.length!==30||payload.total_rows!==payload.rows.length||
+      payload.rows.length<1)
+     throw Error("Chrome拡張v1.1の取得結果が30日データの仕様に一致しません");
+   if(payload.first!==today())
+     throw Error("EXA取得開始日が今日と一致しません："+payload.first);
+   showMsg("Chrome拡張で30日分を読取完了。Grand Luxe専用APIへ登録中…");
+   const fallback=await fetch(URL_SB+"/functions/v1/exa-grandluxe-shift-import",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","apikey":KEY_SB,"Authorization":"Bearer "+session.access_token},
+    body:JSON.stringify({...payload,source:"extension_snapshot"})
+   });
+   result=await fallback.json();
+   if(!fallback.ok||!result?.ok)
+      throw Error(result?.error||"Grand Luxeの30日取込に失敗しました（HTTP "+fallback.status+"）");
+   updateMode="Chrome拡張（サーバー失敗時の代替）";
   }
   localStorage.setItem(LAST_KEY,String(Date.now()));
   await load();
-  showMsg("Grand Luxe "+(automatic?"自動":"手動")+"更新完了："+result.imported+"件・"+result.days+"日分（事前 "+result.preoff+"件）。");
+  showMsg("Grand Luxe "+(automatic?"自動":"手動")+"更新完了｜"+updateMode+"："+
+    result.imported+"件・"+result.days+"日分（事前 "+(result.preoff??0)+"件）。");
  }catch(error){
-  showMsg("Grand Luxe "+(automatic?"自動":"今すぐ")+"更新失敗："+(error?.name==="AbortError"?"サーバー応答が120秒を超えました":String(error.message||error)),true);
+  const timeout=error?.name==="AbortError";
+  showMsg("Grand Luxeの更新は完了していません。"+
+    (timeout?"EXAサーバーの応答が120秒を超えました。":"原因："+String(error.message||error)),true);
  }finally{
   extensionBusy=false;button.disabled=false;button.textContent="今すぐ更新";$("autoSync").disabled=false;
  }
