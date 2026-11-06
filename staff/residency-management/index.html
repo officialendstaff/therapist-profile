@@ -8,22 +8,22 @@
 <section id="login" class="login hide"><h2>管理者ログイン</h2><p class="sub">面接管理と同じアカウントでログインできます。4人の管理者専用ページです。</p><form id="loginForm"><label for="email">メールアドレス</label><input id="email" type="email" autocomplete="username" required><label for="password">パスワード</label><input id="password" type="password" autocomplete="current-password" required><button class="primary" type="submit">ログイン</button></form><p id="loginError" class="sub"></p></section>
 <main id="app" class="wrap hide"><div class="page-head"><div><h2>セラピスト一覧</h2><div class="sub">EXAを基準に、面接情報・写真・在籍履歴を確認できます。</div></div><button id="reload" class="refresh">最新データを取得</button></div><p id="message" class="message hide" role="status"></p>
 <div class="metrics"><div class="metric"><span>EXA登録数</span><strong id="countAll">—</strong></div><div class="metric"><span>実働区分</span><strong id="countReal">—</strong></div><div class="metric"><span>ダミー区分</span><strong id="countDummy">—</strong></div><div class="metric"><span>面接情報との紐づけ</span><strong id="countLinked">—</strong></div></div>
-<div class="note">現在、EXAとの連携は「薔薇と紳士」のみです。他4店舗は準備中です。<strong>EXAの「実働・ダミー」と、在籍管理の「在籍中・休業中・退店」は別の情報</strong>です。面接未連携や出勤予定なしを退店とは判断しません。</div>
-<div class="filters"><select id="store"><option value="rose">薔薇と紳士</option><option disabled>Grand Luxe（未連携）</option><option disabled>LUXY OSAKA（未連携）</option><option disabled>Un Secret（未連携）</option><option disabled>BUSTY OSAKA（未連携）</option></select><select id="exaFilter"><option value="all">EXA区分：すべて</option><option value="active">実働</option><option value="dummy">ダミー</option></select><select id="statusFilter"><option value="all">在籍状況：すべて</option><option value="unconfirmed">未確認／未設定</option><option value="preparing">入店準備</option><option value="active">在籍中</option><option value="paused">休業中</option><option value="left">退店</option></select><select id="interviewFilter"><option value="all">面接：すべて</option><option value="linked">紐づけ済み</option><option value="unlinked">未紐づけ</option></select><input id="search" type="search" placeholder="源氏名・EXA IDで検索"></div>
-<div class="workspace"><section class="panel"><div class="panel-header"><strong>セラピスト</strong><span id="listCount" class="sub"></span></div><div class="table-wrapper"><table class="staff-table"><thead><tr><th>源氏名</th><th>EXA</th><th>在籍</th><th>面接</th></tr></thead><tbody id="list"></tbody></table></div></section>
+<div class="note">EXA登録者は店舗ごとに分離して管理します。Grand Luxe・LUXY OSAKA・Un SecretのEXA接続は未設定です。<strong>EXAの「実働・ダミー」と、在籍管理の「在籍中・休業中・退店」は別の情報</strong>です。面接未連携や出勤予定なしを退店とは判断しません。</div>
+<div class="filters"><select id="store"><option value="rose">薔薇と紳士</option><option value="busty">BUSTY OSAKA</option><option value="grandluxe">Grand Luxe</option><option value="luxy">LUXY OSAKA</option><option value="unsecret">Un Secret</option></select><select id="exaFilter"><option value="all">EXA区分：すべて</option><option value="active">実働</option><option value="dummy">ダミー</option></select><select id="statusFilter"><option value="all">在籍状況：すべて</option><option value="unconfirmed">未確認／未設定</option><option value="preparing">入店準備</option><option value="active">在籍中</option><option value="paused">休業中</option><option value="left">退店（在籍履歴）</option><option value="archived">退店者／EXA削除確認</option></select><select id="interviewFilter"><option value="all">面接：すべて</option><option value="linked">紐づけ済み</option><option value="unlinked">未紐づけ</option></select><input id="search" type="search" placeholder="源氏名・EXA IDで検索"></div>
+<section id="retiredWorkspace" class="panel hide" style="padding:16px;margin-bottom:13px"><div class="page-head"><div><h2>退店者・EXA削除管理</h2><div class="sub">EXA削除確認と実際の退店確定を分離します。過去の出勤・接客情報は残ります。</div></div><button id="recordDeletion" class="refresh" type="button">EXA削除を記録</button></div><div id="retiredMsg" class="sub"></div><div style="overflow:auto"><table class="staff-table" style="width:100%"><thead><tr><th>源氏名・ID</th><th>状態</th><th>出勤履歴</th><th>接客本数</th><th>当欠</th><th>操作</th></tr></thead><tbody id="retiredRows"></tbody></table></div></section><div class="workspace" id="activeWorkspace"><section class="panel"><div class="panel-header"><strong>セラピスト</strong><span id="listCount" class="sub"></span></div><div class="table-wrapper"><table class="staff-table"><thead><tr><th>源氏名</th><th>EXA</th><th>在籍</th><th>面接</th></tr></thead><tbody id="list"></tbody></table></div></section>
 <section class="panel"><div id="detail" class="detail"><div class="empty">左の一覧からセラピストを選択してください。</div></div></section></div></main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.10/dist/umd/supabase.min.js"></script>
 <script>
 const SB_URL="https://vjjnkflbfsjihwzjsjpr.supabase.co",SB_KEY="sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos";
 const client=window.supabase?.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,storage:localStorage,storageKey:"mattan-recruit-auth"}});
-const $=id=>document.getElementById(id),STORE="rose",PHOTO_BUCKET="therapist-internal-photos";
+const $=id=>document.getElementById(id);let STORE="rose";const PHOTO_BUCKET="therapist-internal-photos";const STORE_NAMES={rose:"薔薇と紳士",busty:"BUSTY OSAKA",grandluxe:"Grand Luxe",luxy:"LUXY OSAKA",unsecret:"Un Secret"};
 const statusNames={unconfirmed:"未確認",preparing:"入店準備",active:"在籍中",paused:"休業中",left:"退店"};
 const safe=v=>{const el=document.createElement("span");el.textContent=String(v??"");return el.innerHTML;};
-let staff=[],exaLinks=[],interviewLinks=[],membership=[],photos=[],selected=null,currentTab="basic",authorized=false,requestSeq=0;
+let staff=[],exaLinks=[],interviewLinks=[],membership=[],photos=[],departures=[],selected=null,currentTab="basic",authorized=false,requestSeq=0;
 const fmtDate=d=>d?String(d).slice(0,10):"—";
 const getPerson=t=>exaLinks.find(x=>x.exa_id===t.exa_id)?.person_id||null;
 const getHistory=t=>membership.filter(x=>x.person_id===getPerson(t)).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
-const getStatus=t=>getHistory(t)[0]?.status||"unconfirmed";
+const getStatus=t=>t.employment_status==="departed"?"left":getHistory(t)[0]?.status||"unconfirmed";
 const hasInterview=t=>interviewLinks.some(x=>x.person_id===getPerson(t))&&Boolean(getPerson(t));
 function alertMsg(s,error=false){const el=$("message");el.textContent=s;el.classList.remove("hide");el.classList.toggle("error",error);}
 function cleanMsg(){$("message").classList.add("hide");}
@@ -42,27 +42,30 @@ $("logout").onclick=async()=>{await client.auth.signOut();sessionStorage.removeI
 async function load(){
  if(!authorized)return;alertMsg("在籍情報を取得しています…");
  const queries=[
-  client.from("exa_shift_therapists").select("store_code,exa_id,stage_name,residency").eq("store_code",STORE).order("stage_name"),
+  client.from("exa_shift_therapists").select("store_code,exa_id,stage_name,residency,employment_status,operating_category").eq("store_code",STORE).order("stage_name"),
   client.from("therapist_exa_links").select("store_code,exa_id,person_id").eq("store_code",STORE),
   client.from("therapist_interview_links").select("person_id,interview_applicant_id"),
   client.from("therapist_store_memberships").select("id,person_id,store_code,stage_name,status,started_on,ended_on,notes,created_at").eq("store_code",STORE).order("created_at",{ascending:false}),
-  client.from("exa_therapist_photos").select("exa_id,storage_path").eq("store_code",STORE)
+  client.from("exa_therapist_photos").select("exa_id,storage_path").eq("store_code",STORE),
+  client.from("exa_departure_records").select("exa_id,stage_name_snapshot,state,detected_at,confirmed_at,detected_source").eq("store_code",STORE).in("state",["deleted_detected","confirmed_departed"]).order("updated_at",{ascending:false})
  ];
  const res=await Promise.all(queries);
  const err=res.find(r=>r.error)?.error;
  if(err){alertMsg("データ取得に失敗："+err.message,true);return;}
- [staff,exaLinks,interviewLinks,membership,photos]=res.map(r=>r.data||[]);
+ [staff,exaLinks,interviewLinks,membership,photos,departures]=res.map(r=>r.data||[]);
  $("countAll").textContent=staff.length;
- $("countReal").textContent=staff.filter(t=>t.residency!=="dummy").length;
- $("countDummy").textContent=staff.filter(t=>t.residency==="dummy").length;
+ $("countReal").textContent=staff.filter(t=>t.residency!=="dummy"&&t.employment_status!=="departed").length;
+ $("countDummy").textContent=staff.filter(t=>t.residency==="dummy"&&t.employment_status!=="departed").length;
  $("countLinked").textContent=staff.filter(t=>hasInterview(t)).length;
- cleanMsg();renderList();
+ cleanMsg();renderList();if($("statusFilter").value==="archived")void renderRetired();
  if(selected!==null){if(staff.some(t=>t.exa_id===selected))await showDetail(selected,currentTab);else{$("detail").innerHTML='<div class="empty">対象者が見つかりません。</div>';selected=null;}}
 }
 function renderList(){
  const term=$("search").value.trim().toLowerCase(),exa=$("exaFilter").value,status=$("statusFilter").value,interview=$("interviewFilter").value;
+ const archived=status==="archived";$("retiredWorkspace").classList.toggle("hide",!archived);$("activeWorkspace").classList.toggle("hide",archived);if(archived){void renderRetired();return;}
  const filtered=staff.filter(t=>{
   const isDummy=t.residency==="dummy",linked=hasInterview(t),st=getStatus(t);
+  if(t.employment_status==="departed"&&status!=="left")return false;
   if(exa!=="all"&&(exa==="dummy")!==isDummy)return false;
   if(status!=="all"&&st!==status)return false;
   if(interview!=="all"&&(interview==="linked")!==linked)return false;
@@ -86,7 +89,7 @@ async function showDetail(exaId,tab="basic"){
  const seq=++requestSeq;
  const linked=hasInterview(t),personId=getPerson(t),st=getStatus(t),history=getHistory(t);
  const el=$("detail");
- el.innerHTML='<div class="profile-head"><div class="profile-photo" id="photo">画像未登録</div><div><div class="sub">薔薇と紳士｜EXA ID '+t.exa_id+'</div><h3>'+safe(t.stage_name||"ID "+t.exa_id)+'</h3><span class="pill">'+(t.residency==="dummy"?"EXA：ダミー":"EXA：実働")+'</span> <span class="pill '+(st==="active"?"ok":st==="left"?"danger":"warn")+'">在籍：'+statusNames[st]+'</span><p class="sub">面接情報：'+(linked?"紐づけ済み":"未紐づけ")+'</p></div></div><div class="tabs" id="tabs"></div><div id="tabBody"></div>';
+ el.innerHTML='<div class="profile-head"><div class="profile-photo" id="photo">画像未登録</div><div><div class="sub">'+safe(STORE_NAMES[STORE])+'｜EXA ID '+t.exa_id+'</div><h3>'+safe(t.stage_name||"ID "+t.exa_id)+'</h3><span class="pill">'+(t.residency==="dummy"?"EXA：ダミー":"EXA：実働")+'</span> <span class="pill '+(st==="active"?"ok":st==="left"?"danger":"warn")+'">在籍：'+statusNames[st]+'</span><p class="sub">面接情報：'+(linked?"紐づけ済み":"未紐づけ")+'</p></div></div><div class="tabs" id="tabs"></div><div id="tabBody"></div>';
  for(const [key,label] of [["basic","基本情報"],["interview","面接・LINE"],["shift","出勤実績"],["history","在籍履歴"]]){
   const b=document.createElement("button");b.textContent=label;b.classList.toggle("active",tab===key);b.onclick=()=>showDetail(exaId,key);$("tabs").appendChild(b);
  }
@@ -99,7 +102,7 @@ async function showDetail(exaId,tab="basic"){
  }
  if(seq!==requestSeq)return;
  if(tab==="basic"){
-  $("tabBody").innerHTML='<h4 class="section-title">基本情報</h4><div class="data-grid"><div class="data-box"><small>所属店舗</small><strong>薔薇と紳士</strong></div><div class="data-box"><small>EXA ID</small><strong>'+t.exa_id+'</strong></div><div class="data-box"><small>源氏名（EXA）</small><strong>'+safe(t.stage_name)+'</strong></div><div class="data-box"><small>面接情報</small><strong>'+(linked?"連携済":"未連携")+'</strong></div><div class="data-box"><small>在籍状況</small><strong>'+statusNames[st]+'</strong></div><div class="data-box"><small>共通人物ID</small><span>'+(personId?safe(personId):"未発行")+'</span></div></div><p class="sub">画像の登録・差し替え、面接情報との紐づけは出勤管理のセラピスト詳細から行います。</p><a class="secondary" style="display:inline-block;text-decoration:none;margin-top:8px" href="../exa-shifts/">出勤管理を開く</a>';
+  $("tabBody").innerHTML='<h4 class="section-title">基本情報</h4><div class="data-grid"><div class="data-box"><small>所属店舗</small><strong>'+safe(STORE_NAMES[STORE])+'</strong></div><div class="data-box"><small>EXA ID</small><strong>'+t.exa_id+'</strong></div><div class="data-box"><small>源氏名（EXA）</small><strong>'+safe(t.stage_name)+'</strong></div><div class="data-box"><small>面接情報</small><strong>'+(linked?"連携済":"未連携")+'</strong></div><div class="data-box"><small>在籍状況</small><strong>'+statusNames[st]+'</strong></div><div class="data-box"><small>共通人物ID</small><span>'+(personId?safe(personId):"未発行")+'</span></div></div><p class="sub">画像の登録・差し替え、面接情報との紐づけは出勤管理のセラピスト詳細から行います。</p><a class="secondary" style="display:inline-block;text-decoration:none;margin-top:8px" href="../exa-shifts/">出勤管理を開く</a>';
  }else if(tab==="interview"){
   if(!linked){$("tabBody").innerHTML='<h4 class="section-title">面接・LINE</h4><p class="sub">面接情報は未紐づけです。出勤管理のセラピスト名から紐づけてください。</p>';return;}
   const ids=interviewLinks.filter(x=>x.person_id===personId).map(x=>x.interview_applicant_id);
@@ -136,6 +139,49 @@ async function showDetail(exaId,tab="basic"){
   }
  }
 }
+
+async function manageRetired(exaId,action){
+ let note;
+ if(action==="detected"){
+  note=prompt("EXAの登録一覧から削除されたことを確認した根拠を入力してください。出勤予定がないだけでは退店とは判定しません。");
+ }else if(action==="confirm"){
+  if(!confirm("EXAから削除され、ダミーにも利用せず、実際に退店したことを確認しましたか？"))return;
+  note=prompt("退店確認日・確認した根拠を入力してください。");
+ }else{
+  if(!confirm("この退店記録を復帰させますか？履歴は保持します。"))return;
+  note=prompt("復帰理由を入力してください。");
+ }
+ if(note===null)return;
+ note=note.trim();if(!note){$("retiredMsg").textContent="根拠・理由は必須です。";return;}
+ $("retiredMsg").textContent="保存しています…";
+ const {error}=await client.rpc("exa_departure_manage",{p_store:STORE,p_exa_id:exaId,p_action:action,p_note:note});
+ if(error){$("retiredMsg").textContent="保存に失敗しました："+error.message;return;}
+ await load();
+}
+async function renderRetired(){
+ if($("statusFilter").value!=="archived")return;
+ const tbody=$("retiredRows");tbody.replaceChildren();
+ $("retiredMsg").textContent="退店記録："+departures.filter(d=>d.state==="confirmed_departed").length+"名／削除確認待ち："+departures.filter(d=>d.state==="deleted_detected").length+"名";
+ const {data:summary,error}=await client.rpc("exa_departure_archive_summary",{p_store:STORE});
+ if(error){$("retiredMsg").textContent="履歴取得失敗："+error.message;return;}
+ const metrics=new Map((summary||[]).map(x=>[x.exa_id,x]));
+ if(!departures.length){const tr=document.createElement("tr"),td=document.createElement("td");td.colSpan=6;td.textContent="退店確定者・削除確認待ちの登録はありません。";td.style.padding="20px";tr.append(td);tbody.append(tr);return;}
+ for(const d of departures){
+  const tr=document.createElement("tr"),m=metrics.get(d.exa_id)||{};
+  const vals=[d.stage_name_snapshot+"（ID "+d.exa_id+"）",d.state==="confirmed_departed"?"退店確定":"EXA削除確認待ち",String(m.shift_days??0)+"件",String(m.total_customers??0)+"本",String(m.absent_days??0)+"日"];
+  vals.forEach(v=>{const td=document.createElement("td");td.textContent=v;tr.append(td)});
+  const actions=document.createElement("td");
+  if(d.state==="deleted_detected"){const b=document.createElement("button");b.textContent="退店確定";b.className="refresh";b.onclick=()=>manageRetired(d.exa_id,"confirm");actions.append(b)}
+  const undo=document.createElement("button");undo.textContent="復帰";undo.className="refresh";undo.onclick=()=>manageRetired(d.exa_id,"restore");actions.append(undo);
+  tr.append(actions);tbody.append(tr);
+ }
+}
+$("recordDeletion").onclick=()=>{
+ const value=prompt("EXAから削除された方のEXA IDを入力してください。");if(value===null)return;
+ if(!/^\d{1,6}$/.test(value.trim())||Number(value)<1){$("retiredMsg").textContent="EXA IDを正しく入力してください。";return;}
+ void manageRetired(Number(value),"detected");
+};
+$("store").onchange=async()=>{STORE=$("store").value;selected=null;currentTab="basic";$("detail").innerHTML='<div class="empty">左の一覧からセラピストを選択してください。</div>';await load()};
 for(const id of ["search","exaFilter","statusFilter","interviewFilter"])$(id).addEventListener(id==="search"?"input":"change",renderList);
 $("reload").onclick=load;
 checkLogin();
