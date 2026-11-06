@@ -369,6 +369,7 @@ footer{display:none}
 </style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script></head>
 <body>
 <header class="work-header"><div class="brand"><h1>出勤管理</h1><span class="brand-sub">SHIFT MANAGEMENT</span></div><div class="head-controls">
+<a href="../../management-top/" style="color:#fff;border:1px solid #56718d;border-radius:5px;padding:7px 10px;font-size:11px;text-decoration:none;font-weight:700">総合TOP</a>
 <label class="store-label">店舗 <select id="storeSelect" aria-label="店舗切替"><option value="grand-luxe">Grand Luxe</option><option value="luxy-osaka">LUXY OSAKA</option><option value="rose">薔薇と紳士</option><option value="un-secret">Un Secret</option><option value="busty-osaka" selected>BUSTY OSAKA</option></select></label>
 <div class="head-month"><button id="prev" title="前月">◀</button><strong id="monthLabel"></strong><button id="next" title="翌月">▶</button></div>
 <button id="exaSync" class="primary" title="BUSTYのEXAから最新30日分を取得して反映">今すぐ更新</button>
