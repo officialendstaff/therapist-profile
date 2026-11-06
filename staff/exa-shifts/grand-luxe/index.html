@@ -442,7 +442,7 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 <div class="hidden-management-tools" style="display:none" aria-hidden="true">
 <button id="reload">保存データを再読込</button>
 <button id="unscheduledAdd" title="EXA登録画面でIDと源氏名を確認した人だけ追加。出勤データは変更しません">出勤予定なしのEXA登録者を追加</button>
-<button id="csvImport" title="Chrome拡張で取得したEXA 30日JSON・CSVを取り込みます">EXA JSON/CSV取込</button><button id="csvExportSaved" title="表示中の月の保存済み出勤をCSVで出力">保存済み出勤CSV出力</button><input id="csvFile" type="file" accept=".json,application/json,.csv,text/csv" style="display:none">
+<button id="csvImport">EXA CSV取込・更新</button><input id="csvFile" type="file" accept=".csv,text/csv" style="display:none">
 <button id="serverTest" title="EXAサーバー接続と30日読取を検証（保存データは変更しません）">サーバー30日検証</button>
 
 </div><span id="authLabel" class="muted login-tag" style="color:#d5e1f1"></span><button id="logout" class="hide">ログアウト</button>
@@ -1194,50 +1194,12 @@ async function checkAuto(){
  await synchronizeEXA("auto");
 }
 setInterval(checkAuto,60*1000);
-$("csvExportSaved").onclick=()=>{
- if(!authorized)return;
- const staffNames=new Map(therapists.map(t=>[t.exa_id,t.stage_name||""]));
- const rows=shifts.slice().sort((a,b)=>a.work_date.localeCompare(b.work_date)||a.exa_id-b.exa_id);
- if(!rows.length){showMsg("表示中の月の出勤データはありません。",true);return;}
- const four=value=>String(Math.floor(value/60)).padStart(2,"0")+String(value%60).padStart(2,"0");
- const quote=value=>'"'+String(value??"").replace(/"/g,'""')+'"';
- const columns=["店舗","出勤日","EXA ID","源氏名","出勤","退勤","状態"];
- const data=rows.map(r=>["Grand Luxe",r.work_date,r.exa_id,staffNames.get(r.exa_id)||"ID "+r.exa_id,four(r.start_minutes),four(r.end_minutes),r.is_pre_off?"事前":"出勤"]);
- const csv="\uFEFF"+[columns,...data].map(record=>record.map(quote).join(",")).join("\r\n");
- const url=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
- const link=document.createElement("a");link.href=url;link.download="GrandLuxe_保存済みEXA出勤_"+month+".csv";document.body.appendChild(link);link.click();link.remove();
- setTimeout(()=>URL.revokeObjectURL(url),1500);
- showMsg("Grand Luxeの保存済み出勤"+rows.length+"件をCSV出力しました。EXA原本の直接出力ではありません。");
-};
 $("csvImport").onclick=()=>{if(!authorized)return;$("csvFile").click()};
 $("csvFile").onchange=async e=>{
  const file=e.target.files?.[0];if(!file)return;
  const button=$("csvImport");button.disabled=true;
  try{
   if(file.size>1024*1024)throw Error("ファイル容量が大きすぎます（上限1MB）");
-  if(file.name.toLowerCase().endsWith(".json")){
-   const payload=JSON.parse((await file.text()).replace(/^\uFEFF/,""));
-   if(payload?.format!=="grandluxe-exa-readonly-v1"||payload.store_code!=="grandluxe"||
-      payload.days!==30||!Array.isArray(payload.rows)||payload.rows.length<1||
-      payload.total_rows!==payload.rows.length||!Array.isArray(payload.daily_summary)||
-      payload.daily_summary.length!==30)
-       throw Error("Grand Luxe専用30日JSONではありません。Chrome拡張の保存データを選んでください。");
-   const count=payload.rows.filter(r=>r.is_pre_off===true).length;
-   if(!confirm("Grand LuxeのEXA 30日データを取り込みます。\n期間："+payload.first+"〜"+payload.last+
-    "\n予定："+payload.rows.length+"件（事前 "+count+"件）\n未記載の既存予定は削除しません。\n\n続行しますか？"))return;
-   const {data:{session}}=await client.auth.getSession();
-   if(!session)throw Error("ログイン期限切れです。再ログインしてください");
-   showMsg("EXA 30日JSONを検証して登録中…");
-   const response=await fetch(URL_SB+"/functions/v1/exa-grandluxe-shift-import",{
-     method:"POST",headers:{"Content-Type":"application/json","apikey":KEY_SB,"Authorization":"Bearer "+session.access_token},
-     body:JSON.stringify({...payload,source:"extension_snapshot"})
-   });
-   const result=await response.json();
-   if(!response.ok||!result.ok)throw Error(result.error||"30日JSONの登録に失敗しました（HTTP "+response.status+"）");
-   await load();
-   showMsg("Grand Luxe 30日取込完了："+result.imported+"件（事前 "+result.preoff+"件）、"+result.days+"日分。その他の店舗は変更していません。");
-   return;
-  }
   const source=(await file.text()).replace(/^\uFEFF/,"").replace(/\r\n/g,"\n");
   const lines=source.trim().split("\n").filter(Boolean);
   const parseLine=line=>{
