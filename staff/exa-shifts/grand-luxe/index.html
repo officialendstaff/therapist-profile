@@ -1196,12 +1196,14 @@ $("csvFile").onchange=async e=>{
   const head=parseLine(lines.shift()).map(x=>x.trim().replace(/^\uFEFF/,""));
   const required=["出勤日","EXA ID","源氏名","出勤","退勤"];
   const idx=required.map(h=>head.indexOf(h));
+  const stateIdx=head.indexOf("状態");
   if(idx.some(i=>i<0))throw Error("CSVの列名が一致しません："+required.join("、"));
   const rows=lines.map(line=>{
    const vals=parseLine(line);
-   return {date:vals[idx[0]],id:Number(vals[idx[1]]),name:vals[idx[2]],start:vals[idx[3]],finish:vals[idx[4]]};
+   return {date:vals[idx[0]],id:Number(vals[idx[1]]),name:vals[idx[2]],start:vals[idx[3]],finish:vals[idx[4]],...(stateIdx<0?{}:{state:(vals[stateIdx]||"").trim()})};
   });
-  const agree=confirm("EXAシフト"+rows.length+"件をSupabaseに更新登録します。既存の接客本数とダミー区分は保持します。続行しますか？");
+  const preOffCount=rows.filter(r=>r.state==="事前").length;
+  const agree=confirm("Grand LuxeのEXAシフト "+rows.length+"件（事前 "+preOffCount+"件）をSupabaseに登録します。\nCSVに記載のない既存シフトは削除しません。続行しますか？");
   if(!agree)return;
   const {data:{session}}=await client.auth.getSession();
   if(!session)throw Error("ログイン期限切れです。再ログインしてください");
@@ -1213,7 +1215,7 @@ $("csvFile").onchange=async e=>{
   const result=await response.json();
   if(!response.ok||!result.ok)throw Error(result.error||"取込に失敗しました（HTTP "+response.status+"）");
   await load();
-  showMsg("取込完了："+result.imported+"件・"+result.days+"日分。EXA直接更新ではなくCSV取込です。");
+  showMsg("Grand Luxe取込完了："+result.imported+"件（事前 "+result.preoff+"件）・"+result.days+"日分。既存の未記載シフトは削除していません。");
  }catch(error){showMsg("取込失敗："+String(error.message||error),true)}
  finally{button.disabled=false;e.target.value=""}
 };
