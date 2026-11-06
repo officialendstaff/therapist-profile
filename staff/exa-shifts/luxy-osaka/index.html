@@ -15,6 +15,25 @@ button.primary{background:#28659a;color:#fff;border-color:#28659a}.muted{font-si
 .dialog{position:fixed;inset:0;background:#11213999;z-index:30;display:grid;place-items:center}.dialog>section{background:white;border-radius:12px;padding:20px;min-width:500px;max-height:90vh;overflow:auto}.timeline{border-collapse:collapse;width:100%}.timeline td,.timeline th{padding:7px;border:1px solid #e1e7ef;text-align:center}.timeline th{background:#e9f0f9}
 
 
+
+/* B-3 vivid: name cell only, existing working state unchanged */
+.shift td.staff.state-dummy{background:#E5E7EB!important;color:#4B5563!important;box-shadow:inset 4px 0 #8895A5}
+.shift-status-legend{display:inline-flex;align-items:center;gap:13px;flex-wrap:wrap;margin-left:12px;font-size:11px;font-weight:650;color:#4d5c6c}
+.shift-status-legend span{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.shift-status-legend .swatch{display:inline-block;width:11px;height:11px;border-radius:2px;border:1px solid #ffffff88}
+.shift-status-legend .provisional{background:#E0A310}
+.shift-status-legend .paperwork{background:#D44F96}
+.shift-status-legend .leave{background:#35A77A}
+.shift-status-legend .outside{background:#81C784}
+.shift-status-legend .dummy{background:#8895A5}
+.shift-table tbody tr.outside-roster td.staff-name{background:#E4F7D9!important;color:#326D21!important;box-shadow:inset 4px 0 #78B95B}
+.shift-table tbody tr.outside-roster td.staff-name .name-editor{color:#326D21!important}
+.shift-table tbody tr:not(.group) td.staff-name.state-dummy{background:#E5E7EB!important;color:#4B5563!important;box-shadow:inset 4px 0 #8895A5}
+.shift-table tbody tr:not(.group) td.staff-name.state-dummy .name-editor{color:#4B5563!important}
+.shift-table tbody tr:not(.group) td.staff-name.state-provisional{background:#FFE8C2!important;color:#975500!important;box-shadow:inset 4px 0 #E0A310}
+.shift-table tbody tr:not(.group) td.staff-name.state-paperwork{background:#F8D1E5!important;color:#96365C!important;box-shadow:inset 4px 0 #D44F96}
+.shift-table tbody tr:not(.group) td.staff-name.state-leave{background:#D3F2E2!important;color:#237C55!important;box-shadow:inset 4px 0 #35A77A}
+@media(max-width:900px){.shift-status-legend{gap:6px;margin-left:6px;font-size:9px}}
 </style></head>
 <body>
 <header><div class="brand"><h1>出勤管理</h1><span>SHIFT MANAGEMENT</span></div><div class="controls">
@@ -27,7 +46,7 @@ button.primary{background:#28659a;color:#fff;border-color:#28659a}.muted{font-si
 <main id="app" class="hide">
 <div class="notice">この店舗の出勤管理ページは準備済みです。EXA直接同期・CSV取込・接客本数編集・画像登録・アンケート連携は未接続です。薔薇と紳士のデータにはアクセスしません。</div>
 
-<section class="panel"><div class="month-heading"><h2>月間シフト</h2><div class="filter"><button data-filter="real" class="active">実働</button><button data-filter="dummy">ダミー</button><button data-filter="all">全件</button></div></div>
+<section class="panel"><div class="month-heading"><h2>月間シフト</h2><div class="shift-status-legend" aria-label="区分別配色の凡例"><span><i class="swatch provisional"></i>仮登</span><span><i class="swatch paperwork"></i>書類</span><span><i class="swatch leave"></i>長休</span><span><i class="swatch outside"></i>実外</span><span><i class="swatch dummy"></i>ダミー</span></div><div class="filter"><button data-filter="real" class="active">実働</button><button data-filter="dummy">ダミー</button><button data-filter="all">全件</button></div></div>
 <p id="message" class="muted"></p><div class="scroll"><table id="monthly" class="shift"></table><div id="empty" class="empty hide">この店舗の登録データはありません。EXA連携は未設定です。</div></div></section>
 </main>
 <div id="dayPanel" class="dialog hide"><section><div class="month-heading"><h2 id="dayTitle">日別タイムチャート</h2><button id="closeDay">閉じる ×</button></div><div id="timeline"></div></section></div>
@@ -54,7 +73,7 @@ function render(){
  const wanted=staff.filter(t=>filter==="all"||(filter==="dummy"?["dummy","dummy_use"].includes(t.residency||t.operating_category):!["dummy","dummy_use"].includes(t.residency||t.operating_category)));
  for(const person of wanted){
   const row=document.createElement("tr");const id=person.exa_id;
-  makeCell(row,person.stage_name||"ID "+id,"td","staff");
+  const nameCell=makeCell(row,person.stage_name||"ID "+id,"td","staff");if(person.residency==="dummy"||person.operating_category==="dummy_use")nameCell.classList.add("state-dummy");
   const entries=shifts.filter(s=>s.exa_id===id);
   const done=performance.filter(p=>p.exa_id===id);
   makeCell(row,String(entries.length));makeCell(row,String(done.reduce((n,p)=>n+(Number(p.customer_count)||0),0)));
