@@ -147,24 +147,68 @@ body:has(.lg-interview-login:not(.hide):not(.hidden)) .page>.topbar{display:none
 .dialog-action.followup strong{color:#285c86}
 .dialog-head p:empty{display:none}
 @media(max-width:530px){.dialog-action{padding:13px 15px}.dialog-action strong{font-size:16px}}
+
+/* Operations-first management dashboard. Layout only; data and permissions unchanged. */
+#app{max-width:1240px}
+#app .page-head{margin-bottom:8px}
+#app .action-section-heading{margin:19px 0 13px;font-size:15px;letter-spacing:.035em;color:#29384d}
+#app .action-dashboard{grid-template-columns:minmax(0,5fr) minmax(0,5fr) minmax(185px,2.35fr);align-items:stretch;gap:15px}
+#app .action-dashboard .panel{min-height:268px;padding:22px 23px 20px;gap:14px}
+#app .action-dashboard .panel h2{font-size:18px}
+#app .action-dashboard .panel .count{font-size:55px}
+#app .action-dashboard .action-panel .sub{display:flex;align-items:center;border-radius:8px;padding:15px 15px;min-height:72px;font-size:15px;line-height:1.5;font-weight:850}
+#app .action-dashboard .final-panel .sub{background:#963D28;color:white;box-shadow:inset 0 1px rgba(255,255,255,.15)}
+#app .action-dashboard .outside-panel .sub{background:#1D5276;color:white;box-shadow:inset 0 1px rgba(255,255,255,.15)}
+#app .action-dashboard .panel button{min-height:45px;font-size:13px}
+#app .action-dashboard .birthday-panel{padding:21px 16px 19px;gap:13px}
+#app .action-dashboard .birthday-panel h2{font-size:15px}
+#app .action-dashboard .birthday-panel .count{font-size:44px}
+#app .action-dashboard .birthday-panel .sub{font-size:12px;font-weight:500;min-height:0;color:#777974}
+#app .action-dashboard .birthday-panel button{background:#fff;color:#344b62;border:1px solid #C9D3E0;box-shadow:none;font-size:12px;white-space:nowrap;padding-inline:7px}
+#app .action-dashboard .birthday-panel button:hover{background:#F4F7FA}
+#app .menus{grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
+#app .menu-card{min-height:132px;padding:17px;gap:8px;align-items:flex-start}
+#app .menu-card .icon{width:43px;height:43px;font-size:24px}
+#app .menu-card strong{font-size:16px}
+#app .menu-card .arrow{right:15px;top:17px}
+#app .section-heading:not(.action-section-heading){font-size:15px;letter-spacing:.035em;margin:25px 0 13px;color:#29384d}
+@media(max-width:960px){
+ #app .action-dashboard{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #app .birthday-panel{grid-column:span 2}
+ #app .action-dashboard .birthday-panel{min-height:130px;display:grid;grid-template-columns:1fr auto;align-items:center}
+ #app .action-dashboard .birthday-panel .sub{grid-column:1}
+ #app .action-dashboard .birthday-panel button{grid-column:2;grid-row:1 / span 3;width:140px;margin:0}
+ #app .menus{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:600px){
+ #app .action-dashboard{grid-template-columns:1fr}
+ #app .action-dashboard .panel{min-height:220px}
+ #app .birthday-panel{grid-column:span 1}
+ #app .action-dashboard .action-panel .sub{font-size:14px;min-height:58px;padding:12px}
+ #app .action-dashboard .birthday-panel{grid-template-columns:1fr auto;min-height:120px}
+ #app .action-dashboard .birthday-panel button{width:120px}
+ #app .menus{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #app .menu-card{min-height:118px;padding:14px}
+}
 </style></head>
 <body>
 <header><div class="brand">L GROUP<small>MANAGEMENT SYSTEM</small></div><div class="header-right"><span id="userName"></span><button id="logout" class="hidden">ログアウト</button></div></header>
 <div id="login" class="lg-interview-login hidden"><div class="auth-card"><aside class="auth-brand-panel" aria-hidden="true"><div class="auth-brand-top"><div class="auth-brand-symbol">L</div><div class="auth-brand-name">L GROUP<small>INTERNAL MANAGEMENT</small></div></div><div class="auth-brand-middle"><span class="auth-brand-kicker">STAFF MANAGEMENT SYSTEM</span><h1 class="auth-brand-title">L GROUP<br>MANAGEMENT.</h1><p class="auth-brand-description">日々の管理業務を、もっとスマートに。<br>すべての情報をひとつの場所で。</p></div><div class="auth-brand-bottom"><span>STAFF PORTAL</span><span>L GROUP © 2026</span></div></aside><div class="auth-form-panel"><p class="auth-eyebrow">WELCOME BACK</p><h2>総合管理ログイン</h2><div class="auth-mode-label"><span>管理者</span></div><form id="loginForm"><p class="auth-help">既存の管理者アカウントと同じID・PASSを使用します。</p><label for="email">ID（メールアドレス）<input id="email" type="email" autocomplete="username" required></label><label for="password">PASS<input id="password" type="password" autocomplete="current-password" required></label><div id="loginError" role="alert"></div><button type="submit">ログイン</button></form><p class="auth-footnote">AUTHORIZED PERSONNEL ONLY</p></div></div></div>
 <main id="app" class="hidden">
  <div class="page-head"><div><h1>総合管理TOP</h1><p id="asOf">各店舗の管理状況</p></div><button class="refresh" id="refresh">最新の情報に更新</button></div>
- <div class="dashboard">
-  <section class="panel"><h2><span>◷</span>最終出勤</h2><div class="count" id="finalCount">—<small>名</small></div><div class="sub">退勤前に次回シフトを決める！</div><button data-open="final">対象者を確認</button></section>
-  <section class="panel"><h2><span>◫</span>実働外</h2><div class="count" id="outsideCount">—<small>名</small></div><div class="sub">本人に連絡して次回出勤を確保！</div><button data-open="outside">連絡対象者を確認</button></section>
-  <section class="panel"><h2><span>♧</span>誕生日</h2><div class="count" id="birthdayCount">—<small>名</small></div><div class="sub">誕生日の前後3日間</div><button data-open="birthday">一覧を確認</button></section>
+ <h2 class="section-heading action-section-heading">本日の対応事項</h2>
+ <div class="dashboard action-dashboard">
+  <section class="panel action-panel final-panel"><h2><span>◷</span>最終出勤</h2><div class="count" id="finalCount">—<small>名</small></div><div class="sub">退勤前に次回シフトを決める！</div><button data-open="final">対象者を確認</button></section>
+  <section class="panel action-panel outside-panel"><h2><span>◫</span>実働外</h2><div class="count" id="outsideCount">—<small>名</small></div><div class="sub">本人に連絡して次回出勤を確保！</div><button data-open="outside">連絡対象者を確認</button></section>
+  <section class="panel birthday-panel"><h2><span>♧</span>誕生日</h2><div class="count" id="birthdayCount">—<small>名</small></div><div class="sub">前後3日間</div><button data-open="birthday">一覧を確認</button></section>
  </div>
 
  <h2 class="section-heading">管理メニュー</h2>
  <nav class="menus" aria-label="管理メニュー">
-  <a class="menu-card" href="../interview-sheet-preview/" target="_blank" rel="noopener noreferrer"><span class="icon">▤</span><strong>面接管理</strong><small>応募・面接・LINE通知</small><span class="arrow">↗</span></a>
-  <a class="menu-card" href="../interview-sheet-preview/metrics.html" target="_blank" rel="noopener noreferrer"><span class="icon">▥</span><strong>数値管理</strong><small>面接数値・店舗数値</small><span class="arrow">↗</span></a>
-  <a class="menu-card" href="../exa-shifts/" target="_blank" rel="noopener noreferrer"><span class="icon">▦</span><strong>出勤管理</strong><small>月間シフト・日別タイムチャート</small><span class="arrow">↗</span></a>
-  <a class="menu-card" href="../residency-management/" target="_blank" rel="noopener noreferrer"><span class="icon">♙</span><strong>在籍管理</strong><small>在籍区分・退店管理</small><span class="arrow">↗</span></a>
+  <a class="menu-card" href="../interview-sheet-preview/" target="_blank" rel="noopener noreferrer"><span class="icon">▤</span><strong>面接管理</strong><span class="arrow">↗</span></a>
+  <a class="menu-card" href="../interview-sheet-preview/metrics.html" target="_blank" rel="noopener noreferrer"><span class="icon">▥</span><strong>数値管理</strong><span class="arrow">↗</span></a>
+  <a class="menu-card" href="../exa-shifts/" target="_blank" rel="noopener noreferrer"><span class="icon">▦</span><strong>出勤管理</strong><span class="arrow">↗</span></a>
+  <a class="menu-card" href="../residency-management/" target="_blank" rel="noopener noreferrer"><span class="icon">♙</span><strong>在籍管理</strong><span class="arrow">↗</span></a>
  </nav>
 </main>
 <main id="staffApp" class="hidden" style="max-width:820px"><div class="page-head"><div><h1>スタッフ管理</h1><p>許可された面接管理ページへ移動できます。</p></div></div><nav class="menus" aria-label="スタッフメニュー" style="grid-template-columns:1fr"><a class="menu-card" href="../interview-management/" target="_blank" rel="noopener noreferrer"><span class="icon">▤</span><strong>面接管理</strong><small>担当店舗の応募・面接情報</small><span class="arrow">↗</span></a></nav></main>
@@ -234,7 +278,17 @@ const configs={
 };
 function render(){
  if(!mode)return;const cfg=configs[mode],q=$("search").value.trim().toLowerCase(),store=$("storeFilter").value;
- const rows=(data[cfg.key]||[]).filter(r=>(store==="all"||r.store===store)&&(!q||String(r.name||"").toLowerCase().includes(q)||String(r.exa_id||"").includes(q)));
+ const rows=(data[cfg.key]||[]).filter(r=>(store==="all"||r.store===store)&&(!q||String(r.name||"").toLowerCase().includes(q)||String(r.exa_id||"").includes(q))).sort((a,b)=>{
+  if(mode==="final"){
+    const x=a.end_minutes==null?Infinity:Number(a.end_minutes),y=b.end_minutes==null?Infinity:Number(b.end_minutes);
+    return x-y||String(a.store).localeCompare(String(b.store))||Number(a.exa_id)-Number(b.exa_id);
+  }
+  if(mode==="outside"){
+    const x=a.last_date||"9999-12-31",y=b.last_date||"9999-12-31";
+    return x.localeCompare(y)||String(a.store).localeCompare(String(b.store))||Number(a.exa_id)-Number(b.exa_id);
+  }
+  return Math.abs(Number(a.offset))-Math.abs(Number(b.offset))||Number(a.offset)-Number(b.offset)||String(a.store).localeCompare(String(b.store));
+ });
  text($("dialogTitle"),cfg.title+"｜"+rows.length+"名");text($("dialogSub"),cfg.sub||"");
  const actionBox=$("dialogAction");
  actionBox.classList.toggle("hidden",!cfg.action);
