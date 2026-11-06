@@ -74,7 +74,7 @@ body:has(.lg-interview-login:not(.hide):not(.hidden)) .page>.topbar{display:none
 (()=>{"use strict";
 const $=id=>document.getElementById(id);
 const client=window.supabase?.createClient("https://vjjnkflbfsjihwzjsjpr.supabase.co","sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos",{auth:{persistSession:true,autoRefreshToken:true,storage:localStorage,storageKey:"mattan-recruit-auth"}});
-function showLogin(message=""){$("metricsFrame").classList.add("hidden");$("metricsLogin").classList.remove("hidden");$("metricsLoginError").textContent=message}
+function showLogin(message=""){location.replace("/therapist-profile/staff/management-top/")}
 async function check(){
  if(!client){showLogin("認証処理を読み込めません。");return}
  const {data:{session}}=await client.auth.getSession();
