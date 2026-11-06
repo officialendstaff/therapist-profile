@@ -85,15 +85,34 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 const $=id=>document.getElementById(id);
 const client=window.supabase?.createClient("https://vjjnkflbfsjihwzjsjpr.supabase.co","sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos",{auth:{persistSession:true,autoRefreshToken:true,storage:localStorage,storageKey:"mattan-recruit-auth"}});
 function showLogin(message=""){location.replace("/therapist-profile/staff/management-top/")}
+async function staffMetricsView(){
+ const token=sessionStorage.getItem("interview_staff_session_v2")||localStorage.getItem("interview_staff_session_v2");
+ if(!token||!/^[0-9a-f]{64}$/.test(token))return false;
+ try{
+  const r=await fetch("https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access",{
+   method:"POST",cache:"no-store",headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({action:"verify",token})
+  });
+  if(!r.ok||!(await r.json()).ok)return false;
+  sessionStorage.setItem("interview_staff_session_v2",token);
+  const home=document.getElementById("lgHeaderHomeLabel");if(home)home.textContent="スタッフ TOP";
+  $("metricsLogin").classList.add("hidden");
+  $("metricsFrame").classList.remove("hidden");
+  if(!$("metricsFrame").getAttribute("src"))$("metricsFrame").src="./?standaloneMetrics=1";
+  return true;
+ }catch{return false}
+}
+
 async function check(){
  if(!client){showLogin("認証処理を読み込めません。");return}
  const {data:{session}}=await client.auth.getSession();
- if(!session){showLogin();return}
+ if(!session){if(await staffMetricsView())return;showLogin();return}
  const [profile,allowed]=await Promise.all([
   client.from("recruit_staff_profiles").select("display_name,role,approved_at").eq("user_id",session.user.id).maybeSingle(),
   client.rpc("can_link_therapist_interview")
  ]);
  if(profile.error||allowed.error||allowed.data!==true||!profile.data?.approved_at||!["master","full"].includes(profile.data.role)){
+  if(await staffMetricsView())return;
   showLogin("このページへの権限がありません。");return
  }
  const homeName=document.getElementById("lgHeaderHomeLabel");if(homeName)homeName.textContent=(profile.data.display_name||"管理")+" TOP";
