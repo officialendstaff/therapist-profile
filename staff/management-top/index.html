@@ -220,6 +220,28 @@ body:has(.lg-interview-login:not(.hide):not(.hidden)) .page>.topbar{display:none
  #app .action-dashboard .birthday-panel button{min-height:50px}
  #app .menu-card{min-height:137px;padding:17px}
 }
+
+/* Outside-roster follow-up control layout */
+.dialog{width:min(1100px,calc(100vw - 32px));max-height:88vh}
+.dialog-head{padding:20px 24px}
+.dialog-head h2{font-size:22px}
+.dialog-header-controls{display:flex;align-items:center;gap:12px}
+.dialog-header-controls select{min-width:190px;border:1px solid #cad7e6;border-radius:7px;padding:10px 12px;color:#263e57;background:#fff;font-size:13px}
+.list-wrap{padding:0 22px 22px}
+.list-wrap th{font-size:12px;padding:15px 13px}
+.list-wrap td{font-size:14px;padding:14px 13px}
+.therapist-name-cell strong{display:block;font-size:15px;color:#213a56}
+.therapist-name-cell small{display:block;font-size:12px;color:#788a9e;margin-top:1px}
+.therapist-name-cell span{display:block;font-size:11px;color:#7f91a4;margin-top:3px}
+.contact-status-cell{min-width:170px}
+.contact-check{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:650;cursor:pointer;white-space:nowrap}
+.contact-check input{width:17px;height:17px;accent-color:#2d628d}
+.contact-state{margin-top:7px;font-size:12px;font-weight:750}
+.state-pending{color:#a25b3c}.state-followup{color:#42668b}.state-overdue{color:#b54138}
+.recontact-button{margin-top:7px;border:1px solid #d29381;border-radius:6px;padding:7px 10px;background:#fff2ef;color:#9c4132;font-size:12px;font-weight:700}
+.recontact-button:hover{background:#ffe5dd}
+.contact-time{white-space:nowrap;font-variant-numeric:tabular-nums;color:#41566f;font-size:13px!important}
+@media(max-width:650px){.dialog{width:calc(100vw - 18px)}.dialog-head{padding:13px 14px}.dialog-head h2{font-size:16px}.dialog-header-controls select{min-width:0;width:120px;padding:8px}.list-wrap{padding:0 10px 14px}.list-wrap th,.list-wrap td{padding:10px 8px;font-size:12px}}
 </style></head>
 <body>
 <header><div class="brand">L GROUP<small>MANAGEMENT SYSTEM</small></div><div class="header-right"><span id="userName"></span><button id="logout" class="hidden">ログアウト</button></div></header>
@@ -244,10 +266,9 @@ body:has(.lg-interview-login:not(.hide):not(.hidden)) .page>.topbar{display:none
 <main id="staffApp" class="hidden" style="max-width:820px"><div class="page-head"><div><h1>スタッフ管理</h1><p>許可された面接管理ページへ移動できます。</p></div></div><nav class="menus" aria-label="スタッフメニュー" style="grid-template-columns:1fr"><a class="menu-card" href="../interview-management/" target="_blank" rel="noopener noreferrer"><span class="icon">▤</span><strong>面接管理</strong><small>担当店舗の応募・面接情報</small><span class="arrow">↗</span></a></nav></main>
 <div id="overlay" class="overlay hidden" role="presentation">
  <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
-  <div class="dialog-head"><div><h2 id="dialogTitle">一覧</h2><p id="dialogSub"></p></div><button class="close" id="close" aria-label="閉じる">閉じる ×</button></div>
+  <div class="dialog-head"><div><h2 id="dialogTitle">一覧</h2><p id="dialogSub"></p></div><div class="dialog-header-controls"><select id="storeFilter" aria-label="店舗を絞り込む"><option value="all">全店舗</option><option value="rose">薔薇と紳士</option><option value="busty">BUSTY OSAKA</option><option value="grandluxe">Grand Luxe</option><option value="luxy">LUXY OSAKA</option><option value="unsecret">Un Secret</option></select><button class="close" id="close" aria-label="閉じる">閉じる ×</button></div></div>
   <div id="dialogAction" class="dialog-action hidden" role="note"><strong id="dialogActionTitle"></strong><span id="dialogActionNote"></span></div>
-  <div class="filters"><input id="search" type="search" placeholder="源氏名・EXA IDで検索" aria-label="一覧内を検索"><select id="storeFilter" aria-label="店舗を絞り込む">
-   <option value="all">全店舗</option><option value="rose">薔薇と紳士</option><option value="busty">BUSTY OSAKA</option><option value="grandluxe">Grand Luxe</option><option value="luxy">LUXY OSAKA</option><option value="unsecret">Un Secret</option></select></div>
+  <div class="filters" id="dialogFilters"><input id="search" type="search" placeholder="源氏名・EXA IDで検索" aria-label="一覧内を検索"></div>
   <div class="list-wrap"><table><thead id="listHead"></thead><tbody id="listBody"></tbody></table></div>
  </section>
 </div>
@@ -261,6 +282,7 @@ const client=window.supabase?.createClient(url,key,{auth:{persistSession:true,au
 const names={rose:"薔薇と紳士",busty:"BUSTY OSAKA",grandluxe:"Grand Luxe",luxy:"LUXY OSAKA",unsecret:"Un Secret"};
 const links={rose:"../exa-shifts/",busty:"../exa-shifts/busty-osaka/",grandluxe:"../exa-shifts/grand-luxe/",luxy:"../exa-shifts/luxy-osaka/",unsecret:"../exa-shifts/un-secret/"};
 let data={final_today:[],outside:[],birthday:[],connected_stores:[],unconnected_stores:[]},mode=null,authorized=false;
+let contacts=new Map();let contactSaving=false;
 const text=(e,v)=>{e.textContent=String(v??"")};
 const mk=(tag,value)=>{const e=document.createElement(tag);text(e,value);return e};
 function showLogin(error=""){$("app").classList.add("hidden");$("staffApp").classList.add("hidden");$("login").classList.remove("hidden");$("logout").classList.add("hidden");text($("loginError"),error)}
@@ -291,9 +313,11 @@ async function load(){
  if(!authorized)return;
  $("refresh").disabled=true;
  try{
-  const r=await client.rpc("management_top_overview");
+  const [r,contactResult]=await Promise.all([client.rpc("management_top_overview"),client.rpc("management_shift_contact_list")]);
   if(r.error)throw r.error;
+  if(contactResult.error)throw contactResult.error;
   data=r.data||data;
+  contacts=new Map((contactResult.data||[]).map(x=>[x.store_code+":"+x.exa_id,x.contacted_at]));
   for(const [category,element] of [["final_today","finalCount"],["outside","outsideCount"],["birthday","birthdayCount"]])
    $(element).innerHTML=String((data[category]||[]).length)+'<small>名</small>';
   text($("asOf"),"集計基準日 "+(data.as_of||"—"));
@@ -307,7 +331,9 @@ const configs={
  birthday:{title:"誕生日",sub:"誕生日の前後3日間",key:"birthday",last:"誕生日"}
 };
 function render(){
- if(!mode)return;const cfg=configs[mode],q=$("search").value.trim().toLowerCase(),store=$("storeFilter").value;
+ if(!mode)return;const cfg=configs[mode],q=mode==="birthday"?$("search").value.trim().toLowerCase():"",store=$("storeFilter").value;
+ $("storeFilter").classList.toggle("hidden",mode==="final");
+ $("dialogFilters").classList.toggle("hidden",mode!=="birthday");
  const rows=(data[cfg.key]||[]).filter(r=>(store==="all"||r.store===store)&&(!q||String(r.name||"").toLowerCase().includes(q)||String(r.exa_id||"").includes(q))).sort((a,b)=>{
   if(mode==="final"){
     const x=a.end_minutes==null?Infinity:Number(a.end_minutes),y=b.end_minutes==null?Infinity:Number(b.end_minutes);
@@ -327,26 +353,85 @@ function render(){
  text($("dialogActionTitle"),cfg.action||"");
  text($("dialogActionNote"),cfg.note||"");
  const tr=document.createElement("tr");
- for(const h of ["店舗","源氏名 / EXA ID",cfg.last,"操作"])tr.append(mk("th",h));
+ const heads=mode==="outside"?["店舗","源氏名","最終出勤日","対応状況","最終対応日時"]:["店舗","源氏名 / EXA ID",cfg.last,"操作"];
+ for(const h of heads)tr.append(mk("th",h));
  $("listHead").replaceChildren(tr);$("listBody").replaceChildren();
- if(!rows.length){const r=document.createElement("tr"),d=mk("td","該当者はいません。");d.colSpan=4;d.className="empty";r.append(d);$("listBody").append(r);return}
+ if(!rows.length){const row=document.createElement("tr"),cell=mk("td","該当者はいません。");cell.colSpan=heads.length;cell.className="empty";row.append(cell);$("listBody").append(row);return}
  for(const person of rows){
   const row=document.createElement("tr");
-  row.append(mk("td",names[person.store]||person.store),mk("td",(person.name||"名称未設定")+"｜ID "+person.exa_id));
-  let v="—";
-  if(mode==="final"&&person.end_minutes!==null){const minutes=Number(person.end_minutes);const hours=Math.floor(minutes/60);v=String(hours%24).padStart(2,"0")+":"+String(minutes%60).padStart(2,"0")+(hours>=24?"（翌日）":"")}
-  if(mode==="outside")v=person.last_date||"記録なし";
-  if(mode==="birthday"){const offset=Number(person.offset);v=(person.birthday||"—")+(offset===0?"（当日）":offset<0?"（"+Math.abs(offset)+"日前）":"（"+offset+"日後）")}
-  row.append(mk("td",v));
-  const cell=document.createElement("td"),a=document.createElement("a");
-  a.href=mode==="birthday"?"../residency-management/":(links[person.store]||"../exa-shifts/");
-  a.textContent=mode==="birthday"?"在籍管理へ":"出勤管理へ";cell.append(a);row.append(cell);$("listBody").append(row);
+  row.append(mk("td",names[person.store]||person.store));
+  if(mode==="outside"){
+   const nameCell=document.createElement("td");nameCell.className="therapist-name-cell";
+   const raw=person.name||"名称未設定";
+   const match=/^(.+?)[-－ー]([ぁ-んァ-ヶ\s]+)[-－ー]$/.exec(raw);
+   const name=match?match[1]:raw;
+   const main=mk("strong",name);nameCell.append(main);
+   if(match){nameCell.append(mk("small",match[2].trim()))}
+   nameCell.append(mk("span","ID "+person.exa_id));
+   row.append(nameCell);
+   row.append(mk("td",person.last_date||"記録なし"));
+   const status=document.createElement("td");status.className="contact-status-cell";
+   const contactKey=person.store+":"+person.exa_id;
+   const at=contacts.get(contactKey);
+   const overdue=at&&Date.now()-Date.parse(at)>=24*60*60*1000;
+   const label=document.createElement("label");label.className="contact-check";
+   const check=document.createElement("input");check.type="checkbox";check.checked=!!at;check.disabled=contactSaving;
+   check.dataset.contactStore=person.store;check.dataset.contactExaId=String(person.exa_id);
+   label.append(check,mk("span","連絡済み"));status.append(label);
+   const note=mk("div",!at?"未対応":overdue?"再連絡が必要":"連絡済み・未確定");
+   note.className="contact-state "+(!at?"state-pending":overdue?"state-overdue":"state-followup");
+   status.append(note);
+   if(overdue){
+    const again=mk("button","再連絡済みにする");again.type="button";again.className="recontact-button";again.disabled=contactSaving;
+    again.dataset.recontactStore=person.store;again.dataset.recontactExaId=String(person.exa_id);status.append(again);
+   }
+   row.append(status);
+   const timeCell=mk("td",at?formatContactTime(at):"—");timeCell.className="contact-time";row.append(timeCell);
+  }else{
+   row.append(mk("td",(person.name||"名称未設定")+"｜ID "+person.exa_id));
+   let v="—";
+   if(mode==="final"&&person.end_minutes!==null){const minutes=Number(person.end_minutes);const hours=Math.floor(minutes/60);v=String(hours%24).padStart(2,"0")+":"+String(minutes%60).padStart(2,"0")+(hours>=24?"（翌日）":"")}
+   if(mode==="birthday"){const offset=Number(person.offset);v=(person.birthday||"—")+(offset===0?"（当日）":offset<0?"（"+Math.abs(offset)+"日前）":"（"+offset+"日後）")}
+   row.append(mk("td",v));
+   const cell=document.createElement("td"),a=document.createElement("a");
+   a.href=mode==="birthday"?"../residency-management/":(links[person.store]||"../exa-shifts/");
+   a.textContent=mode==="birthday"?"在籍管理へ":"出勤管理へ";cell.append(a);row.append(cell);
+  }
+  $("listBody").append(row);
  }
+
 }
-function open(type){mode=type;$("search").value="";$("storeFilter").value="all";$("overlay").classList.remove("hidden");render();$("search").focus()}
+function open(type){mode=type;$("search").value="";$("storeFilter").value="all";$("overlay").classList.remove("hidden");render();if(type==="birthday")$("search").focus()}
 function close(){mode=null;$("overlay").classList.add("hidden")}
 document.querySelectorAll("[data-open]").forEach(b=>b.addEventListener("click",()=>open(b.dataset.open)));
 $("search").addEventListener("input",render);$("storeFilter").addEventListener("change",render);
+function formatContactTime(iso){
+ const d=new Date(iso);
+ if(!Number.isFinite(d.getTime()))return "日時不明";
+ return new Intl.DateTimeFormat("ja-JP",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}).format(d);
+}
+async function saveContact(store,exaId,isContacted){
+ if(contactSaving)return;
+ contactSaving=true;
+ $("listBody").querySelectorAll("input,button").forEach(el=>el.disabled=true);
+ try{
+  const r=await client.rpc("management_shift_contact_set",{p_store:store,p_exa_id:exaId,p_contacted:isContacted});
+  if(r.error)throw r.error;
+  const saved=Array.isArray(r.data)?r.data[0]:r.data;
+  const key=store+":"+exaId;
+  if(saved?.contacted_at)contacts.set(key,saved.contacted_at);else contacts.delete(key);
+ }catch(e){alert("連絡記録を保存できません："+(e.message||e))}
+ finally{contactSaving=false;render()}
+}
+$("listBody").addEventListener("change",e=>{
+ const t=e.target;
+ if(t instanceof HTMLInputElement&&t.matches("[data-contact-store]"))saveContact(t.dataset.contactStore,Number(t.dataset.contactExaId),t.checked);
+});
+$("listBody").addEventListener("click",e=>{
+ const t=e.target.closest("[data-recontact-store]");
+ if(t)saveContact(t.dataset.recontactStore,Number(t.dataset.recontactExaId),true);
+});
+
 $("close").addEventListener("click",close);$("overlay").addEventListener("click",e=>{if(e.target===$("overlay"))close()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&mode)close()});
 $("refresh").addEventListener("click",load);
