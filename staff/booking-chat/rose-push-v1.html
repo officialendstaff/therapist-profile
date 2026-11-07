@@ -452,7 +452,7 @@ async function call(action,params={}){
  catch(e){if(e.status===401)unauthorized();throw e}
 }
 function isUnread(t){return !!(t.last_customer_message_at&&(!t.staff_last_read_at||new Date(t.last_customer_message_at)>new Date(t.staff_last_read_at)))}
-function nameOf(t){const visitor=t.booking_chat_visitors;return (visitor&&visitor.display_name)||"お客様 "+String(t.visitor_id).slice(0,8)}
+function nameOf(t){const visitor=t.booking_chat_visitors;const saved=typeof visitor?.display_name==="string"?visitor.display_name.trim():"";return saved||String(t.visitor_id||"").slice(0,8)+" 様"}
 function drawList(){
  const list=$("threads");list.replaceChildren();
  let unread=0;
