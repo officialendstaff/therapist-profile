@@ -31,7 +31,15 @@ function sendViewport(){
    panel.style.setProperty("max-height",viewport.height+"px","important");
   }
  }
- frame.contentWindow.postMessage({type:"lgroup.chat.viewport",store:guestStore,...viewport},chatOrigin);
+ // Send iframe dimensions, NOT the full host page width. Desktop panels are
+ // narrower than the page; using window.innerWidth causes chat content to overflow.
+ const rect=frame.getBoundingClientRect();
+ const width=Math.round(rect.width||frame.clientWidth||viewport.width);
+ const height=Math.round(rect.height||frame.clientHeight||viewport.height);
+ frame.contentWindow.postMessage({
+  type:"lgroup.chat.viewport",store:guestStore,
+  width:Math.max(240,width),height:Math.max(120,height)
+ },chatOrigin);
 }
 function lockScroll(){
  if(restoreScroll||window.innerWidth>640)return;
@@ -80,7 +88,7 @@ function showChat(){
  const panel=root.querySelector(".lg-chat-panel"),back=root.querySelector(".lg-chat-backdrop"),button=root.querySelector(".lg-chat-launcher");
  open=true;panel.hidden=false;back.hidden=false;button.setAttribute("aria-expanded","true");
  lockScroll();
- if(!frame.getAttribute("src"))frame.setAttribute("src",base+"?store="+encodeURIComponent(guestStore)+"&embed=1&v=20261107-last-message-v4");
+ if(!frame.getAttribute("src"))frame.setAttribute("src",base+"?store="+encodeURIComponent(guestStore)+"&embed=1&v=20261107-desktop-fit-v5");
  sendViewport();
  frame.contentWindow?.postMessage({type:"lgroup.chat.opened",store:guestStore},chatOrigin);
  root.querySelector(".lg-chat-close").focus({preventScroll:true});
