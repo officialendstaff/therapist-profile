@@ -122,10 +122,28 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
 #app>header.lg-common-header .unread-total{color:#f3b0c3;font-size:11px}
 @media(max-width:1280px){#app>header.lg-common-header small,#app>header.lg-common-header #pushStatus{display:none}}
 @media(max-width:900px){#app>header.lg-common-header{height:auto;min-height:60px;flex-wrap:wrap;padding:7px 12px;gap:5px}#app>header.lg-common-header .lg-header-home img{height:36px;width:36px}#app>header.lg-common-header .lg-header-brand{width:100%}#app>header.lg-common-header .lg-chat-header-actions{overflow-x:auto;justify-content:flex-start;padding:4px 0;gap:6px}#app>header.lg-common-header .lg-header-section-icon{height:25px;width:25px}}
+</style><style id="lg-chat-notification-settings-20261107">
+#app{overflow:visible}
+#app>header.lg-common-header{position:relative;z-index:30;flex-shrink:0}
+#app>header.lg-common-header .lg-chat-header-actions{overflow:visible;gap:10px}
+#app>header.lg-common-header .chat-notification-settings{position:relative;display:inline-flex;align-items:center;font-family:inherit}
+#app>header.lg-common-header .chat-notification-settings>summary{list-style:none;display:inline-flex;align-items:center;justify-content:center;height:34px;padding:0 13px;border:1px solid #728199;border-radius:6px;background:#243851;color:#fff;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap}
+#app>header.lg-common-header .chat-notification-settings>summary::-webkit-details-marker{display:none}
+#app>header.lg-common-header .chat-notification-settings>summary:after{content:"⌄";margin-left:8px;color:#c0cedd}
+#app>header.lg-common-header .chat-notification-settings[open]>summary{background:#364c69}
+#app>header.lg-common-header .chat-notification-settings>summary:focus-visible{outline:2px solid #d5b277;outline-offset:2px}
+#app>header.lg-common-header .chat-notification-panel{position:absolute;right:0;top:calc(100% + 10px);z-index:50;display:flex;flex-direction:column;gap:10px;width:min(300px,calc(100vw - 20px));padding:16px;border:1px solid #cbd7e4;border-radius:10px;background:#fff;box-shadow:0 14px 35px #14283f45;color:#253a55;white-space:normal;text-align:left}
+#app>header.lg-common-header .chat-notification-panel>strong{display:block;color:#223650;font-size:15px;margin-bottom:3px}
+#app>header.lg-common-header .chat-notification-panel button{display:block;min-height:38px;width:100%;font-size:12px;padding:9px 12px;background:#edf3fa;color:#284463;border-color:#cbd8e6}
+#app>header.lg-common-header .chat-notification-panel #pushEnable{background:#e8f5ed;border-color:#9bcab0;color:#1b6548}
+#app>header.lg-common-header .chat-notification-panel #pushEnable[data-enabled="true"]{background:#e2f5ea;color:#176442}
+#app>header.lg-common-header .chat-notification-panel #pushStatus{display:block;max-width:none;overflow:visible;text-overflow:clip;color:#62788f;font-size:11px;line-height:1.6;margin:0}
+@media(max-width:900px){#app>header.lg-common-header .lg-chat-header-actions{overflow:visible;justify-content:flex-end;padding:4px 0}#app>header.lg-common-header .chat-notification-panel{right:0}}
+@media(max-width:480px){#app>header.lg-common-header .lg-chat-header-actions{width:100%;gap:7px}#app>header.lg-common-header .chat-notification-panel{right:-60px}}
 </style></head><body>
 <div id="gate"><section class="gate-card"><h1>L GROUP｜チャット管理</h1><p>面接管理にログイン済みの管理者アカウントで接続します。チャット専用パスワードは不要です。</p><button class="primary" id="connect" type="button">管理者アカウントで接続</button><p id="gateError" role="alert" aria-live="polite"></p><p><a href="/therapist-profile/staff/management-top/" target="_blank" rel="noopener noreferrer">面接管理のログイン画面を開く</a></p></section></div>
 <div id="app" hidden>
-<header class="lg-common-header"><div class="lg-header-brand"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ戻る"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><span class="lg-header-divider"></span><img class="lg-header-section-icon" src="/therapist-profile/staff/assets/favicons/chat.svg" alt=""><strong>チャット管理</strong></div><div class="lg-chat-header-actions"><small>薔薇と紳士 先行テスト｜HP未設置</small><span class="unread-total" id="unreadTotal" aria-live="polite">未読 0件</span><button id="pushEnable" type="button" data-enabled="false">プッシュ通知を有効化</button><button id="pushTest" type="button" disabled>通知テスト</button><span id="pushStatus" aria-live="polite">未設定</span><button id="notifyToggle" type="button" aria-pressed="false">画面内通知音 OFF</button><a id="customerTestLink" href="../../chat/?store=%E8%96%94%E8%96%87%E3%81%A8%E7%B4%B3%E5%A3%AB" target="_blank" rel="noopener noreferrer">お客様用テスト画面</a><button id="reload" type="button">情報更新</button></div></header>
+<header class="lg-common-header"><div class="lg-header-brand"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ戻る"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><span class="lg-header-divider"></span><img class="lg-header-section-icon" src="/therapist-profile/staff/assets/favicons/chat.svg" alt=""><strong>チャット管理</strong></div><div class="lg-chat-header-actions"><span class="unread-total" id="unreadTotal" aria-live="polite">未読 0件</span><details id="notificationSettings" class="chat-notification-settings"><summary aria-label="通知設定を開く">通知設定</summary><div class="chat-notification-panel" role="group" aria-label="チャットの通知設定"><strong>通知設定</strong><button id="pushEnable" type="button" data-enabled="false">プッシュ通知を有効化</button><button id="pushTest" type="button" disabled>通知テスト</button><button id="notifyToggle" type="button" aria-pressed="false">画面内通知音 OFF</button><p id="pushStatus" aria-live="polite">未設定</p></div></details><button id="reload" type="button">情報更新</button></div></header>
 <div id="error" class="alert" hidden role="alert"></div>
 <div class="layout" id="layout">
 <div class="aside"><div class="filters"><select id="store" aria-label="店舗を切り替える"><option value="all">全店舗</option><option value="Grand Luxe">Grand Luxe</option><option value="LUXY OSAKA">LUXY OSAKA</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select><div class="filters-extra"><input id="threadSearch" type="search" placeholder="お客様・店舗を検索" aria-label="会話を検索"><button id="unreadOnly" type="button" aria-pressed="false">未読のみ</button></div><div class="hint" id="summary">問い合わせを取得中です</div></div><div class="thread-list" id="threads"></div></div>
@@ -205,7 +223,7 @@ $("pushTest").addEventListener("click",async()=>{
 const acceptedStores=["all","Grand Luxe","LUXY OSAKA","Un Secret","薔薇と紳士","BUSTY OSAKA"];
 const requestedStore=new URLSearchParams(location.search).get("store");
 $("store").value=acceptedStores.includes(requestedStore)?requestedStore:"薔薇と紳士";
-function setCustomerTestLink(){const store=$("store").value==="all"?"薔薇と紳士":$("store").value;$("customerTestLink").href="../../chat/?store="+encodeURIComponent(store)}
+function setCustomerTestLink(){/* Customer test link removed from the daily management UI. */}
 setCustomerTestLink();
 let token="",threadId="",items=[],loading=false,replying=false;
 let listInitialized=false,notifyOn=false,audioContext=null,activeThreadUpdatedAt="",threadOpening=false;
@@ -248,6 +266,13 @@ $("notifyToggle").addEventListener("click",()=>{
  if(notifyOn){
   try{const Audio=window.AudioContext||window.webkitAudioContext;if(Audio){audioContext=audioContext||new Audio();void audioContext.resume()}}catch{}
  }
+});
+const notificationSettings=$("notificationSettings");
+document.addEventListener("pointerdown",event=>{
+ if(notificationSettings.open&&!notificationSettings.contains(event.target))notificationSettings.open=false;
+});
+document.addEventListener("keydown",event=>{
+ if(event.key==="Escape"&&notificationSettings.open){notificationSettings.open=false;notificationSettings.querySelector("summary").focus()}
 });
 $("backToList").addEventListener("click",()=>$("layout").classList.remove("chat-open"));
 function updateCounters(){
