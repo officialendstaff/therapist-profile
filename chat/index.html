@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="ja"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-store">
+<meta name="robots" content="noindex,nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src https://vjjnkflbfsjihwzjsjpr.supabase.co; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+<title>ご相談チャット | L GROUP</title>
+<style>
+:root{color-scheme:light;--accent:#387fa6;--accent-soft:#eaf3f9;--ink:#24364c;--muted:#77889a;--line:#dee6ed}
+*{box-sizing:border-box}body{margin:0;background:#f5f7fa;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif}
+button,textarea{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.55}
+.shell{width:min(100%,760px);margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;background:#fff;box-shadow:0 0 24px rgba(17,40,63,.06)}
+.topbar{padding:16px 20px 15px;border-bottom:1px solid var(--line);background:#fff;display:flex;align-items:center;gap:12px;flex:none}
+.mark{width:36px;height:36px;border-radius:12px;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:20px;font-weight:700}
+.title{font-size:17px;font-weight:800;letter-spacing:.01em}.subtitle{margin-top:3px;font-size:11px;color:var(--muted);letter-spacing:.08em}
+.state{margin-left:auto;display:flex;align-items:center;gap:5px;color:#718399;font-size:11px}.dot{width:7px;height:7px;border-radius:50%;background:#9ba7b4}
+.intro{background:#f7f9fb;border-bottom:1px solid var(--line);padding:10px 20px;color:#738499;font-size:11px;line-height:1.75}
+.chat{flex:1;min-height:300px;overflow-y:auto;padding:24px 16px 30px;display:flex;flex-direction:column;gap:15px;scroll-behavior:smooth}
+.bubble-wrap{display:flex;flex-direction:column;align-items:flex-start;max-width:84%;gap:5px}
+.bubble-wrap.mine{align-self:flex-end;align-items:flex-end}
+.bubble{padding:12px 14px;border-radius:15px 15px 15px 3px;background:#f0f4f7;color:#283c54;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.7;box-shadow:0 1px 3px rgba(0,0,0,.03)}
+.mine .bubble{background:var(--accent);color:#fff;border-radius:15px 15px 3px 15px}
+.when{font-size:10px;color:#98a4b1}
+.empty{padding:18px 14px;margin:auto 0;text-align:center;color:#74869b;line-height:2;font-size:13px}
+.empty strong{font-size:16px;display:block;color:#3c5470;margin-bottom:10px}
+.composer{border-top:1px solid var(--line);padding:13px 16px calc(15px + env(safe-area-inset-bottom));background:#fff;flex:none}
+.composer-row{display:flex;align-items:flex-end;gap:10px}
+textarea{resize:none;flex:1;min-height:46px;max-height:130px;line-height:1.5;background:#f7f9fb;border:1px solid #dbe4ec;border-radius:12px;padding:12px;outline:none;font-size:14px}
+textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.send{border:0;border-radius:12px;background:var(--accent);color:#fff;font-weight:750;padding:0 20px;height:46px;white-space:nowrap}
+.help{font-size:10px;color:#8a99a9;margin-top:8px;line-height:1.6}
+.notice{padding:11px 14px;margin:12px 16px 0;border-radius:8px;border:1px solid #e8cfb7;color:#8e6134;background:#fff8ef;font-size:12px;line-height:1.7}
+.notice[hidden],#chatScreen[hidden],#chooser[hidden]{display:none!important}
+#chooser{margin:auto;padding:45px 20px;text-align:center;max-width:550px}
+#chooser h1{font-size:22px}#chooser p{font-size:13px;color:#6d8298;line-height:2}
+.stores{display:grid;gap:9px;margin:28px auto}.stores a{padding:17px;border:1px solid #d8e4ed;border-radius:10px;text-decoration:none;color:#2a4e72;background:#f9fbfd;font-size:14px;font-weight:700}
+@media(min-width:760px){.shell{min-height:min(100dvh,900px);max-height:100dvh}.chat{min-height:0}}
+</style></head><body><main class="shell">
+<section id="chooser" hidden><h1>L GROUP チャット</h1><p>ご相談する店舗をお選びください。<br>店舗ごとに会話履歴を分けて管理しています。</p><div class="stores" id="storeLinks"></div></section>
+<section id="chatScreen" hidden style="display:flex;flex:1;flex-direction:column;min-height:0">
+<header class="topbar"><div class="mark">L</div><div><div class="title" id="storeTitle">チャット</div><div class="subtitle">L GROUP ONLINE CHAT</div></div><div class="state"><i class="dot"></i><span id="connection">接続中</span></div></header>
+<div class="intro">ご質問・ご相談をお送りください。返信にはお時間をいただく場合があります。<strong>現在はテスト運用中です。送信だけでは予約確定になりません。</strong></div>
+<div class="notice" id="error" role="alert" hidden></div>
+<div class="chat" id="timeline" role="log" aria-label="チャット履歴" aria-live="polite"></div>
+<form id="composer" class="composer"><div class="composer-row"><textarea id="draft" rows="1" maxlength="2000" placeholder="メッセージを入力" aria-label="メッセージ" required disabled></textarea><button class="send" id="send" type="submit" disabled>送信</button></div><div class="help">同じブラウザで再度開くと会話履歴を引き継げます。別店舗への問い合わせは各店舗で新規として扱います。</div></form>
+</section></main>
+<script>
+(()=>{
+"use strict";
+const API="https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/booking-chat";
+const STORES=["Grand Luxe","LUXY OSAKA","Un Secret","薔薇と紳士","BUSTY OSAKA"];
+const COLORS={"Grand Luxe":"#8166a8","LUXY OSAKA":"#397bc3","Un Secret":"#138c80","薔薇と紳士":"#bf6f8e","BUSTY OSAKA":"#b8814a"};
+const $=id=>document.getElementById(id);
+const store=new URLSearchParams(location.search).get("store");
+const key="l_group_booking_chat_token_v1";
+let token="",ready=false,lastId=0,posting=false,polling=false;
+if(!STORES.includes(store)){
+ $("chooser").hidden=false;
+ for(const name of STORES){const a=document.createElement("a");a.href="?store="+encodeURIComponent(name);a.textContent=name;$("storeLinks").append(a)}
+ return;
+}
+$("chatScreen").hidden=false;$("storeTitle").textContent=store;
+document.documentElement.style.setProperty("--accent",COLORS[store]);
+const err=(message)=>{$("error").textContent=message;$("error").hidden=false;};
+const clearErr=()=>{$("error").textContent="";$("error").hidden=true;};
+const setReady=v=>{ready=v;$("draft").disabled=!v;$("send").disabled=!v;$("connection").textContent=v?"チャット接続中":"接続待機中";$("connection").previousElementSibling.style.background=v?"#41a184":"#9ba7b4";};
+async function api(payload){
+ const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),15000);
+ try{
+  const res=await fetch(API,{method:"POST",mode:"cors",cache:"no-store",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload),signal:controller.signal});
+  const data=await res.json();
+  if(!res.ok||!data.ok){const error=new Error(data.error||"request_failed");error.status=res.status;throw error}
+  return data;
+ }finally{clearTimeout(timeout)}
+}
+function line(message){
+ const mine=message.sender==="customer";
+ const wrap=document.createElement("div");wrap.className="bubble-wrap"+(mine?" mine":"");
+ const bubble=document.createElement("div");bubble.className="bubble";bubble.textContent=message.body;
+ const time=document.createElement("div");time.className="when";
+ const date=new Date(message.created_at);
+ time.textContent=(mine?"送信":"店舗から返信")+"　"+(Number.isNaN(+date)?"":date.toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}));
+ wrap.append(bubble,time);return wrap;
+}
+function add(messages){
+ const pane=$("timeline");
+ const ids=new Set([...pane.children].map(x=>x.dataset.messageId).filter(Boolean));
+ let added=0;
+ for(const m of messages){
+  if(ids.has(String(m.id)))continue;
+  const node=line(m);node.dataset.messageId=String(m.id);pane.append(node);
+  lastId=Math.max(lastId,Number(m.id)||0);added++;
+ }
+ if(added)pane.scrollTop=pane.scrollHeight;
+}
+function empty(){
+ if($("timeline").children.length)return;
+ const p=document.createElement("div");p.className="empty";p.id="welcome";
+ const strong=document.createElement("strong");strong.textContent="ご相談をお聞かせください";
+ p.append(strong,document.createTextNode("初回のメッセージを送信すると、店舗のスタッフに届きます。"));$("timeline").append(p);
+}
+function removeWelcome(){const p=$("welcome");if(p)p.remove()}
+function loadToken(){try{return localStorage.getItem(key)||""}catch{return ""}}
+function saveToken(t){try{localStorage.setItem(key,t)}catch{err("ブラウザで情報を保存できません。次回履歴を引き継げない可能性があります。")}}
+async function init(){
+ setReady(false);clearErr();
+ try{
+  token=loadToken();
+  let data;
+  try{data=await api({action:"guest_init",store,token:token||undefined})}
+  catch(e){if(e.status===401&&token){token="";try{localStorage.removeItem(key)}catch{};data=await api({action:"guest_init",store})}else throw e}
+  if(data.token){token=data.token;saveToken(token)}
+  if(!token)throw Error("no_session");
+  $("timeline").replaceChildren();lastId=0;add(data.messages||[]);empty();setReady(true);
+ }catch(e){err("チャットに接続できません。ページを再読み込みしてください。（"+String(e.message||e)+"）");setReady(false)}
+}
+async function poll(){
+ if(!ready||polling||posting||document.hidden)return;
+ polling=true;
+ try{const data=await api({action:"guest_poll",token,store,after:lastId});if(data.messages?.length){removeWelcome();add(data.messages)}}
+ catch(e){if(e.status===401){setReady(false);err("識別情報の有効期限が切れました。ページを再読み込みしてください。")}}
+ finally{polling=false}
+}
+$("composer").addEventListener("submit",async e=>{
+ e.preventDefault();if(!ready||posting)return;
+ const body=$("draft").value.trim();if(!body)return;
+ posting=true;$("send").disabled=true;clearErr();
+ const client_message_id=crypto.randomUUID();
+ try{
+  const data=await api({action:"guest_send",token,store,body,client_message_id});
+  removeWelcome();add([data.message]);$("draft").value="";
+ }catch(e){err("送信できませんでした。再度お試しください。（"+String(e.message||e)+"）")}
+ finally{posting=false;$("send").disabled=!ready;$("draft").focus()}
+});
+$("draft").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!("isComposing" in e&&e.isComposing)){e.preventDefault();$("composer").requestSubmit()}});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)void poll()});
+setInterval(()=>void poll(),8000);
+void init();
+})();
+</script></body></html>
