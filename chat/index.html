@@ -59,10 +59,9 @@ html.embedded,body.embedded{height:100%;overflow:hidden;width:var(--embed-width,
 <section id="chooser" hidden><h1>L GROUP チャット</h1><p>ご相談する店舗をお選びください。<br>店舗ごとに会話履歴を分けて管理しています。</p><div class="stores" id="storeLinks"></div></section>
 <section id="chatScreen" hidden style="display:flex;flex:1;flex-direction:column;min-height:0">
 <header class="topbar"><div class="mark">L</div><div><div class="title" id="storeTitle">チャット</div><div class="subtitle">L GROUP ONLINE CHAT</div></div><div class="state"><i class="dot"></i><span id="connection">接続中</span></div></header>
-<div class="intro">ご質問・ご相談をお送りください。返信にはお時間をいただく場合があります。<strong>現在はテスト運用中です。送信だけでは予約確定になりません。</strong></div>
 <div class="notice" id="error" role="alert" hidden></div>
 <div class="chat" id="timeline" role="log" aria-label="チャット履歴" aria-live="polite"></div>
-<form id="composer" class="composer"><div class="composer-row"><textarea id="draft" rows="1" maxlength="2000" placeholder="メッセージを入力" aria-label="メッセージ" required disabled></textarea><button class="send" id="send" type="submit" disabled>送信</button></div><div class="help">同じブラウザで再度開くと会話履歴を引き継げます。別店舗への問い合わせは各店舗で新規として扱います。</div></form>
+<form id="composer" class="composer"><div class="composer-row"><textarea id="draft" rows="1" maxlength="2000" placeholder="メッセージを入力" aria-label="メッセージ" required disabled></textarea><button class="send" id="send" type="submit" disabled>送信</button></div></form>
 </section></main>
 <script>
 (()=>{
