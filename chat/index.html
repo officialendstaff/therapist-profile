@@ -98,6 +98,20 @@ if(embedded){
 }
 const key="l_group_booking_chat_token_v1";
 let parentViewportHeight=0;
+let latestScrollFrame=0;
+function scrollToLatest(){
+ const pane=document.getElementById("timeline");
+ if(!pane)return;
+ pane.scrollTop=pane.scrollHeight;
+}
+function scheduleLatestScroll(){
+ if(latestScrollFrame)cancelAnimationFrame(latestScrollFrame);
+ latestScrollFrame=requestAnimationFrame(()=>{
+  latestScrollFrame=0;
+  scrollToLatest();
+  requestAnimationFrame(scrollToLatest);
+ });
+}
 function applyEmbedHeight(parentHeight){
  if(!embedded)return;
  if(Number.isFinite(parentHeight)&&parentHeight>0)parentViewportHeight=parentHeight;
@@ -107,17 +121,24 @@ function applyEmbedHeight(parentHeight){
  if(!sizes.length)return;
  const height=Math.round(Math.min(...sizes));
  document.documentElement.style.setProperty("--embed-height",height+"px");
+ scheduleLatestScroll();
 }
 if(embedded){
- const sync=()=>applyEmbedHeight(0);
+ const sync=()=>{applyEmbedHeight(0);scheduleLatestScroll()};
  window.visualViewport?.addEventListener("resize",sync);
  window.visualViewport?.addEventListener("scroll",sync);
  window.addEventListener("resize",sync);
+ window.addEventListener("pageshow",scheduleLatestScroll);
+ window.addEventListener("message",event=>{
+  if(event.source!==window.parent||event.origin!==parentOrigin)return;
+  if(event.data?.type==="lgroup.chat.opened"&&event.data.store===store)scheduleLatestScroll();
+ });
  document.addEventListener("focusin",event=>{
   if(event.target?.id!=="draft")return;
   document.documentElement.classList.add("keyboard-active");
   document.body.classList.add("keyboard-active");
   sync();
+  scheduleLatestScroll();
   window.parent.postMessage({type:"lgroup.chat.focus",store},parentOrigin);
  });
  document.addEventListener("focusout",event=>{
@@ -166,7 +187,7 @@ function add(messages){
   const node=line(m);node.dataset.messageId=String(m.id);pane.append(node);
   lastId=Math.max(lastId,Number(m.id)||0);added++;
  }
- if(added)pane.scrollTop=pane.scrollHeight;
+ if(added)scheduleLatestScroll();
 }
 function empty(){
  if($("timeline").children.length)return;
@@ -217,7 +238,7 @@ async function init(){
   catch(e){if(e.status===401&&token){token="";clearToken();data=await api({action:"guest_init",store})}else throw e}
   if(data.token){token=data.token;saveToken(token)}
   if(!token)throw Error("no_session");
-  $("timeline").replaceChildren();lastId=0;add(data.messages||[]);empty();setReady(true);
+  $("timeline").replaceChildren();lastId=0;add(data.messages||[]);empty();setReady(true);scheduleLatestScroll();
  }catch(e){err("チャットに接続できません。ページを再読み込みしてください。（"+String(e.message||e)+"）");setReady(false)}
 }
 async function poll(){
