@@ -173,7 +173,7 @@ function showChat(){
  open=true;panel.hidden=false;back.hidden=false;button.setAttribute("aria-expanded","true");
  markRead();
  lockScroll();
- if(!frame.getAttribute("src"))frame.setAttribute("src",base+"?store="+encodeURIComponent(guestStore)+"&embed=1&v=20261107-external-link-parent-v1");
+ if(!frame.getAttribute("src"))frame.setAttribute("src",base+"?store="+encodeURIComponent(guestStore)+"&embed=1&v=20261107-mobile-direct-link-v2");
  sendViewport();
  frame.contentWindow?.postMessage({type:"lgroup.chat.opened",store:guestStore},chatOrigin);
  root.querySelector(".lg-chat-close").focus({preventScroll:true});
@@ -220,7 +220,7 @@ function createWidget(){
  root.append(style,backdrop,button,panel);
  renderUnread();
  // Returning visitors receive staff replies even before opening the chat.
- if(token())frame.setAttribute("src",base+"?store="+encodeURIComponent(guestStore)+"&embed=1&v=20261107-external-link-parent-v1");
+ if(token())frame.setAttribute("src",base+"?store="+encodeURIComponent(guestStore)+"&embed=1&v=20261107-mobile-direct-link-v2");
  button.addEventListener("click",()=>open?closeChat():showChat());
  close.addEventListener("click",closeChat);
  backdrop.addEventListener("click",closeChat);
