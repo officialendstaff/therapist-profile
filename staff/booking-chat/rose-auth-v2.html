@@ -590,21 +590,18 @@ function renderMessageLinks(element,body){
    const anchor=document.createElement("a");
    anchor.href=url.href;anchor.target="_blank";anchor.rel="noopener noreferrer";
    anchor.setAttribute("aria-label","リンクを新しいタブで開く: "+address);
-   anchor.style.position="relative";anchor.style.zIndex="2";anchor.style.pointerEvents="auto";anchor.style.cursor="pointer";
-   anchor.addEventListener("click",event=>{
-    if(event.defaultPrevented||event.button!==0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
-    event.preventDefault();event.stopPropagation();
-    const opened=window.open(url.href,"_blank");
-    if(opened)opened.opener=null;
-    else{
-     const fallback=document.createElement("a");
-     fallback.href=url.href;fallback.target="_blank";fallback.rel="noopener noreferrer";
-     fallback.style.display="none";document.body.append(fallback);fallback.click();fallback.remove();
-    }
-   });
+   anchor.style.cssText="position:relative;z-index:2;pointer-events:auto;cursor:pointer;color:#1768ac;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere;font-weight:700";
    anchor.textContent=address;
-   anchor.style.cssText="color:#1768ac;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere;font-weight:700";
+
    fragment.append(anchor);
+   const action=document.createElement("a");
+   action.href=url.href;
+   action.target="_blank";
+   action.rel="noopener noreferrer";
+   action.textContent="↗ 開く";
+   action.setAttribute("aria-label",address+" を新しいタブで開く");
+   action.style.cssText="display:inline-flex;align-items:center;justify-content:center;margin-left:10px;padding:4px 9px;border:1px solid #97b9da;border-radius:6px;background:#f3f8ff;color:#1d5c91;font-size:12px;font-weight:800;text-decoration:none;vertical-align:middle;cursor:pointer;pointer-events:auto";
+   fragment.append(action);
   }catch{fragment.append(document.createTextNode(address))}
   fragment.append(document.createTextNode(suffix));
   start=match.index+raw.length;
