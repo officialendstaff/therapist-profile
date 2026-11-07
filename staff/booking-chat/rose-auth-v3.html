@@ -134,6 +134,31 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
 #app>header.lg-common-header .chat-notification-panel #pushStatus{display:block;max-width:none;overflow:visible;text-overflow:clip;color:#62788f;font-size:11px;line-height:1.6;margin:0}
 @media(max-width:900px){#app>header.lg-common-header .lg-chat-header-actions{overflow:visible;justify-content:flex-end;padding:4px 0}#app>header.lg-common-header .chat-notification-panel{right:0}}
 @media(max-width:480px){#app>header.lg-common-header .lg-chat-header-actions{width:100%;gap:7px}#app>header.lg-common-header .chat-notification-panel{right:-60px}}
+</style><style id="lg-chat-readable-type-20261107">
+/* Staff chat readability: preserve full-size text on desktop and mobile. */
+#app .thread-list .thread{padding:15px 14px;min-height:76px}
+#app .thread-list .thread strong{font-size:14px;line-height:1.5}
+#app .thread-list .thread .store-label{font-size:13px;line-height:1.45;padding:5px 9px}
+#app .thread-list .thread time{font-size:12px;line-height:1.5;color:#657991}
+#app .thread-list .thread .sub{font-size:13px;line-height:1.6;margin-top:6px;gap:8px}
+#app .thread-list .thread .sub .store-label{font-size:12px}
+#app .thread-list .thread .tag{font-size:12px}
+#app .thread-heading strong{font-size:16px;line-height:1.5}
+#app .thread-heading .store-label{font-size:14px}
+#app .message-list{gap:15px;padding:20px}
+#app .message-list .bubble{font-size:16px;line-height:1.65;padding:13px 16px;max-width:min(82%,720px)}
+#app .message-list .bubble span{font-size:12px;line-height:1.5;margin-top:7px}
+#app .reply textarea{font-size:16px;line-height:1.55;min-width:0}
+#app .reply button{font-size:15px;min-width:65px}
+#app .placeholder{font-size:14px}
+@media(max-width:700px){
+ #app .thread-list .thread{padding:15px 12px;min-height:74px}
+ #app .thread-list .thread strong{font-size:14px}
+ #app .thread-list .thread time{font-size:12px}
+ #app .message-list{padding:14px}
+ #app .message-list .bubble{font-size:16px;max-width:92%;padding:12px 14px}
+ #app .reply textarea{font-size:16px}
+}
 </style></head><body>
 <div id="gate"><section class="gate-card"><h1>L GROUP｜チャット管理</h1><p>面接管理にログイン済みの管理者アカウントで接続します。チャット専用パスワードは不要です。</p><button class="primary" id="connect" type="button">管理者アカウントで接続</button><p id="gateError" role="alert" aria-live="polite"></p><p><a href="/therapist-profile/staff/management-top/" target="_blank" rel="noopener noreferrer">面接管理のログイン画面を開く</a></p></section></div>
 <div id="app" hidden>
