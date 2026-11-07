@@ -273,6 +273,40 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
 #gate .auth-connect #gateError{min-height:20px;margin:12px 0 0;color:#af3c47;font-size:12px;line-height:1.6}
 #gate .auth-login-link{display:block;margin-top:19px;color:#285b88;font-size:12px;font-weight:700;text-decoration:underline;text-underline-offset:3px;text-align:center}
 #gate .auth-login-link:hover{color:#183958}
+</style><style id="lg-chat-unread-visibility-20261107">
+/* New customer messages: high-contrast unread state across the full row. */
+#app .thread-list .thread.unread,
+#app .thread-list .thread.unread.active{
+ background:#fff0f4;
+ border-left:5px solid #d12f62;
+ padding-left:9px;
+}
+#app .thread-list .thread.unread:hover{background:#ffe5ed}
+#app .thread-list .thread.unread strong.customer-name{color:#902448;font-weight:800}
+#app .thread-list .thread.unread .tag{
+ display:inline-flex;
+ align-items:center;
+ justify-content:center;
+ flex-shrink:0;
+ min-width:42px;
+ min-height:24px;
+ padding:3px 9px;
+ border-radius:999px;
+ background:#c92b59;
+ color:#fff;
+ font-size:12px;
+ font-weight:800;
+ box-shadow:0 1px 3px #7b17302b;
+}
+#app>header.lg-common-header .unread-total{
+ display:inline-flex;align-items:center;justify-content:center;
+ min-height:28px;padding:5px 10px;border-radius:999px;
+ font-size:12px;font-weight:800;white-space:nowrap;
+ background:#ce315e;color:#fff;
+}
+#app>header.lg-common-header .unread-total[data-count="0"]{
+ background:transparent;color:#b6c7d9;padding:5px 3px;
+}
 </style></head><body>
 <div id="gate" class="lg-interview-login"><div class="auth-card">
 <aside class="auth-brand-panel" aria-hidden="true">
@@ -387,6 +421,17 @@ function setCustomerTestLink(){/* Customer test link removed from the daily mana
 setCustomerTestLink();
 let token="",threadId="",items=[],loading=false,replying=false;
 let listInitialized=false,notifyOn=false,audioContext=null,activeThreadUpdatedAt="",threadOpening=false;
+const readAcknowledgements=new Map();
+function mergeReadAcknowledgements(threads){
+ for(const thread of threads){
+  const saved=readAcknowledgements.get(thread.id);
+  if(!saved)continue;
+  const dbRead=thread.staff_last_read_at;
+  if(dbRead&&Date.parse(dbRead)>=Date.parse(saved))readAcknowledgements.delete(thread.id);
+  else thread.staff_last_read_at=saved;
+ }
+ return threads;
+}
 let currentCustomerId="",currentCustomerName="",nameSaving=false;
 function showCustomerTitle(thread){
  $("threadTitle").replaceChildren(makeStoreLabel(thread.store_key),document.createTextNode("｜"+nameOf(thread)));
@@ -481,6 +526,7 @@ function updateCounters(){
  const total=items.filter(isUnread).length;
  $("summary").textContent="表示 "+visibleThreads().length+" / 全"+items.length+"件 ／ 未読 "+total+"件";
  $("unreadTotal").textContent="未読 "+total+"件";
+ $("unreadTotal").dataset.count=String(total);
  document.title=(total?"("+total+") ":"")+defaultTitle;
 }
 
@@ -503,7 +549,7 @@ const stored=()=>{try{return sessionStorage.getItem(SESSION_KEY)||localStorage.g
 function existingAdminJwt(){try{const raw=localStorage.getItem("mattan-recruit-auth")||sessionStorage.getItem("mattan-recruit-auth");const session=raw?JSON.parse(raw):null;return typeof session?.access_token==="string"?session.access_token:""}catch{return ""}}
 function showError(msg){$("error").textContent=msg;$("error").hidden=false}
 function clearError(){$("error").textContent="";$("error").hidden=true}
-function unauthorized(){$("app").hidden=true;$("gate").hidden=false;token="";threadId="";sessionStorage.removeItem(SESSION_KEY);localStorage.removeItem(SESSION_KEY);$("gateError").textContent="再ログインしてください。"}
+function unauthorized(){readAcknowledgements.clear();$("app").hidden=true;$("gate").hidden=false;token="";threadId="";sessionStorage.removeItem(SESSION_KEY);localStorage.removeItem(SESSION_KEY);$("gateError").textContent="再ログインしてください。"}
 async function call(action,params={}){
  try{return await request(API,{action,staff_token:token,...params})}
  catch(e){if(e.status===401)unauthorized();throw e}
@@ -545,7 +591,7 @@ async function loadList(){
    const old=previous.get(item.id);
    return old===undefined||item.last_customer_message_at>old;
   });
-  items=next;
+  items=mergeReadAcknowledgements(next);
   listInitialized=true;
   drawList();clearError();
   if(hasNew)notificationTone();
@@ -613,8 +659,14 @@ async function openThread(id,options={}){
   $("reply").hidden=false;
   if(switched)$("draft").value="";
   const found=items.find(t=>t.id===id);
-  if(found){found.staff_last_read_at=new Date().toISOString();activeThreadUpdatedAt=found.updated_at}
-  else activeThreadUpdatedAt=data.thread.updated_at;
+  const persistedRead=data.thread.staff_last_read_at;
+  if(!persistedRead)throw new Error("既読時刻の保存を確認できません");
+  readAcknowledgements.set(id,persistedRead);
+  if(found){
+   const current=Date.parse(found.staff_last_read_at||"");
+   if(!Number.isFinite(current)||current<Date.parse(persistedRead))found.staff_last_read_at=persistedRead;
+   activeThreadUpdatedAt=found.updated_at;
+  }else activeThreadUpdatedAt=data.thread.updated_at;
   drawList();clearError();
  }catch(e){showError("会話を取得できません。（"+e.message+"）")}
  finally{threadOpening=false}
