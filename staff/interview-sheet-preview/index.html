@@ -579,6 +579,29 @@ html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!imp
 .sales-metrics-blank{display:grid;place-items:center;min-height:112px;background:#f7f9fc;border:1px dashed #d5e0eb;border-radius:6px;color:#8495a7;font-size:12px;text-align:center}
 @media(max-width:800px){#storeMetricsHeader .metrics-mode-tabs button{padding:8px 13px;font-size:12px}.sales-metrics-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.sales-metrics-sections{grid-template-columns:1fr}}
 @media(max-width:700px){#storeMetricsHeader .metrics-mode-tabs{margin-bottom:8px}#salesMetricsBody{height:auto!important;overflow:visible!important;padding:8px 0 24px!important}.sales-metrics-card{padding:12px;min-height:86px}.sales-metrics-card strong{font-size:23px}}
+</style><style id="sales-metrics-live-20261107">
+.sales-metrics-periods{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 15px}
+.sales-metrics-period{background:#fff;border:1px solid #cbd8e8;border-radius:6px;color:#425b78;font-weight:750;font-size:12px;padding:8px 14px;cursor:pointer}
+.sales-metrics-period.active{color:#fff;background:#285c90;border-color:#285c90}
+#salesMetricsBody>.sales-metrics-kpis{margin-bottom:12px}
+#salesMetricsBody>.sales-metrics-kpis:nth-of-type(4){grid-template-columns:repeat(5,minmax(0,1fr))}
+.sales-metrics-card{border-top:3px solid #c3d8ed}
+.sales-metrics-chart-legend{display:flex;justify-content:flex-end;gap:14px;font-size:11px;font-weight:800}
+.sales-metrics-ratio-label{font-size:18px;font-weight:800;margin:22px 0;color:#334d6b}
+.sales-metrics-ratio-bar{display:flex;overflow:hidden;border-radius:7px;height:20px;background:#edf2f7}
+.sales-metrics-ratio-bar>div{height:100%}
+#salesContractBreakdown p{font-size:12px;font-weight:750;margin-top:20px;color:#566b83}
+.sales-metrics-tablewrap{overflow-x:auto}
+.sales-metrics-table{width:100%;border-collapse:collapse;white-space:nowrap;font-size:11px}
+.sales-metrics-table th,.sales-metrics-table td{padding:11px 8px;border-bottom:1px solid #e6edf3;text-align:right}
+.sales-metrics-table th:first-child,.sales-metrics-table td:first-child{text-align:left}
+.sales-metrics-table th{color:#7389a0;background:#f6f9fc}
+.sales-metrics-table td{color:#334a64;font-weight:700}
+.sales-metrics-bar-row{margin:18px 0;font-size:12px;font-weight:750;color:#526a83}
+.sales-metrics-bar-track{margin-top:8px;height:11px;border-radius:6px;background:#e7eff6;overflow:hidden}
+.sales-metrics-bar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,#71b1e1,#3d78b5)}
+.sales-metrics-footnote{font-size:11px;color:#75879a;line-height:1.8;margin:18px 0}
+@media(max-width:750px){#salesMetricsBody>.sales-metrics-kpis:nth-of-type(4){grid-template-columns:repeat(2,minmax(0,1fr))}.sales-metrics-table{font-size:10px}}
 </style></head><body>
 <header class="header"><button class="brand" id="home"><img id="homeAvatar" src="./icons/recruit-180.png" alt="" onerror="this.style.display='none'"><span id="homeLabel">TOP</span></button><div class="header-actions"><button id="manualInterviewOpen" type="button">面接登録</button><button id="sound">通知設定</button></div></header>
 <section class="calendar" aria-label="月間カレンダー"><div class="cal-head"><button id="prev" aria-label="前月">◀</button><span id="month"></span><button id="next" aria-label="翌月">▶</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="days" id="days"></div></section>
@@ -1051,17 +1074,155 @@ async function refreshStoreMetricsSheets(){
 }
 
 function showStoreMetrics(){document.getElementById('myPagePanel').hidden=true;bindStoreMetrics();currentPage='集計頁';$('todayPanel').hidden=true;$('sharedPanel').hidden=true;$('applicantDetail').hidden=true;$('registrationPanel').hidden=true;$('storeMetrics').hidden=false;document.querySelector('.main-panel').classList.remove('sheet-mode');document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.page==='集計頁'));if(!$('storeMetricsMonth').value)$('storeMetricsMonth').value=dateKey(new Date()).slice(0,7);renderStoreMetrics();refreshLineInboxReadOnly().then(()=>renderStoreMetrics());refreshInterviewLists().then(()=>renderStoreMetrics());refreshStoreMetricsSheets().then(()=>{if(!$('storeMetrics').hidden)renderStoreMetrics()})}
+const salesMetricsData={month:'',status:'idle',rows:[],day:0,request:0,error:''};
+const salesMetricColumns=['revenue_yen','profit_yen','contracts_count','new_contracts_count','repeat_contracts_count','active_staff_count','free_count','regular_nominations_count','net_nominations_count','inbound_people','new_inbound_people'];
+const salesStoreMap=[['Grand Luxe','Grand Luxe'],['LUXY','LUXY OSAKA'],['Un Secret','Un Secret'],['薔薇と紳士','薔薇と紳士'],['BUSTY OSAKA','BUSTY OSAKA']];
+function salesDayOf(r){return Number(String(r.metric_date||'').slice(-2))}
+function salesTotal(rows){
+ const result={};for(const k of salesMetricColumns)result[k]=0;
+ for(const r of rows)for(const k of salesMetricColumns)result[k]+=Number(r[k])||0;
+ return result;
+}
+function salesNumber(n){return Number.isFinite(n)?Math.round(n).toLocaleString('ja-JP'):'—'}
+function salesYen(n){return Number.isFinite(n)?salesNumber(n)+'円':'—'}
+function salesRatio(n,d){return d?(n*100/d).toFixed(1)+'%':'—'}
+function salesTrendSvg(rows){
+ if(!rows.length)return '<div class="sales-metrics-blank">該当するデータはありません</div>';
+ const points=rows.slice().sort((a,b)=>a.metric_date.localeCompare(b.metric_date));
+ const min=salesDayOf(points[0]),maxDay=salesDayOf(points[points.length-1]);
+ const high=Math.max(1,...points.map(r=>Math.max(Number(r.revenue_yen)||0,Number(r.profit_yen)||0)))*1.12;
+ const w=880,h=245,l=72,t=14,b=31;
+ const x=d=>l+(w-l-15)*(maxDay===min?.5:(d-min)/(maxDay-min));
+ const y=v=>t+(h-t-b)*(1-v/high);
+ let grid='';
+ for(let i=0;i<=4;i++){
+  const val=high*i/4,yy=y(val);
+  grid+='<line x1="'+l+'" x2="'+(w-15)+'" y1="'+yy+'" y2="'+yy+'" stroke="#e3eaf2" stroke-dasharray="4 5"/>';
+  grid+='<text x="'+(l-9)+'" y="'+(yy+4)+'" text-anchor="end" font-size="11" fill="#7a8c9f">'+(val>=10000?Math.round(val/10000)+'万':salesNumber(val))+'</text>';
+ }
+ let lines='';
+ for(const spec of [['revenue_yen','#387fc4'],['profit_yen','#d67d9d']]){
+  let d='',prior=-1;
+  for(const r of points){
+   const day=salesDayOf(r),part=x(day).toFixed(2)+' '+y(Number(r[spec[0]])||0).toFixed(2);
+   d+=(prior===day-1?' L ':' M ')+part;prior=day;
+  }
+  lines+='<path d="'+d+'" stroke="'+spec[1]+'" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
+  for(const r of points)lines+='<circle cx="'+x(salesDayOf(r))+'" cy="'+y(Number(r[spec[0]])||0)+'" r="4.5" fill="#fff" stroke="'+spec[1]+'" stroke-width="2.5"><title>'+salesDayOf(r)+'日 '+salesYen(Number(r[spec[0]]))+'</title></circle>';
+ }
+ let days='';
+ for(const r of points){
+  const day=salesDayOf(r);
+  if(points.length>14&&day%3!==0&&day!==min&&day!==maxDay)continue;
+  days+='<text x="'+x(day)+'" y="'+(h-6)+'" text-anchor="middle" font-size="11" fill="#71849b">'+day+'日</text>';
+ }
+ return '<div class="sales-metrics-chart-legend"><span style="color:#387fc4">● 料金</span><span style="color:#d67d9d">● 利益</span></div><svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="xMidYMid meet" role="img" aria-label="料金と利益の日別推移" style="width:100%;height:260px">'+grid+lines+days+'</svg>';
+}
+function renderSalesMetrics(){
+ const root=$('salesMetricsBody');if(!root||root.hidden||$('storeMetrics').hidden)return;
+ const month=$('storeMetricsMonth').value,shop=$('storeMetricsShop').value;
+ const ready=salesMetricsData.status==='ready'&&salesMetricsData.month===month;
+ const all=ready?salesMetricsData.rows:[];
+ const rows=all.filter(r=>r.store_key===shop);
+ const days=[...new Set(rows.map(salesDayOf))].sort((a,b)=>a-b);
+ const chosen=salesMetricsData.day,view=rows.filter(r=>!chosen||salesDayOf(r)===chosen),has=view.length>0;
+ const s=salesTotal(view),c=s.contracts_count;
+ const cards=[
+  ['料金',has?salesYen(s.revenue_yen):'—'],['利益',has?salesYen(s.profit_yen):'—'],
+  ['成約数',has?salesNumber(c)+'件':'—'],['客単価',has&&c?salesYen(s.revenue_yen/c):'—'],
+  ['新規成約数',has?salesNumber(s.new_contracts_count)+'件':'—'],
+  ['リピート成約数',has?salesNumber(s.repeat_contracts_count)+'件':'—'],
+  ['リピート成約比率',has?salesRatio(s.repeat_contracts_count,c):'—'],
+  ['出勤数',has?salesNumber(s.active_staff_count)+'人':'—'],
+  ['フリー数',has?salesNumber(s.free_count)+'件':'—'],
+  ['本指名数',has?salesNumber(s.regular_nominations_count)+'件':'—'],
+  ['ネット指名数',has?salesNumber(s.net_nominations_count)+'件':'—'],
+  ['着信人数',has?salesNumber(s.inbound_people)+'人':'—'],
+  ['新規着信人数',has?salesNumber(s.new_inbound_people)+'人':'—']
+ ];
+ const status=salesMetricsData.status;
+ const title=(shop==='all'?'全店舗':shop)+' ｜ '+month.replace('-','年')+'月';
+ const subtitle=status==='loading'?'営業数値を読み込み中です':status==='error'?'データ取得に失敗しました':status==='login-required'?'面接管理へのログインが必要です':days.length?'Excel保存済み：'+days.length+'日分（最新 '+month+'-'+String(days[days.length-1]).padStart(2,'0')+'）':'この月の登録データはありません';
+ const box=(name,v)=>'<div class="sales-metrics-card"><span>'+name+'</span><strong>'+v+'</strong></div>';
+ const block=items=>'<div class="sales-metrics-kpis">'+items.map(item=>box(item[0],item[1])).join('')+'</div>';
+ root.innerHTML='<div class="sales-metrics-intro"><div><strong>営業数値　'+title+'</strong><span>'+subtitle+'</span></div><span class="sales-metrics-status">'+(ready?(has?'保存済データ':'データなし'):'確認中')+'</span></div>'+
+ '<div class="sales-metrics-periods" id="salesMetricsPeriods"></div>'+
+ block(cards.slice(0,4))+block(cards.slice(4,8))+block(cards.slice(8))+
+ '<div class="sales-metrics-sections">'+
+ '<section class="sales-metrics-section"><h2>日別｜料金・利益の推移</h2>'+salesTrendSvg(rows)+'</section>'+
+ '<section class="sales-metrics-section"><h2>成約構成｜新規・リピート</h2><div id="salesContractBreakdown"></div></section>'+
+ '<section class="sales-metrics-section"><h2>店舗別｜営業実績の比較</h2><div class="sales-metrics-tablewrap"><table class="sales-metrics-table"><thead><tr><th>店舗</th><th>料金</th><th>利益</th><th>成約数</th><th>客単価</th><th>リピート比率</th></tr></thead><tbody id="salesComparisonRows"></tbody></table></div></section>'+
+ '<section class="sales-metrics-section"><h2>指名状況</h2><div id="salesNominationBars"></div></section></div>'+
+ '<p class="sales-metrics-footnote">出典：EXA日別レポート。客単価＝料金÷成約数、リピート成約比率＝リピート成約数÷成約数。全店舗合計はEXAの全店舗欄に基づき、各店舗の単純合計で置き換えません。未保存の日はゼロとして計上しません。</p>';
+ const periods=$('salesMetricsPeriods');
+ for(const d of [0,...days]){
+  const btn=document.createElement('button');btn.type='button';btn.className='sales-metrics-period'+(chosen===d?' active':'');
+  btn.setAttribute('aria-pressed',String(chosen===d));btn.textContent=d?d+'日':'全期間';
+  btn.onclick=()=>{salesMetricsData.day=d;renderSalesMetrics()};periods.append(btn);
+ }
+ const breakdown=$('salesContractBreakdown');
+ if(has){
+  const pct=c?s.repeat_contracts_count*100/c:0;
+  breakdown.innerHTML='<div class="sales-metrics-ratio-label">リピート成約比率　'+salesRatio(s.repeat_contracts_count,c)+'</div>'+
+   '<div class="sales-metrics-ratio-bar"><div style="width:'+(100-pct)+'%;background:#418dd0"></div><div style="width:'+pct+'%;background:#d781a2"></div></div>'+
+   '<p>新規：'+salesNumber(s.new_contracts_count)+'件　｜　リピート：'+salesNumber(s.repeat_contracts_count)+'件</p>';
+ }else breakdown.textContent='データなし';
+ const tbody=$('salesComparisonRows');
+ for(const [key,name] of salesStoreMap){
+  const sr=all.filter(r=>r.store_key===key&&(!chosen||salesDayOf(r)===chosen));
+  const v=salesTotal(sr),ok=sr.length>0;
+  const vals=[name,ok?salesYen(v.revenue_yen):'—',ok?salesYen(v.profit_yen):'—',
+   ok?salesNumber(v.contracts_count)+'件':'—',ok&&v.contracts_count?salesYen(v.revenue_yen/v.contracts_count):'—',
+   ok?salesRatio(v.repeat_contracts_count,v.contracts_count):'—'];
+  const tr=document.createElement('tr');
+  for(const item of vals){const td=document.createElement('td');td.textContent=item;tr.append(td)}tbody.append(tr);
+ }
+ const nominations=$('salesNominationBars');
+ for(const [label,value] of [['フリー数',s.free_count],['本指名数',s.regular_nominations_count],['ネット指名数',s.net_nominations_count]]){
+  const row=document.createElement('div');row.className='sales-metrics-bar-row';
+  const bar=document.createElement('div');bar.className='sales-metrics-bar-fill';
+  const ceiling=Math.max(1,s.free_count,s.regular_nominations_count,s.net_nominations_count);
+  bar.style.width=has?100*value/ceiling+'%':'0%';
+  row.textContent=label+'　'+(has?salesNumber(value)+'件':'—');
+  const track=document.createElement('div');track.className='sales-metrics-bar-track';track.append(bar);row.append(track);nominations.append(row);
+ }
+}
+async function refreshSalesMetrics(){
+ const month=$('storeMetricsMonth').value||dateKey(new Date()).slice(0,7);
+ if(salesMetricsData.month===month&&(salesMetricsData.status==='ready'||salesMetricsData.status==='loading')){renderSalesMetrics();return}
+ const id=++salesMetricsData.request;
+ salesMetricsData.month=month;salesMetricsData.day=0;salesMetricsData.rows=[];salesMetricsData.status='loading';renderSalesMetrics();
+ const token=sessionStorage.getItem('interview_staff_session_v2')||localStorage.getItem('interview_staff_session_v2');
+ if(!token){salesMetricsData.status='login-required';renderSalesMetrics();return}
+ try{
+  const res=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access',{method:'POST',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'sales_metrics',token,month})});
+  const data=await res.json();
+  if(!res.ok||!data.ok||!Array.isArray(data.rows))throw Error(data.error||'read_failed');
+  if(id!==salesMetricsData.request)return;
+  salesMetricsData.rows=data.rows;salesMetricsData.status='ready';
+ }catch(error){
+  if(id!==salesMetricsData.request)return;
+  salesMetricsData.status='error';salesMetricsData.error=String(error.message||error);
+ }
+ renderSalesMetrics();
+}
 function setMetricsMode(mode){
  const sales=mode==='sales';
  $('metricsInterviewTab').setAttribute('aria-selected',String(!sales));
  $('metricsSalesTab').setAttribute('aria-selected',String(sales));
  $('storeMetricsBody').hidden=sales;
  $('salesMetricsBody').hidden=!sales;
+ if(sales)refreshSalesMetrics();else renderStoreMetrics();
 }
 $('metricsInterviewTab').addEventListener('click',()=>setMetricsMode('interview'));
 $('metricsSalesTab').addEventListener('click',()=>setMetricsMode('sales'));
 function renderStoreMetrics(){
-const root=$('storeMetricsBody');if(!root)return;root.replaceChildren();
+ if(!$('salesMetricsBody').hidden){
+  const parts=String($('storeMetricsMonth').value||'').split('-');
+  if(parts.length===2)$('storeMetricsMonthLabel').textContent=Number(parts[0])+'年'+Number(parts[1])+'月';
+  refreshSalesMetrics();return;
+ }
+ const root=$('storeMetricsBody');if(!root)return;root.replaceChildren();
 const shop=$('storeMetricsShop').value;const todayMonth=dateKey(new Date()).slice(0,7);if($('storeMetricsMonth').value>todayMonth)$('storeMetricsMonth').value=todayMonth;const month=$('storeMetricsMonth').value;
 const [yr,mo]=month.split('-').map(Number);$('storeMetricsMonthLabel').textContent=yr+'年'+mo+'月';
 const accounts={'Grand Luxe':'grandluxe','LUXY':'luxy','Un Secret':'unsecret','薔薇と紳士':'rose','BUSTY OSAKA':'busty'};
