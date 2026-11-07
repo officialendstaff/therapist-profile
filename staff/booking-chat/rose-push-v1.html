@@ -2,6 +2,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><meta name="build" content="rose-staff-list-v2-20261107">
 <meta http-equiv="Cache-Control" content="no-store"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="../interview-sheet-preview/icons/recruit-180.png">
+<link rel="icon" type="image/svg+xml" href="/therapist-profile/staff/assets/favicons/chat.svg?v=20261107">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src https://vjjnkflbfsjihwzjsjpr.supabase.co; script-src 'self' 'unsafe-inline'; worker-src 'self'; manifest-src 'self'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <title>チャット管理｜L GROUP</title>
 <style>
@@ -102,10 +103,29 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
  #pushEnable,#pushTest{padding:8px 9px;font-size:11px}
  #pushStatus{flex-basis:100%;order:7;max-width:none}
 }
+</style><style id="lg-chat-unified-header-v1">
+#app>header.lg-common-header{box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;flex-wrap:nowrap;gap:14px;width:100%;min-height:64px;height:64px;padding:0 18px;background:#1e293b;color:#fff;border-bottom:1px solid #344155}
+#app>header.lg-common-header .lg-header-brand{display:flex;align-items:center;gap:10px;min-width:0;flex:0 0 auto}
+#app>header.lg-common-header .lg-header-home{display:inline-flex;align-items:center;gap:8px;color:#fff;text-decoration:none;white-space:nowrap;font-size:13px;font-weight:750}
+#app>header.lg-common-header .lg-header-home img{width:46px;height:46px;object-fit:contain;border-radius:7px}
+#app>header.lg-common-header .lg-header-divider{height:27px;width:1px;background:#556277}
+#app>header.lg-common-header .lg-header-section-icon{width:30px;height:30px;object-fit:contain;border-radius:7px}
+#app>header.lg-common-header strong{font-size:14px;white-space:nowrap}
+#app>header.lg-common-header .lg-chat-header-actions{display:flex;gap:7px;align-items:center;justify-content:flex-end;min-width:0;flex:1 1 auto;white-space:nowrap}
+#app>header.lg-common-header small{margin:0;color:#bdc7d6;font-size:10px;white-space:nowrap}
+#app>header.lg-common-header button{background:#243851;border:1px solid #728199;color:#fff;border-radius:6px;padding:7px 9px;font-size:11px;white-space:nowrap}
+#app>header.lg-common-header #pushEnable{background:#1e4d47;border-color:#6ca998;color:#fff}
+#app>header.lg-common-header #pushEnable[data-enabled="true"]{background:#e5f6ec;color:#175b43;border-color:#9acdaf}
+#app>header.lg-common-header #pushTest{background:#243851;color:#fff}
+#app>header.lg-common-header #customerTestLink{margin:0;padding:8px 10px;background:#3474a7;color:#fff;font-size:11px}
+#app>header.lg-common-header #pushStatus{max-width:160px;overflow:hidden;text-overflow:ellipsis;color:#bdc7d6;font-size:10px}
+#app>header.lg-common-header .unread-total{color:#f3b0c3;font-size:11px}
+@media(max-width:1280px){#app>header.lg-common-header small,#app>header.lg-common-header #pushStatus{display:none}}
+@media(max-width:900px){#app>header.lg-common-header{height:auto;min-height:60px;flex-wrap:wrap;padding:7px 12px;gap:5px}#app>header.lg-common-header .lg-header-home img{height:36px;width:36px}#app>header.lg-common-header .lg-header-brand{width:100%}#app>header.lg-common-header .lg-chat-header-actions{overflow-x:auto;justify-content:flex-start;padding:4px 0;gap:6px}#app>header.lg-common-header .lg-header-section-icon{height:25px;width:25px}}
 </style></head><body>
 <div id="gate"><section class="gate-card"><h1>L GROUP｜チャット管理</h1><p>面接管理にログイン済みの管理者アカウントで接続します。チャット専用パスワードは不要です。</p><button class="primary" id="connect" type="button">管理者アカウントで接続</button><p id="gateError" role="alert" aria-live="polite"></p><p><a href="/therapist-profile/staff/management-top/" target="_blank" rel="noopener noreferrer">面接管理のログイン画面を開く</a></p></section></div>
 <div id="app" hidden>
-<header><strong>チャット管理</strong><small>薔薇と紳士 先行テスト｜HP未設置</small><span class="unread-total" id="unreadTotal" aria-live="polite">未読 0件</span><button id="pushEnable" type="button" data-enabled="false">プッシュ通知を有効化</button><button id="pushTest" type="button" disabled>通知テスト</button><span id="pushStatus" aria-live="polite">未設定</span><button id="notifyToggle" type="button" aria-pressed="false">画面内通知音 OFF</button><a id="customerTestLink" href="../../chat/?store=%E8%96%94%E8%96%87%E3%81%A8%E7%B4%B3%E5%A3%AB" target="_blank" rel="noopener noreferrer">お客様用テスト画面</a><button id="reload" type="button">情報更新</button></header>
+<header class="lg-common-header"><div class="lg-header-brand"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ戻る"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><span class="lg-header-divider"></span><img class="lg-header-section-icon" src="/therapist-profile/staff/assets/favicons/chat.svg" alt=""><strong>チャット管理</strong></div><div class="lg-chat-header-actions"><small>薔薇と紳士 先行テスト｜HP未設置</small><span class="unread-total" id="unreadTotal" aria-live="polite">未読 0件</span><button id="pushEnable" type="button" data-enabled="false">プッシュ通知を有効化</button><button id="pushTest" type="button" disabled>通知テスト</button><span id="pushStatus" aria-live="polite">未設定</span><button id="notifyToggle" type="button" aria-pressed="false">画面内通知音 OFF</button><a id="customerTestLink" href="../../chat/?store=%E8%96%94%E8%96%87%E3%81%A8%E7%B4%B3%E5%A3%AB" target="_blank" rel="noopener noreferrer">お客様用テスト画面</a><button id="reload" type="button">情報更新</button></div></header>
 <div id="error" class="alert" hidden role="alert"></div>
 <div class="layout" id="layout">
 <div class="aside"><div class="filters"><select id="store" aria-label="店舗を切り替える"><option value="all">全店舗</option><option value="Grand Luxe">Grand Luxe</option><option value="LUXY OSAKA">LUXY OSAKA</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select><div class="filters-extra"><input id="threadSearch" type="search" placeholder="お客様・店舗を検索" aria-label="会話を検索"><button id="unreadOnly" type="button" aria-pressed="false">未読のみ</button></div><div class="hint" id="summary">問い合わせを取得中です</div></div><div class="thread-list" id="threads"></div></div>
