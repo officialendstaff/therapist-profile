@@ -178,7 +178,7 @@ function createWidget(){
  frame=document.createElement("iframe");
  frame.className="lg-chat-frame";frame.title="薔薇と紳士 チャット";
  frame.loading="eager";frame.referrerPolicy="strict-origin-when-cross-origin";
- frame.setAttribute("sandbox","allow-scripts allow-forms allow-same-origin");
+ frame.setAttribute("sandbox","allow-scripts allow-forms allow-same-origin allow-popups allow-popups-to-escape-sandbox");
  frame.setAttribute("scrolling","no");
  frame.addEventListener("load",sendViewport);
  panel.append(header,frame);
