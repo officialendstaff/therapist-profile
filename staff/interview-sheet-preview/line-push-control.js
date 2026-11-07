@@ -76,15 +76,15 @@ register.addEventListener("click",async()=>{
  if(!supported()){message("このブラウザではプッシュ通知を利用できません。");return}
  busy=true;register.disabled=true;
  try{
+  // Permission must be requested as the first asynchronous operation under a user gesture.
+  const permission=Notification.permission==="granted"?"granted":await Notification.requestPermission();
+  if(permission!=="granted"){message(permission==="denied"?"通知が拒否されています。ブラウザ設定を確認してください。":"通知を許可してください。");return}
   const current=await findSub();
-  if(current&&Notification.permission==="granted"){
+  if(current){
    await call("unsubscribe",{endpoint:current.endpoint});
    await current.unsubscribe();
    subscription=null;setState(false);message("この端末の通知登録を解除しました。");return;
   }
-  // Request permission directly from the button gesture, before any network roundtrip.
-  const permission=Notification.permission==="granted"?"granted":await Notification.requestPermission();
-  if(permission!=="granted"){message(permission==="denied"?"通知が拒否されています。ブラウザ設定を確認してください。":"通知を許可してください。");return}
   message("通知を登録しています…");
   const [cfg,reg]=await Promise.all([call("config"),navigator.serviceWorker.register(SW,{scope:ROOT})]);
   let sub=await reg.pushManager.getSubscription();
