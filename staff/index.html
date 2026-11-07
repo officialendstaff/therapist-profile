@@ -87,21 +87,6 @@ function closeInvitation(){inviteModal.classList.remove('open')}
 document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('a[href]').forEach(a=>{const h=(a.getAttribute('href')||'').trim();if(!h||h.startsWith('#')||h.startsWith('javascript:')||h.startsWith('mailto:')||h.startsWith('tel:'))return;try{const u=new URL(h,location.href);const samePage=u.origin===location.origin&&u.pathname===location.pathname;if(!samePage){a.target='_blank';a.rel='noopener noreferrer'}}catch(e){}})});
 </script>
 
-<!-- 薔薇と紳士 HP内チャット実装テスト。?roseChatTest=1 の時のみ有効。 -->
-<script>
-(function(){
-  if(new URLSearchParams(location.search).get("roseChatTest")!=="1")return;
-  const banner=document.createElement("div");
-  banner.id="rose-chat-test-banner";
-  banner.setAttribute("role","status");
-  banner.style.cssText="position:fixed;top:8px;left:8px;z-index:2147481999;max-width:calc(100vw - 16px);padding:8px 12px;border:1px solid #dabd87;border-radius:8px;background:#2c2022;color:#fff4de;font:700 12px/1.5 sans-serif;box-shadow:0 4px 16px #0008";
-  banner.textContent="薔薇と紳士｜HP内チャット設置テスト";
-  document.body.appendChild(banner);
-  const script=document.createElement("script");
-  script.src="/therapist-profile/chat/embed/rose.js?v=20261107-staff-trial-v1";
-  script.dataset.preview="1";
-  script.defer=true;
-  document.body.appendChild(script);
-})();
-</script>
+<!-- 薔薇と紳士チャット｜スタッフHP内表示。既存HPコンテンツには影響させない。 -->
+<script defer src="/therapist-profile/chat/embed/rose.js?v=20261107-staff-main-v1" data-preview="1"></script>
 </body></html>
