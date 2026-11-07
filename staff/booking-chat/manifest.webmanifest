@@ -1,0 +1,17 @@
+{
+  "id": "/therapist-profile/staff/booking-chat/",
+  "name": "L GROUP チャット管理",
+  "short_name": "L GROUPチャット",
+  "start_url": "/therapist-profile/staff/booking-chat/rose-auth-v2.html?store=%E8%96%94%E8%96%87%E3%81%A8%E7%B4%B3%E5%A3%AB",
+  "scope": "/therapist-profile/staff/booking-chat/",
+  "display": "standalone",
+  "background_color": "#f5f7fa",
+  "theme_color": "#283a50",
+  "icons": [
+    {
+      "src": "../interview-sheet-preview/icons/recruit-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
