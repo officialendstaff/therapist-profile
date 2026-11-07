@@ -210,23 +210,7 @@ function renderMessageLinks(element,body){
     anchor.addEventListener("click",openFromEmbedded);
    }
    fragment.append(anchor);
-   const action=document.createElement("a");
-   action.href=url.href;
-   action.target="_blank";
-   action.rel="noopener noreferrer";
-   action.textContent="↗ 開く";
-   action.setAttribute("aria-label",address+" を新しいタブで開く");
-   action.style.cssText="display:inline-flex;align-items:center;justify-content:center;margin-left:10px;padding:4px 9px;border:1px solid #97b9da;border-radius:6px;background:#f3f8ff;color:#1d5c91;font-size:12px;font-weight:800;text-decoration:none;vertical-align:middle;cursor:pointer;pointer-events:auto";
-   if(embedded)action.addEventListener("click",event=>{
-    if(event.defaultPrevented||event.button!==0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
-    event.preventDefault();event.stopPropagation();
-    try{
-     const parentOpen=window.parent.__LG_CHAT_OPEN_EXTERNAL__;
-     if(typeof parentOpen==="function"){parentOpen(url.href);return}
-    }catch{}
-    window.parent.postMessage({type:"lgroup.chat.openExternal",store,href:url.href},parentOrigin);
-   });
-   fragment.append(action);
+
   }catch{fragment.append(document.createTextNode(address))}
   fragment.append(document.createTextNode(suffix));
   start=match.index+raw.length;
