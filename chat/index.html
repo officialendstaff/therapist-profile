@@ -50,6 +50,11 @@ html.embedded,body.embedded{height:100%;overflow:hidden;width:var(--embed-width,
 .embedded .help{font-size:10px}
 .embedded .intro{padding:9px 13px}
 .embedded .bubble{font-size:13px}
+.embedded.keyboard-active .intro,.embedded.keyboard-active .help{display:none}
+.embedded.keyboard-active .composer{padding:8px 10px 8px;flex-shrink:0}
+.embedded.keyboard-active .chat{padding-bottom:10px}
+.embedded.keyboard-active .composer textarea{max-height:90px}
+@media(max-height:400px){.embedded .intro,.embedded .help{display:none}}
 </style></head><body><main class="shell">
 <section id="chooser" hidden><h1>L GROUP チャット</h1><p>ご相談する店舗をお選びください。<br>店舗ごとに会話履歴を分けて管理しています。</p><div class="stores" id="storeLinks"></div></section>
 <section id="chatScreen" hidden style="display:flex;flex:1;flex-direction:column;min-height:0">
@@ -85,13 +90,44 @@ if(embedded){
   if(data?.type!=="lgroup.chat.viewport"||data.store!==store)return;
   const width=Math.floor(Number(data.width));
   const height=Math.floor(Number(data.height));
-  if(!Number.isFinite(width)||width<280||width>1920||!Number.isFinite(height)||height<250||height>2000)return;
+  if(!Number.isFinite(width)||width<240||width>1920||!Number.isFinite(height)||height<120||height>2000)return;
   document.documentElement.style.setProperty("--embed-width",width+"px");
-  document.documentElement.style.setProperty("--embed-height",height+"px");
+  applyEmbedHeight(height);
  });
 
 }
 const key="l_group_booking_chat_token_v1";
+let parentViewportHeight=0;
+function applyEmbedHeight(parentHeight){
+ if(!embedded)return;
+ if(Number.isFinite(parentHeight)&&parentHeight>0)parentViewportHeight=parentHeight;
+ const localVisual=window.visualViewport?.height;
+ const localInner=window.innerHeight;
+ const sizes=[parentViewportHeight,localVisual,localInner].filter(x=>Number.isFinite(x)&&x>=120);
+ if(!sizes.length)return;
+ const height=Math.round(Math.min(...sizes));
+ document.documentElement.style.setProperty("--embed-height",height+"px");
+}
+if(embedded){
+ const sync=()=>applyEmbedHeight(0);
+ window.visualViewport?.addEventListener("resize",sync);
+ window.visualViewport?.addEventListener("scroll",sync);
+ window.addEventListener("resize",sync);
+ document.addEventListener("focusin",event=>{
+  if(event.target?.id!=="draft")return;
+  document.documentElement.classList.add("keyboard-active");
+  document.body.classList.add("keyboard-active");
+  sync();
+  window.parent.postMessage({type:"lgroup.chat.focus",store},parentOrigin);
+ });
+ document.addEventListener("focusout",event=>{
+  if(event.target?.id!=="draft")return;
+  document.documentElement.classList.remove("keyboard-active");
+  document.body.classList.remove("keyboard-active");
+  sync();
+ });
+ sync();
+}
 let token="",ready=false,lastId=0,posting=false,polling=false;
 if(!STORES.includes(store)){
  $("chooser").hidden=false;
