@@ -189,7 +189,7 @@ async function staffMetricsView(){
   syncStaffHomeHeader();
   $("metricsLogin").classList.add("hidden");
   $("metricsFrame").classList.remove("hidden");
-  if(!$("metricsFrame").getAttribute("src"))$("metricsFrame").src="./?standaloneMetrics=1&v=20261107-annual-graph-fix&nocache="+Date.now();
+  if(!$("metricsFrame").getAttribute("src"))$("metricsFrame").src="./?standaloneMetrics=1&v=20261107-monthly-line-chart&nocache="+Date.now();
   return true;
  }catch{return false}
 }
@@ -209,7 +209,7 @@ async function check(){
  await syncInterviewHomeHeader(profile.data.display_name);
  $("metricsLogin").classList.add("hidden");
  $("metricsFrame").classList.remove("hidden");
- if(!$("metricsFrame").getAttribute("src"))$("metricsFrame").src="./?standaloneMetrics=1&v=20261107-annual-graph-fix&nocache="+Date.now();
+ if(!$("metricsFrame").getAttribute("src"))$("metricsFrame").src="./?standaloneMetrics=1&v=20261107-monthly-line-chart&nocache="+Date.now();
 }
 $("metricsLoginForm").addEventListener("submit",async e=>{
  e.preventDefault();
