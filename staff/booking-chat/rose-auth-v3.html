@@ -1,0 +1,388 @@
+<!doctype html><html lang="ja"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta name="build" content="rose-auth-v3-20261107-header-live">
+<meta http-equiv="Cache-Control" content="no-store"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="../interview-sheet-preview/icons/recruit-180.png">
+<link rel="icon" type="image/svg+xml" href="/therapist-profile/staff/assets/favicons/chat.svg?v=20261107">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src https://vjjnkflbfsjihwzjsjpr.supabase.co; script-src 'self' 'unsafe-inline'; worker-src 'self'; manifest-src 'self'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<title>チャット管理｜L GROUP（ヘッダー統一版）</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f7fa;color:#283a50;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif}
+button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}
+#gate{min-height:100dvh;display:grid;place-items:center;padding:20px}
+.gate-card{width:min(100%,400px);background:white;border:1px solid #dae4ed;border-radius:16px;padding:30px;box-shadow:0 12px 40px rgba(29,51,80,.08)}
+.gate-card h1{font-size:19px;margin:0 0 15px}.gate-card p{color:#76889e;font-size:12px;line-height:1.8}
+.gate-card input{width:100%;border-radius:9px;border:1px solid #d4dfe9;padding:12px;background:#fcfdff;margin:10px 0}
+.primary{border:0;border-radius:8px;background:#347faf;color:white;font-weight:700;padding:11px 17px}
+.gate-card button{width:100%}.gate-card a{display:inline-block;color:#2877a6;font-size:12px;font-weight:700;text-decoration:underline;text-underline-offset:3px}.gate-card button:disabled{opacity:.5}
+#app[hidden],#gate[hidden]{display:none!important}
+#app{height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+header{display:flex;gap:16px;align-items:center;padding:14px 21px;background:#fff;border-bottom:1px solid #d9e4eb}
+header strong{font-size:17px}header small{font-size:11px;color:#8191a3;margin-left:10px}
+header button{background:#f0f5f9;border:1px solid #cfdae4;color:#526e86;padding:8px 12px;border-radius:8px;font-size:12px}#customerTestLink{margin-left:auto;color:#fff;background:#3e86b5;border-radius:7px;padding:9px 12px;font-weight:700;text-decoration:none;font-size:12px;white-space:nowrap}#customerTestLink:hover{background:#286b98}
+.layout{min-height:0;flex:1;display:grid;grid-template-columns:330px 1fr}
+.aside{border-right:1px solid #dae4ec;background:#fff;display:flex;flex-direction:column;min-height:0}
+.filters{padding:13px;border-bottom:1px solid #e0e8ee}
+.filters select{padding:11px;width:100%;border:1px solid #d4e0e9;background:#f8fbfd;border-radius:8px;color:#394f67}
+.hint{font-size:11px;color:#8391a0;line-height:1.6;margin-top:8px}
+.thread-list{flex:1;overflow:auto}
+.thread{display:block;width:100%;text-align:left;padding:16px;border:0;border-bottom:1px solid #edf1f5;background:white;color:#34495d}
+.thread.active{background:#eaf3fa;border-left:4px solid #448bbd;padding-left:12px}
+.thread strong{font-size:13px}.thread time{font-size:10px;color:#8f9eae;float:right}
+.thread .sub{font-size:11px;color:#7f92a4;margin-top:7px;display:flex;justify-content:space-between}
+.tag{font-size:10px;color:#be5871;background:#fbe8ee;border-radius:9px;padding:3px 7px;font-weight:700}
+.chat-pane{min-height:0;display:flex;flex-direction:column;background:#f8fafc}
+.thread-heading{padding:14px 18px;background:#fff;border-bottom:1px solid #dce5ee;min-height:66px}
+.thread-heading strong{font-size:15px}.related{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;font-size:11px;color:#8b9bad}
+.related button{font-size:11px;padding:4px 7px;background:#eef5fb;color:#397aaa;border:1px solid #d2e5f1;border-radius:5px}
+.message-list{flex:1;min-height:0;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:13px}
+.bubble{align-self:flex-start;max-width:76%;background:#fff;border:1px solid #e0e8ef;padding:12px 15px;border-radius:13px 13px 13px 3px;font-size:13px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
+.bubble.mine{align-self:flex-end;background:#dcebf7;border-color:#cee2f1;border-radius:13px 13px 3px 13px}
+.bubble span{display:block;margin-top:6px;color:#8595a6;font-size:10px}
+.reply{padding:14px;display:flex;gap:10px;align-items:flex-end;background:#fff;border-top:1px solid #dbe5ef}
+.reply textarea{resize:vertical;width:100%;min-height:50px;max-height:150px;padding:12px;border:1px solid #d2dfea;background:#f9fbfd;border-radius:8px;font-size:13px}
+.reply button{height:50px;white-space:nowrap}
+.placeholder{margin:auto;color:#8597a8;line-height:2;text-align:center;padding:30px;font-size:13px}
+.alert{padding:8px 16px;background:#fff3e9;color:#91522f;border-bottom:1px solid #f0dbca;font-size:12px}
+.alert[hidden],.reply[hidden]{display:none!important}
+@media(max-width:700px){header{padding:12px;gap:6px}#customerTestLink{font-size:10px;padding:9px 7px}header small{display:none}.layout{grid-template-columns:37% 63%}.thread{padding:11px}.thread time{float:none;display:block;margin-top:5px}.thread strong{font-size:11px}.message-list{padding:12px}.bubble{max-width:93%}.reply{padding:7px;gap:5px}.reply button{padding:10px;font-size:12px}.reply textarea{font-size:12px}}
+
+/* 先行テスト：スタッフ通知とスマホ用会話切替 */
+.unread-total{font-size:12px;font-weight:750;color:#b44a69;white-space:nowrap}
+#notifyToggle{background:#f4f7fb;border:1px solid #cfdae4;color:#536982;border-radius:8px;padding:8px 12px;font-weight:700;font-size:12px;white-space:nowrap}
+#notifyToggle[aria-pressed="true"]{background:#e9f5ed;border-color:#8ec9a2;color:#1a7547}
+#backToList{display:none;background:#edf3f8;color:#376380;border:1px solid #d4e0e9;padding:8px 12px;border-radius:7px;font-size:12px;font-weight:700}
+header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-left:0}
+.thread{position:relative}.thread .sub{align-items:center}.thread.unread strong{color:#a93158}
+.reply textarea:focus{outline:2px solid #83b8d6;outline-offset:0}
+@media(max-width:700px){
+ #app{height:100dvh;height:100svh}
+ header{padding:10px 12px;gap:7px}
+ header strong{font-size:15px}
+ header #customerTestLink{order:5;margin-left:0}
+ header small{display:none}
+ #notifyToggle,#reload{padding:8px;font-size:11px}
+ .unread-total{margin-left:auto;font-size:11px}
+ .layout{grid-template-columns:minmax(0,1fr)}
+ .layout>.aside{min-height:0}
+ .thread-list{overscroll-behavior:contain}
+ .thread{padding:16px}
+ .thread strong{font-size:13px}
+ .thread time{display:inline;float:right}
+ .chat-pane{display:none}
+ .layout.chat-open>.aside{display:none}
+ .layout.chat-open>.chat-pane{display:flex;min-width:0}
+ .thread-heading{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:11px 12px;min-height:52px}
+ .thread-heading strong{font-size:13px}
+ .related{width:100%}
+ #backToList{display:inline-flex}
+ .message-list{padding:14px}
+ .bubble{max-width:90%}
+ .reply{padding:10px;padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+ .reply textarea{font-size:16px;resize:none}
+ .reply button{font-size:13px}
+}
+
+/* Web Push: delivered by the browser Service Worker even with this page closed */
+#pushEnable{border:1px solid #2e7aa6;border-radius:8px;background:#2e80ad;color:#fff;padding:8px 13px;font-weight:800;font-size:12px;white-space:nowrap}
+#pushEnable[data-enabled="true"]{border-color:#62a88c;background:#eaf7f0;color:#23794c}
+#pushEnable:disabled,#pushTest:disabled{opacity:.5;cursor:not-allowed}
+#pushTest{border:1px solid #d4e0e9;border-radius:8px;background:#fff;color:#567087;padding:8px 10px;font-size:12px;font-weight:700;white-space:nowrap}
+#pushStatus{font-size:11px;color:#71869c;max-width:270px}
+@media(max-width:700px){
+ #pushEnable,#pushTest{padding:8px 9px;font-size:11px}
+ #pushStatus{flex-basis:100%;order:7;max-width:none}
+}
+</style><style id="lg-chat-unified-header-v1">
+#app>header.lg-common-header{box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;flex-wrap:nowrap;gap:14px;width:100%;min-height:64px;height:64px;padding:0 18px;background:#1e293b;color:#fff;border-bottom:1px solid #344155}
+#app>header.lg-common-header .lg-header-brand{display:flex;align-items:center;gap:10px;min-width:0;flex:0 0 auto}
+#app>header.lg-common-header .lg-header-home{display:inline-flex;align-items:center;gap:8px;color:#fff;text-decoration:none;white-space:nowrap;font-size:13px;font-weight:750}
+#app>header.lg-common-header .lg-header-home img{width:46px;height:46px;object-fit:contain;border-radius:7px}
+#app>header.lg-common-header .lg-header-divider{height:27px;width:1px;background:#556277}
+#app>header.lg-common-header .lg-header-section-icon{width:30px;height:30px;object-fit:contain;border-radius:7px}
+#app>header.lg-common-header strong{font-size:14px;white-space:nowrap}
+#app>header.lg-common-header .lg-chat-header-actions{display:flex;gap:7px;align-items:center;justify-content:flex-end;min-width:0;flex:1 1 auto;white-space:nowrap}
+#app>header.lg-common-header small{margin:0;color:#bdc7d6;font-size:10px;white-space:nowrap}
+#app>header.lg-common-header button{background:#243851;border:1px solid #728199;color:#fff;border-radius:6px;padding:7px 9px;font-size:11px;white-space:nowrap}
+#app>header.lg-common-header #pushEnable{background:#1e4d47;border-color:#6ca998;color:#fff}
+#app>header.lg-common-header #pushEnable[data-enabled="true"]{background:#e5f6ec;color:#175b43;border-color:#9acdaf}
+#app>header.lg-common-header #pushTest{background:#243851;color:#fff}
+#app>header.lg-common-header #customerTestLink{margin:0;padding:8px 10px;background:#3474a7;color:#fff;font-size:11px}
+#app>header.lg-common-header #pushStatus{max-width:160px;overflow:hidden;text-overflow:ellipsis;color:#bdc7d6;font-size:10px}
+#app>header.lg-common-header .unread-total{color:#f3b0c3;font-size:11px}
+@media(max-width:1280px){#app>header.lg-common-header small,#app>header.lg-common-header #pushStatus{display:none}}
+@media(max-width:900px){#app>header.lg-common-header{height:auto;min-height:60px;flex-wrap:wrap;padding:7px 12px;gap:5px}#app>header.lg-common-header .lg-header-home img{height:36px;width:36px}#app>header.lg-common-header .lg-header-brand{width:100%}#app>header.lg-common-header .lg-chat-header-actions{overflow-x:auto;justify-content:flex-start;padding:4px 0;gap:6px}#app>header.lg-common-header .lg-header-section-icon{height:25px;width:25px}}
+</style></head><body>
+<div id="gate"><section class="gate-card"><h1>L GROUP｜チャット管理</h1><p>面接管理にログイン済みの管理者アカウントで接続します。チャット専用パスワードは不要です。</p><button class="primary" id="connect" type="button">管理者アカウントで接続</button><p id="gateError" role="alert" aria-live="polite"></p><p><a href="/therapist-profile/staff/management-top/" target="_blank" rel="noopener noreferrer">面接管理のログイン画面を開く</a></p></section></div>
+<div id="app" hidden>
+<header class="lg-common-header"><div class="lg-header-brand"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ戻る"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><span class="lg-header-divider"></span><img class="lg-header-section-icon" src="/therapist-profile/staff/assets/favicons/chat.svg" alt=""><strong>チャット管理</strong></div><div class="lg-chat-header-actions"><small>薔薇と紳士 先行テスト｜HP未設置</small><span class="unread-total" id="unreadTotal" aria-live="polite">未読 0件</span><button id="pushEnable" type="button" data-enabled="false">プッシュ通知を有効化</button><button id="pushTest" type="button" disabled>通知テスト</button><span id="pushStatus" aria-live="polite">未設定</span><button id="notifyToggle" type="button" aria-pressed="false">画面内通知音 OFF</button><a id="customerTestLink" href="../../chat/?store=%E8%96%94%E8%96%87%E3%81%A8%E7%B4%B3%E5%A3%AB" target="_blank" rel="noopener noreferrer">お客様用テスト画面</a><button id="reload" type="button">情報更新</button></div></header>
+<div id="error" class="alert" hidden role="alert"></div>
+<div class="layout" id="layout">
+<div class="aside"><div class="filters"><select id="store" aria-label="店舗を切り替える"><option value="all">全店舗</option><option value="Grand Luxe">Grand Luxe</option><option value="LUXY OSAKA">LUXY OSAKA</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select><div class="hint" id="summary">問い合わせを取得中です</div></div><div class="thread-list" id="threads"></div></div>
+<div class="chat-pane"><div class="thread-heading" id="heading"><button id="backToList" type="button">〈 一覧</button><strong id="threadTitle">チャットを選択してください</strong><div id="relatedThreads" class="related"></div></div><div class="message-list" id="messages"><div class="placeholder">左の一覧から会話を選択してください。</div></div><form class="reply" id="reply" hidden><textarea id="draft" maxlength="2000" required placeholder="返信を入力" aria-label="返信内容"></textarea><button id="send" class="primary" type="submit">送信</button></form></div>
+</div></div>
+<script>
+(()=>{
+"use strict";
+const API="https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/booking-chat";
+const LOGIN="https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access";
+const SESSION_KEY="interview_staff_session_v2";const $=id=>document.getElementById(id);
+const VAPID_PUBLIC="BCZ_hr99Ujmq2j1M5N8TSo0wP7l2kf62gbwl_Pugx3D3zeHHQHO9shM9HrNNFYN4Lcbmxr3Tjc-usFUPj4L_9UE";
+const SW_URL="/therapist-profile/staff/booking-chat/sw.js";
+const SW_SCOPE="/therapist-profile/staff/booking-chat/";
+function supportsPush(){return "serviceWorker" in navigator&&"PushManager" in window&&"Notification" in window&&window.isSecureContext}
+function vapidBytes(encoded){
+ const padded=encoded.replace(/-/g,"+").replace(/_/g,"/").padEnd(Math.ceil(encoded.length/4)*4,"=");
+ const raw=atob(padded),result=new Uint8Array(raw.length);
+ for(let i=0;i<raw.length;i++)result[i]=raw.charCodeAt(i);
+ return result;
+}
+function pushLabel(message){$("pushStatus").textContent=message}
+function pushControls(enabled){
+ $("pushEnable").dataset.enabled=String(enabled);
+ $("pushEnable").textContent=enabled?"プッシュ通知 ON（解除）":"プッシュ通知を有効化";
+ $("pushTest").disabled=!enabled;
+}
+let pushSubscription=null,pushBusy=false;
+async function existingPushSubscription(){
+ const registration=await navigator.serviceWorker.getRegistration(SW_SCOPE);
+ return registration?await registration.pushManager.getSubscription():null;
+}
+async function syncPushIfGranted(){
+ if(!supportsPush()){pushLabel("このブラウザでは利用不可。iPhoneはホーム画面に追加して開いてください。");return}
+ if(Notification.permission==="denied"){pushLabel("ブラウザの通知設定が拒否されています");pushControls(false);return}
+ if(Notification.permission!=="granted"){pushLabel("通知を有効化すると画面を閉じても受け取れます");pushControls(false);return}
+ try{
+  const sub=await existingPushSubscription();
+  if(!sub){pushControls(false);pushLabel("通知を有効化してください");return}
+  if(!token)return;
+  await call("staff_push_subscribe",{subscription:sub.toJSON()});
+  pushSubscription=sub;pushControls(true);pushLabel("端末登録済み。画面を閉じても通知を受け取れます");
+ }catch(err){pushControls(false);pushLabel("通知登録の確認失敗："+String(err.message||err))}
+}
+$("pushEnable").addEventListener("click",async()=>{
+ if(pushBusy)return;
+ if(!supportsPush()){pushLabel("対応ブラウザが必要です。iPhoneはホーム画面へ追加してください。");return}
+ pushBusy=true;$("pushEnable").disabled=true;
+ try{
+  if(pushSubscription){
+   await call("staff_push_unsubscribe",{endpoint:pushSubscription.endpoint});
+   await pushSubscription.unsubscribe();
+   pushSubscription=null;pushControls(false);pushLabel("プッシュ通知は解除されました");return;
+  }
+  // Permission must be requested directly from a user gesture.
+  const permission=Notification.permission==="granted"?"granted":await Notification.requestPermission();
+  if(permission!=="granted"){pushLabel(permission==="denied"?"通知が拒否されています。ブラウザの設定をご確認ください。":"通知許可が必要です");return}
+  const registration=await navigator.serviceWorker.register(SW_URL,{scope:SW_SCOPE});
+  await navigator.serviceWorker.ready;
+  let sub=await registration.pushManager.getSubscription();
+  if(!sub)sub=await registration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:vapidBytes(VAPID_PUBLIC)});
+  await call("staff_push_subscribe",{subscription:sub.toJSON()});
+  pushSubscription=sub;pushControls(true);pushLabel("設定完了。通知テストを押してください");
+ }catch(err){pushLabel("通知の設定に失敗："+String(err.message||err))}
+ finally{pushBusy=false;$("pushEnable").disabled=false}
+});
+$("pushTest").addEventListener("click",async()=>{
+ if(!pushSubscription||!token)return;
+ $("pushTest").disabled=true;pushLabel("テスト通知を送信中…");
+ try{
+  const result=await call("staff_push_test",{endpoint:pushSubscription.endpoint});
+  pushLabel(result.accepted?"配信サーバーが受け付けました。端末の通知をご確認ください。":"通知サーバーへの配信失敗");
+ }catch(err){pushLabel("通知テスト失敗："+String(err.message||err))}
+ finally{$("pushTest").disabled=!pushSubscription}
+});
+
+const acceptedStores=["all","Grand Luxe","LUXY OSAKA","Un Secret","薔薇と紳士","BUSTY OSAKA"];
+const requestedStore=new URLSearchParams(location.search).get("store");
+$("store").value=acceptedStores.includes(requestedStore)?requestedStore:"薔薇と紳士";
+function setCustomerTestLink(){const store=$("store").value==="all"?"薔薇と紳士":$("store").value;$("customerTestLink").href="../../chat/?store="+encodeURIComponent(store)}
+setCustomerTestLink();
+let token="",threadId="",items=[],loading=false,replying=false;
+let listInitialized=false,notifyOn=false,audioContext=null,activeThreadUpdatedAt="",threadOpening=false;
+const defaultTitle=document.title;
+function notificationTone(){
+ if(!notifyOn)return;
+ try{
+  const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio)return;
+  const ctx=audioContext||(audioContext=new Audio());
+  if(ctx.state==="suspended")void ctx.resume();
+  const t=ctx.currentTime,osc=ctx.createOscillator(),gain=ctx.createGain();
+  osc.type="sine";osc.frequency.setValueAtTime(880,t);
+  osc.frequency.setValueAtTime(1046,t+0.12);
+  gain.gain.setValueAtTime(0.0001,t);
+  gain.gain.exponentialRampToValueAtTime(0.085,t+0.02);
+  gain.gain.exponentialRampToValueAtTime(0.0001,t+0.32);
+  osc.connect(gain);gain.connect(ctx.destination);osc.start(t);osc.stop(t+0.34);
+ }catch(error){console.warn("通知音を再生できません",error)}
+}
+$("notifyToggle").addEventListener("click",()=>{
+ notifyOn=!notifyOn;
+ $("notifyToggle").textContent="通知音 "+(notifyOn?"ON":"OFF");
+ $("notifyToggle").setAttribute("aria-pressed",String(notifyOn));
+ if(notifyOn){
+  try{const Audio=window.AudioContext||window.webkitAudioContext;if(Audio){audioContext=audioContext||new Audio();void audioContext.resume()}}catch{}
+ }
+});
+$("backToList").addEventListener("click",()=>$("layout").classList.remove("chat-open"));
+function updateCounters(){
+ const total=items.filter(isUnread).length;
+ $("summary").textContent="会話 "+items.length+"件 ／ 未読 "+total+"件";
+ $("unreadTotal").textContent="未読 "+total+"件";
+ document.title=(total?"("+total+") ":"")+defaultTitle;
+}
+
+const labelTime=iso=>{const d=new Date(iso);return isNaN(+d)?"":d.toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"})};
+async function request(url,payload){
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);
+ try{const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},cache:"no-store",body:JSON.stringify(payload),signal:controller.signal});const data=await r.json();if(!r.ok||(!data.ok&&url===API)){const e=new Error(data.error||"request_failed");e.status=r.status;throw e}return data;}finally{clearTimeout(timer)}
+}
+const stored=()=>{try{return sessionStorage.getItem(SESSION_KEY)||localStorage.getItem(SESSION_KEY)||""}catch{return ""}};
+function existingAdminJwt(){try{const raw=localStorage.getItem("mattan-recruit-auth")||sessionStorage.getItem("mattan-recruit-auth");const session=raw?JSON.parse(raw):null;return typeof session?.access_token==="string"?session.access_token:""}catch{return ""}}
+function showError(msg){$("error").textContent=msg;$("error").hidden=false}
+function clearError(){$("error").textContent="";$("error").hidden=true}
+function unauthorized(){$("app").hidden=true;$("gate").hidden=false;token="";threadId="";sessionStorage.removeItem(SESSION_KEY);localStorage.removeItem(SESSION_KEY);$("gateError").textContent="再ログインしてください。"}
+async function call(action,params={}){
+ try{return await request(API,{action,staff_token:token,...params})}
+ catch(e){if(e.status===401)unauthorized();throw e}
+}
+function isUnread(t){return !!(t.last_customer_message_at&&(!t.staff_last_read_at||new Date(t.last_customer_message_at)>new Date(t.staff_last_read_at)))}
+function nameOf(t){const visitor=t.booking_chat_visitors;return (visitor&&visitor.display_name)||"お客様 "+String(t.visitor_id).slice(0,8)}
+function drawList(){
+ const list=$("threads");list.replaceChildren();
+ let unread=0;
+ for(const t of items){
+  const active=t.id===threadId;
+  if(isUnread(t))unread++;
+  const btn=document.createElement("button");btn.type="button";btn.className="thread"+(active?" active":"")+(isUnread(t)?" unread":"");
+  const heading=document.createElement("div");
+  const strong=document.createElement("strong");strong.textContent=t.store_key;
+  const time=document.createElement("time");time.textContent=labelTime(t.updated_at);heading.append(strong,time);
+  const desc=document.createElement("div");desc.className="sub";
+  const customer=document.createElement("span");customer.textContent=nameOf(t);desc.append(customer);
+  if(isUnread(t)){const badge=document.createElement("span");badge.className="tag";badge.textContent="未読";desc.append(badge)}
+  btn.append(heading,desc);btn.addEventListener("click",()=>void openThread(t.id));list.append(btn);
+ }
+ if(!items.length){const empty=document.createElement("div");empty.className="placeholder";empty.textContent="まだ問い合わせはありません";list.append(empty)}
+ updateCounters();
+}
+async function loadList(){
+ if(!token||loading)return;loading=true;
+ const store=$("store").value;
+ try{
+  const previous=new Map(items.map(item=>[item.id,item.last_customer_message_at||""]));
+  const data=await call("staff_list",{store});
+  if(store!==$("store").value)return;
+  const next=data.threads||[];
+  const hasNew=listInitialized&&next.some(item=>{
+   if(!item.last_customer_message_at||!isUnread(item))return false;
+   const old=previous.get(item.id);
+   return old===undefined||item.last_customer_message_at>old;
+  });
+  items=next;
+  listInitialized=true;
+  drawList();clearError();
+  if(hasNew)notificationTone();
+  if(threadId&&!document.hidden){
+   const selected=items.find(t=>t.id===threadId);
+   if(selected&&selected.updated_at!==activeThreadUpdatedAt&&!threadOpening){
+    void openThread(threadId,{refresh:true});
+   }
+  }
+ }catch(e){showError("一覧を取得できません。（"+e.message+"）")}
+ finally{loading=false}
+}
+function appendMessage(message){
+ const el=document.createElement("div");el.className="bubble"+(message.sender==="staff"?" mine":"");
+ el.textContent=message.body;
+ const time=document.createElement("span");time.textContent=(message.sender==="staff"?"スタッフ":"お客様")+"　"+labelTime(message.created_at);
+ el.append(time);return el;
+}
+async function openThread(id,options={}){
+ if(!token||threadOpening)return;
+ threadOpening=true;
+ const prev=threadId,switched=prev!==id;
+ threadId=id;
+ if(switched)$("layout").classList.add("chat-open");
+ drawList();
+ try{
+  const data=await call("staff_thread",{thread_id:id});
+  if(threadId!==id)return;
+  $("threadTitle").textContent=data.thread.store_key+"｜お客様 "+String(data.thread.visitor_id).slice(0,8);
+  const rel=$("relatedThreads");rel.replaceChildren();
+  if(data.related?.length){
+   const label=document.createElement("span");label.textContent="他店舗履歴：";rel.append(label);
+   for(const item of data.related){
+    const link=document.createElement("button");link.type="button";link.textContent=item.store_key;
+    link.addEventListener("click",()=>{if($("store").value!=="all"){$("store").value="all";void loadList()}void openThread(item.id)});
+    rel.append(link);
+   }
+  }
+  const pane=$("messages");
+  const wasAtBottom=pane.scrollHeight-pane.scrollTop-pane.clientHeight<90;
+  const oldIds=[...pane.children].map(n=>n.dataset?.messageId).filter(Boolean).join(",");
+  const nextIds=(data.messages||[]).map(m=>String(m.id)).join(",");
+  if(switched||nextIds!==oldIds){
+   pane.replaceChildren();
+   for(const msg of data.messages||[]){
+    const node=appendMessage(msg);node.dataset.messageId=String(msg.id);pane.append(node);
+   }
+   if(switched||wasAtBottom)pane.scrollTop=pane.scrollHeight;
+  }
+  $("reply").hidden=false;
+  if(switched)$("draft").value="";
+  const found=items.find(t=>t.id===id);
+  if(found){found.staff_last_read_at=new Date().toISOString();activeThreadUpdatedAt=found.updated_at}
+  else activeThreadUpdatedAt=data.thread.updated_at;
+  drawList();clearError();
+ }catch(e){showError("会話を取得できません。（"+e.message+"）")}
+ finally{threadOpening=false}
+}
+let connecting=false;
+async function connectExisting(){
+ if(connecting)return;
+ connecting=true;$("connect").disabled=true;$("gateError").textContent="管理者認証を確認しています…";
+ try{
+  const old=stored();
+  if(/^[0-9a-f]{64}$/.test(old)){
+   try{
+    const check=await request(API,{action:"staff_list",staff_token:old,store:$("store").value});
+    token=old;
+    items=check.threads||[];listInitialized=true;$("gate").hidden=true;$("app").hidden=false;drawList();clearError();
+    $("gateError").textContent="";void syncPushIfGranted();return;
+   }catch(e){
+    if(e.status!==401)throw e;
+    sessionStorage.removeItem(SESSION_KEY);localStorage.removeItem(SESSION_KEY);
+   }
+  }
+  const jwt=existingAdminJwt();
+  if(!jwt)throw new Error("面接管理の管理者ログイン情報が見つかりません。先に管理画面でログインしてください。");
+  const res=await fetch(LOGIN,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+jwt},cache:"no-store",body:JSON.stringify({action:"admin_exchange"})});
+  const data=await res.json();
+  if(!res.ok||typeof data.token!=="string"){
+   if(res.status===401)throw new Error("管理者ログインの有効期限が切れています。面接管理にログインし直してください。");
+   if(res.status===403)throw new Error("このアカウントには管理者権限がありません。");
+   throw new Error("既存の管理者認証に接続できません。（"+String(data.error||res.status)+"）");
+  }
+  token=data.token;sessionStorage.setItem(SESSION_KEY,token);localStorage.removeItem(SESSION_KEY);
+  $("gate").hidden=true;$("app").hidden=false;$("gateError").textContent="";clearError();await loadList();void syncPushIfGranted();
+ }catch(err){
+  $("gate").hidden=false;$("app").hidden=true;
+  $("gateError").textContent=String(err.message||err);
+ }finally{connecting=false;$("connect").disabled=false}
+}
+$("connect").addEventListener("click",()=>void connectExisting());
+$("reply").addEventListener("submit",async e=>{
+ e.preventDefault();if(!threadId||!token||replying)return;
+ const body=$("draft").value.trim();if(!body)return;replying=true;$("send").disabled=true;
+ try{
+  await call("staff_send",{thread_id:threadId,body,client_message_id:crypto.randomUUID()});
+  $("draft").value="";await openThread(threadId);await loadList();
+ }catch(err){showError("送信できませんでした。（"+String(err.message||err)+"）")}
+ finally{replying=false;$("send").disabled=false}
+});
+$("draft").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();$("reply").requestSubmit()}});
+$("store").addEventListener("change",()=>{setCustomerTestLink();threadId="";activeThreadUpdatedAt="";listInitialized=false;$("layout").classList.remove("chat-open");$("threadTitle").textContent="チャットを選択してください";$("relatedThreads").replaceChildren();$("messages").replaceChildren();$("reply").hidden=true;void loadList()});
+$("reload").addEventListener("click",()=>{void loadList();if(threadId)void openThread(threadId)});
+setInterval(()=>{if(!document.hidden&&token)void loadList()},10000);
+void connectExisting();
+})();
+</script></body></html>
