@@ -12,7 +12,7 @@ button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{
 .gate-card h1{font-size:19px;margin:0 0 15px}.gate-card p{color:#76889e;font-size:12px;line-height:1.8}
 .gate-card input{width:100%;border-radius:9px;border:1px solid #d4dfe9;padding:12px;background:#fcfdff;margin:10px 0}
 .primary{border:0;border-radius:8px;background:#347faf;color:white;font-weight:700;padding:11px 17px}
-.gate-card button{width:100%}
+.gate-card button{width:100%}.gate-card a{display:inline-block;color:#2877a6;font-size:12px;font-weight:700;text-decoration:underline;text-underline-offset:3px}.gate-card button:disabled{opacity:.5}
 #app[hidden],#gate[hidden]{display:none!important}
 #app{height:100dvh;display:flex;flex-direction:column;overflow:hidden}
 header{display:flex;gap:16px;align-items:center;padding:14px 21px;background:#fff;border-bottom:1px solid #d9e4eb}
@@ -45,7 +45,7 @@ header button{background:#f0f5f9;border:1px solid #cfdae4;color:#526e86;padding:
 .alert[hidden],.reply[hidden]{display:none!important}
 @media(max-width:700px){header{padding:12px;gap:6px}#customerTestLink{font-size:10px;padding:9px 7px}header small{display:none}.layout{grid-template-columns:37% 63%}.thread{padding:11px}.thread time{float:none;display:block;margin-top:5px}.thread strong{font-size:11px}.message-list{padding:12px}.bubble{max-width:93%}.reply{padding:7px;gap:5px}.reply button{padding:10px;font-size:12px}.reply textarea{font-size:12px}}
 </style></head><body>
-<div id="gate"><form class="gate-card" id="gateForm"><h1>L GROUP｜チャット管理</h1><p>スタッフ用テスト画面です。面接管理と同じ管理者パスワードでログインしてください。</p><input id="pass" type="password" autocomplete="current-password" required placeholder="管理者パスワード" aria-label="管理者パスワード"><button class="primary" type="submit">ログイン</button><p id="gateError" role="alert"></p></form></div>
+<div id="gate"><section class="gate-card"><h1>L GROUP｜チャット管理</h1><p>面接管理にログイン済みの管理者アカウントで接続します。チャット専用パスワードは不要です。</p><button class="primary" id="connect" type="button">管理者アカウントで接続</button><p id="gateError" role="alert" aria-live="polite"></p><p><a href="/therapist-profile/staff/management-top/" target="_blank" rel="noopener noreferrer">面接管理のログイン画面を開く</a></p></section></div>
 <div id="app" hidden>
 <header><strong>チャット管理</strong><small>薔薇と紳士 先行テスト｜HP未設置</small><a id="customerTestLink" href="../../chat/?store=%E8%96%94%E8%96%87%E3%81%A8%E7%B4%B3%E5%A3%AB" target="_blank" rel="noopener noreferrer">お客様用テスト画面</a><button id="reload" type="button">情報更新</button></header>
 <div id="error" class="alert" hidden role="alert"></div>
@@ -70,7 +70,8 @@ async function request(url,payload){
  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);
  try{const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},cache:"no-store",body:JSON.stringify(payload),signal:controller.signal});const data=await r.json();if(!r.ok||(!data.ok&&url===API)){const e=new Error(data.error||"request_failed");e.status=r.status;throw e}return data;}finally{clearTimeout(timer)}
 }
-const stored=()=>sessionStorage.getItem(SESSION_KEY)||localStorage.getItem(SESSION_KEY)||"";
+const stored=()=>{try{return sessionStorage.getItem(SESSION_KEY)||localStorage.getItem(SESSION_KEY)||""}catch{return ""}};
+function existingAdminJwt(){try{const raw=localStorage.getItem("mattan-recruit-auth")||sessionStorage.getItem("mattan-recruit-auth");const session=raw?JSON.parse(raw):null;return typeof session?.access_token==="string"?session.access_token:""}catch{return ""}}
 function showError(msg){$("error").textContent=msg;$("error").hidden=false}
 function clearError(){$("error").textContent="";$("error").hidden=true}
 function unauthorized(){$("app").hidden=true;$("gate").hidden=false;token="";threadId="";sessionStorage.removeItem(SESSION_KEY);localStorage.removeItem(SESSION_KEY);$("gateError").textContent="再ログインしてください。"}
@@ -128,15 +129,40 @@ async function openThread(id){
   drawList();clearError();
  }catch(e){showError("会話を取得できません。（"+e.message+"）")}
 }
-$("gateForm").addEventListener("submit",async e=>{
- e.preventDefault();$("gateError").textContent="認証中です";
+let connecting=false;
+async function connectExisting(){
+ if(connecting)return;
+ connecting=true;$("connect").disabled=true;$("gateError").textContent="管理者認証を確認しています…";
  try{
-  const data=await request(LOGIN,{action:"login",password:$("pass").value});
-  if(!data.token)throw Error("login_failed");
-  token=data.token;sessionStorage.setItem(SESSION_KEY,token);$("pass").value="";
-  $("gate").hidden=true;$("app").hidden=false;clearError();await loadList();
- }catch(err){$("gateError").textContent="認証に失敗しました。（"+String(err.message||err)+"）"}
-});
+  const old=stored();
+  if(/^[0-9a-f]{64}$/.test(old)){
+   try{
+    const check=await request(API,{action:"staff_list",staff_token:old,store:$("store").value});
+    token=old;
+    items=check.threads||[];$("gate").hidden=true;$("app").hidden=false;drawList();clearError();
+    $("gateError").textContent="";return;
+   }catch(e){
+    if(e.status!==401)throw e;
+    sessionStorage.removeItem(SESSION_KEY);localStorage.removeItem(SESSION_KEY);
+   }
+  }
+  const jwt=existingAdminJwt();
+  if(!jwt)throw new Error("面接管理の管理者ログイン情報が見つかりません。先に管理画面でログインしてください。");
+  const res=await fetch(LOGIN,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+jwt},cache:"no-store",body:JSON.stringify({action:"admin_exchange"})});
+  const data=await res.json();
+  if(!res.ok||typeof data.token!=="string"){
+   if(res.status===401)throw new Error("管理者ログインの有効期限が切れています。面接管理にログインし直してください。");
+   if(res.status===403)throw new Error("このアカウントには管理者権限がありません。");
+   throw new Error("既存の管理者認証に接続できません。（"+String(data.error||res.status)+"）");
+  }
+  token=data.token;sessionStorage.setItem(SESSION_KEY,token);localStorage.removeItem(SESSION_KEY);
+  $("gate").hidden=true;$("app").hidden=false;$("gateError").textContent="";clearError();await loadList();
+ }catch(err){
+  $("gate").hidden=false;$("app").hidden=true;
+  $("gateError").textContent=String(err.message||err);
+ }finally{connecting=false;$("connect").disabled=false}
+}
+$("connect").addEventListener("click",()=>void connectExisting());
 $("reply").addEventListener("submit",async e=>{
  e.preventDefault();if(!threadId||!token||replying)return;
  const body=$("draft").value.trim();if(!body)return;replying=true;$("send").disabled=true;
@@ -150,6 +176,6 @@ $("draft").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.is
 $("store").addEventListener("change",()=>{setCustomerTestLink();threadId="";$("heading").textContent="チャットを選択してください";$("messages").replaceChildren();$("reply").hidden=true;void loadList()});
 $("reload").addEventListener("click",()=>{void loadList();if(threadId)void openThread(threadId)});
 setInterval(()=>{if(!document.hidden&&token){void loadList();if(threadId)void openThread(threadId)}},15000);
-token=stored();if(token){$("gate").hidden=true;$("app").hidden=false;void loadList()}
+void connectExisting();
 })();
 </script></body></html>
