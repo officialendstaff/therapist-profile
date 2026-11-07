@@ -603,6 +603,17 @@ html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!imp
 .sales-metrics-bar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,#71b1e1,#3d78b5)}
 .sales-metrics-footnote{font-size:11px;color:#75879a;line-height:1.8;margin:18px 0}
 @media(max-width:750px){#salesMetricsBody>.sales-metrics-kpis:nth-of-type(3){grid-template-columns:repeat(2,minmax(0,1fr))}.sales-metrics-table{font-size:10px}}
+</style><style id="sales-annual-five-stores-20261107">
+.sales-metrics-sections>.sales-annual-panel{grid-column:1/-1;min-width:0;min-height:360px}
+.sales-annual-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.sales-annual-chart{min-width:0;padding:7px 6px}
+.sales-annual-chart h3{font-size:13px;color:#344e69;font-weight:750;margin:0 0 4px}
+.sales-annual-legend{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:7px 14px;margin:3px 3px 12px;font-size:11px;color:#536880;font-weight:750}
+.sales-annual-legend span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.sales-annual-legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.sales-annual-caption{margin:10px 0 0;color:#74869b;font-size:11px;line-height:1.75}
+.sales-annual-message{display:grid;place-items:center;margin:10px 0;min-height:210px;background:#f8fafc;border-radius:7px;color:#8392a5;font-size:12px}
+@media(max-width:820px){.sales-annual-pair{grid-template-columns:1fr;gap:6px}.sales-annual-legend{justify-content:flex-start}.sales-metrics-sections>.sales-annual-panel{min-height:0}}
 </style></head><body>
 <header class="header"><button class="brand" id="home"><img id="homeAvatar" src="./icons/recruit-180.png" alt="" onerror="this.style.display='none'"><span id="homeLabel">TOP</span></button><div class="header-actions"><button id="manualInterviewOpen" type="button">面接登録</button><button id="sound">通知設定</button></div></header>
 <section class="calendar" aria-label="月間カレンダー"><div class="cal-head"><button id="prev" aria-label="前月">◀</button><span id="month"></span><button id="next" aria-label="翌月">▶</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="days" id="days"></div></section>
@@ -1087,37 +1098,113 @@ function salesTotal(rows){
 function salesNumber(n){return Number.isFinite(n)?Math.round(n).toLocaleString('ja-JP'):'—'}
 function salesYen(n){return Number.isFinite(n)?salesNumber(n)+'円':'—'}
 function salesRatio(n,d){return d?(n*100/d).toFixed(1)+'%':'—'}
-function salesTrendSvg(rows){
- if(!rows.length)return '<div class="sales-metrics-blank">該当するデータはありません</div>';
- const points=rows.slice().sort((a,b)=>a.metric_date.localeCompare(b.metric_date));
- const min=salesDayOf(points[0]),maxDay=salesDayOf(points[points.length-1]);
- const high=Math.max(1,...points.map(r=>Math.max(Number(r.revenue_yen)||0,Number(r.profit_yen)||0)))*1.12;
- const w=880,h=245,l=72,t=14,b=31;
- const x=d=>l+(w-l-15)*(maxDay===min?0.5:(d-min)/(maxDay-min));
- const y=v=>t+(h-t-b)*(1-v/high);
- let grid='';
+const salesAnnualState={year:0,status:'idle',months:[],request:0,error:''};
+const salesAnnualShopColors=[
+ ['Grand Luxe','#7b64b2'],['LUXY','#468ccf'],['Un Secret','#1ba18b'],
+ ['薔薇と紳士','#d7789c'],['BUSTY OSAKA','#d49a59']
+];
+function salesAnnualSvgElement(type,attrs,content){
+ const el=document.createElementNS('http://www.w3.org/2000/svg',type);
+ for(const [key,value] of Object.entries(attrs))el.setAttribute(key,String(value));
+ if(content!==undefined)el.textContent=String(content);
+ return el;
+}
+function salesAnnualCompact(value){return salesNumber(value/10000)+'万'}
+function salesAnnualSingleChart(parent,rows,year,field,title){
+ const section=document.createElement('section');section.className='sales-annual-chart';
+ const name=document.createElement('h3');name.textContent=title;section.append(name);
+ const byMonth=new Map(rows.map(v=>[v.store_key+':'+v.month,v]));
+ const monthly=Array.from({length:12},(_,i)=>{
+  const mo=year+'-'+String(i+1).padStart(2,'0');
+  return salesAnnualShopColors.map(([store,color])=>{
+   const data=byMonth.get(store+':'+mo);
+   return {store,color,value:data?Number(data[field])||0:0,days:data?Number(data.days)||0:0,valid:!!data};
+  });
+ });
+ const totals=monthly.map(segments=>segments.reduce((sum,x)=>sum+(x.valid?x.value:0),0));
+ const maximum=Math.max(1,...totals),step=Math.ceil(maximum/4/100000)*100000;
+ const ceiling=step*4;
+ const w=880,h=280,left=68,right=14,top=32,bottom=35,plotHeight=h-top-bottom;
+ const svg=salesAnnualSvgElement('svg',{viewBox:'0 0 '+w+' '+h,role:'img','aria-label':year+'年の5店舗別'+title+'の月間累計'});
+ svg.style.cssText='width:100%;height:auto;display:block;overflow:visible';
  for(let i=0;i<=4;i++){
-  const val=high*i/4,yy=y(val);
-  grid+='<line x1="'+l+'" x2="'+(w-15)+'" y1="'+yy+'" y2="'+yy+'" stroke="#e3eaf2" stroke-dasharray="4 5"/>';
-  grid+='<text x="'+(l-9)+'" y="'+(yy+4)+'" text-anchor="end" font-size="11" fill="#7a8c9f">'+(val>=10000?Math.round(val/10000)+'万':salesNumber(val))+'</text>';
+  const y=top+plotHeight-i*plotHeight/4;
+  svg.append(salesAnnualSvgElement('line',{x1:left,y1:y,x2:w-right,y2:y,stroke:'#e0e7f0','stroke-dasharray':i===0?'':'4 5'}));
+  svg.append(salesAnnualSvgElement('text',{x:left-9,y:y+4,'font-size':11,'text-anchor':'end',fill:'#8192a5'},i===0?'0':salesAnnualCompact(step*i)));
  }
- let lines='';
- for(const spec of [['revenue_yen','#387fc4'],['profit_yen','#d67d9d']]){
-  let d='',prior=-1;
-  for(const r of points){
-   const day=salesDayOf(r),part=x(day).toFixed(2)+' '+y(Number(r[spec[0]])||0).toFixed(2);
-   d+=(prior===day-1?' L ':' M ')+part;prior=day;
+ const fullWidth=w-left-right,barWidth=Math.min(46,fullWidth/12*0.65);
+ for(let i=0;i<12;i++){
+  const center=left+fullWidth*(i+0.5)/12;
+  svg.append(salesAnnualSvgElement('text',{x:center,y:h-13,'text-anchor':'middle','font-size':12,fill:'#6f8197'},(i+1)+'月'));
+  const segments=monthly[i];
+  if(!segments.some(item=>item.valid))continue;
+  let bottom=h-bottom;
+  for(const item of segments){
+   if(!item.valid||item.value<=0)continue;
+   const barHeight=item.value/ceiling*plotHeight;
+   const rect=salesAnnualSvgElement('rect',{x:center-barWidth/2,y:bottom-barHeight,width:barWidth,height:barHeight,fill:item.color,rx:1});
+   const tip=salesAnnualSvgElement('title',{},(i+1)+'月　'+item.store+'：'+salesYen(item.value)+'（取得済み'+item.days+'日）');
+   rect.append(tip);svg.append(rect);bottom-=barHeight;
   }
-  lines+='<path d="'+d+'" stroke="'+spec[1]+'" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
-  for(const r of points)lines+='<circle cx="'+x(salesDayOf(r))+'" cy="'+y(Number(r[spec[0]])||0)+'" r="4.5" fill="#fff" stroke="'+spec[1]+'" stroke-width="2.5"><title>'+salesDayOf(r)+'日 '+salesYen(Number(r[spec[0]]))+'</title></circle>';
+  const total=totals[i];
+  if(total>0)svg.append(salesAnnualSvgElement('text',{x:center,y:Math.max(16,bottom-7),'text-anchor':'middle','font-size':11,'font-weight':'700',fill:'#354c68'},salesAnnualCompact(total)));
  }
- let days='';
- for(const r of points){
-  const day=salesDayOf(r);
-  if(points.length>14&&day%3!==0&&day!==min&&day!==maxDay)continue;
-  days+='<text x="'+x(day)+'" y="'+(h-6)+'" text-anchor="middle" font-size="11" fill="#71849b">'+day+'日</text>';
+ section.append(svg);parent.append(section);
+}
+function renderSalesAnnualCharts(container,year){
+ container.replaceChildren();
+ if(salesAnnualState.year!==year||salesAnnualState.status==='idle'||salesAnnualState.status==='loading'){
+  const message=document.createElement('p');message.className='sales-annual-message';message.textContent='5店舗の月間データを読み込み中です';container.append(message);return;
  }
- return '<div class="sales-metrics-chart-legend"><span style="color:#387fc4">● 料金</span><span style="color:#d67d9d">● 利益</span></div><svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="xMidYMid meet" role="img" aria-label="料金と利益の日別推移" style="width:100%;height:260px">'+grid+lines+days+'</svg>';
+ if(salesAnnualState.status!=='ready'){
+  const error=document.createElement('p');error.className='sales-annual-message';error.textContent='月間データを取得できませんでした';container.append(error);return;
+ }
+ const months=salesAnnualState.months;
+ if(!months.length){
+  const message=document.createElement('p');message.className='sales-annual-message';message.textContent=year+'年の営業数値は未登録です';container.append(message);return;
+ }
+ const legend=document.createElement('div');legend.className='sales-annual-legend';
+ for(const [name,color] of salesAnnualShopColors){
+  const item=document.createElement('span');
+  const square=document.createElement('i');square.style.background=color;
+  item.append(square,document.createTextNode(name==='LUXY'?'LUXY OSAKA':name));legend.append(item);
+ }
+ container.append(legend);
+ const pair=document.createElement('div');pair.className='sales-annual-pair';
+ salesAnnualSingleChart(pair,months,year,'revenue_yen','料金');
+ salesAnnualSingleChart(pair,months,year,'profit_yen','利益');
+ container.append(pair);
+ const latest=months.map(r=>r.month).sort().at(-1);
+ const latestRows=months.filter(r=>r.month===latest);
+ if(latestRows.length){
+  const caption=document.createElement('p');caption.className='sales-annual-caption';
+  const dayCounts=[...new Set(latestRows.map(r=>Number(r.days)))];
+  caption.textContent=latest.slice(0,4)+'年'+Number(latest.slice(-2))+'月：'+(dayCounts.length===1?'各店舗'+dayCounts[0]+'日分':'店舗ごとに保存日数が異なります')+'の実績を反映。データ未取得の月は表示していません。';
+  container.append(caption);
+ }
+}
+async function refreshSalesAnnualMetrics(){
+ const year=Number(String($('storeMetricsMonth').value).slice(0,4));
+ if(!Number.isInteger(year))return;
+ if(salesAnnualState.year===year&&(salesAnnualState.status==='ready'||salesAnnualState.status==='loading'))return;
+ const request=++salesAnnualState.request;
+ salesAnnualState.year=year;salesAnnualState.status='loading';salesAnnualState.months=[];
+ const token=sessionStorage.getItem('interview_staff_session_v2')||localStorage.getItem('interview_staff_session_v2');
+ if(!token){salesAnnualState.status='login-required';renderSalesMetrics();return}
+ try{
+  const res=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access',{
+   method:'POST',cache:'no-store',headers:{'Content-Type':'application/json'},
+   body:JSON.stringify({action:'sales_metrics_yearly',token,year})
+  });
+  const data=await res.json();
+  if(!res.ok||!data.ok||!Array.isArray(data.months))throw Error(data.error||'read_failed');
+  if(request!==salesAnnualState.request)return;
+  salesAnnualState.months=data.months;salesAnnualState.status='ready';
+ }catch(e){
+  if(request!==salesAnnualState.request)return;
+  salesAnnualState.status='error';salesAnnualState.error=String(e.message||e);
+ }
+ renderSalesMetrics();
 }
 function renderSalesMetrics(){
  const root=$('salesMetricsBody');if(!root||root.hidden||$('storeMetrics').hidden)return;
@@ -1145,11 +1232,12 @@ function renderSalesMetrics(){
  root.innerHTML=(salesMetricsData.status==='error'?'<p class="sales-metrics-error">営業数値を取得できませんでした。再読み込みしてください。</p>':salesMetricsData.status==='login-required'?'<p class="sales-metrics-error">認証が必要です。ログインしてください。</p>':'')+
  block(cards.slice(0,4))+block(cards.slice(4,8))+block(cards.slice(8))+
  '<div class="sales-metrics-sections">'+
- '<section class="sales-metrics-section"><h2>日別｜料金・利益の推移</h2>'+salesTrendSvg(rows)+'</section>'+
+ '<section class="sales-metrics-section sales-annual-panel"><h2>全店｜月間営業推移（5店舗）</h2><div id="salesMonthlyAllStores"></div></section>'+
  '<section class="sales-metrics-section"><h2>成約構成｜新規・リピート</h2><div id="salesContractBreakdown"></div></section>'+
  '<section class="sales-metrics-section"><h2>店舗別｜営業実績の比較</h2><div class="sales-metrics-tablewrap"><table class="sales-metrics-table"><thead><tr><th>店舗</th><th>料金</th><th>利益</th><th>成約数</th><th>客単価</th><th>リピート比率</th></tr></thead><tbody id="salesComparisonRows"></tbody></table></div></section>'+
  '<section class="sales-metrics-section"><h2>指名状況</h2><div id="salesNominationBars"></div></section></div>'+
  '<p class="sales-metrics-footnote">出典：EXA日別レポート。客単価＝料金÷成約数、リピート成約比率＝リピート成約数÷成約数。全店舗合計はEXAの全店舗欄に基づき、各店舗の単純合計で置き換えません。未保存の日はゼロとして計上しません。</p>';
+ renderSalesAnnualCharts($('salesMonthlyAllStores'),Number(month.slice(0,4)));
  const breakdown=$('salesContractBreakdown');
  if(has){
   const pct=c?s.repeat_contracts_count*100/c:0;
@@ -1179,6 +1267,7 @@ function renderSalesMetrics(){
 }
 async function refreshSalesMetrics(){
  const month=$('storeMetricsMonth').value||dateKey(new Date()).slice(0,7);
+ void refreshSalesAnnualMetrics();
  if(salesMetricsData.month===month&&(salesMetricsData.status==='ready'||salesMetricsData.status==='loading')){renderSalesMetrics();return}
  const id=++salesMetricsData.request;
  salesMetricsData.month=month;salesMetricsData.rows=[];salesMetricsData.status='loading';renderSalesMetrics();
