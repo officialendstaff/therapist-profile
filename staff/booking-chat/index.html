@@ -1,7 +1,7 @@
 <!doctype html><html lang="ja"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<meta http-equiv="Cache-Control" content="no-store">
+<meta http-equiv="Cache-Control" content="no-store"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="../interview-sheet-preview/icons/recruit-180.png">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src https://vjjnkflbfsjihwzjsjpr.supabase.co; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <title>チャット管理｜L GROUP</title>
 <style>
@@ -80,10 +80,21 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
  .reply textarea{font-size:16px;resize:none}
  .reply button{font-size:13px}
 }
+
+/* Web Push: delivered by the browser Service Worker even with this page closed */
+#pushEnable{border:1px solid #2e7aa6;border-radius:8px;background:#2e80ad;color:#fff;padding:8px 13px;font-weight:800;font-size:12px;white-space:nowrap}
+#pushEnable[data-enabled="true"]{border-color:#62a88c;background:#eaf7f0;color:#23794c}
+#pushEnable:disabled,#pushTest:disabled{opacity:.5;cursor:not-allowed}
+#pushTest{border:1px solid #d4e0e9;border-radius:8px;background:#fff;color:#567087;padding:8px 10px;font-size:12px;font-weight:700;white-space:nowrap}
+#pushStatus{font-size:11px;color:#71869c;max-width:270px}
+@media(max-width:700px){
+ #pushEnable,#pushTest{padding:8px 9px;font-size:11px}
+ #pushStatus{flex-basis:100%;order:7;max-width:none}
+}
 </style></head><body>
 <div id="gate"><section class="gate-card"><h1>L GROUP｜チャット管理</h1><p>面接管理にログイン済みの管理者アカウントで接続します。チャット専用パスワードは不要です。</p><button class="primary" id="connect" type="button">管理者アカウントで接続</button><p id="gateError" role="alert" aria-live="polite"></p><p><a href="/therapist-profile/staff/management-top/" target="_blank" rel="noopener noreferrer">面接管理のログイン画面を開く</a></p></section></div>
 <div id="app" hidden>
-<header><strong>チャット管理</strong><small>薔薇と紳士 先行テスト｜HP未設置</small><span class="unread-total" id="unreadTotal" aria-live="polite">未読 0件</span><button id="notifyToggle" type="button" aria-pressed="false">通知音 OFF</button><a id="customerTestLink" href="../../chat/?store=%E8%96%94%E8%96%87%E3%81%A8%E7%B4%B3%E5%A3%AB" target="_blank" rel="noopener noreferrer">お客様用テスト画面</a><button id="reload" type="button">情報更新</button></header>
+<header><strong>チャット管理</strong><small>薔薇と紳士 先行テスト｜HP未設置</small><span class="unread-total" id="unreadTotal" aria-live="polite">未読 0件</span><button id="pushEnable" type="button" data-enabled="false">プッシュ通知を有効化</button><button id="pushTest" type="button" disabled>通知テスト</button><span id="pushStatus" aria-live="polite">未設定</span><button id="notifyToggle" type="button" aria-pressed="false">画面内通知音 OFF</button><a id="customerTestLink" href="../../chat/?store=%E8%96%94%E8%96%87%E3%81%A8%E7%B4%B3%E5%A3%AB" target="_blank" rel="noopener noreferrer">お客様用テスト画面</a><button id="reload" type="button">情報更新</button></header>
 <div id="error" class="alert" hidden role="alert"></div>
 <div class="layout" id="layout">
 <div class="aside"><div class="filters"><select id="store" aria-label="店舗を切り替える"><option value="all">全店舗</option><option value="Grand Luxe">Grand Luxe</option><option value="LUXY OSAKA">LUXY OSAKA</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select><div class="hint" id="summary">問い合わせを取得中です</div></div><div class="thread-list" id="threads"></div></div>
@@ -95,6 +106,71 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
 const API="https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/booking-chat";
 const LOGIN="https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access";
 const SESSION_KEY="interview_staff_session_v2";const $=id=>document.getElementById(id);
+const VAPID_PUBLIC="BCZ_hr99Ujmq2j1M5N8TSo0wP7l2kf62gbwl_Pugx3D3zeHHQHO9shM9HrNNFYN4Lcbmxr3Tjc-usFUPj4L_9UE";
+const SW_URL="/therapist-profile/staff/booking-chat/sw.js";
+const SW_SCOPE="/therapist-profile/staff/booking-chat/";
+function supportsPush(){return "serviceWorker" in navigator&&"PushManager" in window&&"Notification" in window&&window.isSecureContext}
+function vapidBytes(encoded){
+ const padded=encoded.replace(/-/g,"+").replace(/_/g,"/").padEnd(Math.ceil(encoded.length/4)*4,"=");
+ const raw=atob(padded),result=new Uint8Array(raw.length);
+ for(let i=0;i<raw.length;i++)result[i]=raw.charCodeAt(i);
+ return result;
+}
+function pushLabel(message){$("pushStatus").textContent=message}
+function pushControls(enabled){
+ $("pushEnable").dataset.enabled=String(enabled);
+ $("pushEnable").textContent=enabled?"プッシュ通知 ON（解除）":"プッシュ通知を有効化";
+ $("pushTest").disabled=!enabled;
+}
+let pushSubscription=null,pushBusy=false;
+async function existingPushSubscription(){
+ const registration=await navigator.serviceWorker.getRegistration(SW_SCOPE);
+ return registration?await registration.pushManager.getSubscription():null;
+}
+async function syncPushIfGranted(){
+ if(!supportsPush()){pushLabel("このブラウザでは利用不可。iPhoneはホーム画面に追加して開いてください。");return}
+ if(Notification.permission==="denied"){pushLabel("ブラウザの通知設定が拒否されています");pushControls(false);return}
+ if(Notification.permission!=="granted"){pushLabel("通知を有効化すると画面を閉じても受け取れます");pushControls(false);return}
+ try{
+  const sub=await existingPushSubscription();
+  if(!sub){pushControls(false);pushLabel("通知を有効化してください");return}
+  if(!token)return;
+  await call("staff_push_subscribe",{subscription:sub.toJSON()});
+  pushSubscription=sub;pushControls(true);pushLabel("端末登録済み。画面を閉じても通知を受け取れます");
+ }catch(err){pushControls(false);pushLabel("通知登録の確認失敗："+String(err.message||err))}
+}
+$("pushEnable").addEventListener("click",async()=>{
+ if(pushBusy)return;
+ if(!supportsPush()){pushLabel("対応ブラウザが必要です。iPhoneはホーム画面へ追加してください。");return}
+ pushBusy=true;$("pushEnable").disabled=true;
+ try{
+  if(pushSubscription){
+   await call("staff_push_unsubscribe",{endpoint:pushSubscription.endpoint});
+   await pushSubscription.unsubscribe();
+   pushSubscription=null;pushControls(false);pushLabel("プッシュ通知は解除されました");return;
+  }
+  // Permission must be requested directly from a user gesture.
+  const permission=Notification.permission==="granted"?"granted":await Notification.requestPermission();
+  if(permission!=="granted"){pushLabel(permission==="denied"?"通知が拒否されています。ブラウザの設定をご確認ください。":"通知許可が必要です");return}
+  const registration=await navigator.serviceWorker.register(SW_URL,{scope:SW_SCOPE});
+  await navigator.serviceWorker.ready;
+  let sub=await registration.pushManager.getSubscription();
+  if(!sub)sub=await registration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:vapidBytes(VAPID_PUBLIC)});
+  await call("staff_push_subscribe",{subscription:sub.toJSON()});
+  pushSubscription=sub;pushControls(true);pushLabel("設定完了。通知テストを押してください");
+ }catch(err){pushLabel("通知の設定に失敗："+String(err.message||err))}
+ finally{pushBusy=false;$("pushEnable").disabled=false}
+});
+$("pushTest").addEventListener("click",async()=>{
+ if(!pushSubscription||!token)return;
+ $("pushTest").disabled=true;pushLabel("テスト通知を送信中…");
+ try{
+  const result=await call("staff_push_test",{endpoint:pushSubscription.endpoint});
+  pushLabel(result.accepted?"配信サーバーが受け付けました。端末の通知をご確認ください。":"通知サーバーへの配信失敗");
+ }catch(err){pushLabel("通知テスト失敗："+String(err.message||err))}
+ finally{$("pushTest").disabled=!pushSubscription}
+});
+
 const acceptedStores=["all","Grand Luxe","LUXY OSAKA","Un Secret","薔薇と紳士","BUSTY OSAKA"];
 const requestedStore=new URLSearchParams(location.search).get("store");
 $("store").value=acceptedStores.includes(requestedStore)?requestedStore:"薔薇と紳士";
@@ -251,7 +327,7 @@ async function connectExisting(){
     const check=await request(API,{action:"staff_list",staff_token:old,store:$("store").value});
     token=old;
     items=check.threads||[];listInitialized=true;$("gate").hidden=true;$("app").hidden=false;drawList();clearError();
-    $("gateError").textContent="";return;
+    $("gateError").textContent="";void syncPushIfGranted();return;
    }catch(e){
     if(e.status!==401)throw e;
     sessionStorage.removeItem(SESSION_KEY);localStorage.removeItem(SESSION_KEY);
@@ -267,7 +343,7 @@ async function connectExisting(){
    throw new Error("既存の管理者認証に接続できません。（"+String(data.error||res.status)+"）");
   }
   token=data.token;sessionStorage.setItem(SESSION_KEY,token);localStorage.removeItem(SESSION_KEY);
-  $("gate").hidden=true;$("app").hidden=false;$("gateError").textContent="";clearError();await loadList();
+  $("gate").hidden=true;$("app").hidden=false;$("gateError").textContent="";clearError();await loadList();void syncPushIfGranted();
  }catch(err){
   $("gate").hidden=false;$("app").hidden=true;
   $("gateError").textContent=String(err.message||err);
