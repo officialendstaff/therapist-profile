@@ -36,11 +36,17 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft
 .stores{display:grid;gap:9px;margin:28px auto}.stores a{padding:17px;border:1px solid #d8e4ed;border-radius:10px;text-decoration:none;color:#2a4e72;background:#f9fbfd;font-size:14px;font-weight:700}
 @media(min-width:760px){.shell{min-height:min(100dvh,900px);max-height:100dvh}.chat{min-height:0}}
 /* Embedded window: the host HP owns the outer heading and close button. */
-html.embedded,body.embedded{height:100%;overflow:hidden}
-.embedded .shell{width:100%;height:100dvh;max-height:100dvh;min-height:0;box-shadow:none}
+html.embedded,body.embedded{height:100%;overflow:hidden;width:var(--embed-width,100%);max-width:var(--embed-width,100%);min-width:0}
+.embedded .shell{width:100%;max-width:100%;min-width:0;height:var(--embed-height,100dvh);max-height:var(--embed-height,100dvh);min-height:0;box-shadow:none;overflow:hidden}
 .embedded .topbar{display:none}
-.embedded .chat{min-height:0;padding:17px 12px}
-.embedded .composer{padding:10px 11px 12px}
+.embedded .chat{min-height:0;min-width:0;max-width:100%;padding:17px 12px;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.embedded .composer{padding:10px 11px calc(12px + env(safe-area-inset-bottom));min-width:0;max-width:100%;width:100%;overflow:hidden}
+.embedded .composer-row{display:flex;width:100%;max-width:100%;min-width:0;gap:8px}
+.embedded .composer textarea{min-width:0;max-width:100%;width:0;flex:1 1 0;font-size:16px;padding:11px 12px}
+.embedded .composer .send{flex:0 0 auto;min-width:60px;padding:0 12px;font-size:14px}
+.embedded .bubble-wrap{max-width:85%;min-width:0}
+.embedded .bubble{max-width:100%;overflow-wrap:anywhere;word-break:break-word}
+.embedded .intro{width:100%;min-width:0;overflow-wrap:anywhere}
 .embedded .help{font-size:10px}
 .embedded .intro{padding:9px 13px}
 .embedded .bubble{font-size:13px}
@@ -73,6 +79,17 @@ if(embedded){
  }
  document.documentElement.classList.add("embedded");
  document.body.classList.add("embedded");
+ window.addEventListener("message",event=>{
+  if(event.source!==window.parent||event.origin!==parentOrigin)return;
+  const data=event.data;
+  if(data?.type!=="lgroup.chat.viewport"||data.store!==store)return;
+  const width=Math.floor(Number(data.width));
+  const height=Math.floor(Number(data.height));
+  if(!Number.isFinite(width)||width<280||width>1920||!Number.isFinite(height)||height<250||height>2000)return;
+  document.documentElement.style.setProperty("--embed-width",width+"px");
+  document.documentElement.style.setProperty("--embed-height",height+"px");
+ });
+
 }
 const key="l_group_booking_chat_token_v1";
 let token="",ready=false,lastId=0,posting=false,polling=false;
