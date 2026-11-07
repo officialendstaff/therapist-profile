@@ -17,7 +17,7 @@ button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{
 #app{height:100dvh;display:flex;flex-direction:column;overflow:hidden}
 header{display:flex;gap:16px;align-items:center;padding:14px 21px;background:#fff;border-bottom:1px solid #d9e4eb}
 header strong{font-size:17px}header small{font-size:11px;color:#8191a3;margin-left:10px}
-header button{margin-left:auto;background:#f0f5f9;border:1px solid #cfdae4;color:#526e86;padding:8px 12px;border-radius:8px;font-size:12px}
+header button{background:#f0f5f9;border:1px solid #cfdae4;color:#526e86;padding:8px 12px;border-radius:8px;font-size:12px}#customerTestLink{margin-left:auto;color:#fff;background:#3e86b5;border-radius:7px;padding:9px 12px;font-weight:700;text-decoration:none;font-size:12px;white-space:nowrap}#customerTestLink:hover{background:#286b98}
 .layout{min-height:0;flex:1;display:grid;grid-template-columns:330px 1fr}
 .aside{border-right:1px solid #dae4ec;background:#fff;display:flex;flex-direction:column;min-height:0}
 .filters{padding:13px;border-bottom:1px solid #e0e8ee}
@@ -43,11 +43,11 @@ header button{margin-left:auto;background:#f0f5f9;border:1px solid #cfdae4;color
 .placeholder{margin:auto;color:#8597a8;line-height:2;text-align:center;padding:30px;font-size:13px}
 .alert{padding:8px 16px;background:#fff3e9;color:#91522f;border-bottom:1px solid #f0dbca;font-size:12px}
 .alert[hidden],.reply[hidden]{display:none!important}
-@media(max-width:700px){header{padding:12px;gap:6px}header small{display:none}.layout{grid-template-columns:37% 63%}.thread{padding:11px}.thread time{float:none;display:block;margin-top:5px}.thread strong{font-size:11px}.message-list{padding:12px}.bubble{max-width:93%}.reply{padding:7px;gap:5px}.reply button{padding:10px;font-size:12px}.reply textarea{font-size:12px}}
+@media(max-width:700px){header{padding:12px;gap:6px}#customerTestLink{font-size:10px;padding:9px 7px}header small{display:none}.layout{grid-template-columns:37% 63%}.thread{padding:11px}.thread time{float:none;display:block;margin-top:5px}.thread strong{font-size:11px}.message-list{padding:12px}.bubble{max-width:93%}.reply{padding:7px;gap:5px}.reply button{padding:10px;font-size:12px}.reply textarea{font-size:12px}}
 </style></head><body>
 <div id="gate"><form class="gate-card" id="gateForm"><h1>L GROUP｜チャット管理</h1><p>スタッフ用テスト画面です。面接管理と同じ管理者パスワードでログインしてください。</p><input id="pass" type="password" autocomplete="current-password" required placeholder="管理者パスワード" aria-label="管理者パスワード"><button class="primary" type="submit">ログイン</button><p id="gateError" role="alert"></p></form></div>
 <div id="app" hidden>
-<header><strong>チャット管理</strong><small>5店舗共通｜テスト運用</small><button id="reload" type="button">情報更新</button></header>
+<header><strong>チャット管理</strong><small>薔薇と紳士 先行テスト｜HP未設置</small><a id="customerTestLink" href="../../chat/?store=%E8%96%94%E8%96%87%E3%81%A8%E7%B4%B3%E5%A3%AB" target="_blank" rel="noopener noreferrer">お客様用テスト画面</a><button id="reload" type="button">情報更新</button></header>
 <div id="error" class="alert" hidden role="alert"></div>
 <div class="layout">
 <div class="aside"><div class="filters"><select id="store" aria-label="店舗を切り替える"><option value="all">全店舗</option><option value="Grand Luxe">Grand Luxe</option><option value="LUXY OSAKA">LUXY OSAKA</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select><div class="hint" id="summary">問い合わせを取得中です</div></div><div class="thread-list" id="threads"></div></div>
@@ -59,6 +59,11 @@ header button{margin-left:auto;background:#f0f5f9;border:1px solid #cfdae4;color
 const API="https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/booking-chat";
 const LOGIN="https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access";
 const SESSION_KEY="interview_staff_session_v2";const $=id=>document.getElementById(id);
+const acceptedStores=["all","Grand Luxe","LUXY OSAKA","Un Secret","薔薇と紳士","BUSTY OSAKA"];
+const requestedStore=new URLSearchParams(location.search).get("store");
+$("store").value=acceptedStores.includes(requestedStore)?requestedStore:"薔薇と紳士";
+function setCustomerTestLink(){const store=$("store").value==="all"?"薔薇と紳士":$("store").value;$("customerTestLink").href="../../chat/?store="+encodeURIComponent(store)}
+setCustomerTestLink();
 let token="",threadId="",items=[],loading=false,replying=false;
 const labelTime=iso=>{const d=new Date(iso);return isNaN(+d)?"":d.toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"})};
 async function request(url,payload){
@@ -142,7 +147,7 @@ $("reply").addEventListener("submit",async e=>{
  finally{replying=false;$("send").disabled=false}
 });
 $("draft").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();$("reply").requestSubmit()}});
-$("store").addEventListener("change",()=>{threadId="";$("heading").textContent="チャットを選択してください";$("messages").replaceChildren();$("reply").hidden=true;void loadList()});
+$("store").addEventListener("change",()=>{setCustomerTestLink();threadId="";$("heading").textContent="チャットを選択してください";$("messages").replaceChildren();$("reply").hidden=true;void loadList()});
 $("reload").addEventListener("click",()=>{void loadList();if(threadId)void openThread(threadId)});
 setInterval(()=>{if(!document.hidden&&token){void loadList();if(threadId)void openThread(threadId)}},15000);
 token=stored();if(token){$("gate").hidden=true;$("app").hidden=false;void loadList()}
