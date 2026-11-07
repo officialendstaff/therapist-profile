@@ -106,7 +106,7 @@ function appendMessage(message){
  el.append(time);return el;
 }
 async function openThread(id){
- if(!token)return;threadId=id;drawList();
+ if(!token)return;const priorThreadId=threadId;threadId=id;drawList();
  try{
   const data=await call("staff_thread",{thread_id:id});if(threadId!==id)return;
   const h=$("heading");h.replaceChildren();
@@ -118,7 +118,7 @@ async function openThread(id){
    h.append(rel);
   }
   const pane=$("messages");pane.replaceChildren();for(const msg of data.messages||[])pane.append(appendMessage(msg));pane.scrollTop=pane.scrollHeight;
-  $("reply").hidden=false;$("draft").value="";
+  $("reply").hidden=false;if(priorThreadId!==id)$("draft").value="";
   const found=items.find(t=>t.id===id);if(found)found.staff_last_read_at=new Date().toISOString();
   drawList();clearError();
  }catch(e){showError("会話を取得できません。（"+e.message+"）")}
