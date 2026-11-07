@@ -27,7 +27,10 @@ header button{background:#f0f5f9;border:1px solid #cfdae4;color:#526e86;padding:
 .thread-list{flex:1;overflow:auto}
 .thread{display:block;width:100%;text-align:left;padding:16px;border:0;border-bottom:1px solid #edf1f5;background:white;color:#34495d}
 .thread.active{background:#eaf3fa;border-left:4px solid #448bbd;padding-left:12px}
-.thread strong{font-size:13px}.thread time{font-size:10px;color:#8f9eae;float:right}
+.thread strong{font-size:13px}
+.store-label{display:inline-flex;align-items:center;max-width:100%;padding:4px 8px;border:1px solid transparent;border-radius:6px;font-size:12px;font-weight:750;line-height:1.35;white-space:normal;overflow-wrap:anywhere}
+.thread-heading .store-label{margin-right:6px;vertical-align:middle}
+.thread .sub .store-label{font-size:11px;padding:3px 7px}.thread time{font-size:10px;color:#8f9eae;float:right}
 .thread .sub{font-size:11px;color:#7f92a4;margin-top:7px;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .thread .sub span:first-child{min-width:0;overflow-wrap:anywhere}
 .thread .thread-meta{display:flex;align-items:center;gap:7px}
@@ -78,6 +81,9 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
  .thread-list{overscroll-behavior:contain}
  .thread{padding:16px}
  .thread strong{font-size:13px}
+.store-label{display:inline-flex;align-items:center;max-width:100%;padding:4px 8px;border:1px solid transparent;border-radius:6px;font-size:12px;font-weight:750;line-height:1.35;white-space:normal;overflow-wrap:anywhere}
+.thread-heading .store-label{margin-right:6px;vertical-align:middle}
+.thread .sub .store-label{font-size:11px;padding:3px 7px}
  .thread time{display:inline;float:right}
  .chat-pane{display:none}
  .layout.chat-open>.aside{display:none}
@@ -221,7 +227,7 @@ $("pushTest").addEventListener("click",async()=>{
 
 const acceptedStores=["all","Grand Luxe","LUXY OSAKA","Un Secret","薔薇と紳士","BUSTY OSAKA"];
 const requestedStore=new URLSearchParams(location.search).get("store");
-$("store").value=acceptedStores.includes(requestedStore)?requestedStore:"薔薇と紳士";
+$("store").value=acceptedStores.includes(requestedStore)?requestedStore:"all";
 function setCustomerTestLink(){/* Customer test link removed from the daily management UI. */}
 setCustomerTestLink();
 let token="",threadId="",items=[],loading=false,replying=false;
@@ -281,6 +287,16 @@ function updateCounters(){
  document.title=(total?"("+total+") ":"")+defaultTitle;
 }
 
+const SHOP_THEME={"Grand Luxe":{"bg":"#E9E4F3","fg":"#674C92","border":"#C5B5DD"},"LUXY OSAKA":{"bg":"#E4EFFB","fg":"#32679E","border":"#A9C8EA"},"薔薇と紳士":{"bg":"#F9E5ED","fg":"#A34870","border":"#E9B3C8"},"Un Secret":{"bg":"#E5F2ED","fg":"#317A60","border":"#A9D6C3"},"BUSTY OSAKA":{"bg":"#FFF0DF","fg":"#9B612A","border":"#EBC79B"}};
+function makeStoreLabel(storeKey){
+ const label=document.createElement("span");
+ label.className="store-label";
+ const name=storeKey==="LUXY"?"LUXY OSAKA":String(storeKey||"");
+ label.textContent=name;
+ const theme=SHOP_THEME[name];
+ if(theme){label.style.background=theme.bg;label.style.color=theme.fg;label.style.borderColor=theme.border}
+ return label;
+}
 const labelTime=iso=>{const d=new Date(iso);return isNaN(+d)?"":d.toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"})};
 async function request(url,payload){
  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);
@@ -308,7 +324,7 @@ function drawList(){
   const strong=document.createElement("strong");strong.textContent=nameOf(t);
   const time=document.createElement("time");time.textContent=labelTime(t.updated_at);heading.append(strong,time);
   const desc=document.createElement("div");desc.className="sub";
-  const customer=document.createElement("span");customer.textContent=t.store_key;desc.append(customer);
+  const customer=makeStoreLabel(t.store_key);desc.append(customer);
   if(isUnread(t)){const badge=document.createElement("span");badge.className="tag";badge.textContent="未読";desc.append(badge)}
   btn.append(heading,desc);btn.addEventListener("click",()=>void openThread(t.id));list.append(btn);
  }
@@ -361,7 +377,7 @@ async function openThread(id,options={}){
  try{
   const data=await call("staff_thread",{thread_id:id});
   if(threadId!==id)return;
-  $("threadTitle").textContent=data.thread.store_key+"｜"+nameOf(data.thread);
+  $("threadTitle").replaceChildren(makeStoreLabel(data.thread.store_key),document.createTextNode("｜"+nameOf(data.thread)));
   const rel=$("relatedThreads");rel.replaceChildren();
   if(data.related?.length){
    const label=document.createElement("span");label.textContent="関連する他店舗の会話：";rel.append(label);
