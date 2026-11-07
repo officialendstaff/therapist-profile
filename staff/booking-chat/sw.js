@@ -1,6 +1,6 @@
 /* L GROUP booking chat: persistent browser push notifications */
 "use strict";
-const STAFF_URL="/therapist-profile/staff/booking-chat/rose-auth-v2.html?store="+encodeURIComponent("薔薇と紳士")+"&fromPush=1";
+const STAFF_URL="/therapist-profile/staff/booking-chat/rose-push-v1.html?store="+encodeURIComponent("薔薇と紳士")+"&fromPush=1";
 self.addEventListener("install",event=>event.waitUntil(self.skipWaiting()));
 self.addEventListener("activate",event=>event.waitUntil(self.clients.claim()));
 self.addEventListener("push",event=>{
