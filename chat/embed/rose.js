@@ -88,7 +88,7 @@ function showChat(){
  const panel=root.querySelector(".lg-chat-panel"),back=root.querySelector(".lg-chat-backdrop"),button=root.querySelector(".lg-chat-launcher");
  open=true;panel.hidden=false;back.hidden=false;button.setAttribute("aria-expanded","true");
  lockScroll();
- if(!frame.getAttribute("src"))frame.setAttribute("src",base+"?store="+encodeURIComponent(guestStore)+"&embed=1&v=20261107-desktop-fit-v5");
+ if(!frame.getAttribute("src"))frame.setAttribute("src",base+"?store="+encodeURIComponent(guestStore)+"&embed=1&v=20261107-pc-send-grid-v6");
  sendViewport();
  frame.contentWindow?.postMessage({type:"lgroup.chat.opened",store:guestStore},chatOrigin);
  root.querySelector(".lg-chat-close").focus({preventScroll:true});
