@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ja"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta http-equiv="Cache-Control" content="no-store">
+<title>5店舗チャット動作テスト｜L GROUP</title>
+<link rel="icon" type="image/svg+xml" href="/therapist-profile/staff/assets/favicons/chat.svg">
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP",Meiryo,sans-serif;color:#1a2f49;background:#f4f5f7}
+*{box-sizing:border-box}body{margin:0;min-height:100dvh}
+header{background:#1b2b42;color:#fff;padding:15px max(20px,calc((100vw - 960px)/2));display:flex;align-items:center;gap:13px}
+header img{width:30px;height:30px}header strong{font-size:15px}
+header a{color:#fff;font-size:12px;text-decoration:none;margin-left:auto}
+main{max-width:960px;margin:30px auto;padding:0 18px 36px}
+h1{font-size:23px;margin:0 0 9px}p{font-size:14px;line-height:1.85;color:#586b7c}
+.notice{background:#fffaf0;border:1px solid #e8d9aa;border-radius:9px;padding:13px 16px;font-size:13px;color:#695331;margin:18px 0 23px}
+.store-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.store-card{border:1px solid #d9e1e8;background:#fff;border-radius:11px;padding:20px;box-shadow:0 2px 5px #112a430b}
+.store-card h2{display:flex;align-items:center;gap:10px;font-size:17px;margin:0 0 14px}
+.dot{width:12px;height:12px;border-radius:4px;flex:none}
+.store-card a{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:10px 14px;text-decoration:none;background:#243d5b;color:#fff;border-radius:7px;font-size:13px;font-weight:750}
+.store-card .check{display:flex;align-items:center;gap:8px;margin:15px 0 0;font-size:13px;color:#40566d}
+.store-card input{width:17px;height:17px;accent-color:#277a75}
+h3{font-size:16px;margin:27px 0 13px}
+.steps{background:#fff;border:1px solid #d9e1e8;border-radius:10px;padding:17px 23px;font-size:14px;line-height:1.9}
+.steps li+li{margin-top:6px}
+.footer{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;align-items:center}
+.footer a{display:inline-block;padding:11px 15px;border:1px solid #afc2d4;color:#214a72;border-radius:7px;background:#fff;text-decoration:none;font-size:13px;font-weight:700}
+#status{font-size:12px;color:#64748b;margin-left:auto}
+@media(max-width:650px){.store-list{grid-template-columns:1fr}main{margin-top:20px}header a{font-size:11px}h1{font-size:21px}}
+</style>
+</head><body>
+<header><img alt="" src="/therapist-profile/staff/assets/favicons/chat.svg"><strong>L GROUP｜チャット動作テスト</strong><a href="/therapist-profile/staff/management-top/">総合管理TOP</a></header>
+<main>
+<h1>5店舗共通チャット｜動作テスト</h1>
+<p>各店舗の顧客側ページを開き、チャット管理画面で店舗名と会話を確認してください。<strong>公式HPにはまだ設置していません。</strong></p>
+<div class="notice">複数店舗の問い合わせを同じお客様として検証する場合は、必ず<strong>同じブラウザの通常モード</strong>で開いてください。シークレットモード・別端末では同一人物として紐づかない場合があります。各店舗の会話内容はそれぞれ独立しています。</div>
+<div class="store-list">
+<section class="store-card"><h2><span class="dot" style="background:#674C92"></span>Grand Luxe</h2><a href="../../chat/?store=Grand%20Luxe" target="_blank" rel="noopener">お客様用チャットを開く ↗</a><label class="check"><input type="checkbox" data-store="grand">送受信・店舗表示を確認済み</label></section>
+<section class="store-card"><h2><span class="dot" style="background:#32679E"></span>LUXY OSAKA</h2><a href="../../chat/?store=LUXY%20OSAKA" target="_blank" rel="noopener">お客様用チャットを開く ↗</a><label class="check"><input type="checkbox" data-store="luxy">送受信・店舗表示を確認済み</label></section>
+<section class="store-card"><h2><span class="dot" style="background:#317A60"></span>Un Secret</h2><a href="../../chat/?store=Un%20Secret" target="_blank" rel="noopener">お客様用チャットを開く ↗</a><label class="check"><input type="checkbox" data-store="secret">送受信・店舗表示を確認済み</label></section>
+<section class="store-card"><h2><span class="dot" style="background:#A34870"></span>薔薇と紳士</h2><a href="../../chat/?store=%E8%96%94%E8%96%87%E3%81%A8%E7%B4%B3%E5%A3%AB" target="_blank" rel="noopener">お客様用チャットを開く ↗</a><label class="check"><input type="checkbox" data-store="rose">送受信・店舗表示を確認済み</label></section>
+<section class="store-card"><h2><span class="dot" style="background:#9B612A"></span>BUSTY OSAKA</h2><a href="../../chat/?store=BUSTY%20OSAKA" target="_blank" rel="noopener">お客様用チャットを開く ↗</a><label class="check"><input type="checkbox" data-store="busty">送受信・店舗表示を確認済み</label></section>
+</div>
+<h3>確認手順</h3>
+<ol class="steps">
+<li>このページの各店舗ボタンから顧客チャットを開き、「店舗名＋テスト」と送信します。</li>
+<li>管理画面で「全店舗」を選び、正しい店舗名で問い合わせが届くことを確認します。</li>
+<li>管理画面で返信し、お客様側のチャットに届くことを確認します。</li>
+<li>別店舗でも送信し、<strong>同一のお客様として識別されること／店舗ごとに会話履歴が分かれていること</strong>を確認します。</li>
+<li>未読→既読、返信通知、再読み込み後の履歴を確認し、各店舗のチェックを入れます。</li>
+</ol>
+<div class="footer">
+<a href="./rose-auth-v2.html?store=all" target="_blank" rel="noopener">スタッフ側チャット管理を開く ↗</a>
+<span id="status" aria-live="polite">確認済み 0 / 5 店舗</span>
+</div>
+<p style="font-size:12px">チェックの記録はこのブラウザ内だけに保存されます。実際の送受信を自動検証した結果ではありません。</p>
+</main>
+<script>
+(()=>{
+const key="lgroup_booking_chat_store_tests_v1";
+const boxes=[...document.querySelectorAll('input[data-store]')];
+let saved={};try{saved=JSON.parse(localStorage.getItem(key)||'{}')}catch{}
+for(const box of boxes){box.checked=saved[box.dataset.store]===true;box.addEventListener('change',()=>{
+ saved[box.dataset.store]=box.checked;
+ try{localStorage.setItem(key,JSON.stringify(saved))}catch{}
+ update();
+})}
+function update(){document.getElementById('status').textContent='確認済み '+boxes.filter(box=>box.checked).length+' / 5 店舗'}
+update();
+})();
+</script>
+</body></html>
