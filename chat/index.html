@@ -38,12 +38,13 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft
 /* Embedded window: the host HP owns the outer heading and close button. */
 html.embedded,body.embedded{height:100%;overflow:hidden;width:var(--embed-width,100%);max-width:var(--embed-width,100%);min-width:0}
 .embedded .shell{width:100%;max-width:100%;min-width:0;height:var(--embed-height,100dvh);max-height:var(--embed-height,100dvh);min-height:0;box-shadow:none;overflow:hidden}
+.embedded #chatScreen{width:100%;max-width:100%;min-width:0;overflow:hidden}
 .embedded .topbar{display:none}
 .embedded .chat{min-height:0;min-width:0;max-width:100%;padding:17px 12px;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .embedded .composer{padding:10px 11px calc(12px + env(safe-area-inset-bottom));min-width:0;max-width:100%;width:100%;overflow:hidden}
-.embedded .composer-row{display:flex;width:100%;max-width:100%;min-width:0;gap:8px}
-.embedded .composer textarea{min-width:0;max-width:100%;width:0;flex:1 1 0;font-size:16px;padding:11px 12px}
-.embedded .composer .send{flex:0 0 auto;min-width:60px;padding:0 12px;font-size:14px}
+.embedded .composer-row{display:grid;grid-template-columns:minmax(0,1fr) 68px;align-items:end;width:100%;max-width:100%;min-width:0;gap:8px;overflow:hidden}
+.embedded .composer textarea{display:block;box-sizing:border-box;min-width:0;max-width:100%;width:100%;flex:none;font-size:16px;padding:11px 12px}
+.embedded .composer .send{display:block;box-sizing:border-box;flex:none;width:68px;min-width:0;max-width:68px;padding:0 8px;font-size:14px;text-align:center}
 .embedded .bubble-wrap{max-width:85%;min-width:0}
 .embedded .bubble{max-width:100%;overflow-wrap:anywhere;word-break:break-word}
 .embedded .intro{width:100%;min-width:0;overflow-wrap:anywhere}
