@@ -173,10 +173,37 @@ async function api(payload){
   return data;
  }finally{clearTimeout(timeout)}
 }
+function renderMessageLinks(element,body){
+ const source=String(body??"");
+ const pattern=/https?:\/\/[^\s<>"'\u3000]+/gi;
+ const fragment=document.createDocumentFragment();
+ let start=0;
+ for(const match of source.matchAll(pattern)){
+  const raw=match[0];
+  const suffix=(raw.match(/[.,!?;:\)\]\}\u3001\u3002\uff01\uff1f\uff09\u300d\u300f]+$/)||[""])[0];
+  const address=raw.slice(0,raw.length-suffix.length);
+  if(!address)continue;
+  fragment.append(document.createTextNode(source.slice(start,match.index)));
+  try{
+   const url=new URL(address);
+   if(url.protocol!=="https:"&&url.protocol!=="http:")throw Error("unsafe");
+   const anchor=document.createElement("a");
+   anchor.href=url.href;anchor.target="_blank";anchor.rel="noopener noreferrer";
+   anchor.textContent=address;
+   anchor.style.cssText="color:#1768ac;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere;font-weight:700";
+   fragment.append(anchor);
+  }catch{fragment.append(document.createTextNode(address))}
+  fragment.append(document.createTextNode(suffix));
+  start=match.index+raw.length;
+ }
+ fragment.append(document.createTextNode(source.slice(start)));
+ element.replaceChildren(fragment);
+}
+
 function line(message){
  const mine=message.sender==="customer";
  const wrap=document.createElement("div");wrap.className="bubble-wrap"+(mine?" mine":"");
- const bubble=document.createElement("div");bubble.className="bubble";bubble.textContent=message.body;
+ const bubble=document.createElement("div");bubble.className="bubble";renderMessageLinks(bubble,message.body);
  const time=document.createElement("div");time.className="when";
  const date=new Date(message.created_at);
  time.textContent=(mine?"送信完了":"店舗から返信")+"　"+(Number.isNaN(+date)?"":date.toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}));
