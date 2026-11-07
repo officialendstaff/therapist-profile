@@ -1214,8 +1214,8 @@ function setMetricsMode(mode){
  $('salesMetricsBody').hidden=!sales;
  if(sales)refreshSalesMetrics();else renderStoreMetrics();
 }
-$('metricsInterviewTab').addEventListener('click',()=>setMetricsMode('interview'));
-$('metricsSalesTab').addEventListener('click',()=>setMetricsMode('sales'));
+document.getElementById('metricsInterviewTab').addEventListener('click',()=>setMetricsMode('interview'));
+document.getElementById('metricsSalesTab').addEventListener('click',()=>setMetricsMode('sales'));
 function renderStoreMetrics(){
  if(!$('salesMetricsBody').hidden){
   const parts=String($('storeMetricsMonth').value||'').split('-');
