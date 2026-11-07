@@ -21,8 +21,8 @@ button,textarea{font:inherit}button{cursor:pointer}button:disabled{cursor:not-al
 .bubble{padding:12px 14px;border-radius:15px 15px 15px 3px;background:#f0f4f7;color:#283c54;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.7;box-shadow:0 1px 3px rgba(0,0,0,.03)}
 .mine .bubble{background:var(--accent);color:#fff;border-radius:15px 15px 3px 15px}
 .when{font-size:10px;color:#98a4b1}
-.empty{padding:18px 14px;margin:auto 0;text-align:center;color:#74869b;line-height:2;font-size:13px}
-.empty strong{font-size:16px;display:block;color:#3c5470;margin-bottom:10px}
+.empty{align-self:flex-start;max-width:85%;padding:12px 14px;border-radius:15px 15px 15px 3px;background:#f0f4f7;color:#283c54;line-height:1.7;font-size:14px;overflow-wrap:anywhere}
+.empty strong{font-size:14px;display:block;color:#283c54}
 .composer{border-top:1px solid var(--line);padding:13px 16px calc(15px + env(safe-area-inset-bottom));background:#fff;flex:none}
 .composer-row{display:flex;align-items:flex-end;gap:10px}
 textarea{resize:none;flex:1;min-height:46px;max-height:130px;line-height:1.5;background:#f7f9fb;border:1px solid #dbe4ec;border-radius:12px;padding:12px;outline:none;font-size:14px}
@@ -47,15 +47,10 @@ html.embedded,body.embedded{height:100%;overflow:hidden;width:var(--embed-width,
 .embedded .composer .send{display:block;box-sizing:border-box;flex:none;width:68px;min-width:0;max-width:68px;padding:0 8px;font-size:14px;text-align:center}
 .embedded .bubble-wrap{max-width:85%;min-width:0}
 .embedded .bubble{max-width:100%;overflow-wrap:anywhere;word-break:break-word}
-.embedded .intro{width:100%;min-width:0;overflow-wrap:anywhere}
-.embedded .help{font-size:10px}
-.embedded .intro{padding:9px 13px}
 .embedded .bubble{font-size:13px}
-.embedded.keyboard-active .intro,.embedded.keyboard-active .help{display:none}
 .embedded.keyboard-active .composer{padding:8px 10px 8px;flex-shrink:0}
 .embedded.keyboard-active .chat{padding-bottom:10px}
 .embedded.keyboard-active .composer textarea{max-height:90px}
-@media(max-height:400px){.embedded .intro,.embedded .help{display:none}}
 </style></head><body><main class="shell">
 <section id="chooser" hidden><h1>L GROUP チャット</h1><p>ご相談する店舗をお選びください。<br>店舗ごとに会話履歴を分けて管理しています。</p><div class="stores" id="storeLinks"></div></section>
 <section id="chatScreen" hidden style="display:flex;flex:1;flex-direction:column;min-height:0">
@@ -150,6 +145,15 @@ if(embedded){
  sync();
 }
 let token="",ready=false,lastId=0,posting=false,polling=false;
+function reportStaffMessages(messages){
+ if(!embedded||!parentOrigin||window.parent===window)return;
+ const ids=(Array.isArray(messages)?messages:[])
+  .filter(message=>message.sender==="staff"||message.sender==="operator")
+  .map(message=>Number(message.id))
+  .filter(id=>Number.isSafeInteger(id)&&id>0);
+ if(!ids.length)return;
+ window.parent.postMessage({type:"lgroup.chat.staffMessages",store,ids},parentOrigin);
+}
 if(!STORES.includes(store)){
  $("chooser").hidden=false;
  for(const name of STORES){const a=document.createElement("a");a.href="?store="+encodeURIComponent(name);a.textContent=name;$("storeLinks").append(a)}
@@ -175,7 +179,7 @@ function line(message){
  const bubble=document.createElement("div");bubble.className="bubble";bubble.textContent=message.body;
  const time=document.createElement("div");time.className="when";
  const date=new Date(message.created_at);
- time.textContent=(mine?"送信":"店舗から返信")+"　"+(Number.isNaN(+date)?"":date.toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}));
+ time.textContent=(mine?"送信完了":"店舗から返信")+"　"+(Number.isNaN(+date)?"":date.toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}));
  wrap.append(bubble,time);return wrap;
 }
 function add(messages){
@@ -187,13 +191,16 @@ function add(messages){
   const node=line(m);node.dataset.messageId=String(m.id);pane.append(node);
   lastId=Math.max(lastId,Number(m.id)||0);added++;
  }
- if(added)scheduleLatestScroll();
+ if(added){
+  reportStaffMessages(messages);
+  scheduleLatestScroll();
+ }
 }
 function empty(){
  if($("timeline").children.length)return;
  const p=document.createElement("div");p.className="empty";p.id="welcome";
- const strong=document.createElement("strong");strong.textContent="ご相談をお聞かせください";
- p.append(strong,document.createTextNode("初回のメッセージを送信すると、店舗のスタッフに届きます。"));$("timeline").append(p);
+ p.textContent="お気軽にお問い合わせください。";
+ $("timeline").append(p);
 }
 function removeWelcome(){const p=$("welcome");if(p)p.remove()}
 function loadToken(){try{return localStorage.getItem(key)||""}catch{return ""}}
@@ -251,13 +258,13 @@ async function poll(){
 $("composer").addEventListener("submit",async e=>{
  e.preventDefault();if(!ready||posting)return;
  const body=$("draft").value.trim();if(!body)return;
- posting=true;$("send").disabled=true;clearErr();
+ posting=true;$("send").disabled=true;$("send").textContent="送信中";$("send").setAttribute("aria-label","送信中");clearErr();
  const client_message_id=crypto.randomUUID();
  try{
   const data=await api({action:"guest_send",token,store,body,client_message_id});
   removeWelcome();add([data.message]);$("draft").value="";
  }catch(e){err("送信できませんでした。再度お試しください。（"+String(e.message||e)+"）")}
- finally{posting=false;$("send").disabled=!ready;$("draft").focus()}
+ finally{posting=false;$("send").textContent="送信";$("send").setAttribute("aria-label","送信");$("send").disabled=!ready;$("draft").focus()}
 });
 $("draft").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!("isComposing" in e&&e.isComposing)){e.preventDefault();$("composer").requestSubmit()}});
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)void poll()});
