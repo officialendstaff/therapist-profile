@@ -584,7 +584,7 @@ html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!imp
 .sales-metrics-period{background:#fff;border:1px solid #cbd8e8;border-radius:6px;color:#425b78;font-weight:750;font-size:12px;padding:8px 14px;cursor:pointer}
 .sales-metrics-period.active{color:#fff;background:#285c90;border-color:#285c90}
 #salesMetricsBody>.sales-metrics-kpis{margin-bottom:12px}
-#salesMetricsBody>.sales-metrics-kpis:nth-of-type(4){grid-template-columns:repeat(5,minmax(0,1fr))}
+#salesMetricsBody>.sales-metrics-kpis:nth-of-type(5){grid-template-columns:repeat(5,minmax(0,1fr))}
 .sales-metrics-card{border-top:3px solid #c3d8ed}
 .sales-metrics-chart-legend{display:flex;justify-content:flex-end;gap:14px;font-size:11px;font-weight:800}
 .sales-metrics-ratio-label{font-size:18px;font-weight:800;margin:22px 0;color:#334d6b}
@@ -1092,7 +1092,7 @@ function salesTrendSvg(rows){
  const min=salesDayOf(points[0]),maxDay=salesDayOf(points[points.length-1]);
  const high=Math.max(1,...points.map(r=>Math.max(Number(r.revenue_yen)||0,Number(r.profit_yen)||0)))*1.12;
  const w=880,h=245,l=72,t=14,b=31;
- const x=d=>l+(w-l-15)*(maxDay===min?.5:(d-min)/(maxDay-min));
+ const x=d=>l+(w-l-15)*(maxDay===min?0.5:(d-min)/(maxDay-min));
  const y=v=>t+(h-t-b)*(1-v/high);
  let grid='';
  for(let i=0;i<=4;i++){
