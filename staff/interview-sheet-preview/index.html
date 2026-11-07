@@ -1149,16 +1149,16 @@ function salesAnnualSingleChart(parent,rows,year,field,title){
   svg.append(salesAnnualSvgElement('text',{x:center,y:h-13,'text-anchor':'middle','font-size':12,fill:'#6f8197'},(i+1)+'月'));
   const segments=monthly[i];
   if(!segments.some(item=>item.valid))continue;
-  let bottom=h-bottom;
+  let barBottom=h-bottom;
   for(const item of segments){
    if(!item.valid||item.value<=0)continue;
    const barHeight=item.value/ceiling*plotHeight;
-   const rect=salesAnnualSvgElement('rect',{x:center-barWidth/2,y:bottom-barHeight,width:barWidth,height:barHeight,fill:item.color,rx:1});
+   const rect=salesAnnualSvgElement('rect',{x:center-barWidth/2,y:barBottom-barHeight,width:barWidth,height:barHeight,fill:item.color,rx:1});
    const tip=salesAnnualSvgElement('title',{},(i+1)+'月　'+item.store+'：'+salesYen(item.value)+'（取得済み'+item.days+'日）');
-   rect.append(tip);svg.append(rect);bottom-=barHeight;
+   rect.append(tip);svg.append(rect);barBottom-=barHeight;
   }
   const total=totals[i];
-  if(total>0)svg.append(salesAnnualSvgElement('text',{x:center,y:Math.max(16,bottom-7),'text-anchor':'middle','font-size':11,'font-weight':'700',fill:'#354c68'},salesAnnualCompact(total)));
+  if(total>0)svg.append(salesAnnualSvgElement('text',{x:center,y:Math.max(16,barBottom-7),'text-anchor':'middle','font-size':11,'font-weight':'700',fill:'#354c68'},salesAnnualCompact(total)));
  }
  section.append(svg);parent.append(section);
 }
