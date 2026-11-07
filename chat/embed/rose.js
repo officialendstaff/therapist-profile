@@ -101,6 +101,39 @@ function handleStaffMessages(ids){
  }
  if(open)markRead();else renderUnread();
 }
+function safeExternalChatUrl(candidate){
+ try{const value=new URL(String(candidate));return ["https:","http:"].includes(value.protocol)?value.href:null}catch{return null}
+}
+function showExternalChatFallback(href){
+ if(!root)return;
+ let box=root.querySelector(".lg-chat-external-fallback");
+ if(!box){
+  box=document.createElement("div");
+  box.className="lg-chat-external-fallback";
+  box.style.cssText="position:fixed;z-index:2147482010;right:12px;bottom:12px;max-width:min(390px,calc(100vw - 24px));padding:15px;background:white;border:2px solid #347aa7;border-radius:12px;box-shadow:0 8px 40px #17253e50;font:600 14px/1.6 -apple-system,BlinkMacSystemFont,sans-serif;color:#182d46";
+  const message=document.createElement("div");message.textContent="外部ページを開くには、こちらをタップしてください。";
+  const anchor=document.createElement("a");anchor.target="_blank";anchor.rel="noopener noreferrer";
+  anchor.textContent="↗ 新しいタブで開く";
+  anchor.style.cssText="display:block;text-align:center;margin-top:10px;padding:10px;background:#216c9b;color:white;border-radius:7px;text-decoration:none;font-weight:800";
+  const close=document.createElement("button");close.type="button";close.textContent="閉じる";
+  close.style.cssText="display:block;margin:9px 0 0 auto;background:transparent;border:0;color:#456;border-radius:4px;padding:4px 8px";
+  close.addEventListener("click",()=>box.remove());
+  box.append(message,anchor,close);root.append(box);
+ }
+ box.querySelector("a").href=href;
+}
+function openExternalChatLink(candidate){
+ const href=safeExternalChatUrl(candidate);
+ if(!href)return false;
+ try{
+  const opened=window.open(href,"_blank");
+  if(opened){opened.opener=null;return true}
+ }catch{}
+ showExternalChatFallback(href);
+ return true;
+}
+// Same-origin iframe uses this synchronously during a click, retaining browser user activation.
+window.__LG_CHAT_OPEN_EXTERNAL__=openExternalChatLink;
 window.addEventListener("message",event=>{
  if(!frame||event.origin!==chatOrigin||event.source!==frame.contentWindow)return;
  const data=event.data;
@@ -117,6 +150,8 @@ window.addEventListener("message",event=>{
   sendViewport();
  }else if(data.type==="lgroup.chat.close"){
   closeChat();
+ }else if(data.type==="lgroup.chat.openExternal"){
+  openExternalChatLink(data.href);
  }
 });
 function closeChat(){
