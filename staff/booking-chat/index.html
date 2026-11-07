@@ -1,0 +1,150 @@
+<!doctype html><html lang="ja"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta http-equiv="Cache-Control" content="no-store">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src https://vjjnkflbfsjihwzjsjpr.supabase.co; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<title>チャット管理｜L GROUP</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f5f7fa;color:#283a50;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif}
+button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}
+#gate{min-height:100dvh;display:grid;place-items:center;padding:20px}
+.gate-card{width:min(100%,400px);background:white;border:1px solid #dae4ed;border-radius:16px;padding:30px;box-shadow:0 12px 40px rgba(29,51,80,.08)}
+.gate-card h1{font-size:19px;margin:0 0 15px}.gate-card p{color:#76889e;font-size:12px;line-height:1.8}
+.gate-card input{width:100%;border-radius:9px;border:1px solid #d4dfe9;padding:12px;background:#fcfdff;margin:10px 0}
+.primary{border:0;border-radius:8px;background:#347faf;color:white;font-weight:700;padding:11px 17px}
+.gate-card button{width:100%}
+#app[hidden],#gate[hidden]{display:none!important}
+#app{height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+header{display:flex;gap:16px;align-items:center;padding:14px 21px;background:#fff;border-bottom:1px solid #d9e4eb}
+header strong{font-size:17px}header small{font-size:11px;color:#8191a3;margin-left:10px}
+header button{margin-left:auto;background:#f0f5f9;border:1px solid #cfdae4;color:#526e86;padding:8px 12px;border-radius:8px;font-size:12px}
+.layout{min-height:0;flex:1;display:grid;grid-template-columns:330px 1fr}
+.aside{border-right:1px solid #dae4ec;background:#fff;display:flex;flex-direction:column;min-height:0}
+.filters{padding:13px;border-bottom:1px solid #e0e8ee}
+.filters select{padding:11px;width:100%;border:1px solid #d4e0e9;background:#f8fbfd;border-radius:8px;color:#394f67}
+.hint{font-size:11px;color:#8391a0;line-height:1.6;margin-top:8px}
+.thread-list{flex:1;overflow:auto}
+.thread{display:block;width:100%;text-align:left;padding:16px;border:0;border-bottom:1px solid #edf1f5;background:white;color:#34495d}
+.thread.active{background:#eaf3fa;border-left:4px solid #448bbd;padding-left:12px}
+.thread strong{font-size:13px}.thread time{font-size:10px;color:#8f9eae;float:right}
+.thread .sub{font-size:11px;color:#7f92a4;margin-top:7px;display:flex;justify-content:space-between}
+.tag{font-size:10px;color:#be5871;background:#fbe8ee;border-radius:9px;padding:3px 7px;font-weight:700}
+.chat-pane{min-height:0;display:flex;flex-direction:column;background:#f8fafc}
+.thread-heading{padding:14px 18px;background:#fff;border-bottom:1px solid #dce5ee;min-height:66px}
+.thread-heading strong{font-size:15px}.related{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;font-size:11px;color:#8b9bad}
+.related button{font-size:11px;padding:4px 7px;background:#eef5fb;color:#397aaa;border:1px solid #d2e5f1;border-radius:5px}
+.message-list{flex:1;min-height:0;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:13px}
+.bubble{align-self:flex-start;max-width:76%;background:#fff;border:1px solid #e0e8ef;padding:12px 15px;border-radius:13px 13px 13px 3px;font-size:13px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
+.bubble.mine{align-self:flex-end;background:#dcebf7;border-color:#cee2f1;border-radius:13px 13px 3px 13px}
+.bubble span{display:block;margin-top:6px;color:#8595a6;font-size:10px}
+.reply{padding:14px;display:flex;gap:10px;align-items:flex-end;background:#fff;border-top:1px solid #dbe5ef}
+.reply textarea{resize:vertical;width:100%;min-height:50px;max-height:150px;padding:12px;border:1px solid #d2dfea;background:#f9fbfd;border-radius:8px;font-size:13px}
+.reply button{height:50px;white-space:nowrap}
+.placeholder{margin:auto;color:#8597a8;line-height:2;text-align:center;padding:30px;font-size:13px}
+.alert{padding:8px 16px;background:#fff3e9;color:#91522f;border-bottom:1px solid #f0dbca;font-size:12px}
+.alert[hidden],.reply[hidden]{display:none!important}
+@media(max-width:700px){header{padding:12px;gap:6px}header small{display:none}.layout{grid-template-columns:37% 63%}.thread{padding:11px}.thread time{float:none;display:block;margin-top:5px}.thread strong{font-size:11px}.message-list{padding:12px}.bubble{max-width:93%}.reply{padding:7px;gap:5px}.reply button{padding:10px;font-size:12px}.reply textarea{font-size:12px}}
+</style></head><body>
+<div id="gate"><form class="gate-card" id="gateForm"><h1>L GROUP｜チャット管理</h1><p>スタッフ用テスト画面です。面接管理と同じ管理者パスワードでログインしてください。</p><input id="pass" type="password" autocomplete="current-password" required placeholder="管理者パスワード" aria-label="管理者パスワード"><button class="primary" type="submit">ログイン</button><p id="gateError" role="alert"></p></form></div>
+<div id="app" hidden>
+<header><strong>チャット管理</strong><small>5店舗共通｜テスト運用</small><button id="reload" type="button">情報更新</button></header>
+<div id="error" class="alert" hidden role="alert"></div>
+<div class="layout">
+<div class="aside"><div class="filters"><select id="store" aria-label="店舗を切り替える"><option value="all">全店舗</option><option value="Grand Luxe">Grand Luxe</option><option value="LUXY OSAKA">LUXY OSAKA</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select><div class="hint" id="summary">問い合わせを取得中です</div></div><div class="thread-list" id="threads"></div></div>
+<div class="chat-pane"><div class="thread-heading" id="heading"><strong>チャットを選択してください</strong></div><div class="message-list" id="messages"><div class="placeholder">左の一覧から会話を選択してください。</div></div><form class="reply" id="reply" hidden><textarea id="draft" maxlength="2000" required placeholder="返信を入力" aria-label="返信内容"></textarea><button id="send" class="primary" type="submit">送信</button></form></div>
+</div></div>
+<script>
+(()=>{
+"use strict";
+const API="https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/booking-chat";
+const LOGIN="https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access";
+const SESSION_KEY="interview_staff_session_v2";const $=id=>document.getElementById(id);
+let token="",threadId="",items=[],loading=false,replying=false;
+const labelTime=iso=>{const d=new Date(iso);return isNaN(+d)?"":d.toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"})};
+async function request(url,payload){
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);
+ try{const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},cache:"no-store",body:JSON.stringify(payload),signal:controller.signal});const data=await r.json();if(!r.ok||(!data.ok&&url===API)){const e=new Error(data.error||"request_failed");e.status=r.status;throw e}return data;}finally{clearTimeout(timer)}
+}
+const stored=()=>sessionStorage.getItem(SESSION_KEY)||localStorage.getItem(SESSION_KEY)||"";
+function showError(msg){$("error").textContent=msg;$("error").hidden=false}
+function clearError(){$("error").textContent="";$("error").hidden=true}
+function unauthorized(){$("app").hidden=true;$("gate").hidden=false;token="";threadId="";sessionStorage.removeItem(SESSION_KEY);localStorage.removeItem(SESSION_KEY);$("gateError").textContent="再ログインしてください。"}
+async function call(action,params={}){
+ try{return await request(API,{action,staff_token:token,...params})}
+ catch(e){if(e.status===401)unauthorized();throw e}
+}
+function isUnread(t){return !!(t.last_customer_message_at&&(!t.staff_last_read_at||new Date(t.last_customer_message_at)>new Date(t.staff_last_read_at)))}
+function nameOf(t){const visitor=t.booking_chat_visitors;return (visitor&&visitor.display_name)||"お客様 "+String(t.visitor_id).slice(0,8)}
+function drawList(){
+ const list=$("threads");list.replaceChildren();
+ let unread=0;
+ for(const t of items){
+  const active=t.id===threadId;
+  if(isUnread(t))unread++;
+  const btn=document.createElement("button");btn.type="button";btn.className="thread"+(active?" active":"");
+  const heading=document.createElement("div");
+  const strong=document.createElement("strong");strong.textContent=t.store_key;
+  const time=document.createElement("time");time.textContent=labelTime(t.updated_at);heading.append(strong,time);
+  const desc=document.createElement("div");desc.className="sub";
+  const customer=document.createElement("span");customer.textContent=nameOf(t);desc.append(customer);
+  if(isUnread(t)){const badge=document.createElement("span");badge.className="tag";badge.textContent="未読";desc.append(badge)}
+  btn.append(heading,desc);btn.addEventListener("click",()=>void openThread(t.id));list.append(btn);
+ }
+ if(!items.length){const empty=document.createElement("div");empty.className="placeholder";empty.textContent="まだ問い合わせはありません";list.append(empty)}
+ $("summary").textContent="会話 "+items.length+"件 ／ 未読 "+unread+"件";
+}
+async function loadList(){
+ if(!token||loading)return;loading=true;
+ try{const data=await call("staff_list",{store:$("store").value});items=data.threads||[];drawList();clearError()}
+ catch(e){showError("一覧を取得できません。（"+e.message+"）")}
+ finally{loading=false}
+}
+function appendMessage(message){
+ const el=document.createElement("div");el.className="bubble"+(message.sender==="staff"?" mine":"");
+ el.textContent=message.body;
+ const time=document.createElement("span");time.textContent=(message.sender==="staff"?"スタッフ":"お客様")+"　"+labelTime(message.created_at);
+ el.append(time);return el;
+}
+async function openThread(id){
+ if(!token)return;threadId=id;drawList();
+ try{
+  const data=await call("staff_thread",{thread_id:id});if(threadId!==id)return;
+  const h=$("heading");h.replaceChildren();
+  const title=document.createElement("strong");title.textContent=data.thread.store_key+"｜お客様 "+String(data.thread.visitor_id).slice(0,8);h.append(title);
+  const rel=document.createElement("div");rel.className="related";
+  if(data.related?.length){
+   const label=document.createElement("span");label.textContent="他店舗の履歴：";rel.append(label);
+   for(const item of data.related){const link=document.createElement("button");link.type="button";link.textContent=item.store_key;link.addEventListener("click",()=>{if($("store").value!=="all"){$("store").value="all";void loadList()}void openThread(item.id)});rel.append(link)}
+   h.append(rel);
+  }
+  const pane=$("messages");pane.replaceChildren();for(const msg of data.messages||[])pane.append(appendMessage(msg));pane.scrollTop=pane.scrollHeight;
+  $("reply").hidden=false;$("draft").value="";
+  const found=items.find(t=>t.id===id);if(found)found.staff_last_read_at=new Date().toISOString();
+  drawList();clearError();
+ }catch(e){showError("会話を取得できません。（"+e.message+"）")}
+}
+$("gateForm").addEventListener("submit",async e=>{
+ e.preventDefault();$("gateError").textContent="認証中です";
+ try{
+  const data=await request(LOGIN,{action:"login",password:$("pass").value});
+  if(!data.token)throw Error("login_failed");
+  token=data.token;sessionStorage.setItem(SESSION_KEY,token);$("pass").value="";
+  $("gate").hidden=true;$("app").hidden=false;clearError();await loadList();
+ }catch(err){$("gateError").textContent="認証に失敗しました。（"+String(err.message||err)+"）"}
+});
+$("reply").addEventListener("submit",async e=>{
+ e.preventDefault();if(!threadId||!token||replying)return;
+ const body=$("draft").value.trim();if(!body)return;replying=true;$("send").disabled=true;
+ try{
+  await call("staff_send",{thread_id:threadId,body,client_message_id:crypto.randomUUID()});
+  $("draft").value="";await openThread(threadId);await loadList();
+ }catch(err){showError("送信できませんでした。（"+String(err.message||err)+"）")}
+ finally{replying=false;$("send").disabled=false}
+});
+$("draft").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();$("reply").requestSubmit()}});
+$("store").addEventListener("change",()=>{threadId="";$("heading").textContent="チャットを選択してください";$("messages").replaceChildren();$("reply").hidden=true;void loadList()});
+$("reload").addEventListener("click",()=>{void loadList();if(threadId)void openThread(threadId)});
+setInterval(()=>{if(!document.hidden&&token){void loadList();if(threadId)void openThread(threadId)}},15000);
+token=stored();if(token){$("gate").hidden=true;$("app").hidden=false;void loadList()}
+})();
+</script></body></html>
