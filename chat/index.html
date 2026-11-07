@@ -3,7 +3,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-store">
 <meta name="robots" content="noindex,nofollow">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src https://vjjnkflbfsjihwzjsjpr.supabase.co; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src https://vjjnkflbfsjihwzjsjpr.supabase.co; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <title>ご相談チャット | L GROUP</title>
 <style>
 :root{color-scheme:light;--accent:#387fa6;--accent-soft:#eaf3f9;--ink:#24364c;--muted:#77889a;--line:#dee6ed}
@@ -35,6 +35,15 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft
 #chooser h1{font-size:22px}#chooser p{font-size:13px;color:#6d8298;line-height:2}
 .stores{display:grid;gap:9px;margin:28px auto}.stores a{padding:17px;border:1px solid #d8e4ed;border-radius:10px;text-decoration:none;color:#2a4e72;background:#f9fbfd;font-size:14px;font-weight:700}
 @media(min-width:760px){.shell{min-height:min(100dvh,900px);max-height:100dvh}.chat{min-height:0}}
+/* Embedded window: the host HP owns the outer heading and close button. */
+html.embedded,body.embedded{height:100%;overflow:hidden}
+.embedded .shell{width:100%;height:100dvh;max-height:100dvh;min-height:0;box-shadow:none}
+.embedded .topbar{display:none}
+.embedded .chat{min-height:0;padding:17px 12px}
+.embedded .composer{padding:10px 11px 12px}
+.embedded .help{font-size:10px}
+.embedded .intro{padding:9px 13px}
+.embedded .bubble{font-size:13px}
 </style></head><body><main class="shell">
 <section id="chooser" hidden><h1>L GROUP チャット</h1><p>ご相談する店舗をお選びください。<br>店舗ごとに会話履歴を分けて管理しています。</p><div class="stores" id="storeLinks"></div></section>
 <section id="chatScreen" hidden style="display:flex;flex:1;flex-direction:column;min-height:0">
@@ -51,7 +60,20 @@ const API="https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/booking-chat";
 const STORES=["Grand Luxe","LUXY OSAKA","Un Secret","薔薇と紳士","BUSTY OSAKA"];
 const COLORS={"Grand Luxe":"#8166a8","LUXY OSAKA":"#397bc3","Un Secret":"#138c80","薔薇と紳士":"#bf6f8e","BUSTY OSAKA":"#b8814a"};
 const $=id=>document.getElementById(id);
-const store=new URLSearchParams(location.search).get("store");
+const search=new URLSearchParams(location.search);
+const store=search.get("store");
+const embedded=search.get("embed")==="1";
+const trustedParents=new Set(["https://rose-gentleman.com","https://www.rose-gentleman.com","https://officialendstaff.github.io"]);
+let parentOrigin="";
+if(embedded){
+ try{parentOrigin=new URL(document.referrer).origin}catch{}
+ if(store!=="薔薇と紳士"||!trustedParents.has(parentOrigin)){
+  document.body.textContent="このサイトからはチャットを利用できません。";
+  return;
+ }
+ document.documentElement.classList.add("embedded");
+ document.body.classList.add("embedded");
+}
 const key="l_group_booking_chat_token_v1";
 let token="",ready=false,lastId=0,posting=false,polling=false;
 if(!STORES.includes(store)){
@@ -101,14 +123,45 @@ function empty(){
 }
 function removeWelcome(){const p=$("welcome");if(p)p.remove()}
 function loadToken(){try{return localStorage.getItem(key)||""}catch{return ""}}
-function saveToken(t){try{localStorage.setItem(key,t)}catch{err("ブラウザで情報を保存できません。次回履歴を引き継げない可能性があります。")}}
+function shareToken(type,value=""){
+ if(!embedded||!parentOrigin||window.parent===window)return;
+ window.parent.postMessage({type,store,token:value},parentOrigin);
+}
+async function loadTokenFromParent(){
+ if(!embedded||!parentOrigin||window.parent===window)return loadToken();
+ return new Promise(resolve=>{
+  let finished=false;
+  let timeout;
+  function finish(value){
+   if(finished)return;
+   finished=true;clearTimeout(timeout);window.removeEventListener("message",handle);
+   resolve(typeof value==="string"&&/^[a-f0-9]{64}$/.test(value)?value:loadToken());
+  }
+  function handle(event){
+   if(event.source!==window.parent||event.origin!==parentOrigin)return;
+   if(event.data?.type!=="lgroup.chat.token"||event.data?.store!==store)return;
+   finish(event.data.token);
+  }
+  window.addEventListener("message",handle);
+  timeout=setTimeout(()=>finish(""),1600);
+  shareToken("lgroup.chat.getToken");
+ });
+}
+function saveToken(t){
+ try{localStorage.setItem(key,t)}catch{}
+ shareToken("lgroup.chat.saveToken",t);
+}
+function clearToken(){
+ try{localStorage.removeItem(key)}catch{}
+ shareToken("lgroup.chat.clearToken");
+}
 async function init(){
  setReady(false);clearErr();
  try{
-  token=loadToken();
+  token=await loadTokenFromParent();
   let data;
   try{data=await api({action:"guest_init",store,token:token||undefined})}
-  catch(e){if(e.status===401&&token){token="";try{localStorage.removeItem(key)}catch{};data=await api({action:"guest_init",store})}else throw e}
+  catch(e){if(e.status===401&&token){token="";clearToken();data=await api({action:"guest_init",store})}else throw e}
   if(data.token){token=data.token;saveToken(token)}
   if(!token)throw Error("no_session");
   $("timeline").replaceChildren();lastId=0;add(data.messages||[]);empty();setReady(true);
