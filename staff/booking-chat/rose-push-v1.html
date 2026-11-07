@@ -307,8 +307,14 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
 #app>header.lg-common-header .unread-total[data-count="0"]{
  background:transparent;color:#b6c7d9;padding:5px 3px;
 }
+</style><style id="lg-chat-auto-auth-gate-20261107">
+#authLoading{position:fixed;inset:0;z-index:9999;background:#192a41;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;font:700 15px/1.7 -apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}
+#authLoading[hidden]{display:none!important}
+#authLoading .auth-spinner{width:33px;height:33px;border:3px solid #ffffff45;border-top-color:#fff;border-radius:50%;animation:lgChatSpin .7s linear infinite}
+@keyframes lgChatSpin{to{transform:rotate(360deg)}}
 </style></head><body>
-<div id="gate" class="lg-interview-login"><div class="auth-card">
+<div id="authLoading" role="status" aria-live="polite"><span class="auth-spinner" aria-hidden="true"></span><span>管理者認証を確認中…</span></div>
+<div id="gate" class="lg-interview-login" hidden><div class="auth-card">
 <aside class="auth-brand-panel" aria-hidden="true">
  <div class="auth-brand-top"><div class="auth-brand-symbol">L</div><div class="auth-brand-name">L GROUP<small>INTERNAL MANAGEMENT</small></div></div>
  <div class="auth-brand-middle"><span class="auth-brand-kicker">STAFF MANAGEMENT SYSTEM</span><h1 class="auth-brand-title">CHAT<br>MANAGEMENT.</h1><p class="auth-brand-description">日々の管理業務を、もっとスマートに。<br>すべての情報をひとつの場所で。</p></div>
@@ -739,7 +745,7 @@ async function connectExisting(){
  }catch(err){
   $("gate").hidden=false;$("app").hidden=true;
   $("gateError").textContent=String(err.message||err);
- }finally{connecting=false;$("connect").disabled=false}
+ }finally{$("authLoading").hidden=true;connecting=false;$("connect").disabled=false}
 }
 $("connect").addEventListener("click",()=>void connectExisting());
 $("reply").addEventListener("submit",async e=>{
