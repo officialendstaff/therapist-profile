@@ -159,6 +159,12 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
  #app .message-list .bubble{font-size:16px;max-width:92%;padding:12px 14px}
  #app .reply textarea{font-size:16px}
 }
+</style><style id="lg-chat-customer-name-emphasis-20261107">
+#app .thread-list .thread strong.customer-name{display:inline-block;font-size:16px;font-weight:800;color:#18304a;line-height:1.5;overflow-wrap:anywhere;letter-spacing:.01em}
+#app .thread-list .thread.unread strong.customer-name{color:#93364f}
+#app .thread-list .thread .sub .store-label{font-weight:700}
+#app .thread-heading strong{font-size:17px;font-weight:800;color:#1d334e}
+@media(max-width:700px){#app .thread-list .thread strong.customer-name{font-size:16px}}
 </style></head><body>
 <div id="gate"><section class="gate-card"><h1>L GROUP｜チャット管理</h1><p>面接管理にログイン済みの管理者アカウントで接続します。チャット専用パスワードは不要です。</p><button class="primary" id="connect" type="button">管理者アカウントで接続</button><p id="gateError" role="alert" aria-live="polite"></p><p><a href="/therapist-profile/staff/management-top/" target="_blank" rel="noopener noreferrer">面接管理のログイン画面を開く</a></p></section></div>
 <div id="app" hidden>
@@ -319,10 +325,10 @@ function drawList(){
   if(isUnread(t))unread++;
   const btn=document.createElement("button");btn.type="button";btn.className="thread"+(active?" active":"")+(isUnread(t)?" unread":"");
   const heading=document.createElement("div");
-  const strong=makeStoreLabel(t.store_key);
+  const strong=document.createElement("strong");strong.className="customer-name";strong.textContent=nameOf(t);
   const time=document.createElement("time");time.textContent=labelTime(t.updated_at);heading.append(strong,time);
   const desc=document.createElement("div");desc.className="sub";
-  const customer=document.createElement("span");customer.textContent=nameOf(t);desc.append(customer);
+  const customer=makeStoreLabel(t.store_key);desc.append(customer);
   if(isUnread(t)){const badge=document.createElement("span");badge.className="tag";badge.textContent="未読";desc.append(badge)}
   btn.append(heading,desc);btn.addEventListener("click",()=>void openThread(t.id));list.append(btn);
  }
