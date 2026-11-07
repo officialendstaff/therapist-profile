@@ -14,13 +14,24 @@ const stateURL=base+"embed/rose-state.js";
 let host=null,frame=null,root=null,open=false,sequence=0;
 let restoreScroll=null;
 function viewportSize(){
- const width=Math.min(window.innerWidth||document.documentElement.clientWidth||375,window.visualViewport?.width||Infinity);
- const height=window.visualViewport?.height||window.innerHeight||640;
- return {width:Math.max(280,Math.round(width)),height:Math.max(300,Math.round(height))};
+ const vv=window.visualViewport;
+ const width=Math.min(window.innerWidth||document.documentElement.clientWidth||375,vv?.width||Infinity);
+ const height=vv?.height||window.innerHeight||640;
+ return {width:Math.max(240,Math.round(width)),height:Math.max(120,Math.round(height)),top:Math.max(0,Math.round(vv?.offsetTop||0))};
 }
 function sendViewport(){
  if(!open||!frame?.contentWindow)return;
- frame.contentWindow.postMessage({type:"lgroup.chat.viewport",store:guestStore,...viewportSize()},chatOrigin);
+ const viewport=viewportSize();
+ if(root&&window.innerWidth<=640){
+  const panel=root.querySelector(".lg-chat-panel");
+  if(panel){
+   panel.style.setProperty("top",viewport.top+"px","important");
+   panel.style.setProperty("bottom","auto","important");
+   panel.style.setProperty("height",viewport.height+"px","important");
+   panel.style.setProperty("max-height",viewport.height+"px","important");
+  }
+ }
+ frame.contentWindow.postMessage({type:"lgroup.chat.viewport",store:guestStore,...viewport},chatOrigin);
 }
 function lockScroll(){
  if(restoreScroll||window.innerWidth>640)return;
@@ -56,6 +67,10 @@ function closeChat(){
  const panel=root.querySelector(".lg-chat-panel"),back=root.querySelector(".lg-chat-backdrop"),button=root.querySelector(".lg-chat-launcher");
  panel.hidden=true;back.hidden=true;button.setAttribute("aria-expanded","false");
  restoreScroll?.();
+ panel.style.removeProperty("top");
+ panel.style.removeProperty("bottom");
+ panel.style.removeProperty("height");
+ panel.style.removeProperty("max-height");
  button.focus({preventScroll:true});
 }
 function showChat(){
@@ -125,6 +140,8 @@ function loadSwitch(){
 window.addEventListener("keydown",e=>{if(e.key==="Escape"&&open)closeChat()});
 window.addEventListener("resize",sendViewport);
 window.visualViewport?.addEventListener("resize",sendViewport);
+window.visualViewport?.addEventListener("scroll",sendViewport);
+window.addEventListener("orientationchange",sendViewport);
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",loadSwitch,{once:true});else loadSwitch();
 setInterval(loadSwitch,45000);
 })();
