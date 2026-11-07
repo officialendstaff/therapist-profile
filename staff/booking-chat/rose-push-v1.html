@@ -1,9 +1,9 @@
 <!doctype html><html lang="ja"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex,nofollow"><meta name="build" content="rose-push-v1-20261107">
+<meta name="robots" content="noindex,nofollow"><meta name="build" content="rose-staff-list-v2-20261107">
 <meta http-equiv="Cache-Control" content="no-store"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="../interview-sheet-preview/icons/recruit-180.png">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src https://vjjnkflbfsjihwzjsjpr.supabase.co; script-src 'self' 'unsafe-inline'; worker-src 'self'; manifest-src 'self'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
-<title>薔薇と紳士｜プッシュ通知テスト</title>
+<title>チャット管理｜L GROUP</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f5f7fa;color:#283a50;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif}
 button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}
@@ -27,7 +27,18 @@ header button{background:#f0f5f9;border:1px solid #cfdae4;color:#526e86;padding:
 .thread{display:block;width:100%;text-align:left;padding:16px;border:0;border-bottom:1px solid #edf1f5;background:white;color:#34495d}
 .thread.active{background:#eaf3fa;border-left:4px solid #448bbd;padding-left:12px}
 .thread strong{font-size:13px}.thread time{font-size:10px;color:#8f9eae;float:right}
-.thread .sub{font-size:11px;color:#7f92a4;margin-top:7px;display:flex;justify-content:space-between}
+.thread .sub{font-size:11px;color:#7f92a4;margin-top:7px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.thread .sub span:first-child{min-width:0;overflow-wrap:anywhere}
+.thread .thread-meta{display:flex;align-items:center;gap:7px}
+.thread .thread-meta .store-mini{color:#576f85;font-size:10px;font-weight:650}
+.filters-extra{display:flex;gap:8px;align-items:center;margin-top:9px}
+.filters-extra input{flex:1;min-width:0;width:100%;border:1px solid #d4e0e9;background:#f8fbfd;border-radius:8px;padding:10px 11px;font-size:13px}
+.filters-extra button{border:1px solid #d4e0e9;background:#fff;color:#46617b;padding:10px;border-radius:8px;font-size:12px;white-space:nowrap}
+.filters-extra button[aria-pressed="true"]{background:#fce9ef;color:#a93158;border-color:#e7aabb;font-weight:800}
+.thread.active{scroll-margin:8px}
+.related button{max-width:100%;overflow-wrap:anywhere}
+.thread-status{margin-left:7px;display:inline-flex;align-items:center;gap:3px;color:#a93158;font-size:11px}
+.thread-list-empty{padding:24px 12px;text-align:center;color:#7f92a4;font-size:12px;line-height:1.8}
 .tag{font-size:10px;color:#be5871;background:#fbe8ee;border-radius:9px;padding:3px 7px;font-weight:700}
 .chat-pane{min-height:0;display:flex;flex-direction:column;background:#f8fafc}
 .thread-heading{padding:14px 18px;background:#fff;border-bottom:1px solid #dce5ee;min-height:66px}
@@ -97,7 +108,7 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
 <header><strong>チャット管理</strong><small>薔薇と紳士 先行テスト｜HP未設置</small><span class="unread-total" id="unreadTotal" aria-live="polite">未読 0件</span><button id="pushEnable" type="button" data-enabled="false">プッシュ通知を有効化</button><button id="pushTest" type="button" disabled>通知テスト</button><span id="pushStatus" aria-live="polite">未設定</span><button id="notifyToggle" type="button" aria-pressed="false">画面内通知音 OFF</button><a id="customerTestLink" href="../../chat/?store=%E8%96%94%E8%96%87%E3%81%A8%E7%B4%B3%E5%A3%AB" target="_blank" rel="noopener noreferrer">お客様用テスト画面</a><button id="reload" type="button">情報更新</button></header>
 <div id="error" class="alert" hidden role="alert"></div>
 <div class="layout" id="layout">
-<div class="aside"><div class="filters"><select id="store" aria-label="店舗を切り替える"><option value="all">全店舗</option><option value="Grand Luxe">Grand Luxe</option><option value="LUXY OSAKA">LUXY OSAKA</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select><div class="hint" id="summary">問い合わせを取得中です</div></div><div class="thread-list" id="threads"></div></div>
+<div class="aside"><div class="filters"><select id="store" aria-label="店舗を切り替える"><option value="all">全店舗</option><option value="Grand Luxe">Grand Luxe</option><option value="LUXY OSAKA">LUXY OSAKA</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select><div class="filters-extra"><input id="threadSearch" type="search" placeholder="お客様・店舗を検索" aria-label="会話を検索"><button id="unreadOnly" type="button" aria-pressed="false">未読のみ</button></div><div class="hint" id="summary">問い合わせを取得中です</div></div><div class="thread-list" id="threads"></div></div>
 <div class="chat-pane"><div class="thread-heading" id="heading"><button id="backToList" type="button">〈 一覧</button><strong id="threadTitle">チャットを選択してください</strong><div id="relatedThreads" class="related"></div></div><div class="message-list" id="messages"><div class="placeholder">左の一覧から会話を選択してください。</div></div><form class="reply" id="reply" hidden><textarea id="draft" maxlength="2000" required placeholder="返信を入力" aria-label="返信内容"></textarea><button id="send" class="primary" type="submit">送信</button></form></div>
 </div></div>
 <script>
@@ -178,6 +189,22 @@ function setCustomerTestLink(){const store=$("store").value==="all"?"薔薇と�
 setCustomerTestLink();
 let token="",threadId="",items=[],loading=false,replying=false;
 let listInitialized=false,notifyOn=false,audioContext=null,activeThreadUpdatedAt="",threadOpening=false;
+let unreadOnly=false;
+function visibleThreads(){
+ const query=$("threadSearch").value.trim().toLocaleLowerCase("ja-JP");
+ return items.filter(t=>{
+  if(unreadOnly&&!isUnread(t))return false;
+  if(!query)return true;
+  return [t.store_key,nameOf(t),String(t.visitor_id||"")].some(value=>String(value||"").toLocaleLowerCase("ja-JP").includes(query));
+ });
+}
+$("threadSearch").addEventListener("input",drawList);
+$("unreadOnly").addEventListener("click",()=>{
+ unreadOnly=!unreadOnly;
+ $("unreadOnly").setAttribute("aria-pressed",String(unreadOnly));
+ $("unreadOnly").textContent=unreadOnly?"未読のみ ✓":"未読のみ";
+ drawList();
+});
 const defaultTitle=document.title;
 function notificationTone(){
  if(!notifyOn)return;
@@ -205,7 +232,7 @@ $("notifyToggle").addEventListener("click",()=>{
 $("backToList").addEventListener("click",()=>$("layout").classList.remove("chat-open"));
 function updateCounters(){
  const total=items.filter(isUnread).length;
- $("summary").textContent="会話 "+items.length+"件 ／ 未読 "+total+"件";
+ $("summary").textContent="表示 "+visibleThreads().length+" / 全"+items.length+"件 ／ 未読 "+total+"件";
  $("unreadTotal").textContent="未読 "+total+"件";
  document.title=(total?"("+total+") ":"")+defaultTitle;
 }
@@ -229,19 +256,23 @@ function nameOf(t){const visitor=t.booking_chat_visitors;return (visitor&&visito
 function drawList(){
  const list=$("threads");list.replaceChildren();
  let unread=0;
- for(const t of items){
+ for(const t of visibleThreads()){
   const active=t.id===threadId;
   if(isUnread(t))unread++;
   const btn=document.createElement("button");btn.type="button";btn.className="thread"+(active?" active":"")+(isUnread(t)?" unread":"");
   const heading=document.createElement("div");
-  const strong=document.createElement("strong");strong.textContent=t.store_key;
+  const strong=document.createElement("strong");strong.textContent=nameOf(t);
   const time=document.createElement("time");time.textContent=labelTime(t.updated_at);heading.append(strong,time);
   const desc=document.createElement("div");desc.className="sub";
-  const customer=document.createElement("span");customer.textContent=nameOf(t);desc.append(customer);
+  const customer=document.createElement("span");customer.textContent=t.store_key;desc.append(customer);
   if(isUnread(t)){const badge=document.createElement("span");badge.className="tag";badge.textContent="未読";desc.append(badge)}
   btn.append(heading,desc);btn.addEventListener("click",()=>void openThread(t.id));list.append(btn);
  }
- if(!items.length){const empty=document.createElement("div");empty.className="placeholder";empty.textContent="まだ問い合わせはありません";list.append(empty)}
+ if(!visibleThreads().length){
+  const empty=document.createElement("div");empty.className="thread-list-empty";
+  empty.textContent=items.length?"条件に一致する会話はありません":"まだ問い合わせはありません";
+  list.append(empty);
+ }
  updateCounters();
 }
 async function loadList(){
@@ -286,13 +317,21 @@ async function openThread(id,options={}){
  try{
   const data=await call("staff_thread",{thread_id:id});
   if(threadId!==id)return;
-  $("threadTitle").textContent=data.thread.store_key+"｜お客様 "+String(data.thread.visitor_id).slice(0,8);
+  $("threadTitle").textContent=data.thread.store_key+"｜"+nameOf(data.thread);
   const rel=$("relatedThreads");rel.replaceChildren();
   if(data.related?.length){
-   const label=document.createElement("span");label.textContent="他店舗履歴：";rel.append(label);
+   const label=document.createElement("span");label.textContent="関連する他店舗の会話：";rel.append(label);
    for(const item of data.related){
     const link=document.createElement("button");link.type="button";link.textContent=item.store_key;
-    link.addEventListener("click",()=>{if($("store").value!=="all"){$("store").value="all";void loadList()}void openThread(item.id)});
+    link.addEventListener("click",async()=>{
+     if($("store").value!=="all"){
+      $("store").value="all";
+      setCustomerTestLink();
+      listInitialized=false;
+     }
+     if(!threadOpening)await openThread(item.id);
+     void loadList();
+    });
     rel.append(link);
    }
   }
