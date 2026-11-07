@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="strict-origin-when-cross-origin">
+<title>薔薇と紳士｜HP内チャット設置プレビュー</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f9f6f5;color:#3e3034;font-family:-apple-system,BlinkMacSystemFont,"Yu Gothic",Meiryo,sans-serif}
+.head{background:#2c1b22;color:white;padding:16px clamp(18px,4vw,46px);display:flex;align-items:center;justify-content:space-between;gap:15px}
+.brand{font-family:serif;font-size:clamp(21px,4vw,32px);font-weight:700;letter-spacing:.15em}
+.head small{color:#cdbfbb;font-size:11px}
+nav{background:#463037;display:flex;gap:10px;padding:11px 24px;color:#f5e8e6;justify-content:center;flex-wrap:wrap;font-size:12px;letter-spacing:.08em}
+nav span{padding:0 9px}
+.main{max-width:1020px;margin:auto;padding:28px clamp(18px,5vw,50px) 130px}
+.notice{border:1px solid #ddc9b5;background:#fffaf3;border-radius:9px;padding:13px 16px;font-size:13px;line-height:1.9}
+.tag{font-size:10px;font-weight:800;color:#945534;background:#f6e8d8;padding:4px 7px;border-radius:5px}
+.hero{margin-top:30px;padding:60px 22px;text-align:center;background:linear-gradient(145deg,#463038,#20141b);color:white;border-radius:5px}
+.hero h1{font-family:serif;font-size:clamp(25px,6vw,45px);letter-spacing:.13em;line-height:1.5;margin:0}
+.hero p{letter-spacing:.16em;color:#d8c3be;margin-top:16px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:24px}
+.tile{background:white;border:1px solid #e8dfdb;border-radius:4px;padding:25px 16px;text-align:center}
+.tile b{font-size:13px;letter-spacing:.08em}
+.tile p{font-size:12px;color:#82747a;line-height:1.8}
+.steps{margin-top:28px;padding:22px;background:white;border:1px solid #e6deda;border-radius:5px;font-size:13px;line-height:2}
+.steps h2{font-size:16px;margin:0 0 8px}
+.steps a{color:#9e5b69;font-weight:700;word-break:break-all}
+@media(max-width:620px){.grid{grid-template-columns:1fr}.tile{padding:17px}.head small{display:none}.main{padding-bottom:110px}}
+</style>
+</head>
+<body>
+<header class="head"><div class="brand">薔薇と紳士</div><small>HP内チャット設置イメージ｜テスト専用</small></header>
+<nav aria-label="サイトナビゲーション"><span>HOME</span><span>THERAPIST</span><span>SCHEDULE</span><span>SYSTEM</span><span>CONTACT</span></nav>
+<main class="main">
+ <div class="notice"><span class="tag">設置前検証</span> これは<strong>公式HPを変更していないテストページ</strong>です。右下の「チャットでお問い合わせ」から、HPを離れずにチャットを開く動作を確認できます。送信したテストメッセージはスタッフ用画面へ届きます。</div>
+ <section class="hero"><h1>薔薇と紳士</h1><p>RELAXATION &amp; HOSPITALITY</p></section>
+ <div class="grid"><div class="tile"><b>セラピスト</b><p>店舗コンテンツの表示領域</p></div><div class="tile"><b>出勤情報</b><p>店舗コンテンツの表示領域</p></div><div class="tile"><b>お問い合わせ</b><p>HPを離れずにチャット</p></div></div>
+ <section class="steps"><h2>確認事項</h2>右下のチャットを開く → テストメッセージを送る → 閉じる → 再度開いて履歴が残るか確認してください。
+ <p>スタッフ側のテスト画面：<a href="/therapist-profile/staff/booking-chat/rose-push-v1.html" target="_blank" rel="noopener noreferrer">チャット管理を別タブで開く</a></p>
+ <p>本番HP：<a href="https://rose-gentleman.com/top.php" target="_blank" rel="noopener noreferrer">薔薇と紳士 公式HP</a>（こちらは未変更です）</p>
+ </section>
+</main>
+<script src="./rose.js?v=20261107-embed-v1" data-preview="1" defer></script>
+</body></html>
