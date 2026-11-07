@@ -87,5 +87,6 @@ function closeInvitation(){inviteModal.classList.remove('open')}
 document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('a[href]').forEach(a=>{const h=(a.getAttribute('href')||'').trim();if(!h||h.startsWith('#')||h.startsWith('javascript:')||h.startsWith('mailto:')||h.startsWith('tel:'))return;try{const u=new URL(h,location.href);const samePage=u.origin===location.origin&&u.pathname===location.pathname;if(!samePage){a.target='_blank';a.rel='noopener noreferrer'}}catch(e){}})});
 </script>
 
-<!-- チャットのスタッフHPテスト表示は終了。チャット管理本体・履歴は維持。 -->
+<!-- 薔薇と紳士チャット｜スタッフHP内プレビュー表示 -->
+<script defer src="/therapist-profile/chat/embed/rose.js?v=20261107-restored" data-preview="1"></script>
 </body></html>
