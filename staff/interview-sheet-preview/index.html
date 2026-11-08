@@ -555,7 +555,7 @@ html.metrics-standalone #storeMetrics{height:100%!important;min-height:100%!impo
 html.metrics-standalone #storeMetricsBody{height:calc(100% - 65px)!important;overflow:auto!important}
 html.metrics-standalone #storeMetricsHeader .store-metrics-controls{display:none!important}
 html.metrics-standalone #storeMetricsHeader{padding-bottom:5px!important}
-html.metrics-standalone #storeMetricsBody{height:calc(100% - 41px)!important}
+html.metrics-standalone #storeMetricsBody{height:calc(100% - 62px)!important}
 html.metrics-standalone body.interview-admin-locked>.main{visibility:hidden!important}
 html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!important;pointer-events:auto!important}
 </style><script id="metrics-standalone-init">if(new URLSearchParams(location.search).get('standaloneMetrics')==='1')document.documentElement.classList.add('metrics-standalone');</script><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script><style id="sales-metrics-mode-tabs-20261107">
@@ -646,7 +646,56 @@ html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!imp
 .notification-option>p{margin:8px 0}
 #lineVoiceTest{border:1px solid #d0e0ec;background:#edf5fb;color:#376e96}
 #sound[data-push-enabled="true"]{border-color:#a5d2b6;background:#eff8f2;color:#227d4e}
-</style><style id="temporarily-disabled-sales-20261107">#metricsSalesTab:disabled{opacity:.45!important;cursor:not-allowed!important;pointer-events:none!important;box-shadow:none!important}</style></head><body>
+</style><style id="temporarily-disabled-sales-20261107">#metricsSalesTab:disabled{opacity:.45!important;cursor:not-allowed!important;pointer-events:none!important;box-shadow:none!important}</style><style id="interview-metrics-v8-live">
+#storeMetricsHeader{gap:10px!important;align-items:center!important}
+#storeMetricsHeader .metrics-mode-tabs{flex:none}
+#metricsInterviewTab{font-size:0!important}
+#metricsInterviewTab:after{content:'面接数値';font-size:13px}
+.interview-period-switch{display:flex;gap:3px;flex:none;padding:3px;border:1px solid #d4deeb;background:#edf2f9;border-radius:6px}
+.interview-period-switch button{border:0;border-radius:4px;background:transparent;color:#506780;font-size:12px;font-weight:700;padding:6px 12px;cursor:pointer}
+.interview-period-switch button.active{color:#174b86;background:#fff;box-shadow:0 0 0 1px #bbd1e8}
+#storeMetricsHeader>.store-metrics-kpis{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:6px!important;flex:1;min-width:0}
+#storeMetricsHeader .metrics-kpi{border:1px solid #d1deed;background:#f5f8fd;border-radius:5px;height:48px;padding:5px 8px;min-width:0}
+#storeMetricsHeader .metrics-kpi small{display:block;font-size:9px;color:#627a95;white-space:nowrap}
+#storeMetricsHeader .metrics-kpi strong{display:block;font-size:18px;line-height:24px;color:#142d4a}
+#storeMetricsBody{padding-top:6px!important}
+.metrics-v8-grid{display:grid;grid-template-columns:.97fr 1.03fr;gap:9px;width:100%;height:100%;min-height:0}
+.metrics-v8-col{display:grid;gap:9px;min-width:0;min-height:0}
+.metrics-v8-grid.monthly .metrics-v8-left{grid-template-rows:1.5fr .9fr .9fr}
+.metrics-v8-grid.monthly .metrics-v8-right{grid-template-rows:1.95fr 1.35fr}
+.metrics-v8-grid.annual .metrics-v8-left{grid-template-rows:1.52fr 1fr 1fr}
+.metrics-v8-grid.annual .metrics-v8-right{grid-template-rows:1.98fr 1.54fr}
+.metrics-v8-panel{min-width:0;min-height:0;overflow:hidden;border:1px solid #d1deed;border-radius:5px;padding:10px 11px;display:flex;flex-direction:column;background:#fff}
+.metrics-v8-heading{flex:none;min-height:18px;font-size:11px;font-weight:750;color:#213a58;display:flex;align-items:center;justify-content:space-between;gap:5px}
+.metrics-v8-media{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-flow:column;grid-template-rows:repeat(7,minmax(0,1fr));column-gap:14px;row-gap:2px;flex:1;min-height:0;padding-top:7px}
+.metrics-v8-media-row{display:flex;align-items:center;gap:4px;min-height:0;min-width:0;font-size:10px}
+.metrics-v8-media-row>span{width:95px;flex:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.metrics-v8-track{height:9px;flex:1;min-width:0;background:#eef2f7;border-radius:2px;overflow:hidden}
+.metrics-v8-fill{height:100%;border-radius:2px}
+.metrics-v8-media-row>b,.metrics-v8-compare-line>b,.metrics-v8-age-row>b{font-size:10px;width:20px;text-align:right;flex:none;font-variant-numeric:tabular-nums}
+.metrics-v8-comparison{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-flow:column;grid-template-rows:repeat(7,minmax(0,1fr));gap:4px 14px;flex:1;min-height:0;padding-top:5px}
+.metrics-v8-compare-item{display:flex;flex-direction:column;gap:3px;min-width:0;min-height:0;justify-content:center}
+.metrics-v8-compare-item>strong{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.metrics-v8-compare-line{display:flex;gap:4px;align-items:center}
+.metrics-v8-compare-line>span{font-size:9px;width:25px;color:#61758c;flex:none}
+.metrics-v8-age{flex:1;min-height:0;display:grid;grid-template-rows:repeat(8,minmax(0,1fr));padding-top:5px}
+.metrics-v8-age-row{display:flex;gap:7px;align-items:center;min-height:0;font-size:10px}
+.metrics-v8-age-row>span{width:78px;flex:none}
+.metrics-v8-age-row .metrics-v8-track{height:14px}
+.metrics-v8-age-total{font-size:11px;color:#526782}
+.metrics-v8-hours{display:flex;align-items:stretch;gap:3px;flex:1;min-height:0;margin:12px 2px 17px;border-bottom:1px solid #ccd8e8}
+.metrics-v8-hour-col{flex:1;min-width:0;position:relative;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.metrics-v8-hour-bar{width:100%;background:linear-gradient(180deg,#8ce4d1,#04b495);flex:none}
+.metrics-v8-hour-col small{position:absolute;top:calc(100% + 5px);font-size:8px;color:#234365}
+.metrics-v8-hour-number{position:absolute;bottom:calc(100% - 1px);font-size:9px;font-weight:700}
+.metrics-v8-trend{display:flex;gap:5px;flex:1;min-height:0;margin:15px 2px 18px;border-bottom:1px solid #cbd8e8;align-items:flex-end}
+.metrics-v8-trend-group{display:flex;gap:2px;align-items:flex-end;justify-content:center;flex:1;height:100%;position:relative}
+.metrics-v8-trend-bar{width:38%;max-width:22px;border-radius:2px 2px 0 0;position:relative}
+.metrics-v8-trend-bar span{position:absolute;bottom:calc(100% + 3px);left:50%;transform:translateX(-50%);font-size:9px;font-weight:700}
+.metrics-v8-trend-group small{position:absolute;top:calc(100% + 5px);font-size:9px;white-space:nowrap}
+@media(max-width:1100px){#storeMetricsHeader{flex-wrap:wrap}#storeMetricsHeader>.store-metrics-kpis{flex-basis:100%}html.metrics-standalone #storeMetricsBody{height:calc(100% - 105px)!important}}
+@media(max-width:740px){.metrics-v8-grid{height:auto;grid-template-columns:1fr}.metrics-v8-col{grid-template-rows:none!important}.metrics-v8-panel{min-height:220px}.metrics-v8-comparison{min-height:320px}.metrics-v8-media{min-height:190px}#storeMetricsHeader>.store-metrics-kpis{grid-template-columns:repeat(3,1fr)!important}html.metrics-standalone #storeMetricsBody{height:calc(100% - 190px)!important;overflow:auto!important}}
+</style></head><body>
 <header class="header"><button class="brand" id="home"><img id="homeAvatar" src="./icons/recruit-180.png" alt="" onerror="this.style.display='none'"><span id="homeLabel">TOP</span></button><div class="header-actions"><button id="manualInterviewOpen" type="button">面接登録</button><button id="sound">通知設定</button></div></header>
 <section class="calendar" aria-label="月間カレンダー"><div class="cal-head"><button id="prev" aria-label="前月">◀</button><span id="month"></span><button id="next" aria-label="翌月">▶</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="days" id="days"></div></section>
 <section class="chart" aria-label="担当者タイムチャート"><div class="chart-title"><span>担当者タイムチャート</span><span id="selectedDate" class="chart-date"></span></div><div class="chart-scroll"><div class="chart-grid" id="chartGrid"></div></div><div class="legend"><span><i style="background:linear-gradient(90deg,#E9E4F3 25%,#E4EFFB 25% 50%,#F9E5ED 50% 75%,#E5F2ED 75%)"></i>選択可能</span><span><i style="background:#d4d8df"></i>選択不可</span><span><i style="background:#FACC15;border:1px solid #A16207"></i>面接予約済み</span><span class="status" id="slotStatus">対応可能時間は個人ページの設定を参照します</span></div></section>
@@ -1364,7 +1413,21 @@ function setMetricsMode(mode){
 }
 document.getElementById('metricsInterviewTab').addEventListener('click',()=>setMetricsMode('interview'));
 // 営業数値タブは一時停止中。既存の集計データと画面コードは保持する。
+
+let interviewMetricsPeriod='monthly';
+function bindInterviewMetricsPeriod(){
+ const hdr=document.getElementById('storeMetricsHeader');
+ if(!hdr||hdr.querySelector('#interviewPeriodSwitch'))return;
+ const group=document.createElement('div');group.id='interviewPeriodSwitch';group.className='interview-period-switch';
+ for(const [key,label] of [['annual','年間'],['monthly','月間']]){
+  const button=document.createElement('button');button.type='button';button.textContent=label;button.dataset.period=key;
+  button.addEventListener('click',()=>{interviewMetricsPeriod=key;renderStoreMetrics()});
+  group.append(button);
+ }
+ hdr.querySelector('.metrics-mode-tabs')?.after(group);
+}
 function renderStoreMetrics(){
+ bindInterviewMetricsPeriod();
  if(!$('salesMetricsBody').hidden){
   const parts=String($('storeMetricsMonth').value||'').split('-');
   if(parts.length===2)$('storeMetricsMonthLabel').textContent=Number(parts[0])+'年'+Number(parts[1])+'月';
@@ -1609,7 +1672,177 @@ if(storeMetricsSheetsStatus==='ready'&&interviewReady){
 }else{
  const empty=document.createElement('p');empty.textContent='面接実施データ未取得';compare.append(empty);
 }
-chart.append(compare);root.append(chart);
+chart.append(compare);
+ // v8：集計の取得・確定値の基準は上記の既存処理を維持し、表示だけ切り替える。
+ const annual=interviewMetricsPeriod==='annual';
+ const periodControl=document.getElementById('interviewPeriodSwitch');
+ if(periodControl)for(const b of periodControl.querySelectorAll('button'))b.classList.toggle('active',b.dataset.period===interviewMetricsPeriod);
+ $('storeMetricsMonthLabel').textContent=annual?yr+'年':yr+'年'+mo+'月';
+ const header=document.getElementById('storeMetricsHeader');
+ header.querySelector('.store-metrics-kpis')?.remove();
+ const applicable=annual?Array.from({length:12},(_,i)=>yr+'-'+String(i+1).padStart(2,'0')):[month];
+ const dateInPeriod=(date)=>annual?String(date||'').slice(0,4)===String(yr):String(date||'').slice(0,7)===month;
+ const annualInterviews=allInterviews.filter(r=>dateInPeriod(r.date));
+ const annualAttended=annualInterviews.filter(r=>attendedStatuses.includes(r.status));
+ const annualHiring=annualInterviews.filter(r=>['採用','在籍','入店'].includes(r.status)).length;
+ const annualRejected=annualInterviews.filter(r=>r.status==='不採用').length;
+ const annualCancelled=annualInterviews.filter(r=>['キャンセル','無断トビ','トビ（キャンセル）'].includes(r.status)).length;
+ const annualInquiryParts=applicable.map(inquiryCountForMonth);
+ const annualInquiries=annualInquiryParts.some(x=>x===null)?null:annualInquiryParts.reduce((a,b)=>a+b,0);
+ const annualAvailable=interviewReady&&annualInterviews.length>0;
+ const displayed=annual?[
+  ['問い合わせ数',annualInquiries===null?'—':annualInquiries],
+  ['面接実施',annualAvailable?annualAttended.length:'—'],
+  ['面接割合',annualInquiries===null||!annualAvailable?'—':annualInquiries?Math.round(annualAttended.length/annualInquiries*100)+'%':'0%'],
+  ['採用数',annualAvailable?annualHiring:'—'],
+  ['不採用数',annualAvailable?annualRejected:'—'],
+  ['キャンセル',annualAvailable?annualCancelled:'—']
+ ]:metrics;
+ top.replaceChildren();
+ for(const [name,value] of displayed){
+  const cell=document.createElement('div');cell.className='metrics-kpi';const label=document.createElement('small');label.textContent=name;
+  const num=document.createElement('strong');num.textContent=value;cell.append(label,num);top.append(cell);
+ }
+ header.append(top);
+ const dash=document.createElement('div');dash.className='metrics-v8-grid '+(annual?'annual':'monthly');
+ const l=document.createElement('div');l.className='metrics-v8-col metrics-v8-left';
+ const r=document.createElement('div');r.className='metrics-v8-col metrics-v8-right';
+ dash.append(l,r);
+ const section=(parent,title,extraClass='')=>{
+  const el=document.createElement('section');el.className='metrics-v8-panel '+extraClass;
+  const heading=document.createElement('div');heading.className='metrics-v8-heading';heading.textContent=title;
+  el.append(heading);parent.append(el);return el;
+ };
+ const fixedMedia=[...new Set([...mediaNames,'HP','記載なし'])];
+ const countBars=(holder,counts,ready)=>{
+  const names=fixedMedia;
+  const max=Math.max(1,...names.map(n=>counts.get(n)||0));
+  const grid=document.createElement('div');grid.className='metrics-v8-media';
+  for(const n of names){
+   const row=document.createElement('div');row.className='metrics-v8-media-row';
+   const lab=document.createElement('span');lab.textContent=mediaChartLabel(n);lab.title=n;
+   const track=document.createElement('div');track.className='metrics-v8-track';
+   const v=counts.get(n)||0;const bar=document.createElement('div');bar.className='metrics-v8-fill';bar.style.width=v/max*100+'%';bar.style.background=mediaColor(n);track.append(bar);
+   const num=document.createElement('b');num.textContent=ready?String(v):'—';
+   row.append(lab,track,num);grid.append(row);
+  }
+  holder.append(grid);
+ };
+ const comparisons=(holder,nowCounts,oldCounts,nowReady,oldReady,oldLabel,nowLabel)=>{
+  const grid=document.createElement('div');grid.className='metrics-v8-comparison';
+  const max=Math.max(1,...fixedMedia.flatMap(n=>[nowCounts.get(n)||0,oldCounts.get(n)||0]));
+  for(const n of fixedMedia){
+   const item=document.createElement('div');item.className='metrics-v8-compare-item';
+   const head=document.createElement('strong');head.textContent=mediaChartLabel(n);head.title=n;item.append(head);
+   for(const [label,counts,ready,color] of [[oldLabel,oldCounts,oldReady,'#adb8c8'],[nowLabel,nowCounts,nowReady,mediaColor(n)]]){
+    const line=document.createElement('div');line.className='metrics-v8-compare-line';
+    const tag=document.createElement('span');tag.textContent=label;
+    const track=document.createElement('div');track.className='metrics-v8-track';
+    const value=counts.get(n)||0;
+    const bar=document.createElement('div');bar.className='metrics-v8-fill';bar.style.background=color;bar.style.width=ready?value/max*100+'%':'0%';
+    track.append(bar);
+    const num=document.createElement('b');num.textContent=ready?String(value):'—';
+    line.append(tag,track,num);item.append(line);
+   }
+   grid.append(item);
+  }
+  holder.append(grid);
+ };
+ const ageBins=['18〜19歳','20〜24歳','25〜29歳','30〜34歳','35〜39歳','40〜44歳','45歳以上','年齢不明'];
+ const ageCount=new Array(ageBins.length).fill(0);
+ // LINEの初回メッセージに明記された年齢のみ採用する。推測・生年月日推定は行わない。
+ const ageApplicants=allApplicants.filter(a=>dateInPeriod(firstDate(a)));
+ for(const a of ageApplicants){
+  const first=(a.messages||[]).slice().sort((x,y)=>String(x.receivedAt||'').localeCompare(String(y.receivedAt||'')))[0];
+  const message=String(first?.text||'');
+  const match=message.match(/(?:年齢|ご年齢|お歳|歳)[ \\t　]*[：:は]?\\s*(\\d{2})(?:歳|才)?/)||message.match(/(?:^|[\\s　、,])([1-6]\\d)\\s*(?:歳|才)(?:[\\s　、,]|$)/m);
+  const age=match?Number(match[1]):NaN;
+  const idx=!Number.isFinite(age)?7:age<18?7:age<20?0:age<25?1:age<30?2:age<35?3:age<40?4:age<45?5:6;
+  ageCount[idx]++;
+ }
+ const shopName=shop==='LUXY'?'LUXY OSAKA':shop;
+ const shopColor=shop==='all'?'#568DB9':(COLOR_THEME.shops[shopName]?.fg||'#568DB9');
+ const ageGraph=(holder)=>{
+  const all=ageCount.reduce((a,b)=>a+b,0);
+  const total=document.createElement('span');total.className='metrics-v8-age-total';total.textContent=lineReady?'合計 '+all+'人':'合計 —人';
+  holder.querySelector('.metrics-v8-heading').append(total);
+  const grid=document.createElement('div');grid.className='metrics-v8-age';
+  const max=Math.max(1,...ageCount);
+  ageBins.forEach((name,i)=>{
+   const row=document.createElement('div');row.className='metrics-v8-age-row';
+   const lab=document.createElement('span');lab.textContent=name;
+   const track=document.createElement('div');track.className='metrics-v8-track';
+   const bar=document.createElement('div');bar.className='metrics-v8-fill';bar.style.width=ageCount[i]/max*100+'%';bar.style.background=shopColor;track.append(bar);
+   const count=document.createElement('b');count.textContent=lineReady?String(ageCount[i]):'—';
+   row.append(lab,track,count);grid.append(row);
+  });
+  holder.append(grid);
+ };
+ const hourGraph=holder=>{
+  const labels=Array.from({length:24},(_,i)=>String(i));
+  const values=Array(24).fill(0);
+  if(lineReady)for(const a of applicants){const date=firstDate(a);if(!date)continue;const h=new Date(date).getHours();if(Number.isInteger(h)&&h>=0&&h<24)values[h]++;}
+  const graph=document.createElement('div');graph.className='metrics-v8-hours';
+  const max=Math.max(1,...values);
+  values.forEach((v,i)=>{
+   const col=document.createElement('div');col.className='metrics-v8-hour-col';
+   const bar=document.createElement('div');bar.className='metrics-v8-hour-bar';bar.style.height=(lineReady?v/max*88:0)+'%';
+   const num=document.createElement('span');num.className='metrics-v8-hour-number';num.textContent=lineReady&&v?String(v):'';
+   const tick=document.createElement('small');tick.textContent=labels[i];col.append(num,bar,tick);graph.append(col);
+  });
+  holder.append(graph);
+ };
+ const annualTrend=holder=>{
+  const values=Array.from({length:12},(_,i)=>{const key=yr+'-'+String(i+1).padStart(2,'0');
+   const inquiry=inquiryCountForMonth(key);
+   const data=interviewReady?allInterviews.filter(x=>String(x.date||'').slice(0,7)===key&&attendedStatuses.includes(x.status)).length:null;
+   return [inquiry,data];
+  });
+  const max=Math.max(1,...values.flatMap(v=>v.filter(x=>Number.isFinite(x))));
+  const graph=document.createElement('div');graph.className='metrics-v8-trend';
+  values.forEach(([inquiry,interview],i)=>{
+   const group=document.createElement('div');group.className='metrics-v8-trend-group';
+   for(const [n,color] of [[inquiry,'#1688F0'],[interview,'#F24D99']]){
+    const bar=document.createElement('div');bar.className='metrics-v8-trend-bar';bar.style.background=color;bar.style.height=(n===null?0:Math.max(n?1:0,n/max*85))+'%';bar.title=n===null?'未取得':n+'件';
+    if(n){const tag=document.createElement('span');tag.textContent=n;bar.append(tag)}
+    group.append(bar);
+   }
+   const label=document.createElement('small');label.textContent=i+1+'月';group.append(label);graph.append(group);
+  });
+  holder.append(graph);
+ };
+ const interviewedInYear=new Map(),priorYear=new Map();
+ const annualMediaRaw=new Map(),previousAnnualMediaRaw=new Map();
+ for(const sh of storeMetricsSheets){
+  if(!attendanceStatuses.has(sh.status)||!matchShop(sh.shop))continue;
+  const yy=String(sh.month||'').slice(0,4);
+  if(yy!==String(yr)&&yy!==String(yr-1))continue;
+  const dest=yy===String(yr)?annualMediaRaw:previousAnnualMediaRaw;
+  for(const n of sheetMediaNames(sh.source))dest.set(n,(dest.get(n)||0)+1);
+ }
+ for(const row of allInterviews){
+  if(!row.isManual||!attendanceStatuses.has(row.status))continue;
+  const yy=String(row.date||'').slice(0,4);if(yy!==String(yr)&&yy!==String(yr-1))continue;
+  const dest=yy===String(yr)?annualMediaRaw:previousAnnualMediaRaw;
+  const n=normalizedRecruitMedia(row.recruitSource);dest.set(n,(dest.get(n)||0)+1);
+ }
+ const annualMedia=groupedMediaCounts(annualMediaRaw),previousAnnualMedia=groupedMediaCounts(previousAnnualMediaRaw);
+ const annualInquiryMedia=groupedMediaCounts(mediaCounts(ageApplicants));
+ if(!annual){
+  hourGraph(section(l,'初回LINE問い合わせ｜時間帯別','monthly-hour'));
+  countBars(section(l,'求人媒体別｜問い合わせ数','monthly-count'),mediaNow,lineReady);
+  countBars(section(l,'求人媒体別｜面接実施数','monthly-count'),attendedMedia,storeMetricsSheetsStatus==='ready'&&interviewReady);
+  comparisons(section(r,'求人媒体別｜面接実施数・前月比較','monthly-compare'),attendedMedia,priorMedia,currentAttendanceAvailable,priorAttendanceAvailable,'先月','当月');
+  ageGraph(section(r,'問い合わせ者｜年齢分布','monthly-age'));
+ }else{
+  annualTrend(section(l,'問い合わせ・面接実施｜12か月推移','annual-trend'));
+  countBars(section(l,'求人媒体別｜年間問い合わせ数','annual-count'),annualInquiryMedia,lineReady);
+  countBars(section(l,'求人媒体別｜年間面接実施数','annual-count'),annualMedia,storeMetricsSheetsStatus==='ready'&&interviewReady);
+  comparisons(section(r,'求人媒体別｜面接実施数・前年比較','annual-compare'),annualMedia,previousAnnualMedia,storeMetricsSheetsStatus==='ready'&&interviewReady,storeMetricsSheetsStatus==='ready'&&interviewReady&&previousAnnualMediaRaw.size>0,'前年','当年');
+  ageGraph(section(r,'問い合わせ者｜年間年齢分布','annual-age'));
+ }
+ root.replaceChildren(dash);
+
 
 
 }
