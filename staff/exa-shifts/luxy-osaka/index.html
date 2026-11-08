@@ -500,6 +500,14 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
  .therapist-detail-controls .interview-search-row button{padding:6px 9px}
 }
 
+
+.therapist-detail-controls .interview-scroll-select{display:block;width:100%;min-width:0;max-height:145px;overflow-y:auto;border:1px solid #bfcee0;border-radius:7px;padding:3px;background:#fff;font-size:12px;color:#213a53}
+.therapist-detail-controls .interview-scroll-select option{padding:5px 7px;line-height:1.4}
+
+.therapist-detail-heading{display:flex;align-items:center!important;gap:8px;flex-wrap:nowrap!important}
+.therapist-detail-heading #residencyInfo{flex:1;min-width:0;overflow-wrap:anywhere}
+.therapist-detail-heading .therapist-header-close{margin-left:auto;flex-shrink:0;font-size:12px;padding:7px 11px}
+@media(max-width:680px){.therapist-detail-heading{flex-wrap:wrap!important}.therapist-detail-heading .therapist-header-close{margin-left:auto}}
 </style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script><style id="staff-readonly-shift-v1">
  body.staff-readonly #exaSync,body.staff-readonly #autoSync,body.staff-readonly #unscheduledAdd,
  body.staff-readonly #csvImport,body.staff-readonly #serverTest,body.staff-readonly #residencySave,
@@ -553,7 +561,7 @@ header.lg-common-header .lg-header-home{font-size:17px!important;font-weight:700
 <div id="residencyModal" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="residencyTitle">
 <div id="residencyShade" class="day-modal-shade"></div>
 <div class="panel residency-dialog therapist-detail-dialog">
- <div class="therapist-detail-heading"><h2 id="residencyTitle">セラピスト詳細</h2><span id="residencyInfo"></span></div>
+ <div class="therapist-detail-heading"><h2 id="residencyTitle">セラピスト詳細</h2><span id="residencyInfo"></span><button id="residencyCancel" class="therapist-header-close" type="button">閉じる</button></div>
  <div class="therapist-detail-grid">
   <div class="therapist-photo-pane">
    <div class="therapist-photo-frame"><img id="therapistPhoto" alt="セラピスト管理用画像" class="hide"><span id="therapistPhotoEmpty">画像未登録</span></div>
@@ -566,8 +574,7 @@ header.lg-common-header .lg-header-home{font-size:17px!important;font-weight:700
     <p id="personRegistryState" class="muted">確認中…</p>
     <button id="interviewLinkOpen" type="button" class="hide">Interviewを選択</button>
     <div id="interviewLinkPanel" class="hide">
-     <div class="row interview-search-row"><input id="interviewSearchInput" type="search" placeholder="氏名・源氏名で検索" aria-label="Interview検索"><button type="button" id="interviewSearchButton">検索</button></div>
-     <div id="interviewResults" class="interview-results" aria-live="polite"></div>
+     <select id="interviewResults" class="interview-scroll-select" size="6" aria-label="Interview一覧（スクロールして選択）"><option value="">読み込み中…</option></select>
      <button id="interviewLinkConfirm" type="button" class="primary hide">紐づけ保存</button>
     </div>
    </div>
@@ -611,7 +618,7 @@ header.lg-common-header .lg-header-home{font-size:17px!important;font-weight:700
    </div>
   </div>
  </div>
- <div class="therapist-detail-footer"><label class="therapist-photo-action" for="therapistPhotoInput">画像編集</label><button id="residencyCancel" type="button">閉じる</button></div>
+ <div class="therapist-detail-footer"><label class="therapist-photo-action" for="therapistPhotoInput">画像編集</label></div>
 </div>
 </div>
 <div id="countModal" class="day-modal hide" role="dialog" aria-modal="true"><div id="countShade" class="day-modal-shade"></div><div class="panel count-panel"><h2 id="countTitle">接客本数</h2><p class="muted">当欠は0本とは別に記録します。</p><select id="countSelect" size="8"><option value="absent">当欠</option><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select><div class="row space"><button id="countCancel">キャンセル</button><button id="countConfirm" class="primary">確定</button></div></div></div><div id="dayPanel" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="dayTitle"><div class="day-modal-shade" id="dayBackdrop"></div><div class="day-modal-content panel"><div class="row space"><div class="timeline-heading"><h2 id="dayTitle">日別タイムチャート</h2><strong id="dayHeadcount" class="day-headcount"></strong></div><button id="closeDay" type="button" aria-label="閉じる">閉じる ×</button></div><div id="timeline"></div></div></div>
@@ -960,7 +967,6 @@ async function loadPersonRegistry(exaId){
  $("interviewLinkPanel").classList.add("hide");
  $("interviewLinkConfirm").classList.add("hide");
  $("interviewResults").replaceChildren();
- $("interviewSearchInput").value="";
  $("personRegistryState").textContent="面接情報を確認中…";
  try{
   const allowed=await client.rpc("can_link_therapist_interview");
@@ -990,58 +996,41 @@ async function loadPersonRegistry(exaId){
   }else{
    $("personRegistryState").textContent="";
    $("interviewLinkPanel").classList.remove("hide");
+   void loadInterviewOptions(exaId,request);
   }
  }catch(e){
   if(request!==registryRequest)return;
   $("personRegistryState").textContent="面接情報の確認に失敗しました："+(e.message||String(e));
  }
 }
-$("interviewLinkOpen").onclick=()=>{
- $("interviewLinkPanel").classList.toggle("hide");
- if(!$("interviewLinkPanel").classList.contains("hide"))$("interviewSearchInput").focus();
-};
-async function searchInterview(){
- if(!authorized||!registryAdmin||!editingResidency)return;
- const term=$("interviewSearchInput").value.trim();
- selectedInterviewId=null;$("interviewLinkConfirm").classList.add("hide");
+async function loadInterviewOptions(exaId,request){
  const out=$("interviewResults");out.replaceChildren();
- if(term.length<2){out.textContent="2文字以上入力して検索してください。";return;}
- const cleaned=term.replace(/[%_,().\\]/g,"").slice(0,60);
- if(cleaned.length<2){out.textContent="検索文字を確認してください。";return;}
- const currentExa=editingResidency.exaId,request=registryRequest;
- out.textContent="検索しています…";
- const pattern="%"+cleaned+"%";
+ const loading=document.createElement("option");loading.textContent="読み込み中…";loading.value="";out.appendChild(loading);
+ searchInterviewItems=[];selectedInterviewId=null;
  try{
-  const query=client.from("interview_applicants")
-   .select("id,name,kana,stage_name,phone,shop,hire_shop,status,submitted_at")
-   .or("name.ilike."+pattern+",kana.ilike."+pattern+",stage_name.ilike."+pattern+",phone.ilike."+pattern)
-   .order("submitted_at",{ascending:false}).limit(30);
-  const result=await query;
-  if(result.error)throw result.error;
-  if(request!==registryRequest||editingResidency?.exaId!==currentExa)return;
-  searchInterviewItems=result.data||[];
-  out.replaceChildren();
-  if(!searchInterviewItems.length){out.textContent="一致する面接シートはありません。";return;}
-  searchInterviewItems.forEach(item=>{
-   const b=document.createElement("button");
-   b.type="button";b.className="interview-result";
-   const name=document.createElement("strong");name.textContent=item.name||"氏名未登録";b.appendChild(name);
-   const detail=document.createElement("small");
-   const phone=item.phone?("電話末尾："+String(item.phone).slice(-4)):"電話未登録";
-   detail.textContent=[item.kana,item.stage_name?("源氏名："+item.stage_name):"",item.hire_shop||item.shop||"店舗未登録",item.status||"状態未登録",phone].filter(Boolean).join("／");
-   b.appendChild(detail);
-   b.onclick=()=>{
-    selectedInterviewId=item.id;
-    out.querySelectorAll(".interview-result").forEach(el=>el.classList.remove("selected"));
-    b.classList.add("selected");
-    $("interviewLinkConfirm").classList.remove("hide");
-   };
-   out.appendChild(b);
-  });
- }catch(e){if(request===registryRequest)out.textContent="検索失敗："+(e.message||String(e));}
+  const collected=[];
+  for(let offset=0;offset<5000;offset+=500){
+   const result=await client.from("interview_applicants").select("id,name,kana,stage_name,phone,shop,hire_shop,status,submitted_at").order("submitted_at",{ascending:false}).range(offset,offset+499);
+   if(result.error)throw result.error;
+   if(request!==registryRequest||editingResidency?.exaId!==exaId)return;
+   collected.push(...(result.data||[]));
+   if(!result.data||result.data.length<500)break;
+  }
+  if(request!==registryRequest||editingResidency?.exaId!==exaId)return;
+  searchInterviewItems=collected;out.replaceChildren();
+  if(!collected.length){const option=document.createElement("option");option.value="";option.textContent="候補なし";out.appendChild(option);return;}
+  for(const item of collected){
+   const option=document.createElement("option");option.value=String(item.id);
+   option.textContent=[item.name||"氏名未登録",item.stage_name||"",item.hire_shop||item.shop||"",item.status||""].filter(Boolean).join(" / ");out.appendChild(option);
+  }
+  out.selectedIndex=-1;
+ }catch(e){if(request!==registryRequest)return;out.replaceChildren();const option=document.createElement("option");option.value="";option.textContent="一覧取得失敗："+(e.message||String(e));out.appendChild(option);}
 }
-$("interviewSearchButton").onclick=searchInterview;
-$("interviewSearchInput").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();searchInterview();}};
+$("interviewResults").onchange=()=>{
+ const id=$("interviewResults").value;
+ selectedInterviewId=searchInterviewItems.find(x=>String(x.id)===id)?.id||null;
+ $("interviewLinkConfirm").classList.toggle("hide",!selectedInterviewId);
+};
 $("interviewLinkConfirm").onclick=async()=>{
  if(!authorized||!registryAdmin||linkingInterview||!editingResidency||!selectedInterviewId)return;
  const exaId=editingResidency.exaId,exaName=editingResidency.name;
