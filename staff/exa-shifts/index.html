@@ -481,6 +481,25 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 .therapist-detail-footer #residencyCancel{min-width:100px}
 #therapistPhotoStatus{display:none!important}
 @media(max-width:680px){.therapist-detail-dialog{padding:13px!important}.therapist-detail-heading #residencyTitle,.therapist-detail-heading #residencyInfo{font-size:15px!important}.therapist-detail-grid{grid-template-columns:minmax(108px,.75fr) minmax(0,1.25fr)!important;gap:10px!important}.therapist-detail-controls .person-registry{padding:8px!important}.therapist-category-row{flex-wrap:wrap}.therapist-category-row button{width:100%}.therapist-survey-stats,.therapist-performance-stats{gap:5px}.therapist-stat{padding:7px 6px}.therapist-stat-value{font-size:18px}.therapist-stat-label{font-size:10px}.therapist-photo-frame{aspect-ratio:3/4!important}.therapist-detail-footer{margin-top:9px}}
+
+/* Reduce Interview/working-category width; give photo more room */
+@media(min-width:681px){
+ .therapist-detail-dialog{width:min(820px,96vw)!important}
+ .therapist-detail-grid{grid-template-columns:minmax(0,1fr) 315px!important;gap:18px!important}
+ .therapist-detail-controls .person-registry{padding:9px 10px!important}
+ .therapist-category-row{gap:6px}
+ .therapist-category-row button{padding:8px 9px;font-size:12px}
+ .therapist-detail-controls .interview-search-row input{padding:7px 8px}
+ .therapist-detail-controls .interview-search-row button{padding:7px 9px}
+ .therapist-detail-controls #personRegistryState{margin:3px 0!important}
+}
+@media(max-width:680px){
+ .therapist-detail-grid{grid-template-columns:minmax(0,1fr) minmax(190px,1fr)!important}
+ .therapist-detail-controls .interview-search-row{flex-wrap:wrap!important}
+ .therapist-detail-controls .interview-search-row input{width:100%;font-size:11px}
+ .therapist-detail-controls .interview-search-row button{padding:6px 9px}
+}
+
 </style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script><style id="staff-readonly-shift-v1">
  body.staff-readonly #exaSync,body.staff-readonly #autoSync,body.staff-readonly #unscheduledAdd,
  body.staff-readonly #csvImport,body.staff-readonly #serverTest,body.staff-readonly #residencySave,
