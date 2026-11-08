@@ -1105,7 +1105,7 @@ async function loadSurveyLink(exaId){
  const score=linked&&surveyScores.find(x=>x.sheet_person_id===linked.sheet_person_id);
  if(score){
   $("therapistSurveyCount").textContent=Number(score.response_count)+"件";
-  $("therapistSurveyScore").textContent=Number(score.response_count)>=3&&score.score_100!==null?Number(score.score_100).toFixed(1)+"点":"—";
+  $("therapistSurveyScore").textContent=Number(score.response_count)>=1&&score.score_100!==null?Number(score.score_100).toFixed(1)+"点"+(Number(score.response_count)<3?"（参考）":""):"—";
   status.textContent="";
  }else{
   status.textContent=linked?"評価データなし":"";
@@ -1196,7 +1196,7 @@ function openResidency(button){
   const matchedLink=surveyLinks.find(l=>Number(l.exa_id)===exaId);
   const matchedScore=matchedLink&&surveyScores.find(x=>x.sheet_person_id===matchedLink.sheet_person_id);
   $("therapistSurveyCount").textContent=matchedScore?Number(matchedScore.response_count)+"件":"—";
-  $("therapistSurveyScore").textContent=matchedScore&&Number(matchedScore.response_count)>=3&&matchedScore.score_100!==null?Number(matchedScore.score_100).toFixed(1)+"点":"—";
+  $("therapistSurveyScore").textContent=matchedScore&&Number(matchedScore.response_count)>=1&&matchedScore.score_100!==null?Number(matchedScore.score_100).toFixed(1)+"点"+(Number(matchedScore.response_count)<3?"（参考）":""):"—";
   $("surveyLinkOpen").classList.add("hide");$("surveyLinkPanel").classList.add("hide");
   void staffShowPhoto(exaId);
   return;
