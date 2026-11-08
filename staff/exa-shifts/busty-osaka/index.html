@@ -547,6 +547,14 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 .therapist-next-shift .therapist-next-label{font-size:12px;font-weight:700;color:#4c657c;display:block;margin-bottom:3px}
 .therapist-next-shift .therapist-next-value{font-size:23px;line-height:1.3;font-weight:800;color:#234466;font-variant-numeric:tabular-nums;display:block}
 @media(max-width:680px){.therapist-next-shift{padding:8px}.therapist-next-shift .therapist-next-value{font-size:17px}}
+
+/* Align independently framed next shift with bottom edge of photo edit button */
+.therapist-detail-dialog .therapist-detail-grid{align-items:stretch!important}
+.therapist-detail-dialog .therapist-photo-pane,
+.therapist-detail-dialog .therapist-detail-controls{display:flex!important;flex-direction:column!important;min-height:0;min-width:0}
+.therapist-detail-dialog .therapist-photo-pane .therapist-photo-edit-inline{margin-top:auto!important}
+.therapist-detail-dialog .therapist-detail-controls>.therapist-records{margin-bottom:12px!important}
+.therapist-detail-dialog .therapist-detail-controls>.therapist-next-shift{margin-top:auto!important;flex-shrink:0}
 </style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script><style id="staff-readonly-shift-v1">
  body.staff-readonly #exaSync,body.staff-readonly #autoSync,body.staff-readonly #unscheduledAdd,
  body.staff-readonly #csvImport,body.staff-readonly #serverTest,body.staff-readonly #residencySave,
@@ -654,8 +662,8 @@ header.lg-common-header .lg-header-home{font-size:17px!important;font-weight:700
      <div class="therapist-stat"><span class="therapist-stat-label">無報回数</span><span class="therapist-stat-value" id="therapistZeroDays">—</span></div>
      <div class="therapist-stat"><span class="therapist-stat-label">出勤実績</span><span class="therapist-stat-value" id="therapistAttendanceDays">—</span></div>
     </div>
-    <div class="therapist-next-shift"><span class="therapist-next-label">次回出勤</span><span class="therapist-next-value" id="therapistNextShift">—</span></div>
    </div>
+   <div class="therapist-next-shift"><span class="therapist-next-label">次回出勤</span><span class="therapist-next-value" id="therapistNextShift">—</span></div>
   </div>
  </div>
  
