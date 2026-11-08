@@ -450,6 +450,37 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 .therapist-detail-dialog #therapistPhotoStatus{min-height:0;font-size:11px;margin:5px 0 0}
 @media(max-width:590px){.therapist-detail-dialog{padding:14px!important}.therapist-detail-grid{grid-template-columns:110px minmax(0,1fr)!important;gap:12px!important}.therapist-photo-frame{max-height:160px}.therapist-detail-controls .person-registry{padding:9px}.therapist-photo-action{font-size:11px!important;padding:7px 3px}.therapist-detail-controls>.row.space{gap:7px;flex-wrap:wrap}.therapist-detail-dialog #residencyInfo{margin-bottom:11px}}
 
+
+/* Compact therapist management popup, November 2026 */
+.therapist-detail-dialog{width:min(910px,96vw)!important;max-height:94vh!important;padding:20px!important}
+.therapist-detail-heading{display:flex;align-items:baseline;flex-wrap:wrap;gap:9px;margin-bottom:15px}
+.therapist-detail-heading #residencyTitle,.therapist-detail-heading #residencyInfo{margin:0!important;font-size:19px!important;line-height:1.4;font-weight:700;color:#213850}
+.therapist-detail-heading #residencyInfo{font-size:19px!important;color:#355c80}
+.therapist-detail-grid{grid-template-columns:minmax(245px,0.85fr) minmax(330px,1.15fr)!important;gap:20px!important}
+.therapist-photo-frame{max-height:none!important;aspect-ratio:3/4!important}
+.therapist-photo-pane .therapist-photo-action{display:none!important}
+.therapist-detail-controls .person-registry{margin-bottom:10px!important;padding:11px 13px!important}
+.therapist-detail-controls .person-registry p{font-size:12px}
+.therapist-detail-controls #interviewLinkPanel:not(.hide){margin-top:9px}
+.therapist-detail-controls #interviewResults{max-height:120px;overflow:auto}
+.therapist-detail-controls #interviewLinkConfirm{margin-top:6px}
+.therapist-section-title{font-weight:700;font-size:13px;color:#27486c;margin-bottom:7px}
+.therapist-category-row{display:flex;align-items:center;gap:9px}
+.therapist-category-row select{flex:1;min-width:0}
+.therapist-category-row button{flex-shrink:0;white-space:nowrap}
+.therapist-survey-stats,.therapist-performance-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.therapist-stat{background:#f1f6fc;border:1px solid #d8e4f0;border-radius:9px;padding:10px 11px;min-width:0}
+.therapist-stat-label{display:block;font-size:12px;color:#5c7189}
+.therapist-stat-value{display:block;font-size:24px;font-weight:800;color:#214d78;line-height:1.45;font-variant-numeric:tabular-nums}
+.therapist-stat-note{display:block;font-size:10px;color:#75869a}
+.therapist-info-status{font-size:11px;color:#657c94;margin-top:4px}
+.therapist-detail-controls .therapist-evaluation{margin-top:10px}
+.therapist-detail-controls .therapist-records{margin-top:10px}
+.therapist-detail-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px}
+.therapist-detail-footer .therapist-photo-action{display:inline-block;margin:0;min-width:140px}
+.therapist-detail-footer #residencyCancel{min-width:100px}
+#therapistPhotoStatus{display:none!important}
+@media(max-width:680px){.therapist-detail-dialog{padding:13px!important}.therapist-detail-heading #residencyTitle,.therapist-detail-heading #residencyInfo{font-size:15px!important}.therapist-detail-grid{grid-template-columns:minmax(108px,.75fr) minmax(0,1.25fr)!important;gap:10px!important}.therapist-detail-controls .person-registry{padding:8px!important}.therapist-category-row{flex-wrap:wrap}.therapist-category-row button{width:100%}.therapist-survey-stats,.therapist-performance-stats{gap:5px}.therapist-stat{padding:7px 6px}.therapist-stat-value{font-size:18px}.therapist-stat-label{font-size:10px}.therapist-photo-frame{aspect-ratio:3/4!important}.therapist-detail-footer{margin-top:9px}}
 </style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script><style id="staff-readonly-shift-v1">
  body.staff-readonly #exaSync,body.staff-readonly #autoSync,body.staff-readonly #unscheduledAdd,
  body.staff-readonly #csvImport,body.staff-readonly #serverTest,body.staff-readonly #residencySave,
@@ -503,54 +534,67 @@ header.lg-common-header .lg-header-home{font-size:17px!important;font-weight:700
 <div id="residencyModal" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="residencyTitle">
 <div id="residencyShade" class="day-modal-shade"></div>
 <div class="panel residency-dialog therapist-detail-dialog">
-<h2 id="residencyTitle">セラピスト詳細</h2>
-<p id="residencyInfo" class="muted"></p>
-<div class="therapist-detail-grid">
- <div class="therapist-photo-pane">
-  <div class="therapist-photo-frame"><img id="therapistPhoto" alt="セラピスト管理用画像" class="hide"><span id="therapistPhotoEmpty">画像未登録</span></div>
-  <label class="therapist-photo-action" for="therapistPhotoInput">画像を変更</label>
-  <input id="therapistPhotoInput" type="file" accept="image/jpeg,image/png,image/webp" class="hide">
-  <p id="therapistPhotoStatus" class="muted" aria-live="polite"></p>
- </div>
- <div class="therapist-detail-controls">
-  <div class="person-registry interview-match">
-   <strong>面接情報</strong>
-   <p id="personRegistryState" class="muted">面接情報を確認中…</p>
-   <button id="interviewLinkOpen" type="button" class="hide">面接情報と紐づける</button>
-   <div id="interviewLinkPanel" class="hide">
-    <label for="interviewSearchInput">Interviewを検索</label>
-    <div class="row interview-search-row"><input id="interviewSearchInput" type="search" placeholder="本名・フリガナ・源氏名・電話番号"><button type="button" id="interviewSearchButton">検索</button></div>
-    
-    <div id="interviewResults" class="interview-results" aria-live="polite"></div>
-    <button id="interviewLinkConfirm" type="button" class="primary hide">選択した面接情報と紐づける</button>
-   </div>
-   
+ <div class="therapist-detail-heading"><h2 id="residencyTitle">セラピスト詳細</h2><span id="residencyInfo"></span></div>
+ <div class="therapist-detail-grid">
+  <div class="therapist-photo-pane">
+   <div class="therapist-photo-frame"><img id="therapistPhoto" alt="セラピスト管理用画像" class="hide"><span id="therapistPhotoEmpty">画像未登録</span></div>
+   <input id="therapistPhotoInput" type="file" accept="image/jpeg,image/png,image/webp" class="hide">
+   <p id="therapistPhotoStatus" class="muted" aria-live="polite"></p>
   </div>
-  <div class="person-registry interview-match">
-   <strong>アンケート評価</strong>
-   <p id="surveyLinkState" class="muted">評価データを確認中…</p>
-   <button id="surveyLinkOpen" type="button" class="hide">アンケートIDを紐づける</button>
-   <div id="surveyLinkPanel" class="hide">
-    <label for="surveyPersonChoice">スプレッドシートの管理ID／源氏名</label>
-    <select id="surveyPersonChoice"><option value="">選択してください</option></select>
-    
-    <button id="surveyLinkSave" type="button" class="primary">本人確認して紐づける</button>
+  <div class="therapist-detail-controls">
+   <div class="person-registry interview-match">
+    <strong>Interview</strong>
+    <p id="personRegistryState" class="muted">確認中…</p>
+    <button id="interviewLinkOpen" type="button" class="hide">Interviewを選択</button>
+    <div id="interviewLinkPanel" class="hide">
+     <div class="row interview-search-row"><input id="interviewSearchInput" type="search" placeholder="氏名・源氏名で検索" aria-label="Interview検索"><button type="button" id="interviewSearchButton">検索</button></div>
+     <div id="interviewResults" class="interview-results" aria-live="polite"></div>
+     <button id="interviewLinkConfirm" type="button" class="primary hide">紐づけ保存</button>
+    </div>
+   </div>
+   <div class="person-registry">
+    <div class="therapist-section-title">在籍区分</div>
+    <div class="therapist-category-row">
+     <select id="residencyChoice" aria-label="在籍区分">
+      <option value="unclassified" disabled>区分未判定</option>
+      <option value="provisional_hidden">仮登録</option>
+      <option value="pending_documents">未入店</option>
+      <option value="real_working">在籍実働</option>
+      <option value="long_leave">長期休暇</option>
+      <option value="dummy_use">ダミー使用</option>
+     </select>
+     <button id="residencySave" class="primary" type="button">区分保存</button>
+    </div>
+   </div>
+   <div class="person-registry therapist-evaluation">
+    <strong>アンケート評価</strong>
+    <div class="therapist-survey-stats">
+     <div class="therapist-stat"><span class="therapist-stat-label">回答数</span><span class="therapist-stat-value" id="therapistSurveyCount">—</span></div>
+     <div class="therapist-stat"><span class="therapist-stat-label">評価点</span><span class="therapist-stat-value" id="therapistSurveyScore">—</span></div>
+    </div>
+    <p id="surveyLinkState" class="therapist-info-status">確認中…</p>
+    <button id="surveyLinkOpen" type="button" class="hide">アンケートIDを紐づける</button>
+    <div id="surveyLinkPanel" class="hide">
+     <label for="surveyPersonChoice">管理ID／源氏名</label>
+     <select id="surveyPersonChoice"><option value="">選択してください</option></select>
+     <button id="surveyLinkSave" type="button" class="primary">紐づけ保存</button>
+    </div>
+   </div>
+   <div class="person-registry therapist-records">
+    <strong>出勤実績</strong>
+    <div class="therapist-performance-stats">
+     <div class="therapist-stat"><span class="therapist-stat-label">平均稼働（本／出勤日）</span><span class="therapist-stat-value" id="therapistAverageWork">—</span></div>
+     <div class="therapist-stat"><span class="therapist-stat-label">当欠率</span><span class="therapist-stat-value" id="therapistAbsenceRate">—</span></div>
+     <div class="therapist-stat"><span class="therapist-stat-label">無報回数（0本の日）</span><span class="therapist-stat-value" id="therapistZeroDays">—</span></div>
+     <div class="therapist-stat"><span class="therapist-stat-label">出勤実績</span><span class="therapist-stat-value" id="therapistAttendanceDays">—</span></div>
+    </div>
+    <span class="therapist-stat-note">記録済みの出勤実績から算出（当欠率＝当欠÷出勤実績と当欠の合計）</span>
    </div>
   </div>
-  <label for="residencyChoice">出勤管理区分</label>
-  <select id="residencyChoice">
-   <option value="unclassified" disabled>区分未判定</option>
-   <option value="provisional_hidden">仮登録</option>
-   <option value="pending_documents">未入店</option>
-   <option value="real_working">在籍実働</option>
-   <option value="long_leave">長期休暇</option>
-   <option value="dummy_use">ダミー使用</option>
-  </select>
-  
-  <div class="row space"><button id="residencyCancel" type="button">閉じる</button><button id="residencySave" class="primary" type="button">区分を保存</button></div>
  </div>
+ <div class="therapist-detail-footer"><label class="therapist-photo-action" for="therapistPhotoInput">画像編集</label><button id="residencyCancel" type="button">閉じる</button></div>
 </div>
-</div></div>
+</div>
 <div id="countModal" class="day-modal hide" role="dialog" aria-modal="true"><div id="countShade" class="day-modal-shade"></div><div class="panel count-panel"><h2 id="countTitle">接客本数</h2><p class="muted">当欠は0本とは別に記録します。</p><select id="countSelect" size="8"><option value="absent">当欠</option><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select><div class="row space"><button id="countCancel">キャンセル</button><button id="countConfirm" class="primary">確定</button></div></div></div><div id="dayPanel" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="dayTitle"><div class="day-modal-shade" id="dayBackdrop"></div><div class="day-modal-content panel"><div class="row space"><div class="timeline-heading"><h2 id="dayTitle">日別タイムチャート</h2><strong id="dayHeadcount" class="day-headcount"></strong></div><button id="closeDay" type="button" aria-label="閉じる">閉じる ×</button></div><div id="timeline"></div></div></div>
 </main><footer>EXA管理ページの登録内容は変更しません。接客本数のみSupabaseへ保存します。</footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.10/dist/umd/supabase.min.js"></script>
@@ -820,7 +864,7 @@ async function showTherapistPhoto(exaId){
   if(request!==photoRequest)return;
   if(!data){
    $("therapistPhotoEmpty").textContent="画像未登録";
-   $("therapistPhotoStatus").textContent="画像を選択すると、このスタッフ専用画面に登録されます。";
+   $("therapistPhotoStatus").textContent="";
    return;
   }
   const signed=await client.storage.from(PHOTO_BUCKET).createSignedUrl(data.storage_path,120);
@@ -916,8 +960,8 @@ async function loadPersonRegistry(exaId){
   }else if(!registryAdmin){
    $("personRegistryState").textContent="面接情報：未紐づけ（紐づけ操作は指定管理者のみ）";
   }else{
-   $("personRegistryState").textContent="面接情報：未紐づけ";
-   $("interviewLinkOpen").classList.remove("hide");
+   $("personRegistryState").textContent="未紐づけ";
+   $("interviewLinkPanel").classList.remove("hide");
   }
  }catch(e){
   if(request!==registryRequest)return;
@@ -992,12 +1036,15 @@ async function loadSurveyLink(exaId){
  const status=$("surveyLinkState"),btn=$("surveyLinkOpen"),panel=$("surveyLinkPanel");
  panel.classList.add("hide");btn.classList.add("hide");
  status.textContent="評価情報を確認中…";
+ $("therapistSurveyCount").textContent="—";$("therapistSurveyScore").textContent="—";
  const linked=surveyLinks.find(x=>x.exa_id===exaId);
  const score=linked&&surveyScores.find(x=>x.sheet_person_id===linked.sheet_person_id);
  if(score){
-  status.textContent=score.sheet_person_id+"｜"+(score.rose_stage_name||"源氏名なし")+"｜回答 "+score.response_count+"件｜"+(score.response_count>=4&&score.score_100!==null?Number(score.score_100).toFixed(1)+"点":"4件未満・点数非表示");
+  $("therapistSurveyCount").textContent=Number(score.response_count)+"件";
+  $("therapistSurveyScore").textContent=Number(score.response_count)>=4&&score.score_100!==null?Number(score.score_100).toFixed(1)+"点":"—";
+  status.textContent=score.rose_stage_name||"";
  }else{
-  status.textContent=linked?"評価データを取得できません":"アンケート評価：未紐づけ";
+  status.textContent=linked?"評価データなし":"未紐づけ";
  }
  try{
   const allowed=await client.rpc("can_link_therapist_interview");
@@ -1033,6 +1080,20 @@ $("surveyLinkSave").onclick=async()=>{
  }catch(e){showMsg("アンケート紐づけ失敗："+(e.message||String(e)),true)}
  finally{button.disabled=false}
 };
+
+function renderTherapistPerformance(exaId){
+ const rows=historyPerformances.filter(p=>Number(p.exa_id)===Number(exaId));
+ const eligible=rows.filter(p=>p.attendance_status==="absent"||(p.customer_count!==null&&p.customer_count!==undefined&&Number.isFinite(Number(p.customer_count))));
+ const absent=eligible.filter(p=>p.attendance_status==="absent");
+ const worked=eligible.filter(p=>p.attendance_status!=="absent");
+ const count=worked.length;
+ const avg=count?worked.reduce((n,p)=>n+Number(p.customer_count),0)/count:null;
+ const zero=worked.filter(p=>Number(p.customer_count)===0).length;
+ $("therapistAverageWork").textContent=avg===null?"—":avg.toFixed(1);
+ $("therapistAbsenceRate").textContent=eligible.length?(absent.length/eligible.length*100).toFixed(1)+"%":"—";
+ $("therapistZeroDays").textContent=eligible.length?zero+"回":"—";
+ $("therapistAttendanceDays").textContent=eligible.length?count+"日":"—";
+}
 let editingResidency=null;
 function openResidency(button){
  const exaId=Number(button.dataset.staffId);
@@ -1040,12 +1101,13 @@ function openResidency(button){
  if(!person)return;
  editingResidency={exaId,old:person.operating_category,name:person.stage_name};
  $("residencyTitle").textContent="セラピスト詳細";
- $("residencyInfo").textContent=person.stage_name+"（EXA ID："+exaId+"）／区分："+({unclassified:"未判定",provisional_hidden:"仮登録",pending_documents:"未入店（書類未完備）",real_working:"在籍実働",real_outside:"実働外（旧区分）",long_leave:"長期休暇",dummy_use:"ダミー使用",not_used:"対象外"}[person.operating_category]||"未設定");
+ $("residencyInfo").textContent="｜"+person.stage_name+" / EXA ID："+exaId+" / "+({unclassified:"未判定",provisional_hidden:"仮登録",pending_documents:"未入店",real_working:"在籍実働",real_outside:"実働外",long_leave:"長期休暇",dummy_use:"ダミー使用",not_used:"対象外"}[person.operating_category]||"未設定");
  $("residencyChoice").value=["provisional_hidden","pending_documents","real_working","long_leave","dummy_use"].includes(person.operating_category)?person.operating_category:"unclassified";
  $("residencyModal").classList.remove("hide");
+ renderTherapistPerformance(exaId);
  if(staffReadOnly){
   $("residencyChoice").disabled=true;
-  $("personRegistryState").textContent="閲覧専用（面接情報の変更不可）";
+  $("personRegistryState").textContent="閲覧専用";
   $("surveyLinkState").textContent="閲覧専用";
   void staffShowPhoto(exaId);
   return;
