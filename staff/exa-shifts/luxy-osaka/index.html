@@ -1086,7 +1086,7 @@ async function loadSurveyLink(exaId){
  if(score){
   $("therapistSurveyCount").textContent=Number(score.response_count)+"件";
   $("therapistSurveyScore").textContent=Number(score.response_count)>=4&&score.score_100!==null?Number(score.score_100).toFixed(1)+"点":"—";
-  status.textContent=score.rose_stage_name||"";
+  status.textContent="";
  }else{
   status.textContent=linked?"評価データなし":"";
  }
