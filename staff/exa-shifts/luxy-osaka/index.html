@@ -813,8 +813,8 @@ client.from("exa_shift_performance").select("exa_id,work_date,customer_count,att
 client.from("exa_shift_sync_runs").select("finished_at,record_count,mode").eq("store_code","luxy").eq("state","success").order("finished_at",{ascending:false}).limit(1),
 client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code","luxy").lt("work_date",today()).limit(5000),
 client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_dummy_shift,is_pre_off").eq("store_code","luxy").order("work_date").limit(5000),
-Promise.resolve({data:[],error:null}),
-Promise.resolve({data:[],error:null}),
+client.from("exa_survey_scores").select("sheet_person_id,rose_stage_name,response_count,score_100,synced_at").like("sheet_person_id","LUXY:%").limit(1000),
+client.from("exa_survey_links").select("exa_id,sheet_person_id").eq("store_code","luxy"),
 client.from("exa_shift_therapists").select("exa_id").eq("store_code","luxy")
 ]);
 const [a,b,c,d,e,future,sv,sl,roster]=responses;
@@ -1105,7 +1105,7 @@ $("interviewLinkConfirm").onclick=async()=>{
 // Survey scores are a read-only snapshot of the connected sheet's ID tab.
 // EXA and sheet IDs are only joined by a manager-confirmed mapping.
 async function loadSurveyLink(exaId){
- if(!surveyScores.length){$("surveyLinkPanel").classList.add("hide");$("surveyLinkOpen").classList.add("hide");$("surveyLinkState").textContent="LUXY OSAKA のアンケート連携は未設定です。";return;}
+
  const request=++surveyRequest;
  const status=$("surveyLinkState"),btn=$("surveyLinkOpen"),panel=$("surveyLinkPanel");
  panel.classList.add("hide");btn.classList.add("hide");
