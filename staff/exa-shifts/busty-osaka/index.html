@@ -531,6 +531,22 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
  border:1px solid #bfcee0;border-radius:7px;background:#fff;
 }
 .therapist-detail-controls #interviewResults.interview-scroll-select option{padding:3px}
+
+/* Therapist detail: meaningful residency colors and next scheduled shift */
+.therapist-detail-dialog{--detail-accent:#2e7f62;--detail-soft:#eaf6ef;border-top:5px solid var(--detail-accent)!important}
+.therapist-detail-dialog[data-detail-state="real_working"]{--detail-accent:#268466;--detail-soft:#e9f6ef}
+.therapist-detail-dialog[data-detail-state="real_outside"]{--detail-accent:#8895a5;--detail-soft:#edf0f3}
+.therapist-detail-dialog[data-detail-state="provisional_hidden"]{--detail-accent:#ae8540;--detail-soft:#fbf2e2}
+.therapist-detail-dialog[data-detail-state="pending_documents"]{--detail-accent:#548ab7;--detail-soft:#eaf2fa}
+.therapist-detail-dialog[data-detail-state="dummy_use"],.therapist-detail-dialog[data-detail-state="not_used"]{--detail-accent:#9a6a83;--detail-soft:#f6edf2}
+.therapist-detail-dialog[data-detail-state="long_leave"]{--detail-accent:#8877af;--detail-soft:#f1eefa}
+.therapist-detail-dialog #residencyInfo{color:var(--detail-accent)!important}
+.therapist-detail-dialog .therapist-photo-frame{border:2px solid var(--detail-accent)!important}
+.therapist-detail-dialog .therapist-photo-edit-inline{border-color:var(--detail-accent)!important}
+.therapist-next-shift{margin-top:10px;background:var(--detail-soft);border:1px solid var(--detail-accent);border-radius:9px;padding:12px 13px}
+.therapist-next-shift .therapist-next-label{font-size:12px;font-weight:700;color:#4c657c;display:block;margin-bottom:3px}
+.therapist-next-shift .therapist-next-value{font-size:23px;line-height:1.3;font-weight:800;color:#234466;font-variant-numeric:tabular-nums;display:block}
+@media(max-width:680px){.therapist-next-shift{padding:8px}.therapist-next-shift .therapist-next-value{font-size:17px}}
 </style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script><style id="staff-readonly-shift-v1">
  body.staff-readonly #exaSync,body.staff-readonly #autoSync,body.staff-readonly #unscheduledAdd,
  body.staff-readonly #csvImport,body.staff-readonly #serverTest,body.staff-readonly #residencySave,
@@ -638,7 +654,7 @@ header.lg-common-header .lg-header-home{font-size:17px!important;font-weight:700
      <div class="therapist-stat"><span class="therapist-stat-label">無報回数</span><span class="therapist-stat-value" id="therapistZeroDays">—</span></div>
      <div class="therapist-stat"><span class="therapist-stat-label">出勤実績</span><span class="therapist-stat-value" id="therapistAttendanceDays">—</span></div>
     </div>
-    
+    <div class="therapist-next-shift"><span class="therapist-next-label">次回出勤</span><span class="therapist-next-value" id="therapistNextShift">—</span></div>
    </div>
   </div>
  </div>
@@ -1101,6 +1117,25 @@ function renderTherapistPerformance(exaId){
  $("therapistZeroDays").textContent=eligible.length?zero+"回":"—";
  $("therapistAttendanceDays").textContent=eligible.length?count+"日":"—";
 }
+
+function renderTherapistNextShift(exaId,person){
+ const actual=futureShifts.filter(r=>Number(r.exa_id)===Number(exaId)&&r.work_date>=today()&&!r.is_dummy_shift&&!r.is_pre_off&&Number.isFinite(Number(r.start_minutes))&&Number.isFinite(Number(r.end_minutes)))
+ .sort((a,b)=>a.work_date.localeCompare(b.work_date)||a.start_minutes-b.start_minutes);
+ const next=actual[0];
+ const el=$("therapistNextShift");
+ if(next){
+  const date=new Date(next.work_date+"T00:00:00Z");
+  const weekday=["日","月","火","水","木","金","土"][date.getUTCDay()];
+  el.textContent=Number(next.work_date.slice(5,7))+"月"+Number(next.work_date.slice(8,10))+"日（"+weekday+"） "+shiftTime(Number(next.start_minutes))+"〜"+shiftTime(Number(next.end_minutes));
+ }else{
+  el.textContent="未定";
+ }
+ const current=person.operating_category;
+ const category=(current==="real_working"&&!actual.length)?"real_outside":current;
+ document.querySelector(".therapist-detail-dialog").dataset.detailState=category||"unclassified";
+ const statusName={real_working:"在籍実働",real_outside:"実働外",provisional_hidden:"仮登録",pending_documents:"未入店",dummy_use:"ダミー使用",long_leave:"長期休暇",unclassified:"未判定",not_used:"対象外"}[category]||"未設定";
+ $("residencyInfo").textContent="｜"+person.stage_name+" / EXA ID："+exaId+" / "+statusName;
+}
 let editingResidency=null;
 function openResidency(button){
  const exaId=Number(button.dataset.staffId);
@@ -1112,6 +1147,7 @@ function openResidency(button){
  $("residencyChoice").value=["provisional_hidden","pending_documents","real_working","long_leave","dummy_use"].includes(person.operating_category)?person.operating_category:"unclassified";
  $("residencyModal").classList.remove("hide");
  renderTherapistPerformance(exaId);
+ renderTherapistNextShift(exaId,person);
  if(staffReadOnly){
   $("residencyChoice").disabled=true;
   $("personRegistryState").textContent="閲覧専用";
