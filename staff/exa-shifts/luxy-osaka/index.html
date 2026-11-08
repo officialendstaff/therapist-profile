@@ -602,12 +602,12 @@ header.lg-common-header .lg-header-home{font-size:17px!important;font-weight:700
    <div class="person-registry therapist-records">
     <strong>出勤実績</strong>
     <div class="therapist-performance-stats">
-     <div class="therapist-stat"><span class="therapist-stat-label">平均稼働（本／出勤日）</span><span class="therapist-stat-value" id="therapistAverageWork">—</span></div>
+     <div class="therapist-stat"><span class="therapist-stat-label">平均稼働</span><span class="therapist-stat-value" id="therapistAverageWork">—</span></div>
      <div class="therapist-stat"><span class="therapist-stat-label">当欠率</span><span class="therapist-stat-value" id="therapistAbsenceRate">—</span></div>
-     <div class="therapist-stat"><span class="therapist-stat-label">無報回数（0本の日）</span><span class="therapist-stat-value" id="therapistZeroDays">—</span></div>
+     <div class="therapist-stat"><span class="therapist-stat-label">無報回数</span><span class="therapist-stat-value" id="therapistZeroDays">—</span></div>
      <div class="therapist-stat"><span class="therapist-stat-label">出勤実績</span><span class="therapist-stat-value" id="therapistAttendanceDays">—</span></div>
     </div>
-    <span class="therapist-stat-note">記録済みの出勤実績から算出（当欠率＝当欠÷出勤実績と当欠の合計）</span>
+    
    </div>
   </div>
  </div>
@@ -984,11 +984,11 @@ async function loadPersonRegistry(exaId){
   }
   const person=therapists.find(t=>t.exa_id===exaId);
   if(person?.residency==="dummy"){
-   $("personRegistryState").textContent="面接情報：未紐づけ（ダミー区分）";
+   $("personRegistryState").textContent="";
   }else if(!registryAdmin){
-   $("personRegistryState").textContent="面接情報：未紐づけ（紐づけ操作は指定管理者のみ）";
+   $("personRegistryState").textContent="";
   }else{
-   $("personRegistryState").textContent="未紐づけ";
+   $("personRegistryState").textContent="";
    $("interviewLinkPanel").classList.remove("hide");
   }
  }catch(e){
@@ -1073,7 +1073,7 @@ async function loadSurveyLink(exaId){
   $("therapistSurveyScore").textContent=Number(score.response_count)>=4&&score.score_100!==null?Number(score.score_100).toFixed(1)+"点":"—";
   status.textContent=score.rose_stage_name||"";
  }else{
-  status.textContent=linked?"評価データなし":"未紐づけ";
+  status.textContent=linked?"評価データなし":"";
  }
  try{
   const allowed=await client.rpc("can_link_therapist_interview");
