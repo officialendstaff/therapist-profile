@@ -506,6 +506,16 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 .therapist-detail-heading #residencyInfo{flex:1;min-width:0;overflow-wrap:anywhere}
 .therapist-detail-heading .therapist-header-close{margin-left:auto;flex-shrink:0;font-size:12px;padding:7px 11px}
 @media(max-width:680px){.therapist-detail-heading{flex-wrap:wrap!important}.therapist-detail-heading .therapist-header-close{margin-left:auto}}
+
+/* Image edit button aligns exactly with the photo column */
+@media(min-width:681px){
+ .therapist-detail-footer{display:grid!important;grid-template-columns:minmax(0,1fr) 315px!important;column-gap:18px!important}
+ .therapist-detail-footer .therapist-photo-action{display:block!important;width:100%!important;min-width:0!important;box-sizing:border-box!important}
+}
+@media(max-width:680px){
+ .therapist-detail-footer{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(190px,1fr)!important;gap:10px!important}
+ .therapist-detail-footer .therapist-photo-action{display:block!important;width:100%!important;min-width:0!important;box-sizing:border-box!important}
+}
 </style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script><style id="staff-readonly-shift-v1">
  body.staff-readonly #exaSync,body.staff-readonly #autoSync,body.staff-readonly #unscheduledAdd,
  body.staff-readonly #csvImport,body.staff-readonly #serverTest,body.staff-readonly #residencySave,
