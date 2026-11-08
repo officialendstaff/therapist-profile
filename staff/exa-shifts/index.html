@@ -884,10 +884,10 @@ html+='<tr class="'+(outside?'outside-roster':'')+'"><td class="staff-name '+cat
 const surveyId=surveyLinks.find(l=>l.exa_id===t.exa_id)?.sheet_person_id;
 const survey=surveyScores.find(x=>x.sheet_person_id===surveyId);
 const responseCount=survey?.response_count??0;
-const evaluation=responseCount>=4&&survey?.score_100!==null&&Number.isFinite(Number(survey?.score_100))?Number(survey.score_100):null;
+const evaluation=responseCount>=3&&survey?.score_100!==null&&Number.isFinite(Number(survey?.score_100))?Number(survey.score_100):null;
 const scoreClass=evaluation===null?"":evaluation>=95?"score-high":"score-low";
 const scoreText=evaluation===null?"—":evaluation.toFixed(1);
-const scoreTitle=!survey?"アンケート未連携":responseCount<=3?"回答数 "+responseCount+"件：4件未満のため点数非表示":"回答数 "+responseCount+"件／アンケート平均（100点満点）";
+const scoreTitle=!survey?"アンケート未連携":responseCount<=2?"回答数 "+responseCount+"件：3件未満のため点数非表示":"回答数 "+responseCount+"件／アンケート平均（100点満点）";
 if(staffView==="dummy"){
  const pattern=dummyPattern(t.exa_id);
  const timeButton=(v,label)=>v?'<button type="button" class="copy-exa" data-copy-exa="'+v+'" title="'+label+' '+v+' をコピー">'+v+'</button>':'—';
@@ -1105,7 +1105,7 @@ async function loadSurveyLink(exaId){
  const score=linked&&surveyScores.find(x=>x.sheet_person_id===linked.sheet_person_id);
  if(score){
   $("therapistSurveyCount").textContent=Number(score.response_count)+"件";
-  $("therapistSurveyScore").textContent=Number(score.response_count)>=4&&score.score_100!==null?Number(score.score_100).toFixed(1)+"点":"—";
+  $("therapistSurveyScore").textContent=Number(score.response_count)>=3&&score.score_100!==null?Number(score.score_100).toFixed(1)+"点":"—";
   status.textContent="";
  }else{
   status.textContent=linked?"評価データなし":"";
@@ -1140,7 +1140,7 @@ $("surveyLinkSave").onclick=async()=>{
   if(r.error)throw r.error;
   await load();
   if(editingResidency?.exaId===exaId)await loadSurveyLink(exaId);
-  showMsg("アンケートIDを紐づけました。回答4件以上の評価点のみ表示します。");
+  showMsg("アンケートIDを紐づけました。回答3件以上の評価点のみ表示します。");
  }catch(e){showMsg("アンケート紐づけ失敗："+(e.message||String(e)),true)}
  finally{button.disabled=false}
 };
