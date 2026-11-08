@@ -518,6 +518,13 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
  .therapist-detail-footer{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(190px,1fr)!important;gap:10px!important}
  .therapist-detail-footer .therapist-photo-action{display:block!important;width:100%!important;min-width:0!important;box-sizing:border-box!important}
 }
+
+/* Photo edit control belongs to the image column: exact width, no footer grid */
+.therapist-detail-dialog .therapist-photo-pane .therapist-photo-edit-inline{
+ display:block!important;width:100%!important;min-width:0!important;
+ box-sizing:border-box!important;margin:8px 0 0!important;text-align:center;
+}
+.therapist-detail-dialog .therapist-photo-pane{min-width:0}
 </style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script><style id="staff-readonly-shift-v1">
  body.staff-readonly #exaSync,body.staff-readonly #autoSync,body.staff-readonly #unscheduledAdd,
  body.staff-readonly #csvImport,body.staff-readonly #serverTest,body.staff-readonly #residencySave,
@@ -576,6 +583,7 @@ header.lg-common-header .lg-header-home{font-size:17px!important;font-weight:700
   <div class="therapist-photo-pane">
    <div class="therapist-photo-frame"><img id="therapistPhoto" alt="セラピスト管理用画像" class="hide"><span id="therapistPhotoEmpty">画像未登録</span></div>
    <input id="therapistPhotoInput" type="file" accept="image/jpeg,image/png,image/webp" class="hide">
+   <label class="therapist-photo-action therapist-photo-edit-inline" for="therapistPhotoInput">画像編集</label>
    <p id="therapistPhotoStatus" class="muted" aria-live="polite"></p>
   </div>
   <div class="therapist-detail-controls">
@@ -628,7 +636,7 @@ header.lg-common-header .lg-header-home{font-size:17px!important;font-weight:700
    </div>
   </div>
  </div>
- <div class="therapist-detail-footer"><label class="therapist-photo-action" for="therapistPhotoInput">画像編集</label></div>
+ 
 </div>
 </div>
 <div id="countModal" class="day-modal hide" role="dialog" aria-modal="true"><div id="countShade" class="day-modal-shade"></div><div class="panel count-panel"><h2 id="countTitle">接客本数</h2><p class="muted">当欠は0本とは別に記録します。</p><select id="countSelect" size="8"><option value="absent">当欠</option><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select><div class="row space"><button id="countCancel">キャンセル</button><button id="countConfirm" class="primary">確定</button></div></div></div><div id="dayPanel" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="dayTitle"><div class="day-modal-shade" id="dayBackdrop"></div><div class="day-modal-content panel"><div class="row space"><div class="timeline-heading"><h2 id="dayTitle">日別タイムチャート</h2><strong id="dayHeadcount" class="day-headcount"></strong></div><button id="closeDay" type="button" aria-label="閉じる">閉じる ×</button></div><div id="timeline"></div></div></div>
