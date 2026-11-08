@@ -432,6 +432,24 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 .shift-table tbody tr:not(.group) td.staff-name.state-unconfirmed{background:#fff2d7!important;color:#86500d!important;box-shadow:inset 4px 0 #d4a042}
 .shift-table tbody tr:not(.group) td.staff-name.state-unconfirmed .name-editor{color:#86500d!important}
 .exa-hide-note{font-size:9px;color:#ac3342;display:block;font-weight:750}
+
+/* Therapist detail compact layout */
+.therapist-detail-dialog{width:min(720px,96vw)!important;padding:20px!important}
+.therapist-detail-dialog #residencyTitle{margin:0 0 3px;font-size:19px}
+.therapist-detail-dialog #residencyInfo{margin:0 0 15px;font-size:12px}
+.therapist-detail-grid{grid-template-columns:190px minmax(0,1fr)!important;gap:18px!important}
+.therapist-photo-frame{aspect-ratio:3/4;max-height:254px}
+.therapist-photo-action{padding:8px 5px;margin-top:8px}
+.therapist-detail-controls .person-registry{padding:11px 13px;margin-bottom:10px}
+.therapist-detail-controls .person-registry strong{font-size:13px}
+.therapist-detail-controls .person-registry p{font-size:12px;margin:5px 0;line-height:1.45}
+.therapist-detail-controls>label[for="residencyChoice"]{display:block;margin:12px 0 6px;font-weight:700;font-size:13px}
+.therapist-detail-controls #residencyChoice{width:100%;margin:0}
+.therapist-detail-controls>.row.space{margin-top:14px}
+.therapist-detail-dialog #therapistPhotoStatus:empty{display:none}
+.therapist-detail-dialog #therapistPhotoStatus{min-height:0;font-size:11px;margin:5px 0 0}
+@media(max-width:590px){.therapist-detail-dialog{padding:14px!important}.therapist-detail-grid{grid-template-columns:110px minmax(0,1fr)!important;gap:12px!important}.therapist-photo-frame{max-height:160px}.therapist-detail-controls .person-registry{padding:9px}.therapist-photo-action{font-size:11px!important;padding:7px 3px}.therapist-detail-controls>.row.space{gap:7px;flex-wrap:wrap}.therapist-detail-dialog #residencyInfo{margin-bottom:11px}}
+
 </style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script><style id="staff-readonly-shift-v1">
  body.staff-readonly #exaSync,body.staff-readonly #autoSync,body.staff-readonly #unscheduledAdd,
  body.staff-readonly #csvImport,body.staff-readonly #serverTest,body.staff-readonly #residencySave,
@@ -490,9 +508,9 @@ header.lg-common-header .lg-header-home{font-size:17px!important;font-weight:700
 <div class="therapist-detail-grid">
  <div class="therapist-photo-pane">
   <div class="therapist-photo-frame"><img id="therapistPhoto" alt="セラピスト管理用画像" class="hide"><span id="therapistPhotoEmpty">画像未登録</span></div>
-  <label class="therapist-photo-action" for="therapistPhotoInput">画像を登録・差し替え</label>
+  <label class="therapist-photo-action" for="therapistPhotoInput">画像を変更</label>
   <input id="therapistPhotoInput" type="file" accept="image/jpeg,image/png,image/webp" class="hide">
-  <p id="therapistPhotoStatus" class="muted" aria-live="polite">非公開・スタッフ専用。WebPに変換して保存します。</p>
+  <p id="therapistPhotoStatus" class="muted" aria-live="polite"></p>
  </div>
  <div class="therapist-detail-controls">
   <div class="person-registry interview-match">
@@ -502,11 +520,11 @@ header.lg-common-header .lg-header-home{font-size:17px!important;font-weight:700
    <div id="interviewLinkPanel" class="hide">
     <label for="interviewSearchInput">Interviewを検索</label>
     <div class="row interview-search-row"><input id="interviewSearchInput" type="search" placeholder="本名・フリガナ・源氏名・電話番号"><button type="button" id="interviewSearchButton">検索</button></div>
-    <p class="muted">同一人物だと確認できた面接シートを選択してください。</p>
+    
     <div id="interviewResults" class="interview-results" aria-live="polite"></div>
     <button id="interviewLinkConfirm" type="button" class="primary hide">選択した面接情報と紐づける</button>
    </div>
-   <p class="muted">面接情報がないセラピストは、未紐づけのままで構いません。</p>
+   
   </div>
   <div class="person-registry interview-match">
    <strong>アンケート評価</strong>
@@ -515,7 +533,7 @@ header.lg-common-header .lg-header-home{font-size:17px!important;font-weight:700
    <div id="surveyLinkPanel" class="hide">
     <label for="surveyPersonChoice">スプレッドシートの管理ID／源氏名</label>
     <select id="surveyPersonChoice"><option value="">選択してください</option></select>
-    <p class="muted">EXA IDと管理IDは異なります。本人を確認してから確定してください。回答3件以下は評価欄に表示しません。</p>
+    
     <button id="surveyLinkSave" type="button" class="primary">本人確認して紐づける</button>
    </div>
   </div>
@@ -528,8 +546,8 @@ header.lg-common-header .lg-header-home{font-size:17px!important;font-weight:700
    <option value="long_leave">長期休暇</option>
    <option value="dummy_use">ダミー使用</option>
   </select>
-  <p class="muted">「実働外」は今後の出勤予定がない場合に自動判定します。区分変更は出勤管理内の登録内容のみ更新し、EXA本体の表示設定は変更しません。EXAの表示／非表示情報との自動同期は未接続です。</p>
-  <div class="row space"><button id="residencyCancel" type="button">閉じる</button><button id="residencySave" class="primary" type="button">区分変更を確定</button></div>
+  
+  <div class="row space"><button id="residencyCancel" type="button">閉じる</button><button id="residencySave" class="primary" type="button">区分を保存</button></div>
  </div>
 </div>
 </div></div>
