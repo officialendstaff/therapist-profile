@@ -557,6 +557,12 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 .therapist-detail-dialog .therapist-photo-pane .therapist-photo-edit-inline{margin-top:auto!important}
 .therapist-detail-dialog .therapist-detail-controls>.therapist-records{margin-bottom:12px!important}
 .therapist-detail-dialog .therapist-detail-controls>.therapist-next-shift{margin-top:auto!important;flex-shrink:0}
+
+/* Balance next-shift typography with the other detail cards */
+.therapist-detail-dialog .therapist-next-shift{padding:9px 11px!important}
+.therapist-detail-dialog .therapist-next-shift .therapist-next-label{font-size:11px!important;margin-bottom:3px!important}
+.therapist-detail-dialog .therapist-next-shift .therapist-next-value{font-size:15px!important;font-weight:700!important;line-height:1.4!important;white-space:nowrap!important;letter-spacing:-.3px!important}
+@media(max-width:680px){.therapist-detail-dialog .therapist-next-shift .therapist-next-value{font-size:12px!important;letter-spacing:-.4px!important}.therapist-detail-dialog .therapist-next-shift{padding:8px!important}}
 </style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script><style id="staff-readonly-shift-v1">
  body.staff-readonly #exaSync,body.staff-readonly #autoSync,body.staff-readonly #unscheduledAdd,
  body.staff-readonly #csvImport,body.staff-readonly #serverTest,body.staff-readonly #residencySave,
