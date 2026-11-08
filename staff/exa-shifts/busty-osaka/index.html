@@ -804,8 +804,8 @@ client.from("exa_shift_performance").select("exa_id,work_date,customer_count,att
 client.from("exa_shift_sync_runs").select("finished_at,record_count,mode").eq("store_code","busty").eq("state","success").order("finished_at",{ascending:false}).limit(1),
 client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code","busty").lt("work_date",today()).limit(5000),
 client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_dummy_shift,is_pre_off").eq("store_code","busty").order("work_date").limit(5000),
-Promise.resolve({data:[],error:null}),
-Promise.resolve({data:[],error:null}),
+client.from("exa_survey_scores").select("sheet_person_id,rose_stage_name,response_count,score_100,synced_at").like("sheet_person_id","BUSTY:%").limit(1000),
+client.from("exa_survey_links").select("exa_id,sheet_person_id").eq("store_code","busty"),
 client.from("exa_shift_therapists").select("exa_id").eq("store_code","busty")
 ]);
 const [a,b,c,d,e,future,sv,sl,roster]=responses;
@@ -1095,7 +1095,11 @@ $("interviewLinkConfirm").onclick=async()=>{
 // EXA and sheet IDs are only joined by a manager-confirmed mapping.
 async function loadSurveyLink(exaId){
  $("surveyLinkOpen").classList.add("hide");$("surveyLinkPanel").classList.add("hide");
- $("surveyLinkState").textContent="BUSTY OSAKA：アンケート評価データは未接続です。";
+ const linked=surveyLinks.find(x=>Number(x.exa_id)===Number(exaId));
+ const score=linked&&surveyScores.find(x=>x.sheet_person_id===linked.sheet_person_id);
+ $("therapistSurveyCount").textContent=score?Number(score.response_count)+"件":"—";
+ $("therapistSurveyScore").textContent=score&&Number(score.response_count)>=3&&score.score_100!==null?Number(score.score_100).toFixed(1)+"点":"—";
+ $("surveyLinkState").textContent=score?"":linked?"評価データなし":"";
 }
 $("surveyLinkOpen").onclick=()=>{$("surveyLinkPanel").classList.toggle("hide")};
 $("surveyLinkSave").onclick=async()=>{
