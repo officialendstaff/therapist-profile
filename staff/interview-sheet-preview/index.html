@@ -1687,7 +1687,8 @@ chart.append(compare);
  const annualHiring=annualInterviews.filter(r=>['採用','在籍','入店'].includes(r.status)).length;
  const annualRejected=annualInterviews.filter(r=>r.status==='不採用').length;
  const annualCancelled=annualInterviews.filter(r=>['キャンセル','無断トビ','トビ（キャンセル）'].includes(r.status)).length;
- const annualInquiryParts=applicable.map(inquiryCountForMonth);
+ const activeMonth=dateKey(new Date()).slice(0,7);
+ const annualInquiryParts=applicable.filter(k=>k<=activeMonth).map(inquiryCountForMonth);
  const annualInquiries=annualInquiryParts.some(x=>x===null)?null:annualInquiryParts.reduce((a,b)=>a+b,0);
  const annualAvailable=interviewReady&&annualInterviews.length>0;
  const displayed=annual?[
@@ -1755,7 +1756,7 @@ chart.append(compare);
  for(const a of ageApplicants){
   const first=(a.messages||[]).slice().sort((x,y)=>String(x.receivedAt||'').localeCompare(String(y.receivedAt||'')))[0];
   const message=String(first?.text||'');
-  const match=message.match(/(?:年齢|ご年齢|お歳|歳)[ \\t　]*[：:は]?\\s*(\\d{2})(?:歳|才)?/)||message.match(/(?:^|[\\s　、,])([1-6]\\d)\\s*(?:歳|才)(?:[\\s　、,]|$)/m);
+  const match=message.match(/(?:年齢|ご年齢|お歳)[ \t　]*[：:は]?\s*(\d{2})(?:歳|才)?/)||message.match(/(?:^|[\s　、,])([1-6]\d)\s*(?:歳|才)(?:[\s　、,]|$)/m);
   const age=match?Number(match[1]):NaN;
   const idx=!Number.isFinite(age)?7:age<18?7:age<20?0:age<25?1:age<30?2:age<35?3:age<40?4:age<45?5:6;
   ageCount[idx]++;
