@@ -301,6 +301,29 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
 #authLoading[hidden]{display:none!important}
 #authLoading .auth-spinner{width:33px;height:33px;border:3px solid #ffffff45;border-top-color:#fff;border-radius:50%;animation:lgChatSpin .7s linear infinite}
 @keyframes lgChatSpin{to{transform:rotate(360deg)}}
+
+/* Original rose-auth-v2 layout preserved; moderation, greeting editor, app-style unread badges */
+.lg-chat-header-actions .unread-total{display:inline-flex;align-items:center;gap:6px}
+.chat-unread-badge{display:inline-flex;min-width:21px;height:21px;padding:0 6px;align-items:center;justify-content:center;border-radius:999px;background:#d92e4a;color:#fff;font-weight:850;font-size:12px;line-height:1;font-variant-numeric:tabular-nums}
+.chat-unread-badge[hidden]{display:none!important}
+.thread.blocked{background:#f7f8fa}
+.thread.blocked .tag{background:#e9edf1;color:#65778a}
+.thread .tag.chat-unread-badge{font-size:11px;color:#fff;background:#d92e4a;border-radius:999px;min-width:19px;height:19px}
+#blockThread{font-size:11px;color:#a5304a;background:#fff1f3;border:1px solid #e5a9ba;border-radius:6px;padding:6px 10px;white-space:nowrap}
+#blockThread[data-blocked="true"]{color:#27764f;background:#e8f6ee;border-color:#a4d7b9}
+#blockThread[hidden]{display:none!important}
+#editGreeting{font-size:11px;color:#e7f4ff;background:#29466a;border:1px solid #587799;border-radius:6px;padding:7px 11px;white-space:nowrap}
+#editGreeting:hover{background:#34577e}
+#greetingDialog{border:1px solid #ccd9e6;border-radius:12px;width:min(92vw,500px);max-height:90dvh;padding:22px;box-shadow:0 20px 55px #08192e55;color:#20354e}
+#greetingDialog::backdrop{background:#111e30a6}
+#greetingForm{display:flex;flex-direction:column;gap:12px}
+#greetingForm h2{margin:0 0 4px;font-size:18px}
+#greetingForm label{font-size:12px;font-weight:750;display:flex;flex-direction:column;gap:6px}
+#greetingForm textarea,#greetingForm select{border:1px solid #cbdae8;border-radius:7px;padding:10px;width:100%;background:#fff;color:#20354e}
+#greetingForm textarea{min-height:145px;resize:vertical}
+.greeting-actions{display:flex;justify-content:flex-end;gap:8px}
+.greeting-actions button{border-radius:7px;padding:9px 14px;border:1px solid #cbd8e6}
+@media(max-width:700px){#editGreeting{padding:6px 8px;font-size:10px}#blockThread{font-size:10px;padding:6px 8px}}
 </style></head><body>
 <div id="authLoading" role="status" aria-live="polite"><span class="auth-spinner" aria-hidden="true"></span><span>管理者認証を確認中…</span></div>
 <div id="gate" class="lg-interview-login" hidden><div class="auth-card">
@@ -322,11 +345,11 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
  <p class="auth-footnote">AUTHORIZED PERSONNEL ONLY</p>
 </div></div></div>
 <div id="app" hidden>
-<header class="lg-common-header"><div class="lg-header-brand"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ戻る"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><span class="lg-header-divider"></span><img class="lg-header-section-icon" src="/therapist-profile/staff/assets/favicons/chat.svg" alt=""><strong>チャット管理</strong></div><div class="lg-chat-header-actions"><span class="unread-total" id="unreadTotal" aria-live="polite">未読 0件</span><details id="notificationSettings" class="chat-notification-settings"><summary aria-label="通知設定を開く">通知設定</summary><div class="chat-notification-panel" role="group" aria-label="チャットの通知設定"><strong>通知設定</strong><button id="pushEnable" type="button" data-enabled="false">プッシュ通知を有効化</button><button id="pushTest" type="button" disabled>通知テスト</button><button id="notifyToggle" type="button" aria-pressed="false">画面内通知音 OFF</button><p id="pushStatus" aria-live="polite">未設定</p></div></details><button id="reload" type="button">情報更新</button></div></header>
+<header class="lg-common-header"><div class="lg-header-brand"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ戻る"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><span class="lg-header-divider"></span><img class="lg-header-section-icon" src="/therapist-profile/staff/assets/favicons/chat.svg" alt=""><strong>チャット管理</strong></div><div class="lg-chat-header-actions"><span class="unread-total" id="unreadTotal" aria-live="polite">未読 <span id="unreadBadge" class="chat-unread-badge" hidden>0</span></span><button id="editGreeting" type="button">あいさつ文編集</button><details id="notificationSettings" class="chat-notification-settings"><summary aria-label="通知設定を開く">通知設定</summary><div class="chat-notification-panel" role="group" aria-label="チャットの通知設定"><strong>通知設定</strong><button id="pushEnable" type="button" data-enabled="false">プッシュ通知を有効化</button><button id="pushTest" type="button" disabled>通知テスト</button><button id="notifyToggle" type="button" aria-pressed="false">画面内通知音 OFF</button><p id="pushStatus" aria-live="polite">未設定</p></div></details><button id="reload" type="button">情報更新</button></div></header>
 <div id="error" class="alert" hidden role="alert"></div>
 <div class="layout" id="layout">
 <div class="aside"><div class="filters"><select id="store" aria-label="店舗を切り替える"><option value="all">全店舗</option><option value="Grand Luxe">Grand Luxe</option><option value="LUXY OSAKA">LUXY OSAKA</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select><div class="hint" id="summary">問い合わせを取得中です</div></div><div class="thread-list" id="threads"></div></div>
-<div class="chat-pane"><div class="thread-heading" id="heading"><button id="backToList" type="button">〈 一覧</button><strong id="threadTitle">チャットを選択してください</strong><button id="editCustomerName" class="edit-customer-name" type="button" hidden aria-label="お客様名を編集">✎ 名前変更</button><div id="relatedThreads" class="related"></div></div><div class="message-list" id="messages"><div class="placeholder">左の一覧から会話を選択してください。</div></div><form class="reply" id="reply" hidden><textarea id="draft" maxlength="2000" required placeholder="返信を入力" aria-label="返信内容"></textarea><button id="send" class="primary" type="submit">送信</button></form></div>
+<div class="chat-pane"><div class="thread-heading" id="heading"><button id="backToList" type="button">〈 一覧</button><strong id="threadTitle">チャットを選択してください</strong><button id="editCustomerName" class="edit-customer-name" type="button" hidden aria-label="お客様名を編集">✎ 名前変更</button><button id="blockThread" type="button" hidden>ブロック</button><div id="relatedThreads" class="related"></div></div><div class="message-list" id="messages"><div class="placeholder">左の一覧から会話を選択してください。</div></div><form class="reply" id="reply" hidden><textarea id="draft" maxlength="2000" required placeholder="返信を入力" aria-label="返信内容"></textarea><button id="send" class="primary" type="submit">送信</button></form></div>
 </div></div>
 <dialog id="customerNameDialog" class="customer-name-dialog" aria-labelledby="customerNameDialogTitle">
  <form id="customerNameForm">
@@ -338,6 +361,7 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
   <div class="customer-name-buttons"><button type="button" id="customerNameCancel">キャンセル</button><button type="submit" id="customerNameSave" class="primary">保存</button></div>
  </form>
 </dialog>
+<dialog id="greetingDialog" aria-labelledby="greetingTitle"><form id="greetingForm"><h2 id="greetingTitle">あいさつ文編集</h2><label>対象店舗<select id="greetingStore" required><option value="Grand Luxe">Grand Luxe</option><option value="LUXY OSAKA">LUXY OSAKA</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select></label><label>お客様用チャットに表示する本文<textarea id="greetingText" maxlength="500" required></textarea></label><p id="greetingStatus" role="status" style="font-size:12px;color:#526e89;margin:0"></p><div class="greeting-actions"><button id="greetingCancel" type="button">キャンセル</button><button id="greetingSave" type="submit" class="primary">保存</button></div></form></dialog>
 <script>
 (()=>{
 "use strict";
@@ -504,8 +528,10 @@ $("backToList").addEventListener("click",()=>$("layout").classList.remove("chat-
 function updateCounters(){
  const total=items.filter(isUnread).length;
  $("summary").textContent="会話 "+items.length+"件 ／ 未読 "+total+"件";
- $("unreadTotal").textContent="未読 "+total+"件";
+ $("unreadBadge").textContent=total>99?"99+":String(total);
+ $("unreadBadge").hidden=total===0;
  $("unreadTotal").dataset.count=String(total);
+ if("setAppBadge" in navigator){try{const operation=total?navigator.setAppBadge(total):navigator.clearAppBadge();void operation.catch(()=>{});}catch{}}
  document.title=(total?"("+total+") ":"")+defaultTitle;
 }
 
@@ -541,13 +567,13 @@ function drawList(){
  for(const t of items){
   const active=t.id===threadId;
   if(isUnread(t))unread++;
-  const btn=document.createElement("button");btn.type="button";btn.className="thread"+(active?" active":"")+(isUnread(t)?" unread":"");
+  const btn=document.createElement("button");btn.type="button";btn.className="thread"+(active?" active":"")+(isUnread(t)?" unread":"")+(t.status==="blocked"?" blocked":"");
   const heading=document.createElement("div");
   const strong=document.createElement("strong");strong.className="customer-name";strong.textContent=nameOf(t);
   const time=document.createElement("time");time.textContent=labelTime(t.updated_at);heading.append(strong,time);
   const desc=document.createElement("div");desc.className="sub";
   const customer=makeStoreLabel(t.store_key);desc.append(customer);
-  if(isUnread(t)){const badge=document.createElement("span");badge.className="tag";badge.textContent="未読";desc.append(badge)}
+  if(t.status==="blocked"){const badge=document.createElement("span");badge.className="tag";badge.textContent="ブロック中";desc.append(badge)}else if(isUnread(t)){const badge=document.createElement("span");badge.className="tag chat-unread-badge";badge.textContent="1";desc.append(badge)}
   btn.append(heading,desc);btn.addEventListener("click",()=>void openThread(t.id));list.append(btn);
  }
  if(!items.length){const empty=document.createElement("div");empty.className="placeholder";empty.textContent="まだ問い合わせはありません";list.append(empty)}
@@ -653,13 +679,18 @@ async function openThread(id,options={}){
    }
    if(switched||wasAtBottom)pane.scrollTop=pane.scrollHeight;
   }
-  $("reply").hidden=false;
+  const blocked=data.thread.status==="blocked";
+  $("blockThread").hidden=false;
+  $("blockThread").dataset.blocked=String(blocked);
+  $("blockThread").textContent=blocked?"ブロック解除":"ブロック";
+  $("reply").hidden=blocked;
   if(switched)$("draft").value="";
   const found=items.find(t=>t.id===id);
   const persistedRead=data.thread.staff_last_read_at;
   if(!persistedRead)throw new Error("既読時刻の保存を確認できません");
   readAcknowledgements.set(id,persistedRead);
   if(found){
+   found.status=data.thread.status;
    const current=Date.parse(found.staff_last_read_at||"");
    if(!Number.isFinite(current)||current<Date.parse(persistedRead))found.staff_last_read_at=persistedRead;
    activeThreadUpdatedAt=found.updated_at;
@@ -711,8 +742,46 @@ $("reply").addEventListener("submit",async e=>{
  }catch(err){showError("送信できませんでした。（"+String(err.message||err)+"）")}
  finally{replying=false;$("send").disabled=false}
 });
+
+$("blockThread").addEventListener("click",async()=>{
+ if(!threadId||!token)return;
+ const blocked=$("blockThread").dataset.blocked==="true";
+ if(!blocked&&!confirm("この店舗のチャットをブロックします。履歴は削除しません。よろしいですか？"))return;
+ $("blockThread").disabled=true;
+ try{
+  await call(blocked?"staff_unblock":"staff_block",{thread_id:threadId});
+  await loadList();
+  await openThread(threadId,{refresh:true});
+ }catch(err){showError("ブロック操作に失敗しました。（"+String(err.message||err)+"）")}
+ finally{$("blockThread").disabled=false}
+});
+async function loadGreeting(){
+ const store=$("greetingStore").value;
+ $("greetingStatus").textContent="読み込み中…";
+ $("greetingSave").disabled=true;
+ try{
+  const data=await call("staff_get_greeting",{store});
+  if($("greetingStore").value===store){$("greetingText").value=data.greeting;$("greetingStatus").textContent=""}
+ }catch(err){$("greetingStatus").textContent="読み込み失敗："+String(err.message||err)}
+ finally{$("greetingSave").disabled=false}
+}
+$("editGreeting").addEventListener("click",()=>{
+ $("greetingStore").value=$("store").value==="all"?"薔薇と紳士":$("store").value;
+ $("greetingDialog").showModal();void loadGreeting();
+});
+$("greetingStore").addEventListener("change",()=>void loadGreeting());
+$("greetingCancel").addEventListener("click",()=>$("greetingDialog").close());
+$("greetingForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ const store=$("greetingStore").value,greeting=$("greetingText").value.trim();
+ if(!greeting)return;
+ $("greetingSave").disabled=true;$("greetingStatus").textContent="保存中…";
+ try{await call("staff_set_greeting",{store,greeting});$("greetingStatus").textContent="保存しました";$("greetingDialog").close()}
+ catch(err){$("greetingStatus").textContent="保存失敗："+String(err.message||err)}
+ finally{$("greetingSave").disabled=false}
+});
 $("draft").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();$("reply").requestSubmit()}});
-$("store").addEventListener("change",()=>{setCustomerTestLink();threadId="";activeThreadUpdatedAt="";listInitialized=false;$("layout").classList.remove("chat-open");$("threadTitle").textContent="チャットを選択してください";$("relatedThreads").replaceChildren();$("messages").replaceChildren();$("reply").hidden=true;void loadList()});
+$("store").addEventListener("change",()=>{setCustomerTestLink();threadId="";activeThreadUpdatedAt="";listInitialized=false;$("layout").classList.remove("chat-open");$("threadTitle").textContent="チャットを選択してください";$("relatedThreads").replaceChildren();$("messages").replaceChildren();$("reply").hidden=true;$("blockThread").hidden=true;void loadList()});
 $("reload").addEventListener("click",()=>{void loadList();if(threadId)void openThread(threadId)});
 setInterval(()=>{if(!document.hidden&&token)void loadList()},10000);
 void connectExisting();
