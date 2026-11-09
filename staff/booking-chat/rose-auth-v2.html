@@ -321,6 +321,10 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
 #greetingForm label{font-size:12px;font-weight:750;display:flex;flex-direction:column;gap:6px}
 #greetingForm textarea,#greetingForm select{border:1px solid #cbdae8;border-radius:7px;padding:10px;width:100%;background:#fff;color:#20354e}
 #greetingForm textarea{min-height:145px;resize:vertical}
+#greetingDialog .greeting-current{padding:12px 14px;background:#f3f7fb;border:1px solid #d8e4ef;border-radius:8px}
+#greetingDialog .greeting-current strong{font-size:12px;color:#385775;display:block;margin-bottom:7px}
+#greetingCurrentText{font-size:13px;line-height:1.7;color:#203b56;white-space:pre-wrap;overflow-wrap:anywhere}
+
 .greeting-actions{display:flex;justify-content:flex-end;gap:8px}
 .greeting-actions button{border-radius:7px;padding:9px 14px;border:1px solid #cbd8e6}
 @media(max-width:700px){#editGreeting{padding:6px 8px;font-size:10px}#blockThread{font-size:10px;padding:6px 8px}}
@@ -444,7 +448,7 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
   <button id="blockDialogConfirm" type="button">ブロックする</button>
  </div>
 </dialog>
-<dialog id="greetingDialog" aria-labelledby="greetingTitle"><form id="greetingForm"><h2 id="greetingTitle">あいさつ文編集</h2><label>対象店舗<select id="greetingStore" required><option value="Grand Luxe">Grand Luxe</option><option value="LUXY OSAKA">LUXY OSAKA</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select></label><label>お客様用チャットに表示する本文<textarea id="greetingText" maxlength="500" required></textarea></label><p id="greetingStatus" role="status" style="font-size:12px;color:#526e89;margin:0"></p><div class="greeting-actions"><button id="greetingCancel" type="button">キャンセル</button><button id="greetingSave" type="submit" class="primary">保存</button></div></form></dialog>
+<dialog id="greetingDialog" aria-labelledby="greetingTitle"><form id="greetingForm"><h2 id="greetingTitle">あいさつ文編集</h2><label>対象店舗<select id="greetingStore" required><option value="Grand Luxe">Grand Luxe</option><option value="LUXY OSAKA">LUXY OSAKA</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select></label><div class="greeting-current"><strong>現在のあいさつ文（変更前）</strong><div id="greetingCurrentText">読み込み中…</div></div><label>お客様用チャットに表示する本文<textarea id="greetingText" maxlength="500" required></textarea></label><p id="greetingStatus" role="status" style="font-size:12px;color:#526e89;margin:0"></p><div class="greeting-actions"><button id="greetingCancel" type="button">キャンセル</button><button id="greetingSave" type="submit" class="primary">保存</button></div></form></dialog>
 <script>
 (()=>{
 "use strict";
@@ -874,11 +878,13 @@ $("blockDialogConfirm").addEventListener("click",async()=>{
 async function loadGreeting(){
  const store=$("greetingStore").value;
  $("greetingStatus").textContent="読み込み中…";
+ $("greetingCurrentText").textContent="読み込み中…";
+ $("greetingText").value="";
  $("greetingSave").disabled=true;
  try{
   const data=await call("staff_get_greeting",{store});
-  if($("greetingStore").value===store){$("greetingText").value=data.greeting;$("greetingStatus").textContent=""}
- }catch(err){$("greetingStatus").textContent="読み込み失敗："+String(err.message||err)}
+  if($("greetingStore").value===store){$("greetingText").value=data.greeting;$("greetingCurrentText").textContent=data.greeting;$("greetingStatus").textContent=""}
+ }catch(err){$("greetingCurrentText").textContent="取得できませんでした";$("greetingStatus").textContent="読み込み失敗："+String(err.message||err)}
  finally{$("greetingSave").disabled=false}
 }
 $("editGreeting").addEventListener("click",()=>{
@@ -892,7 +898,7 @@ $("greetingForm").addEventListener("submit",async e=>{
  const store=$("greetingStore").value,greeting=$("greetingText").value.trim();
  if(!greeting)return;
  $("greetingSave").disabled=true;$("greetingStatus").textContent="保存中…";
- try{await call("staff_set_greeting",{store,greeting});$("greetingStatus").textContent="保存しました";$("greetingDialog").close()}
+ try{await call("staff_set_greeting",{store,greeting});$("greetingCurrentText").textContent=greeting;$("greetingStatus").textContent="保存しました";$("greetingDialog").close()}
  catch(err){$("greetingStatus").textContent="保存失敗："+String(err.message||err)}
  finally{$("greetingSave").disabled=false}
 });
