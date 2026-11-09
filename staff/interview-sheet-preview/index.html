@@ -704,9 +704,9 @@ html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!imp
 .metrics-v8-age-total{font-size:11px;color:#526782}
 .metrics-v8-hours{display:flex;align-items:stretch;gap:3px;flex:1;min-height:0;margin:12px 2px 17px;border-bottom:1px solid #ccd8e8}
 .metrics-v8-hour-col{flex:1;min-width:0;position:relative;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
-.metrics-v8-hour-bar{width:100%;background:linear-gradient(180deg,#8ce4d1,#04b495);flex:none}
+.metrics-v8-hour-bar{width:100%;background:linear-gradient(180deg,#95ebdc 0%,#64d9c3 35%,#06b99a 100%);flex:none;position:relative;border-radius:1px 1px 0 0}
 .metrics-v8-hour-col small{position:absolute;top:calc(100% + 5px);font-size:8px;color:#234365}
-.metrics-v8-hour-number{position:absolute;bottom:calc(100% - 1px);font-size:9px;font-weight:700}
+.metrics-v8-hour-number{position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);font-size:10px;font-weight:800;color:#102b48;white-space:nowrap}
 .metrics-v8-trend{display:flex;gap:5px;flex:1;min-height:0;margin:15px 2px 18px;border-bottom:1px solid #cbd8e8;align-items:flex-end}
 .metrics-v8-trend-group{display:flex;gap:2px;align-items:flex-end;justify-content:center;flex:1;height:100%;position:relative}
 .metrics-v8-trend-bar{width:38%;max-width:22px;border-radius:2px 2px 0 0;position:relative}
@@ -1804,14 +1804,16 @@ chart.append(compare);
  const hourGraph=holder=>{
   const labels=Array.from({length:24},(_,i)=>String(i));
   const values=Array(24).fill(0);
-  if(lineReady)for(const a of applicants){const date=firstDate(a);if(!date)continue;const h=new Date(date).getHours();if(Number.isInteger(h)&&h>=0&&h<24)values[h]++;}
+  // LINE初回問い合わせの時間帯は選択月ではなく、取得済みの全期間累計。
+  // 店舗選択のみ適用し、同一応募者は初回メッセージで1回計上。
+  if(lineReady)for(const a of allApplicants){const date=firstDate(a);if(!date)continue;const h=new Date(date).getHours();if(Number.isInteger(h)&&h>=0&&h<24)values[h]++;}
   const graph=document.createElement('div');graph.className='metrics-v8-hours';
   const max=Math.max(1,...values);
   values.forEach((v,i)=>{
    const col=document.createElement('div');col.className='metrics-v8-hour-col';
    const bar=document.createElement('div');bar.className='metrics-v8-hour-bar';bar.style.height=(lineReady?v/max*88:0)+'%';
    const num=document.createElement('span');num.className='metrics-v8-hour-number';num.textContent=lineReady&&v?String(v):'';
-   const tick=document.createElement('small');tick.textContent=labels[i];col.append(num,bar,tick);graph.append(col);
+   const tick=document.createElement('small');tick.textContent=labels[i];bar.append(num);col.append(bar,tick);graph.append(col);
   });
   holder.append(graph);
  };
