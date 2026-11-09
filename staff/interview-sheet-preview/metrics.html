@@ -278,6 +278,8 @@ function bindMetricsHeaderControls(){
    const month=target("storeMetricsMonth"),panel=target("storeMetrics");
    if(month)observer.observe(month,{attributes:true,attributeFilter:["value"]});
    if(month)month.addEventListener("change",sync);
+   const innerPeriodLabel=target("storeMetricsMonthLabel");
+   if(innerPeriodLabel)observer.observe(innerPeriodLabel,{childList:true,characterData:true,subtree:true});
    if(panel)observer.observe(panel,{attributes:true,attributeFilter:["hidden"]});
    view.addEventListener("interview-auth-ready",sync);
    sync();view.requestAnimationFrame(sync);
