@@ -104,14 +104,23 @@ header.lg-common-header .lg-header-home{font-size:17px!important;font-weight:700
 .lg-common-header .lg-account-panel a:hover,.lg-common-header .lg-account-panel button:hover{background:#edf3fa!important}
 .lg-common-header .lg-account-native-logout{display:none!important}
 .lg-common-header #authLabel{display:none!important}
+</style><style id="metrics-v8-header-match">
+header.lg-common-header{height:49px!important;min-height:49px!important;max-height:49px!important;padding:0 12px!important;border:0!important;background:#1b2940!important}
+header.lg-common-header .lg-header-home{font-size:13px!important;letter-spacing:normal!important}
+header.lg-common-header .lg-header-home img{width:27px!important;height:32px!important;object-fit:contain!important}
+.metrics-header-right{gap:8px!important}
+.metrics-header-controls{gap:8px!important}
+.metrics-header-controls select{height:26px!important;min-width:125px!important;max-width:165px!important;padding:0 8px!important;font-size:12px!important}
+.metrics-header-controls button.arrow{height:26px!important;min-width:26px!important;width:26px!important;padding:0!important;background:#f5f7fc!important;border:1px solid #b8c8da!important;font-size:12px!important}
+#metricsHeaderYear{min-width:76px!important;color:#fff!important;font-size:12px!important;font-weight:800!important;text-align:center!important}
+.lg-common-header .lg-account-menu>summary{height:26px!important;padding:0 10px!important;font-size:12px!important}
+@media(max-width:650px){header.lg-common-header{height:49px!important;min-height:49px!important;max-height:49px!important}}
 </style></head>
 <body><div class="page"><header class="topbar lg-common-header"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ移動" aria-label="総合管理TOPへ移動"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span id="lgHeaderHomeLabel">TOP</span></a><div class="metrics-header-right"><div id="metricsHeaderControls" class="metrics-header-controls" hidden aria-label="数値管理の表示切替">
 <select id="metricsHeaderShop" aria-label="店舗切替"><option value="all">全店舗</option><option value="Grand Luxe">Grand Luxe</option><option value="LUXY">LUXY</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select>
-<button type="button" id="metricsHeader2025" aria-label="2025年へ切替">2025年</button>
-<button type="button" id="metricsHeader2026" aria-label="2026年へ切替">2026年</button>
-<button type="button" id="metricsHeaderPrev" class="arrow" aria-label="前月">◀</button>
-<strong id="metricsHeaderMonth" aria-live="polite">—</strong>
-<button type="button" id="metricsHeaderNext" class="arrow" aria-label="翌月">▶</button>
+<button type="button" id="metricsHeaderPrevYear" class="arrow" aria-label="前年">◀</button>
+<strong id="metricsHeaderYear" aria-live="polite">2026年</strong>
+<button type="button" id="metricsHeaderNextYear" class="arrow" aria-label="翌年">▶</button>
 </div><details id="lgAccountMenu" class="lg-account-menu" hidden><summary aria-label="アカウントメニューを開く">アカウント</summary><div class="lg-account-panel" role="group" aria-label="アカウント操作"><strong class="lg-account-identity" id="lgAccountIdentity">認証確認中</strong><a href="/therapist-profile/staff/interview-sheet-preview/?account=1">アカウント画面</a><button type="button" id="lgAccountLogout">ログアウト</button></div></details></div></header>
 <section id="metricsLogin" class="lg-interview-login metrics-login hidden"><div class="auth-card"><aside class="auth-brand-panel" aria-hidden="true"><div class="auth-brand-top"><div class="auth-brand-symbol">L</div><div class="auth-brand-name">L GROUP<small>INTERNAL MANAGEMENT</small></div></div><div class="auth-brand-middle"><span class="auth-brand-kicker">STAFF MANAGEMENT SYSTEM</span><h1 class="auth-brand-title">ANALYTICS<br>MANAGEMENT.</h1><p class="auth-brand-description">日々の管理業務を、もっとスマートに。<br>すべての情報をひとつの場所で。</p></div><div class="auth-brand-bottom"><span>STAFF PORTAL</span><span>L GROUP © 2026</span></div></aside><div class="auth-form-panel"><p class="auth-eyebrow">WELCOME BACK</p><h2>数値管理ログイン</h2><div class="auth-mode-label"><span>管理者</span></div><form id="metricsLoginForm"><p class="auth-help">既存の管理者アカウントと同じID・PASSを使用します。</p><label for="metricsEmail">ID（メールアドレス）<input id="metricsEmail" type="email" autocomplete="username" required></label><label for="metricsPassword">PASS<input id="metricsPassword" type="password" autocomplete="current-password" required></label><div id="metricsLoginError" role="alert"></div><button type="submit">ログイン</button></form><p class="auth-footnote">AUTHORIZED PERSONNEL ONLY</p></div></div></section>
 <iframe id="metricsFrame" class="frame hidden" title="数値管理ダッシュボード" allow="clipboard-write"></iframe></div>
@@ -222,26 +231,32 @@ $("metricsLoginForm").addEventListener("submit",async e=>{
 
 function bindMetricsHeaderControls(){
  const frame=$("metricsFrame"),toolbar=$("metricsHeaderControls");
- const outerShop=$("metricsHeaderShop"),label=$("metricsHeaderMonth");
+ const outerShop=$("metricsHeaderShop"),yearLabel=$("metricsHeaderYear");
  let inside=null,view=null,observer=null;
  function target(id){return inside?.getElementById(id)}
  function sync(){
   if(!inside)return;
-  const panel=target("storeMetrics"),shop=target("storeMetricsShop"),month=target("storeMetricsMonth"),monthLabel=target("storeMetricsMonthLabel");
-  const ready=Boolean(panel&&!panel.hidden&&shop&&month&&month.value&&monthLabel);
+  const panel=target("storeMetrics"),shop=target("storeMetricsShop"),month=target("storeMetricsMonth");
+  const ready=Boolean(panel&&!panel.hidden&&shop&&month&&month.value);
   toolbar.hidden=!ready;
   if(!ready)return;
   if(outerShop.value!==shop.value)outerShop.value=shop.value;
-  label.textContent=monthLabel.textContent||"—";
-  for(const y of [2025,2026])$("metricsHeader"+y).setAttribute("aria-pressed",String(month.value.startsWith(String(y))));
-  const now=new Date(),thisMonth=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0");
-  $("metricsHeaderNext").disabled=month.value>=thisMonth;
+  const year=Number(month.value.slice(0,4));
+  yearLabel.textContent=year+"年";
+  $("metricsHeaderNextYear").disabled=year>=new Date().getFullYear();
  }
- function clickTarget(id){
+ function setYear(delta){
   if(toolbar.hidden)return;
-  const b=target(id);
-  if(!b)return;
-  b.click();sync();
+  const month=target("storeMetricsMonth");
+  if(!month||!month.value)return;
+  const parts=month.value.split("-").map(Number);
+  const year=parts[0]+delta,number=parts[1];
+  const today=new Date(),currentYear=today.getFullYear(),currentMonth=today.getMonth()+1;
+  if(year>currentYear||year<2025)return;
+  const nextMonth=year===currentYear?Math.min(number,currentMonth):number;
+  month.value=year+"-"+String(nextMonth).padStart(2,"0");
+  month.dispatchEvent(new Event("change",{bubbles:true}));
+  sync();
  }
  outerShop.addEventListener("change",()=>{
   if(toolbar.hidden)return;
@@ -251,18 +266,18 @@ function bindMetricsHeaderControls(){
   select.dispatchEvent(new Event("change",{bubbles:true}));
   sync();
  });
- for(const year of [2025,2026])$("metricsHeader"+year).addEventListener("click",()=>clickTarget("storeMetrics"+year));
- $("metricsHeaderPrev").addEventListener("click",()=>clickTarget("storeMetricsPrev"));
- $("metricsHeaderNext").addEventListener("click",()=>clickTarget("storeMetricsNext"));
+ $("metricsHeaderPrevYear").addEventListener("click",()=>setYear(-1));
+ $("metricsHeaderNextYear").addEventListener("click",()=>setYear(1));
  frame.addEventListener("load",()=>{
   if(observer){observer.disconnect();observer=null;}
   if(view)view.removeEventListener("interview-auth-ready",sync);
   try{
    inside=frame.contentDocument;view=frame.contentWindow;
-   if(!inside||!inside.getElementById("storeMetricsShop")){toolbar.hidden=true;return;}
+   if(!inside||!target("storeMetricsShop")){toolbar.hidden=true;return;}
    observer=new MutationObserver(sync);
-   const monthLabel=target("storeMetricsMonthLabel"),panel=target("storeMetrics");
-   if(monthLabel)observer.observe(monthLabel,{childList:true,characterData:true,subtree:true});
+   const month=target("storeMetricsMonth"),panel=target("storeMetrics");
+   if(month)observer.observe(month,{attributes:true,attributeFilter:["value"]});
+   if(month)month.addEventListener("change",sync);
    if(panel)observer.observe(panel,{attributes:true,attributeFilter:["hidden"]});
    view.addEventListener("interview-auth-ready",sync);
    sync();view.requestAnimationFrame(sync);
