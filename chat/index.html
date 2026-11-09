@@ -25,6 +25,7 @@ button,textarea{font:inherit}button{cursor:pointer}button:disabled{cursor:not-al
 .empty strong{font-size:14px;display:block;color:#283c54}
 .chat-greeting-notice{align-self:stretch;max-width:100%;margin:8px 0 10px;border:1px solid #e0d1b7;border-radius:12px;background:#fcf8f1;color:#584831;padding:13px 15px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.7;box-shadow:0 1px 3px rgba(53,37,11,.04)}
 .chat-greeting-notice strong{display:block;margin-bottom:5px;font-size:12px;color:#87623e}
+.chat-greeting-notice a{color:#176baa;font-weight:800;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere;cursor:pointer}
 
 .composer{border-top:1px solid var(--line);padding:13px 16px calc(15px + env(safe-area-inset-bottom));background:#fff;flex:none}
 .composer-row{display:flex;align-items:flex-end;gap:10px}
@@ -258,13 +259,25 @@ const tokyoDate=()=>new Intl.DateTimeFormat("sv-SE",{timeZone:"Asia/Tokyo",year:
 function showGreeting(info={},force=false){
  const nextText=typeof info.greeting==="string"&&info.greeting.trim()?info.greeting:greetingText;
  const nextVersion=typeof info.greeting_updated_at==="string"?info.greeting_updated_at:greetingUpdatedAt;
- const key=tokyoDate()+"|"+nextVersion+"|"+nextText;
+ const linkText=typeof info.greeting_link_text==="string"?info.greeting_link_text:"";
+ const linkUrl=typeof info.greeting_link_url==="string"?info.greeting_link_url:"";
+ const key=tokyoDate()+"|"+nextVersion+"|"+nextText+"|"+linkText+"|"+linkUrl;
  greetingText=nextText;greetingUpdatedAt=nextVersion;
  if(!force&&key===greetingShownKey)return;
  greetingShownKey=key;
  const banner=document.createElement("div");banner.className="chat-greeting-notice";
  banner.dataset.greetingKey=key;
- const body=document.createElement("div");body.textContent=greetingText;
+ const body=document.createElement("div");
+ let safeLink=null;
+ if(linkText&&greetingText.includes(linkText)){
+  try{const url=new URL(linkUrl);if(url.protocol==="https:"&&!url.username&&!url.password)safeLink=url.href}catch{}
+ }
+ if(safeLink){
+  const position=greetingText.indexOf(linkText);
+  body.append(document.createTextNode(greetingText.slice(0,position)));
+  const anchor=document.createElement("a");anchor.href=safeLink;anchor.target="_blank";anchor.rel="noopener noreferrer";anchor.textContent=linkText;
+  body.append(anchor,document.createTextNode(greetingText.slice(position+linkText.length)));
+ }else body.textContent=greetingText;
  banner.append(body);$("timeline").append(banner);
  scheduleLatestScroll();
 }
