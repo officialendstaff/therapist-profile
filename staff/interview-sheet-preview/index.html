@@ -746,7 +746,11 @@ html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!imp
 @media(max-width:1100px){.sales-refined-grid{grid-template-columns:1fr}.sales-refined-panel{max-width:900px}}
 @media(max-width:650px){#salesMetricsBody{padding:8px 3px 20px}.sales-refined-header strong{font-size:17px}.sales-refined-panel{padding:12px 8px}.sales-refined-panel-head h3{font-size:15px}.sales-refined-grid{gap:10px}.sales-refined-month{font-size:11px;padding:7px 9px}}
 </style>
-</head><body>
+<style id="recruit-media-order-20261109">
+.metrics-v8-media{grid-template-rows:repeat(6,minmax(0,1fr))!important}
+.metrics-v8-comparison{grid-template-rows:repeat(6,minmax(0,1fr))!important}
+.metrics-other-media-hover{cursor:help;text-decoration:underline dotted;text-underline-offset:3px}
+</style></head><body>
 <header class="header"><button class="brand" id="home"><img id="homeAvatar" src="./icons/recruit-180.png" alt="" onerror="this.style.display='none'"><span id="homeLabel">TOP</span></button><div class="header-actions"><button id="manualInterviewOpen" type="button">面接登録</button><button id="sound">通知設定</button></div></header>
 <section class="calendar" aria-label="月間カレンダー"><div class="cal-head"><button id="prev" aria-label="前月">◀</button><span id="month"></span><button id="next" aria-label="翌月">▶</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="days" id="days"></div></section>
 <section class="chart" aria-label="担当者タイムチャート"><div class="chart-title"><span>担当者タイムチャート</span><span id="selectedDate" class="chart-date"></span></div><div class="chart-scroll"><div class="chart-grid" id="chartGrid"></div></div><div class="legend"><span><i style="background:linear-gradient(90deg,#E9E4F3 25%,#E4EFFB 25% 50%,#F9E5ED 50% 75%,#E5F2ED 75%)"></i>選択可能</span><span><i style="background:#d4d8df"></i>選択不可</span><span><i style="background:#FACC15;border:1px solid #A16207"></i>面接予約済み</span><span class="status" id="slotStatus">対応可能時間は個人ページの設定を参照します</span></div></section>
@@ -1527,7 +1531,7 @@ const hourly=Array.from({length:24},()=>0);
 if(lineReady)for(const a of allApplicants){const d=firstDate(a);if(!d)continue;const hour=new Date(d).getHours();if(hour>=0&&hour<24)hourly[hour]++}
 const right=panel('');
 bars(right,Array.from({length:24},(_,i)=>String(i)),[{name:'初回LINE問い合わせ',color:'#0BBF9D',glossy:true,values:lineReady?hourly:Array(24).fill(null)}]);chart.append(right);
-const mediaNames=['エステ魂','メンズエステワーク','エステラブワーク','リラクジョブ','エステクイーン','Richセラピ','エステアイ','メンエスリクルート','バニラ','02','X','その他'];
+const mediaNames=['エステ魂','メンズエステワーク','エステラブワーク','リラクジョブ','エステクイーン','Richセラピ','エステアイ','メンエスリクルート','バニラ','02','X','ココア','その他'];
 const colors=['#AEB7C5','#168CF2','#F59B48','#9D69E5','#18B7A5','#F36A9C','#526CE0','#F1C04D','#38A8DC','#76B66D','#D77A58','#6E7D91','#B885D4'];
 function mediaOf(a){
  const texts=(a.messages||[]).map(m=>String(m.text||''));
@@ -1571,19 +1575,31 @@ function normalizedRecruitMedia(name){
  // Sentences of greeting/acknowledgement are not advertising sources.
  if(/^(?:よろしく|宜しく|お願い(?:します|いたします|致します)|ありがとう|有難う|お世話にな|承知しました|了解しました|はじめまして|初めまして|こんにちは|こんばんは|お疲れ様|お疲れさま)/.test(compact))return '記載なし';
  if(/^(?:エステラブ|エステラブワーク)$/.test(compact))return 'エステラブワーク';
+ if(/^cocoa$/i.test(compact)||compact==='ココア')return 'ココア';
  if(compact==='その他')return 'その他';
  const known=mediaNames.find(m=>m!== 'その他'&&m.toLowerCase()===compact.toLowerCase());
  if(known)return known;
  if(wrapped)return 'その他（'+detail+'）';
  return original;
 }
+const displayMediaOrder=['リラクジョブ','エステラブワーク','メンエスリクルート','メンズエステワーク','エステクイーン','記載なし','バニラ','エステ魂','02','HP','ココア','その他'];
+const displayMediaSet=new Set(displayMediaOrder);
+function displayMediaCategory(value){
+ const name=normalizedRecruitMedia(value);
+ return displayMediaSet.has(name)?name:'その他';
+}
 function groupedMediaCounts(raw){
  const grouped=new Map();
  for(const [name,count] of raw){
-  const category=String(name).startsWith('その他（')||String(name).startsWith('その他(')?'その他':name;
+  const category=displayMediaCategory(name);
   grouped.set(category,(grouped.get(category)||0)+count);
  }
  return grouped;
+}
+function lineOtherMediaNames(raw){
+ return [...raw.entries()].filter(([name,count])=>count>0&&displayMediaCategory(name)==='その他'&&name!=='その他')
+  .sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0],'ja'))
+  .map(([name,count])=>({name:String(name).replace(/^その他[（(]([\s\S]*?)[）)]$/,'$1'),count}));
 }
 function otherMediaBreakdown(raw){
  const detail=[...raw.entries()].filter(([name,count])=>count>0&&(name==='その他'||String(name).startsWith('その他（')||String(name).startsWith('その他(')));
@@ -1605,6 +1621,7 @@ const mediaChartFullLabels={
  'エステラブワーク':'エステラブワーク',
  'リラクジョブ':'リラクジョブ',
  'エステクイーン':'エステクイーン',
+ 'ココア':'ココア',
  'Richセラピ':'Richセラピ',
  'エステアイ':'エステアイ',
  'メンエスリクルート':'メンエスリクルート',
@@ -1761,8 +1778,11 @@ chart.append(compare);
   const heading=document.createElement('div');heading.className='metrics-v8-heading';heading.textContent=title;
   el.append(heading);parent.append(el);return el;
  };
- const fixedMedia=['その他','エステラブワーク','エステアイ','リラクジョブ','バニラ','02','HP','Richセラピ','X','エステクイーン','エステ魂','メンエスリクルート','メンズエステワーク','記載なし'];
- const previewMediaColors=['#aeb9c8','#ba85d9','#ef6b9a','#359af0','#ee965a','#82bb2d','#4f9ab6','#bf7f64','#6f76df','#43b4a9','#ddab46','#9b85d0','#d77979','#8294a9'];
+ const fixedMedia=displayMediaOrder;
+ const previewMediaColors=['#359af0','#ef6b9a','#9b85d0','#d77979','#43b4a9','#8294a9','#ee965a','#ddab46','#82bb2d','#4f9ab6','#ba85d9','#aeb9c8'];
+ const activeOtherMediaNames=lineOtherMediaNames(annual?mediaCounts(ageApplicants):mediaNowRaw);
+ const otherMediaHover=activeOtherMediaNames.length?activeOtherMediaNames.map(x=>x.name+'：'+x.count+'件').join('\n'):'LINEに媒体の具体名なし';
+ const setOtherHover=(element,name)=>{if(name==='その他'){element.title=otherMediaHover;element.classList.add('metrics-other-media-hover');}else{element.title=name;}};
  const previewMediaColor=(name)=>{const i=fixedMedia.indexOf(name);return i>=0?previewMediaColors[i]:mediaColor(name)};
  const countBars=(holder,counts,ready)=>{
   const names=fixedMedia;
@@ -1770,7 +1790,7 @@ chart.append(compare);
   const grid=document.createElement('div');grid.className='metrics-v8-media';
   for(const n of names){
    const row=document.createElement('div');row.className='metrics-v8-media-row';
-   const lab=document.createElement('span');lab.textContent=mediaChartLabel(n);lab.title=n;
+   const lab=document.createElement('span');lab.textContent=mediaChartLabel(n);setOtherHover(lab,n);
    const track=document.createElement('div');track.className='metrics-v8-track';
    const v=counts.get(n)||0;const bar=document.createElement('div');bar.className='metrics-v8-fill';bar.style.width=v/max*100+'%';bar.style.background=previewMediaColor(n);track.append(bar);
    const num=document.createElement('b');num.textContent=ready?String(v):'—';
@@ -1783,7 +1803,7 @@ chart.append(compare);
   const max=Math.max(1,...fixedMedia.flatMap(n=>[nowCounts.get(n)||0,oldCounts.get(n)||0]));
   for(const n of fixedMedia){
    const item=document.createElement('div');item.className='metrics-v8-compare-item';
-   const head=document.createElement('strong');head.textContent=mediaChartLabel(n);head.title=n;item.append(head);
+   const head=document.createElement('strong');head.textContent=mediaChartLabel(n);setOtherHover(head,n);item.append(head);
    for(const [label,counts,ready,color] of [[oldLabel,oldCounts,oldReady,'#adb8c8'],[nowLabel,nowCounts,nowReady,previewMediaColor(n)]]){
     const line=document.createElement('div');line.className='metrics-v8-compare-line';
     const tag=document.createElement('span');tag.textContent=label;
