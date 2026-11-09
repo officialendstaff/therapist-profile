@@ -179,8 +179,8 @@ let greetingText="お気軽にお問い合わせください。";
 const setReady=v=>{ready=v;$("draft").disabled=!v||isBlocked;$("send").disabled=!v||isBlocked;$("connection").textContent=isBlocked?"受付停止中":v?"チャット接続中":"接続待機中";$("connection").previousElementSibling.style.background=isBlocked?"#bf7d7d":v?"#41a184":"#9ba7b4";};
 function setBlocked(value){
  isBlocked=!!value;setReady(ready);
- if(isBlocked){$("draft").placeholder="このチャットでは現在メッセージを送信できません。";err("このチャットでは現在メッセージを送信できません。過去の履歴は閲覧できます。");}
- else{$("draft").placeholder="メッセージを入力";if($("error").textContent.includes("このチャットでは現在"))clearErr();}
+ if(isBlocked){$("draft").placeholder="";err("現在メッセージを送信できません。");}
+ else{$("draft").placeholder="メッセージを入力";if($("error").textContent==="現在メッセージを送信できません。")clearErr();}
 }
 async function api(payload){
  const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),15000);
