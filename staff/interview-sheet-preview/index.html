@@ -1788,7 +1788,26 @@ chart.append(compare);
  top.replaceChildren();
  for(const [name,value] of displayed){
   const cell=document.createElement('div');cell.className='metrics-kpi';const label=document.createElement('small');label.textContent=name;
-  const num=document.createElement('strong');num.textContent=value;cell.append(label,num);top.append(cell);
+  const num=document.createElement('strong');num.textContent=value;
+  // Preserve the compact six-column header while keeping the label legible and the value flush-right.
+  cell.style.setProperty('display','flex','important');
+  cell.style.setProperty('flex-direction','row','important');
+  cell.style.setProperty('align-items','center','important');
+  cell.style.setProperty('justify-content','space-between','important');
+  cell.style.setProperty('gap','8px','important');
+  cell.style.setProperty('padding','6px 12px','important');
+  label.style.setProperty('font-size','12px','important');
+  label.style.setProperty('font-weight','800','important');
+  label.style.setProperty('color','#344f70','important');
+  label.style.setProperty('line-height','1.2','important');
+  label.style.setProperty('white-space','nowrap','important');
+  num.style.setProperty('font-size','20px','important');
+  num.style.setProperty('font-weight','850','important');
+  num.style.setProperty('color','#102f52','important');
+  num.style.setProperty('text-align','right','important');
+  num.style.setProperty('margin-left','auto','important');
+  num.style.setProperty('flex','0 0 auto','important');
+  cell.append(label,num);top.append(cell);
  }
  header.append(top);
  const dash=document.createElement('div');dash.className='metrics-v8-grid '+(annual?'annual':'monthly');
