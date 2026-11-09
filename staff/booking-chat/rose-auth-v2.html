@@ -306,7 +306,14 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
 .lg-chat-header-actions .unread-total{display:inline-flex;align-items:center;gap:6px}
 .chat-unread-badge{display:inline-flex;min-width:21px;height:21px;padding:0 6px;align-items:center;justify-content:center;border-radius:999px;background:#d92e4a;color:#fff;font-weight:850;font-size:12px;line-height:1;font-variant-numeric:tabular-nums}
 .chat-unread-badge[hidden]{display:none!important}
-.thread.blocked{background:#f7f8fa}
+.thread.blocked{background:#fff3f4!important;border-left:4px solid #d0344d!important}
+.thread.blocked.active{background:#fce8eb!important}
+.thread.blocked .customer-name{color:#a82441!important}
+.thread.blocked .tag{font-size:11px!important;font-weight:850!important;background:#cc3650!important;color:#fff!important;padding:4px 9px!important;border-radius:6px!important}
+#activeBlockStatus{display:inline-flex;align-items:center;padding:6px 12px;background:#c52e49;color:#fff;border-radius:7px;font-size:13px;font-weight:850;white-space:nowrap}
+#activeBlockStatus[hidden]{display:none!important}
+#app .chat-pane .thread-heading:has(#activeBlockStatus:not([hidden])){background:#fff8f9!important;border-bottom:2px solid #e7a0ad!important}
+
 .thread.blocked .tag{background:#e9edf1;color:#65778a}
 .thread .tag.chat-unread-badge{font-size:11px;color:#fff;background:#d92e4a;border-radius:999px;min-width:19px;height:19px}
 #blockThread{font-size:11px;color:#a5304a;background:#fff1f3;border:1px solid #e5a9ba;border-radius:6px;padding:6px 10px;white-space:nowrap}
@@ -430,7 +437,7 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
 <div id="error" class="alert" hidden role="alert"></div>
 <div class="layout" id="layout">
 <div class="aside"><div class="filters"><select id="store" aria-label="店舗を切り替える"><option value="all">全店舗</option><option value="Grand Luxe">Grand Luxe</option><option value="LUXY OSAKA">LUXY OSAKA</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select><div class="hint" id="summary">問い合わせを取得中です</div></div><div class="thread-list" id="threads"></div></div>
-<div class="chat-pane"><div class="thread-heading" id="heading"><button id="backToList" type="button">〈 一覧</button><strong id="threadTitle">チャットを選択してください</strong><div class="chat-heading-actions"><button id="editCustomerName" class="edit-customer-name" type="button" hidden aria-label="お客様名を編集">✎ 名前変更</button><button id="blockThread" type="button" hidden>ブロック</button></div><div id="relatedThreads" class="related"></div></div><div class="message-list" id="messages"><div class="placeholder">左の一覧から会話を選択してください。</div></div><form class="reply" id="reply" hidden><textarea id="draft" maxlength="2000" required placeholder="返信を入力" aria-label="返信内容"></textarea><button id="send" class="primary" type="submit">送信</button></form></div>
+<div class="chat-pane"><div class="thread-heading" id="heading"><button id="backToList" type="button">〈 一覧</button><strong id="threadTitle">チャットを選択してください</strong><span id="activeBlockStatus" class="active-block-status" hidden>ブロック中</span><div class="chat-heading-actions"><button id="editCustomerName" class="edit-customer-name" type="button" hidden aria-label="お客様名を編集">✎ 名前変更</button><button id="blockThread" type="button" hidden>ブロック</button></div><div id="relatedThreads" class="related"></div></div><div class="message-list" id="messages"><div class="placeholder">左の一覧から会話を選択してください。</div></div><form class="reply" id="reply" hidden><textarea id="draft" maxlength="2000" required placeholder="返信を入力" aria-label="返信内容"></textarea><button id="send" class="primary" type="submit">送信</button></form></div>
 </div></div>
 <dialog id="customerNameDialog" class="customer-name-dialog" aria-labelledby="customerNameDialogTitle">
  <form id="customerNameForm">
@@ -776,6 +783,7 @@ async function openThread(id,options={}){
    if(switched||wasAtBottom)pane.scrollTop=pane.scrollHeight;
   }
   const blocked=data.thread.status==="blocked";
+  $("activeBlockStatus").hidden=!blocked;
   $("blockThread").hidden=false;
   $("blockThread").dataset.blocked=String(blocked);
   $("blockThread").textContent=blocked?"ブロック解除":"ブロック";
@@ -911,7 +919,7 @@ $("greetingForm").addEventListener("submit",async e=>{
  finally{$("greetingSave").disabled=false}
 });
 $("draft").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();$("reply").requestSubmit()}});
-$("store").addEventListener("change",()=>{setCustomerTestLink();threadId="";activeThreadUpdatedAt="";listInitialized=false;$("layout").classList.remove("chat-open");$("threadTitle").textContent="チャットを選択してください";$("relatedThreads").replaceChildren();$("messages").replaceChildren();$("reply").hidden=true;$("blockThread").hidden=true;void loadList()});
+$("store").addEventListener("change",()=>{setCustomerTestLink();threadId="";activeThreadUpdatedAt="";listInitialized=false;$("layout").classList.remove("chat-open");$("threadTitle").textContent="チャットを選択してください";$("relatedThreads").replaceChildren();$("messages").replaceChildren();$("reply").hidden=true;$("blockThread").hidden=true;$("activeBlockStatus").hidden=true;void loadList()});
 $("reload").addEventListener("click",()=>{void loadList();if(threadId)void openThread(threadId)});
 setInterval(()=>{if(!document.hidden&&token)void loadList()},10000);
 void connectExisting();
