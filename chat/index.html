@@ -23,6 +23,9 @@ button,textarea{font:inherit}button{cursor:pointer}button:disabled{cursor:not-al
 .when{font-size:10px;color:#98a4b1}
 .empty{align-self:flex-start;max-width:85%;padding:12px 14px;border-radius:15px 15px 15px 3px;background:#f0f4f7;color:#283c54;line-height:1.7;font-size:14px;overflow-wrap:anywhere}
 .empty strong{font-size:14px;display:block;color:#283c54}
+.chat-greeting-notice{align-self:stretch;max-width:100%;margin:8px 0 10px;border:1px solid #e0d1b7;border-radius:12px;background:#fcf8f1;color:#584831;padding:13px 15px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.7;box-shadow:0 1px 3px rgba(53,37,11,.04)}
+.chat-greeting-notice strong{display:block;margin-bottom:5px;font-size:12px;color:#87623e}
+
 .composer{border-top:1px solid var(--line);padding:13px 16px calc(15px + env(safe-area-inset-bottom));background:#fff;flex:none}
 .composer-row{display:flex;align-items:flex-end;gap:10px}
 textarea{resize:none;flex:1;min-height:46px;max-height:130px;line-height:1.5;background:#f7f9fb;border:1px solid #dbe4ec;border-radius:12px;padding:12px;outline:none;font-size:14px}
@@ -249,12 +252,24 @@ function add(messages){
   scheduleLatestScroll();
  }
 }
-function empty(){
- if($("timeline").children.length)return;
- const p=document.createElement("div");p.className="empty";p.id="welcome";
- p.textContent=greetingText;
- $("timeline").append(p);
+let greetingShownKey="";
+let greetingUpdatedAt="";
+const tokyoDate=()=>new Intl.DateTimeFormat("sv-SE",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+function showGreeting(info={},force=false){
+ const nextText=typeof info.greeting==="string"&&info.greeting.trim()?info.greeting:greetingText;
+ const nextVersion=typeof info.greeting_updated_at==="string"?info.greeting_updated_at:greetingUpdatedAt;
+ const key=tokyoDate()+"|"+nextVersion+"|"+nextText;
+ greetingText=nextText;greetingUpdatedAt=nextVersion;
+ if(!force&&key===greetingShownKey)return;
+ greetingShownKey=key;
+ const banner=document.createElement("div");banner.className="chat-greeting-notice";
+ banner.dataset.greetingKey=key;
+ const title=document.createElement("strong");title.textContent="本日のご案内";
+ const body=document.createElement("div");body.textContent=greetingText;
+ banner.append(title,body);$("timeline").append(banner);
+ scheduleLatestScroll();
 }
+function empty(){/* Greeting is shown independently, including when history exists. */}
 function removeWelcome(){const p=$("welcome");if(p)p.remove()}
 function loadToken(){try{return localStorage.getItem(key)||""}catch{return ""}}
 function shareToken(type,value=""){
@@ -299,13 +314,14 @@ async function init(){
   if(data.token){token=data.token;saveToken(token)}
   if(!token)throw Error("no_session");
   greetingText=typeof data.greeting==="string"&&data.greeting.trim()?data.greeting:"お気軽にお問い合わせください。";
-  $("timeline").replaceChildren();lastId=0;add(data.messages||[]);empty();setReady(true);setBlocked(data.blocked);scheduleLatestScroll();
+  $("timeline").replaceChildren();lastId=0;greetingShownKey="";
+  add(data.messages||[]);showGreeting(data,true);setReady(true);setBlocked(data.blocked);scheduleLatestScroll();
  }catch(e){err("チャットに接続できません。ページを再読み込みしてください。（"+String(e.message||e)+"）");setReady(false)}
 }
 async function poll(){
  if(!ready||polling||posting||document.hidden)return;
  polling=true;
- try{const data=await api({action:"guest_poll",token,store,after:lastId});setBlocked(data.blocked);if(data.messages?.length){removeWelcome();add(data.messages)}}
+ try{const data=await api({action:"guest_poll",token,store,after:lastId});setBlocked(data.blocked);if(data.messages?.length){removeWelcome();add(data.messages)}showGreeting(data)}
  catch(e){if(e.status===401){setReady(false);err("識別情報の有効期限が切れました。ページを再読み込みしてください。")}}
  finally{polling=false}
 }
