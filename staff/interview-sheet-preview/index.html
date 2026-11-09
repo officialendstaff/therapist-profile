@@ -725,7 +725,11 @@ html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!imp
 .metrics-v8-trend-group small{position:absolute;top:calc(100% + 5px);font-size:9px;white-space:nowrap}
 @media(max-width:1100px){#storeMetricsHeader{flex-wrap:wrap}#storeMetricsHeader>.store-metrics-kpis{flex-basis:100%}html.metrics-standalone #storeMetricsBody{height:calc(100% - 105px)!important}}
 @media(max-width:740px){.metrics-v8-grid{height:auto;grid-template-columns:1fr}.metrics-v8-col{grid-template-rows:none!important}.metrics-v8-panel{min-height:220px}.metrics-v8-comparison{min-height:320px}.metrics-v8-media{min-height:190px}#storeMetricsHeader>.store-metrics-kpis{grid-template-columns:repeat(3,1fr)!important}html.metrics-standalone #storeMetricsBody{height:calc(100% - 190px)!important;overflow:auto!important}}
-</style></head><body>
+</style>
+<style id="sales-five-store-comparison-20261109">
+.sales-five-heading{display:flex;align-items:center;justify-content:space-between;margin:0 0 13px;padding:0 4px;color:#253a53}.sales-five-heading strong{font-size:17px}.sales-five-heading span{font-size:12px;color:#6a7d94;font-weight:700}.sales-five-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.sales-five-panel{background:#fff;border:1px solid #d6e1ec;border-radius:8px;padding:14px 16px;min-width:0}.sales-five-panel h3{font-size:14px;margin:0 0 14px;color:#263f5b}.sales-five-bars{display:grid;gap:11px}.sales-five-row{display:grid;grid-template-columns:105px minmax(40px,1fr) 86px;gap:10px;align-items:center;min-width:0}.sales-five-shop{font-size:11px;font-weight:750;color:#3b526b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sales-five-track{height:13px;border-radius:4px;background:#edf2f7;overflow:hidden}.sales-five-fill{height:100%;border-radius:4px}.sales-five-value{font-size:12px;text-align:right;color:#263d57;white-space:nowrap;font-variant-numeric:tabular-nums}.sales-metrics-footnote{margin:14px 4px 0;font-size:11px;color:#63768d;line-height:1.75}@media(max-width:900px){.sales-five-grid{grid-template-columns:1fr}}@media(max-width:500px){.sales-five-panel{padding:12px 9px}.sales-five-row{grid-template-columns:84px minmax(20px,1fr) 78px;gap:6px}.sales-five-shop{font-size:10px}.sales-five-value{font-size:11px}}
+</style>
+</head><body>
 <header class="header"><button class="brand" id="home"><img id="homeAvatar" src="./icons/recruit-180.png" alt="" onerror="this.style.display='none'"><span id="homeLabel">TOP</span></button><div class="header-actions"><button id="manualInterviewOpen" type="button">面接登録</button><button id="sound">通知設定</button></div></header>
 <section class="calendar" aria-label="月間カレンダー"><div class="cal-head"><button id="prev" aria-label="前月">◀</button><span id="month"></span><button id="next" aria-label="翌月">▶</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="days" id="days"></div></section>
 <section class="chart" aria-label="担当者タイムチャート"><div class="chart-title"><span>担当者タイムチャート</span><span id="selectedDate" class="chart-date"></span></div><div class="chart-scroll"><div class="chart-grid" id="chartGrid"></div></div><div class="legend"><span><i style="background:linear-gradient(90deg,#E9E4F3 25%,#E4EFFB 25% 50%,#F9E5ED 50% 75%,#E5F2ED 75%)"></i>選択可能</span><span><i style="background:#d4d8df"></i>選択不可</span><span><i style="background:#FACC15;border:1px solid #A16207"></i>面接予約済み</span><span class="status" id="slotStatus">対応可能時間は個人ページの設定を参照します</span></div></section>
@@ -1327,91 +1331,53 @@ async function refreshSalesAnnualMetrics(){
  renderSalesMetrics();
 }
 function renderSalesMetrics(){
- const root=$('salesMetricsBody');if(!root||root.hidden||$('storeMetrics').hidden)return;
- const month=$('storeMetricsMonth').value,shop=$('storeMetricsShop').value;
+ const root=$('salesMetricsBody');
+ if(!root||root.hidden||$('storeMetrics').hidden)return;
+ const month=$('storeMetricsMonth').value;
  const ready=salesMetricsData.status==='ready'&&salesMetricsData.month===month;
  const all=ready?salesMetricsData.rows:[];
- const rows=all.filter(r=>r.store_key===shop);
- const view=rows,has=view.length>0;
- const s=salesTotal(view),c=s.contracts_count;
- const cards=[
-  ['料金',has?salesYen(s.revenue_yen):'—'],['利益',has?salesYen(s.profit_yen):'—'],
-  ['成約数',has?salesNumber(c)+'件':'—'],['客単価',has&&c?salesYen(s.revenue_yen/c):'—'],
-  ['新規成約数',has?salesNumber(s.new_contracts_count)+'件':'—'],
-  ['リピート成約数',has?salesNumber(s.repeat_contracts_count)+'件':'—'],
-  ['リピート成約比率',has?salesRatio(s.repeat_contracts_count,c):'—'],
-  ['出勤数',has?salesNumber(s.active_staff_count)+'人':'—'],
-  ['フリー数',has?salesNumber(s.free_count)+'件':'—'],
-  ['本指名数',has?salesNumber(s.regular_nominations_count)+'件':'—'],
-  ['ネット指名数',has?salesNumber(s.net_nominations_count)+'件':'—'],
-  ['着信人数',has?salesNumber(s.inbound_people)+'人':'—'],
-  ['新規着信人数',has?salesNumber(s.new_inbound_people)+'人':'—']
+ const metrics=[
+  {label:'成約本数',unit:'本',field:'contracts_count'},
+  {label:'利益平均',unit:'円/日',value:(s,n)=>n?s.profit_yen/n:null},
+  {label:'女子報酬平均',unit:'円',unsupported:true},
+  {label:'単価平均',unit:'円/本',value:s=>s.contracts_count?s.profit_yen/s.contracts_count:null},
+  {label:'新規数',unit:'本',field:'new_contracts_count'},
+  {label:'顧客数',unit:'人',unsupported:true},
+  {label:'フリー',unit:'本',field:'free_count'},
+  {label:'ネット',unit:'本',field:'net_nominations_count'},
+  {label:'本指名',unit:'本',field:'regular_nominations_count'},
+  {label:'着信件数',unit:'件',unsupported:true},
+  {label:'出勤人数（延べ）',unit:'人日',field:'active_staff_count'}
  ];
- const box=(name,v)=>'<div class="sales-metrics-card"><span>'+name+'</span><strong>'+v+'</strong></div>';
- const block=items=>'<div class="sales-metrics-kpis">'+items.map(item=>box(item[0],item[1])).join('')+'</div>';
- root.innerHTML=(salesMetricsData.status==='error'?'<p class="sales-metrics-error">営業数値を取得できませんでした。再読み込みしてください。</p>':salesMetricsData.status==='login-required'?'<p class="sales-metrics-error">認証が必要です。ログインしてください。</p>':'')+
- block(cards.slice(0,4))+block(cards.slice(4,8))+block(cards.slice(8))+
- '<div class="sales-metrics-sections">'+
- '<section class="sales-metrics-section sales-annual-panel"><h2>全店｜月間営業推移（5店舗）</h2><div id="salesMonthlyAllStores"></div></section>'+
- '<section class="sales-metrics-section"><h2>成約構成｜新規・リピート</h2><div id="salesContractBreakdown"></div></section>'+
- '<section class="sales-metrics-section"><h2>店舗別｜営業実績の比較</h2><div class="sales-metrics-tablewrap"><table class="sales-metrics-table"><thead><tr><th>店舗</th><th>料金</th><th>利益</th><th>成約数</th><th>客単価</th><th>リピート比率</th></tr></thead><tbody id="salesComparisonRows"></tbody></table></div></section>'+
- '<section class="sales-metrics-section"><h2>指名状況</h2><div id="salesNominationBars"></div></section></div>'+
- '<p class="sales-metrics-footnote">出典：EXA日別レポート。客単価＝料金÷成約数、リピート成約比率＝リピート成約数÷成約数。全店舗合計はEXAの全店舗欄に基づき、各店舗の単純合計で置き換えません。未保存の日はゼロとして計上しません。</p>';
- renderSalesAnnualCharts($('salesMonthlyAllStores'),Number(month.slice(0,4)));
- const breakdown=$('salesContractBreakdown');
- if(has&&c>0){
-  const fresh=Math.max(0,Number(s.new_contracts_count)||0);
-  const repeat=Math.max(0,Number(s.repeat_contracts_count)||0);
-  const classified=fresh+repeat;
-  const freshPercent=classified?fresh/classified*100:0;
-  const repeatPercent=classified?repeat/classified*100:0;
-  const container=document.createElement('div');
-  container.className='sales-contract-pie-layout';
-  const pie=document.createElement('div');
-  pie.className='sales-contract-pie';
-  pie.setAttribute('role','img');
-  pie.setAttribute('aria-label','新規成約 '+salesNumber(fresh)+'件 '+freshPercent.toFixed(1)+'%、リピート成約 '+salesNumber(repeat)+'件 '+repeatPercent.toFixed(1)+'%');
-  pie.style.background=classified?'conic-gradient(#418dd0 0% '+freshPercent+'%, #d781a2 '+freshPercent+'% 100%)':'#e8edf3';
-  const legend=document.createElement('div');
-  legend.className='sales-contract-pie-legend';
-  for(const [label,count,percent,color] of [['新規成約',fresh,freshPercent,'#418dd0'],['リピート成約',repeat,repeatPercent,'#d781a2']]){
-   const item=document.createElement('div');item.className='sales-contract-pie-item';
-   const head=document.createElement('div');head.className='sales-contract-pie-name';
-   const swatch=document.createElement('span');swatch.style.background=color;
-   const labelNode=document.createElement('strong');labelNode.textContent=label;
-   head.append(swatch,labelNode);
-   const value=document.createElement('div');value.className='sales-contract-pie-value';
-   value.textContent=salesNumber(count)+'件';
-   const ratio=document.createElement('div');ratio.className='sales-contract-pie-percent';
-   ratio.textContent=classified?percent.toFixed(1)+'%':'—';
-   item.append(head,value,ratio);legend.append(item);
-  }
-  container.append(pie,legend);breakdown.replaceChildren(container);
-  if(classified!==c){
-   const note=document.createElement('p');note.className='sales-contract-pie-note';
-   note.textContent='成約数と新規・リピートの内訳に差異があります（成約数 '+salesNumber(c)+'件／内訳計 '+salesNumber(classified)+'件）。円グラフは内訳計を基準に表示しています。';
-   breakdown.append(note);
-  }
- }else breakdown.textContent=has?'成約実績はありません':'データなし';
- const tbody=$('salesComparisonRows');
- for(const [key,name] of salesStoreMap){
-  const sr=all.filter(r=>r.store_key===key);
-  const v=salesTotal(sr),ok=sr.length>0;
-  const vals=[name,ok?salesYen(v.revenue_yen):'—',ok?salesYen(v.profit_yen):'—',
-   ok?salesNumber(v.contracts_count)+'件':'—',ok&&v.contracts_count?salesYen(v.revenue_yen/v.contracts_count):'—',
-   ok?salesRatio(v.repeat_contracts_count,v.contracts_count):'—'];
-  const tr=document.createElement('tr');
-  for(const item of vals){const td=document.createElement('td');td.textContent=item;tr.append(td)}tbody.append(tr);
- }
- const nominations=$('salesNominationBars');
- for(const [label,value] of [['フリー数',s.free_count],['本指名数',s.regular_nominations_count],['ネット指名数',s.net_nominations_count]]){
-  const row=document.createElement('div');row.className='sales-metrics-bar-row';
-  const bar=document.createElement('div');bar.className='sales-metrics-bar-fill';
-  const ceiling=Math.max(1,s.free_count,s.regular_nominations_count,s.net_nominations_count);
-  bar.style.width=has?100*value/ceiling+'%':'0%';
-  row.textContent=label+'　'+(has?salesNumber(value)+'件':'—');
-  const track=document.createElement('div');track.className='sales-metrics-bar-track';track.append(bar);row.append(track);nominations.append(row);
- }
+ const stores=salesStoreMap.map(([key,name])=>{
+  const rows=all.filter(r=>r.store_key===key);
+  return {key,name,has:rows.length>0,days:rows.length,totals:salesTotal(rows)};
+ });
+ const values=metric=>stores.map(store=>{
+  if(!store.has||metric.unsupported)return null;
+  const raw=metric.field?store.totals[metric.field]:metric.value(store.totals,store.days);
+  return Number.isFinite(raw)?raw:null;
+ });
+ const escapeHtml=value=>String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+ const formatted=(value,metric)=>value===null?'—':salesNumber(value)+(metric.unit==='円/日'||metric.unit==='円/本'||metric.unit==='円'?'円':metric.unit==='人日'?'人日':metric.unit);
+ const chart=metric=>{
+  const vals=values(metric),maximum=Math.max(1,...vals.filter(v=>v!==null));
+  const bars=stores.map((store,i)=>{
+   const value=vals[i];
+   return '<div class="sales-five-row"><span class="sales-five-shop">'+escapeHtml(store.name)+'</span>'+
+    '<div class="sales-five-track"><div class="sales-five-fill" style="width:'+(value===null?0:Math.max(0,value/maximum*100))+'%;background:'+salesAnnualShopColors[i][1]+'"></div></div>'+
+    '<strong class="sales-five-value">'+formatted(value,metric)+'</strong></div>';
+  }).join('');
+  return '<section class="sales-five-panel"><h3>'+escapeHtml(metric.label)+'</h3><div class="sales-five-bars">'+bars+'</div></section>';
+ };
+ const messages=[
+  salesMetricsData.status==='error'?'営業数値を取得できませんでした。再読み込みしてください。':null,
+  salesMetricsData.status==='login-required'?'認証が必要です。ログインしてください。':null,
+  salesMetricsData.status==='loading'?'営業数値を読み込み中です。':null
+ ].filter(Boolean).map(t=>'<p class="sales-metrics-error">'+escapeHtml(t)+'</p>').join('');
+ root.innerHTML='<div class="sales-five-heading"><strong>5店舗｜営業数値比較</strong><span>'+escapeHtml(month.replace('-','年'))+'月</span></div>'+
+ messages+'<div class="sales-five-grid">'+metrics.map(chart).join('')+'</div>'+
+ '<p class="sales-metrics-footnote">出典：EXA日別レポート。単価平均＝利益総額÷成約本数。利益平均＝取得済み日別レポートの利益合計÷取得済み日数。出勤人数は日別人数を加算した延べ人数です。女子報酬平均・顧客実人数・着信件数は現在の保存データから算出できないため「—」と表示します。店舗別の未保存日は0として扱いません。全店合計は表示しません。</p>';
 }
 async function refreshSalesMetrics(){
  const month=$('storeMetricsMonth').value||dateKey(new Date()).slice(0,7);
