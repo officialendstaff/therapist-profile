@@ -564,13 +564,6 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 .therapist-detail-dialog .therapist-next-shift .therapist-next-value{font-size:15px!important;font-weight:700!important;line-height:1.4!important;white-space:nowrap!important;letter-spacing:-.3px!important}
 @media(max-width:680px){.therapist-detail-dialog .therapist-next-shift .therapist-next-value{font-size:12px!important;letter-spacing:-.4px!important}.therapist-detail-dialog .therapist-next-shift{padding:8px!important}}
 
-#legacyProfile[hidden]{display:none!important}
-.legacy-profile-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
-.legacy-profile-grid>div{padding:9px 10px;border:1px solid #e0e6ee;background:#f9fbfd;border-radius:7px;min-width:0}
-.legacy-profile-grid span{display:block;font-size:11px;color:#64758b;margin-bottom:4px}
-.legacy-profile-grid b{font-size:13px;color:#24374d;font-weight:650;overflow-wrap:anywhere;white-space:pre-wrap}
-.legacy-profile-grid>div:last-child{grid-column:1/-1}
-@media(max-width:520px){.legacy-profile-grid{grid-template-columns:1fr}.legacy-profile-grid>div:last-child{grid-column:auto}}
 </style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script><style id="staff-readonly-shift-v1">
  body.staff-readonly #exaSync,body.staff-readonly #autoSync,body.staff-readonly #unscheduledAdd,
  body.staff-readonly #csvImport,body.staff-readonly #serverTest,body.staff-readonly #residencySave,
@@ -680,15 +673,6 @@ header.lg-common-header .lg-header-home{font-size:17px!important;font-weight:700
     </div>
    </div>
    <div class="therapist-next-shift"><span class="therapist-next-label">次回出勤</span><span class="therapist-next-value" id="therapistNextShift">—</span></div>
-   <div class="person-registry legacy-profile" id="legacyProfile" hidden>
-    <strong>既存在籍者情報</strong>
-    <div class="legacy-profile-grid">
-     <div><span>氏名</span><b id="legacyFullName">—</b></div>
-     <div><span>ふりがな</span><b id="legacyKana">—</b></div>
-     <div><span>生年月日</span><b id="legacyBirth">—</b></div>
-     <div><span>住所</span><b id="legacyAddress">—</b></div>
-    </div>
-   </div>
   </div>
  </div>
  
@@ -1206,23 +1190,6 @@ function renderTherapistNextShift(exaId,person){
  $("residencyInfo").textContent="｜"+person.stage_name+" / EXA ID："+exaId+" / "+statusName;
 }
 let editingResidency=null;
-let legacyInfoRequest=0;
-async function loadLegacyProfile(exaId){
- const request=++legacyInfoRequest;
- $("legacyProfile").hidden=true;
- if(staffReadOnly||!authorized)return;
- const {data,error}=await client.from("therapist_legacy_profiles")
-   .select("full_name,name_kana,birth_date,address")
-   .eq("store_code","grandluxe").eq("exa_id",exaId).maybeSingle();
- if(request!==legacyInfoRequest||!editingResidency||editingResidency.exaId!==exaId||staffReadOnly)return;
- if(error){$("legacyProfile").hidden=false;$("legacyFullName").textContent="取得できません";$("legacyKana").textContent="—";$("legacyBirth").textContent="—";$("legacyAddress").textContent="—";return;}
- if(!data)return;
- $("legacyFullName").textContent=data.full_name||"未登録";
- $("legacyKana").textContent=data.name_kana||"未登録";
- $("legacyBirth").textContent=data.birth_date?data.birth_date.replaceAll("-","/"):"未登録";
- $("legacyAddress").textContent=data.address||"未登録";
- $("legacyProfile").hidden=false;
-}
 function openResidency(button){
  const exaId=Number(button.dataset.staffId);
  const person=therapists.find(t=>t.exa_id===exaId);
@@ -1232,8 +1199,6 @@ function openResidency(button){
  $("residencyInfo").textContent="｜"+person.stage_name+" / EXA ID："+exaId+" / "+({unclassified:"未判定",provisional_hidden:"仮登録",pending_documents:"未入店",real_working:"在籍実働",real_outside:"実働外",long_leave:"長期休暇",dummy_use:"ダミー使用",not_used:"対象外"}[person.operating_category]||"未設定");
  $("residencyChoice").value=["provisional_hidden","pending_documents","real_working","long_leave","dummy_use"].includes(person.operating_category)?person.operating_category:"unclassified";
  $("residencyModal").classList.remove("hide");
- $("legacyProfile").hidden=true;
- if(!staffReadOnly)void loadLegacyProfile(exaId);
  renderTherapistPerformance(exaId);
  renderTherapistNextShift(exaId,person);
  if(staffReadOnly){
@@ -1254,8 +1219,6 @@ function openResidency(button){
  loadSurveyLink(exaId);
 }
 function closeResidency(){
- legacyInfoRequest++;
- $("legacyProfile").hidden=true;
  photoRequest++;
  registryRequest++;
  surveyRequest++;
