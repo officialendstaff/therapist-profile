@@ -324,6 +324,44 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
 .greeting-actions{display:flex;justify-content:flex-end;gap:8px}
 .greeting-actions button{border-radius:7px;padding:9px 14px;border:1px solid #cbd8e6}
 @media(max-width:700px){#editGreeting{padding:6px 8px;font-size:10px}#blockThread{font-size:10px;padding:6px 8px}}
+
+/* Keep customer identity left and prominent actions aligned to the far right. */
+#app .chat-pane .thread-heading{
+ display:flex!important;align-items:center!important;flex-wrap:wrap!important;
+ gap:10px!important;min-height:66px;padding:11px 18px!important;
+}
+#app .chat-pane .thread-heading #threadTitle{
+ flex:0 1 auto;min-width:0;font-size:17px!important;line-height:1.4;
+}
+#app .chat-pane .thread-heading .chat-heading-actions{
+ display:flex;align-items:center;gap:10px;flex:0 0 auto;margin-left:auto;
+}
+#app .chat-pane .thread-heading .chat-heading-actions button{
+ box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;
+ height:36px;min-height:36px;margin:0!important;padding:0 16px!important;
+ border-radius:8px;font-size:13px!important;font-weight:800!important;
+ line-height:1.2!important;white-space:nowrap;
+ box-shadow:0 1px 3px rgba(18,42,68,.07);
+}
+#app .chat-pane .thread-heading .chat-heading-actions #editCustomerName{
+ background:#e7f0fa!important;border:1px solid #89b3d8!important;color:#215781!important;
+}
+#app .chat-pane .thread-heading .chat-heading-actions #blockThread{
+ background:#fff0f2!important;border:1px solid #df9dad!important;color:#aa2b47!important;
+}
+#app .chat-pane .thread-heading .chat-heading-actions #blockThread[data-blocked="true"]{
+ background:#e7f5ec!important;border-color:#9bceb0!important;color:#227448!important;
+}
+#app .chat-pane .thread-heading .chat-heading-actions button[hidden]{display:none!important}
+#app .chat-pane .thread-heading .related:not(:empty){flex:0 0 100%;width:100%;margin-top:0}
+@media(max-width:700px){
+ #app .chat-pane .thread-heading{gap:8px!important;padding:10px 12px!important}
+ #app .chat-pane .thread-heading #threadTitle{font-size:14px!important}
+ #app .chat-pane .thread-heading .chat-heading-actions{gap:6px}
+ #app .chat-pane .thread-heading .chat-heading-actions button{
+  height:34px;min-height:34px;padding:0 9px!important;font-size:11px!important
+ }
+}
 </style></head><body>
 <div id="authLoading" role="status" aria-live="polite"><span class="auth-spinner" aria-hidden="true"></span><span>管理者認証を確認中…</span></div>
 <div id="gate" class="lg-interview-login" hidden><div class="auth-card">
@@ -349,7 +387,7 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
 <div id="error" class="alert" hidden role="alert"></div>
 <div class="layout" id="layout">
 <div class="aside"><div class="filters"><select id="store" aria-label="店舗を切り替える"><option value="all">全店舗</option><option value="Grand Luxe">Grand Luxe</option><option value="LUXY OSAKA">LUXY OSAKA</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select><div class="hint" id="summary">問い合わせを取得中です</div></div><div class="thread-list" id="threads"></div></div>
-<div class="chat-pane"><div class="thread-heading" id="heading"><button id="backToList" type="button">〈 一覧</button><strong id="threadTitle">チャットを選択してください</strong><button id="editCustomerName" class="edit-customer-name" type="button" hidden aria-label="お客様名を編集">✎ 名前変更</button><button id="blockThread" type="button" hidden>ブロック</button><div id="relatedThreads" class="related"></div></div><div class="message-list" id="messages"><div class="placeholder">左の一覧から会話を選択してください。</div></div><form class="reply" id="reply" hidden><textarea id="draft" maxlength="2000" required placeholder="返信を入力" aria-label="返信内容"></textarea><button id="send" class="primary" type="submit">送信</button></form></div>
+<div class="chat-pane"><div class="thread-heading" id="heading"><button id="backToList" type="button">〈 一覧</button><strong id="threadTitle">チャットを選択してください</strong><div class="chat-heading-actions"><button id="editCustomerName" class="edit-customer-name" type="button" hidden aria-label="お客様名を編集">✎ 名前変更</button><button id="blockThread" type="button" hidden>ブロック</button></div><div id="relatedThreads" class="related"></div></div><div class="message-list" id="messages"><div class="placeholder">左の一覧から会話を選択してください。</div></div><form class="reply" id="reply" hidden><textarea id="draft" maxlength="2000" required placeholder="返信を入力" aria-label="返信内容"></textarea><button id="send" class="primary" type="submit">送信</button></form></div>
 </div></div>
 <dialog id="customerNameDialog" class="customer-name-dialog" aria-labelledby="customerNameDialogTitle">
  <form id="customerNameForm">
