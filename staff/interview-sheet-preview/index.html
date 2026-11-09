@@ -1789,7 +1789,7 @@ chart.append(compare);
   const max=Math.max(1,...names.map(n=>counts.get(n)||0));
   const grid=document.createElement('div');grid.className='metrics-v8-media';
   for(const n of names){
-   const row=document.createElement('div');row.className='metrics-v8-media-row';
+   const row=document.createElement('div');row.className='metrics-v8-media-row';setOtherHover(row,n);
    const lab=document.createElement('span');lab.textContent=mediaChartLabel(n);setOtherHover(lab,n);
    const track=document.createElement('div');track.className='metrics-v8-track';
    const v=counts.get(n)||0;const bar=document.createElement('div');bar.className='metrics-v8-fill';bar.style.width=v/max*100+'%';bar.style.background=previewMediaColor(n);track.append(bar);
@@ -1802,7 +1802,7 @@ chart.append(compare);
   const grid=document.createElement('div');grid.className='metrics-v8-comparison';
   const max=Math.max(1,...fixedMedia.flatMap(n=>[nowCounts.get(n)||0,oldCounts.get(n)||0]));
   for(const n of fixedMedia){
-   const item=document.createElement('div');item.className='metrics-v8-compare-item';
+   const item=document.createElement('div');item.className='metrics-v8-compare-item';setOtherHover(item,n);
    const head=document.createElement('strong');head.textContent=mediaChartLabel(n);setOtherHover(head,n);item.append(head);
    for(const [label,counts,ready,color] of [[oldLabel,oldCounts,oldReady,'#adb8c8'],[nowLabel,nowCounts,nowReady,previewMediaColor(n)]]){
     const line=document.createElement('div');line.className='metrics-v8-compare-line';
