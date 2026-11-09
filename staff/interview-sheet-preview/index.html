@@ -1219,7 +1219,7 @@ async function refreshStoreMetricsSheets(){
 
 function showStoreMetrics(){document.getElementById('myPagePanel').hidden=true;bindStoreMetrics();currentPage='集計頁';$('todayPanel').hidden=true;$('sharedPanel').hidden=true;$('applicantDetail').hidden=true;$('registrationPanel').hidden=true;$('storeMetrics').hidden=false;document.querySelector('.main-panel').classList.remove('sheet-mode');document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.page==='集計頁'));if(!$('storeMetricsMonth').value)$('storeMetricsMonth').value=dateKey(new Date()).slice(0,7);renderStoreMetrics();refreshLineInboxReadOnly().then(()=>renderStoreMetrics());refreshInterviewLists().then(()=>renderStoreMetrics());refreshStoreMetricsSheets().then(()=>{if(!$('storeMetrics').hidden)renderStoreMetrics()})}
 const salesMetricsData={month:'',status:'idle',rows:[],request:0,error:''};
-const salesMetricColumns=['revenue_yen','profit_yen','contracts_count','new_contracts_count','repeat_contracts_count','active_staff_count','free_count','regular_nominations_count','net_nominations_count','inbound_people','new_inbound_people'];
+const salesMetricColumns=['revenue_yen','profit_yen','therapist_payout_yen','contracts_count','new_contracts_count','repeat_contracts_count','active_staff_count','free_count','regular_nominations_count','net_nominations_count','inbound_people','new_inbound_people'];
 const salesStoreMap=[['Grand Luxe','Grand Luxe'],['LUXY','LUXY OSAKA'],['Un Secret','Un Secret'],['薔薇と紳士','薔薇と紳士'],['BUSTY OSAKA','BUSTY OSAKA']];
 function salesDayOf(r){return Number(String(r.metric_date||'').slice(-2))}
 function salesTotal(rows){
@@ -1354,12 +1354,12 @@ function renderSalesMetrics(){
  const rows=ready?salesMetricsData.rows:[];
  const stores=salesStoreMap.map(([key,name],i)=>{
   const data=rows.filter(r=>r.store_key===key);
-  return {key,name,short:['Grand Luxe','LUXY','Un Secret','薔薇と紳士','BUSTY'][i],has:data.length>0,days:data.length,totals:salesTotal(data)};
+  return {key,name,short:['Grand Luxe','LUXY','Un Secret','薔薇と紳士','BUSTY'][i],has:data.length>0,days:data.length,payoutAvailable:data.length>0&&data.every(r=>r.therapist_payout_yen!==null&&r.therapist_payout_yen!==undefined),totals:salesTotal(data)};
  });
  const metrics=[
   {label:'成約本数',unit:'本',field:'contracts_count'},
   {label:'利益平均',unit:'円/日',value:(t,days)=>days?t.profit_yen/days:null},
-  {label:'女子報酬平均',unit:'円',unsupported:true},
+  {label:'女子報酬平均',unit:'円/本',requiresPayout:true,value:t=>t.contracts_count?t.therapist_payout_yen/t.contracts_count:null},
   {label:'単価平均',unit:'円/本',value:t=>t.contracts_count?t.profit_yen/t.contracts_count:null},
   {label:'新規数',unit:'本',field:'new_contracts_count'},
   {label:'顧客数',unit:'人',unsupported:true},
@@ -1371,7 +1371,7 @@ function renderSalesMetrics(){
  ];
  const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const valueOf=(metric,store)=>{
-  if(!store.has||metric.unsupported)return null;
+  if(!store.has||metric.unsupported||metric.requiresPayout&&!store.payoutAvailable)return null;
   const value=metric.field?store.totals[metric.field]:metric.value(store.totals,store.days);
   return Number.isFinite(value)?value:null;
  };
@@ -1414,7 +1414,7 @@ function renderSalesMetrics(){
  root.innerHTML='<div class="sales-refined-header"><div><span class="sales-refined-kicker">SALES PERFORMANCE</span><strong>5店舗 営業実績比較</strong></div><span class="sales-refined-month">'+esc(month.replace('-','年'))+'月</span></div>'+errors+
  '<div class="sales-refined-grid">'+metrics.map(svgChart).join('')+'</div>'+
 
- '<p class="sales-metrics-footnote">全11項目を表示。女子報酬平均・顧客数・着信件数は取得できないため各店「—」表示。縦棒は各指標の5店舗比較です。単価平均＝利益総額÷成約本数。利益平均＝利益総額÷集計済み日数。出勤人数＝延べ人数。未保存日を0として計上しません。出典：EXA日別レポート。全店合計は表示しません。</p>';
+ '<p class="sales-metrics-footnote">全11項目を表示。女子報酬平均＝女子報酬合計÷成約本数。女子報酬の未登録期間は「—」表示。顧客実人数・着信件数は元資料に対応する数値がないため「—」表示（Excelの着信人数とは区別）。縦棒は各指標の5店舗比較です。単価平均＝利益総額÷成約本数。利益平均＝利益総額÷集計済み日数。出勤人数＝延べ人数。未保存日を0として計上しません。出典：EXA日別レポート。全店合計は表示しません。</p>';
 }
 async function refreshSalesMetrics(){
  const month=$('storeMetricsMonth').value||dateKey(new Date()).slice(0,7);
