@@ -163,7 +163,14 @@ $("chatScreen").hidden=false;$("storeTitle").textContent=store;
 document.documentElement.style.setProperty("--accent",COLORS[store]);
 const err=(message)=>{$("error").textContent=message;$("error").hidden=false;};
 const clearErr=()=>{$("error").textContent="";$("error").hidden=true;};
-const setReady=v=>{ready=v;$("draft").disabled=!v;$("send").disabled=!v;$("connection").textContent=v?"チャット接続中":"接続待機中";$("connection").previousElementSibling.style.background=v?"#41a184":"#9ba7b4";};
+let isBlocked=false;
+let greetingText="お気軽にお問い合わせください。";
+const setReady=v=>{ready=v;$("draft").disabled=!v||isBlocked;$("send").disabled=!v||isBlocked;$("connection").textContent=isBlocked?"受付停止中":v?"チャット接続中":"接続待機中";$("connection").previousElementSibling.style.background=isBlocked?"#bf7d7d":v?"#41a184":"#9ba7b4";};
+function setBlocked(value){
+ isBlocked=!!value;setReady(ready);
+ if(isBlocked){$("draft").placeholder="このチャットでは現在メッセージを送信できません。";err("このチャットでは現在メッセージを送信できません。過去の履歴は閲覧できます。");}
+ else{$("draft").placeholder="メッセージを入力";if($("error").textContent.includes("このチャットでは現在"))clearErr();}
+}
 async function api(payload){
  const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),15000);
  try{
@@ -245,7 +252,7 @@ function add(messages){
 function empty(){
  if($("timeline").children.length)return;
  const p=document.createElement("div");p.className="empty";p.id="welcome";
- p.textContent="お気軽にお問い合わせください。";
+ p.textContent=greetingText;
  $("timeline").append(p);
 }
 function removeWelcome(){const p=$("welcome");if(p)p.remove()}
@@ -291,26 +298,27 @@ async function init(){
   catch(e){if(e.status===401&&token){token="";clearToken();data=await api({action:"guest_init",store})}else throw e}
   if(data.token){token=data.token;saveToken(token)}
   if(!token)throw Error("no_session");
-  $("timeline").replaceChildren();lastId=0;add(data.messages||[]);empty();setReady(true);scheduleLatestScroll();
+  greetingText=typeof data.greeting==="string"&&data.greeting.trim()?data.greeting:"お気軽にお問い合わせください。";
+  $("timeline").replaceChildren();lastId=0;add(data.messages||[]);empty();setReady(true);setBlocked(data.blocked);scheduleLatestScroll();
  }catch(e){err("チャットに接続できません。ページを再読み込みしてください。（"+String(e.message||e)+"）");setReady(false)}
 }
 async function poll(){
  if(!ready||polling||posting||document.hidden)return;
  polling=true;
- try{const data=await api({action:"guest_poll",token,store,after:lastId});if(data.messages?.length){removeWelcome();add(data.messages)}}
+ try{const data=await api({action:"guest_poll",token,store,after:lastId});setBlocked(data.blocked);if(data.messages?.length){removeWelcome();add(data.messages)}}
  catch(e){if(e.status===401){setReady(false);err("識別情報の有効期限が切れました。ページを再読み込みしてください。")}}
  finally{polling=false}
 }
 $("composer").addEventListener("submit",async e=>{
- e.preventDefault();if(!ready||posting)return;
+ e.preventDefault();if(!ready||posting||isBlocked)return;
  const body=$("draft").value.trim();if(!body)return;
  posting=true;$("send").disabled=true;$("send").textContent="送信中";$("send").setAttribute("aria-label","送信中");clearErr();
  const client_message_id=crypto.randomUUID();
  try{
   const data=await api({action:"guest_send",token,store,body,client_message_id});
   removeWelcome();add([data.message]);$("draft").value="";
- }catch(e){err("送信できませんでした。再度お試しください。（"+String(e.message||e)+"）")}
- finally{posting=false;$("send").textContent="送信";$("send").setAttribute("aria-label","送信");$("send").disabled=!ready;$("draft").focus()}
+ }catch(e){if(e.status===403&&e.message==="blocked"){setBlocked(true)}else err("送信できませんでした。再度お試しください。（"+String(e.message||e)+"）")}
+ finally{posting=false;$("send").textContent="送信";$("send").setAttribute("aria-label","送信");$("send").disabled=!ready||isBlocked;if(!isBlocked)$("draft").focus()}
 });
 $("draft").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!("isComposing" in e&&e.isComposing)){e.preventDefault();$("composer").requestSubmit()}});
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)void poll()});
