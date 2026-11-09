@@ -264,9 +264,8 @@ function showGreeting(info={},force=false){
  greetingShownKey=key;
  const banner=document.createElement("div");banner.className="chat-greeting-notice";
  banner.dataset.greetingKey=key;
- const title=document.createElement("strong");title.textContent="本日のご案内";
  const body=document.createElement("div");body.textContent=greetingText;
- banner.append(title,body);$("timeline").append(banner);
+ banner.append(body);$("timeline").append(banner);
  scheduleLatestScroll();
 }
 function empty(){/* Greeting is shown independently, including when history exists. */}
