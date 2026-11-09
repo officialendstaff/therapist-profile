@@ -376,6 +376,27 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
  border:1px solid;border-radius:5px;font-size:11px;font-weight:750;white-space:nowrap
 }
 @media(max-width:700px){#app .chat-pane .thread-heading{min-height:84px!important}}
+
+/* Centered in-page confirmation instead of the browser's native confirm(). */
+#chatBlockDialog{
+ box-sizing:border-box;position:fixed;inset:0;margin:auto;
+ width:min(92vw,440px);max-height:calc(100dvh - 32px);overflow:auto;
+ border:1px solid #d6e1ed;border-radius:14px;background:#fff;
+ padding:25px 26px 23px;color:#223850;box-shadow:0 22px 70px rgba(10,30,55,.32)
+}
+#chatBlockDialog::backdrop{background:rgba(16,30,49,.54)}
+#chatBlockDialog h2{margin:0 0 12px;font-size:19px;font-weight:800;color:#1d344e}
+#chatBlockDialog p{margin:0;font-size:14px;line-height:1.75;color:#4f657d}
+#chatBlockDialog .block-dialog-note{margin-top:9px;font-size:12px;color:#8190a2}
+#chatBlockDialog .block-dialog-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:23px}
+#chatBlockDialog .block-dialog-actions button{height:40px;min-width:108px;border-radius:8px;padding:0 16px;font-size:13px;font-weight:800}
+#blockDialogCancel{background:#eef3f8;color:#35536f;border:1px solid #cbd7e4}
+#blockDialogConfirm{background:#b73350;color:#fff;border:1px solid #a62a46}
+#blockDialogConfirm[data-unblock="true"]{background:#287c53;border-color:#207047}
+#chatBlockDialog button:disabled{opacity:.55;cursor:wait}
+#blockDialogError{margin-top:11px!important;color:#b22c46!important;font-size:12px!important}
+#blockDialogError:empty{display:none}
+@media(max-width:700px){#chatBlockDialog{padding:22px 18px}#chatBlockDialog .block-dialog-actions button{flex:1;min-width:0}}
 </style></head><body>
 <div id="authLoading" role="status" aria-live="polite"><span class="auth-spinner" aria-hidden="true"></span><span>管理者認証を確認中…</span></div>
 <div id="gate" class="lg-interview-login" hidden><div class="auth-card">
@@ -412,6 +433,16 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
   <p id="customerNameError" class="customer-name-error" role="alert" aria-live="polite"></p>
   <div class="customer-name-buttons"><button type="button" id="customerNameCancel">キャンセル</button><button type="submit" id="customerNameSave" class="primary">保存</button></div>
  </form>
+</dialog>
+<dialog id="chatBlockDialog" aria-labelledby="chatBlockDialogTitle" aria-describedby="chatBlockDialogDescription">
+ <h2 id="chatBlockDialogTitle">チャットをブロック</h2>
+ <p id="chatBlockDialogDescription">この店舗のお客様とのチャットをブロックします。よろしいですか？</p>
+ <p class="block-dialog-note" id="chatBlockDialogNote">過去の会話履歴は削除されません。</p>
+ <p id="blockDialogError" role="alert"></p>
+ <div class="block-dialog-actions">
+  <button id="blockDialogCancel" type="button">キャンセル</button>
+  <button id="blockDialogConfirm" type="button">ブロックする</button>
+ </div>
 </dialog>
 <dialog id="greetingDialog" aria-labelledby="greetingTitle"><form id="greetingForm"><h2 id="greetingTitle">あいさつ文編集</h2><label>対象店舗<select id="greetingStore" required><option value="Grand Luxe">Grand Luxe</option><option value="LUXY OSAKA">LUXY OSAKA</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select></label><label>お客様用チャットに表示する本文<textarea id="greetingText" maxlength="500" required></textarea></label><p id="greetingStatus" role="status" style="font-size:12px;color:#526e89;margin:0"></p><div class="greeting-actions"><button id="greetingCancel" type="button">キャンセル</button><button id="greetingSave" type="submit" class="primary">保存</button></div></form></dialog>
 <script>
@@ -800,17 +831,45 @@ $("reply").addEventListener("submit",async e=>{
  finally{replying=false;$("send").disabled=false}
 });
 
-$("blockThread").addEventListener("click",async()=>{
- if(!threadId||!token)return;
+let blockDialogBusy=false;
+$("blockThread").addEventListener("click",()=>{
+ if(!threadId||!token||blockDialogBusy)return;
  const blocked=$("blockThread").dataset.blocked==="true";
- if(!blocked&&!confirm("この店舗のチャットをブロックします。履歴は削除しません。よろしいですか？"))return;
- $("blockThread").disabled=true;
+ $("chatBlockDialog").dataset.threadId=threadId;
+ $("chatBlockDialog").dataset.blocked=String(blocked);
+ $("chatBlockDialogTitle").textContent=blocked?"チャットのブロック解除":"チャットをブロック";
+ $("chatBlockDialogDescription").textContent=blocked
+  ?"この店舗のお客様のチャットを再開します。よろしいですか？"
+  :"この店舗のお客様とのチャットをブロックします。よろしいですか？";
+ $("chatBlockDialogNote").textContent=blocked
+  ?"ブロックを解除すると、再びメッセージを送受信できます。"
+  :"過去の会話履歴は削除されません。";
+ $("blockDialogConfirm").textContent=blocked?"解除する":"ブロックする";
+ $("blockDialogConfirm").dataset.unblock=String(blocked);
+ $("blockDialogError").textContent="";
+ $("chatBlockDialog").showModal();
+});
+$("blockDialogCancel").addEventListener("click",()=>{if(!blockDialogBusy)$("chatBlockDialog").close()});
+$("chatBlockDialog").addEventListener("cancel",e=>{if(blockDialogBusy)e.preventDefault()});
+$("blockDialogConfirm").addEventListener("click",async()=>{
+ if(blockDialogBusy||!token)return;
+ const modal=$("chatBlockDialog"),targetId=modal.dataset.threadId;
+ const blocked=modal.dataset.blocked==="true";
+ if(!targetId)return;
+ blockDialogBusy=true;
+ $("blockDialogConfirm").disabled=true;$("blockDialogCancel").disabled=true;
+ $("blockDialogError").textContent="";
  try{
-  await call(blocked?"staff_unblock":"staff_block",{thread_id:threadId});
+  await call(blocked?"staff_unblock":"staff_block",{thread_id:targetId});
+  modal.close();
   await loadList();
-  await openThread(threadId,{refresh:true});
- }catch(err){showError("ブロック操作に失敗しました。（"+String(err.message||err)+"）")}
- finally{$("blockThread").disabled=false}
+  if(threadId===targetId)await openThread(targetId,{refresh:true});
+ }catch(err){
+  $("blockDialogError").textContent="操作できませんでした。（"+String(err.message||err)+"）";
+ }finally{
+  blockDialogBusy=false;
+  $("blockDialogConfirm").disabled=false;$("blockDialogCancel").disabled=false;
+ }
 });
 async function loadGreeting(){
  const store=$("greetingStore").value;
