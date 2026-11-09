@@ -627,7 +627,7 @@ header.lg-common-header .lg-header-home{font-size:17px!important;font-weight:700
   </div>
   <div class="therapist-detail-controls">
    <div class="person-registry interview-match">
-    <strong>Interview</strong>
+    <strong id="personRegistryHeading">Interview</strong>
     <p id="personRegistryState" class="muted">確認中…</p>
     <button id="interviewLinkOpen" type="button" class="hide">Interviewを選択</button>
     <div id="interviewLinkPanel" class="hide">
@@ -1024,6 +1024,7 @@ async function loadPersonRegistry(exaId){
  $("interviewLinkPanel").classList.add("hide");
  $("interviewLinkConfirm").classList.add("hide");
  $("interviewResults").replaceChildren();
+ $("personRegistryHeading").textContent="Interview";
  $("personRegistryState").textContent="面接情報を確認中…";
  try{
   const allowed=await client.rpc("can_link_therapist_interview");
@@ -1040,6 +1041,14 @@ async function loadPersonRegistry(exaId){
     $("personRegistryState").textContent="紐づけ済み";
     return;
    }
+  }
+  const legacy=await client.from("therapist_legacy_profiles").select("exa_id").eq("store_code","unsecret").eq("exa_id",exaId).maybeSingle();
+  if(legacy.error)throw legacy.error;
+  if(request!==registryRequest)return;
+  if(legacy.data){
+   $("personRegistryHeading").textContent="既存在籍者情報";
+   $("personRegistryState").textContent="Excel登録済み";
+   return;
   }
   const person=therapists.find(t=>t.exa_id===exaId);
   if(person?.residency==="dummy"){
@@ -1089,6 +1098,9 @@ $("interviewLinkConfirm").onclick=async()=>{
  const exaId=editingResidency.exaId,exaName=editingResidency.name;
  const item=searchInterviewItems.find(x=>x.id===selectedInterviewId);
  if(!item)return;
+ const legacyCheck=await client.from("therapist_legacy_profiles").select("exa_id").eq("store_code","unsecret").eq("exa_id",exaId).maybeSingle();
+ if(legacyCheck.error){showMsg("在籍者情報の確認に失敗："+legacyCheck.error.message,true);return;}
+ if(legacyCheck.data){showMsg("Excel登録済みのためInterviewとの紐づけ対象外です。",true);await loadPersonRegistry(exaId);return;}
  if(!confirm("EXA："+exaName+"（ID "+exaId+"）\nInterview："+(item.name||"氏名未登録")+"（"+(item.hire_shop||item.shop||"店舗未登録")+"）\n\n同一人物であることを確認しましたか？\n確定すると面接情報が紐づきます。"))return;
  linkingInterview=true;$("interviewLinkConfirm").disabled=true;
  try{
