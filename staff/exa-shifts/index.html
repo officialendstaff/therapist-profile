@@ -564,6 +564,16 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 .therapist-detail-dialog .therapist-next-shift .therapist-next-value{font-size:15px!important;font-weight:700!important;line-height:1.4!important;white-space:nowrap!important;letter-spacing:-.3px!important}
 @media(max-width:680px){.therapist-detail-dialog .therapist-next-shift .therapist-next-value{font-size:12px!important;letter-spacing:-.4px!important}.therapist-detail-dialog .therapist-next-shift{padding:8px!important}}
 
+
+/* rose reading safety fallback 20261110 */
+.shift-table .staff-name:has(>.name-editor[data-staff-id="31"]):not(:has(>.reading))::after{content:"いずみ";display:block;font-weight:400;color:#77879c;font-size:9px;line-height:1.2;margin-top:2px;}
+.shift-table .staff-name:has(>.name-editor[data-staff-id="65"]):not(:has(>.reading))::after{content:"なな";display:block;font-weight:400;color:#77879c;font-size:9px;line-height:1.2;margin-top:2px;}
+.shift-table .staff-name:has(>.name-editor[data-staff-id="90"]):not(:has(>.reading))::after{content:"ふじさわ";display:block;font-weight:400;color:#77879c;font-size:9px;line-height:1.2;margin-top:2px;}
+.shift-table .staff-name:has(>.name-editor[data-staff-id="121"]):not(:has(>.reading))::after{content:"ひろせ";display:block;font-weight:400;color:#77879c;font-size:9px;line-height:1.2;margin-top:2px;}
+.shift-table .staff-name:has(>.name-editor[data-staff-id="130"]):not(:has(>.reading))::after{content:"くろき";display:block;font-weight:400;color:#77879c;font-size:9px;line-height:1.2;margin-top:2px;}
+.shift-table .staff-name:has(>.name-editor[data-staff-id="138"]):not(:has(>.reading))::after{content:"ゆきむら";display:block;font-weight:400;color:#77879c;font-size:9px;line-height:1.2;margin-top:2px;}
+.shift-table .staff-name:has(>.name-editor[data-staff-id="151"]):not(:has(>.reading))::after{content:"うえと";display:block;font-weight:400;color:#77879c;font-size:9px;line-height:1.2;margin-top:2px;}
+.shift-table .staff-name:has(>.name-editor[data-staff-id="191"]):not(:has(>.reading))::after{content:"まつい";display:block;font-weight:400;color:#77879c;font-size:9px;line-height:1.2;margin-top:2px;}
 </style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script><style id="staff-readonly-shift-v1">
  body.staff-readonly #exaSync,body.staff-readonly #autoSync,body.staff-readonly #unscheduledAdd,
  body.staff-readonly #csvImport,body.staff-readonly #serverTest,body.staff-readonly #residencySave,
