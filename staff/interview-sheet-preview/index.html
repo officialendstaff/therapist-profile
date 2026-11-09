@@ -666,13 +666,24 @@ html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!imp
 .metrics-v8-media-row .metrics-v8-fill,.metrics-v8-compare-line .metrics-v8-fill{box-shadow:inset 0 1px rgba(255,255,255,.28)}
 .metrics-v8-age-row .metrics-v8-fill{box-shadow:inset 0 1px rgba(255,255,255,.1)}
 
-#storeMetricsHeader{gap:10px!important;align-items:center!important}
+#storeMetricsHeader{gap:10px!important;align-items:center!important;min-height:49px!important;padding:0!important;margin:0!important}
+.metrics-inner-month-nav{display:flex;align-items:center;gap:5px;flex:none;white-space:nowrap}
+.metrics-inner-month-nav[hidden]{display:none!important}
+.metrics-inner-month-nav button{height:26px;min-width:30px;padding:0 7px;border:1px solid #cbd7e8;border-radius:4px;background:#fff;color:#405b7c;font-weight:700;font-size:12px;cursor:pointer}
+.metrics-inner-month-nav button:disabled{opacity:.38;cursor:not-allowed}
+#metricsInnerMonthValue{min-width:36px;text-align:center;font-size:12px;font-weight:800}
+#storeMetricsHeader .metrics-mode-tabs{height:35px!important;display:flex!important;align-items:center!important;gap:2px!important;padding:3px!important;background:#edf2f9!important;border:1px solid #d4deeb!important;border-radius:6px!important}
+#storeMetricsHeader .metrics-mode-tabs button{height:27px!important;min-height:0!important;padding:0 12px!important;border:0!important;border-radius:4px!important;font-weight:700!important;font-size:12px!important;white-space:nowrap!important}
+#storeMetricsHeader .metrics-mode-tabs button[aria-selected="true"]{background:#fff!important;color:#174b86!important;box-shadow:0 0 0 1px #bbd1e8!important}
+#storeMetricsHeader .metrics-mode-tabs button[aria-selected="false"]{background:transparent!important;color:#95a6be!important}
+#storeMetricsHeader .metrics-kpi{height:48px!important}
+
 #storeMetricsHeader .metrics-mode-tabs{flex:none}
 #metricsInterviewTab{font-size:0!important}
 #metricsInterviewTab:after{content:'面接数値';font-size:13px}
-.interview-period-switch{display:flex;gap:3px;flex:none;padding:3px;border:1px solid #d4deeb;background:#edf2f9;border-radius:6px}
-.interview-period-switch button{border:0;border-radius:4px;background:transparent;color:#506780;font-size:12px;font-weight:700;padding:6px 12px;cursor:pointer}
-.interview-period-switch button.active{color:#174b86;background:#fff;box-shadow:0 0 0 1px #bbd1e8}
+.interview-period-switch{display:flex;gap:5px;flex:none;padding:0;border:0;background:transparent}
+.interview-period-switch button{height:26px;border:1px solid #cbd7e8;border-radius:4px;background:#fff;color:#45607f;font-size:12px;font-weight:700;padding:0 12px;cursor:pointer}
+.interview-period-switch button.active{color:#14548c;background:#e7f0fb;border-color:#7dadd7}
 #storeMetricsHeader>.store-metrics-kpis{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:6px!important;flex:1;min-width:0}
 #storeMetricsHeader .metrics-kpi{border:1px solid #d1deed;background:#f5f8fd;border-radius:5px;height:48px;padding:5px 8px;min-width:0}
 #storeMetricsHeader .metrics-kpi small{display:block;font-size:9px;color:#627a95;white-space:nowrap}
@@ -1444,6 +1455,13 @@ function bindInterviewMetricsPeriod(){
   group.append(button);
  }
  hdr.querySelector('.metrics-mode-tabs')?.after(group);
+ const nav=document.createElement('div');nav.id='metricsInnerMonthNav';nav.className='metrics-inner-month-nav';
+ const prev=document.createElement('button');prev.type='button';prev.textContent='◀';prev.setAttribute('aria-label','前月');
+ const label=document.createElement('strong');label.id='metricsInnerMonthValue';
+ const next=document.createElement('button');next.type='button';next.textContent='▶';next.setAttribute('aria-label','翌月');
+ prev.addEventListener('click',()=>document.getElementById('storeMetricsPrev')?.click());
+ next.addEventListener('click',()=>document.getElementById('storeMetricsNext')?.click());
+ nav.append(prev,label,next);group.after(nav);
 }
 function renderStoreMetrics(){
  bindInterviewMetricsPeriod();
@@ -1697,6 +1715,13 @@ chart.append(compare);
  const periodControl=document.getElementById('interviewPeriodSwitch');
  if(periodControl)for(const b of periodControl.querySelectorAll('button'))b.classList.toggle('active',b.dataset.period===interviewMetricsPeriod);
  $('storeMetricsMonthLabel').textContent=annual?yr+'年':yr+'年'+mo+'月';
+ const monthNav=document.getElementById('metricsInnerMonthNav');
+ if(monthNav){
+  monthNav.hidden=annual;
+  const monthLabel=document.getElementById('metricsInnerMonthValue');if(monthLabel)monthLabel.textContent=mo+'月';
+  const arrows=monthNav.querySelectorAll('button');
+  if(arrows[1])arrows[1].disabled=month>=todayMonth;
+ }
  const header=document.getElementById('storeMetricsHeader');
  header.querySelector('.store-metrics-kpis')?.remove();
  const applicable=annual?Array.from({length:12},(_,i)=>yr+'-'+String(i+1).padStart(2,'0')):[month];
