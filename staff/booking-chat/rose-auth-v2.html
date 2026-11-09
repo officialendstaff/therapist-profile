@@ -321,6 +321,10 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
 #greetingForm label{font-size:12px;font-weight:750;display:flex;flex-direction:column;gap:6px}
 #greetingForm textarea,#greetingForm select{border:1px solid #cbdae8;border-radius:7px;padding:10px;width:100%;background:#fff;color:#20354e}
 #greetingForm textarea{min-height:145px;resize:vertical}
+#greetingDialog .greeting-link-fields{display:flex;flex-direction:column;gap:11px;margin:2px 0;padding:14px;background:#f6f9fd;border:1px solid #d9e5f0;border-radius:9px}
+#greetingDialog .greeting-link-fields strong{font-size:13px;color:#2c4c6c}
+#greetingDialog .greeting-link-fields input{width:100%;border:1px solid #cbdae8;border-radius:7px;padding:10px;background:#fff;color:#20354e;font-size:13px}
+#greetingDialog .greeting-link-fields small{font-size:11px;color:#73869b;line-height:1.6}
 #greetingDialog .greeting-current{padding:12px 14px;background:#f3f7fb;border:1px solid #d8e4ef;border-radius:8px}
 #greetingDialog .greeting-current strong{font-size:12px;color:#385775;display:block;margin-bottom:7px}
 #greetingCurrentText{font-size:13px;line-height:1.7;color:#203b56;white-space:pre-wrap;overflow-wrap:anywhere}
@@ -448,7 +452,7 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
   <button id="blockDialogConfirm" type="button">ブロックする</button>
  </div>
 </dialog>
-<dialog id="greetingDialog" aria-labelledby="greetingTitle"><form id="greetingForm"><h2 id="greetingTitle">あいさつ文編集</h2><label>対象店舗<select id="greetingStore" required><option value="Grand Luxe">Grand Luxe</option><option value="LUXY OSAKA">LUXY OSAKA</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select></label><div class="greeting-current"><strong>現在のあいさつ文（変更前）</strong><div id="greetingCurrentText">読み込み中…</div></div><label>お客様用チャットに表示する本文<textarea id="greetingText" maxlength="500" required></textarea></label><p id="greetingStatus" role="status" style="font-size:12px;color:#526e89;margin:0"></p><div class="greeting-actions"><button id="greetingCancel" type="button">キャンセル</button><button id="greetingSave" type="submit" class="primary">保存</button></div></form></dialog>
+<dialog id="greetingDialog" aria-labelledby="greetingTitle"><form id="greetingForm"><h2 id="greetingTitle">あいさつ文編集</h2><label>対象店舗<select id="greetingStore" required><option value="Grand Luxe">Grand Luxe</option><option value="LUXY OSAKA">LUXY OSAKA</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select></label><div class="greeting-current"><strong>現在のあいさつ文（変更前）</strong><div id="greetingCurrentText">読み込み中…</div></div><label>お客様用チャットに表示する本文<textarea id="greetingText" maxlength="500" required></textarea></label><div class="greeting-link-fields"><strong>文字列にリンクを設定（任意）</strong><label>リンクにする文字列<input id="greetingLinkText" type="text" maxlength="100" autocomplete="off" placeholder="例：本日の出勤スケジュールを見る"></label><label>リンク先URL<input id="greetingLinkUrl" type="url" maxlength="1000" inputmode="url" autocomplete="url" placeholder="https://example.com/"></label><small>本文に含まれる文字列を指定してください。リンク先は新しいタブで開きます。</small></div><p id="greetingStatus" role="status" style="font-size:12px;color:#526e89;margin:0"></p><div class="greeting-actions"><button id="greetingCancel" type="button">キャンセル</button><button id="greetingSave" type="submit" class="primary">保存</button></div></form></dialog>
 <script>
 (()=>{
 "use strict";
@@ -879,11 +883,11 @@ async function loadGreeting(){
  const store=$("greetingStore").value;
  $("greetingStatus").textContent="読み込み中…";
  $("greetingCurrentText").textContent="読み込み中…";
- $("greetingText").value="";
+ $("greetingText").value="";$("greetingLinkText").value="";$("greetingLinkUrl").value="";
  $("greetingSave").disabled=true;
  try{
   const data=await call("staff_get_greeting",{store});
-  if($("greetingStore").value===store){$("greetingText").value=data.greeting;$("greetingCurrentText").textContent=data.greeting;$("greetingStatus").textContent=""}
+  if($("greetingStore").value===store){$("greetingText").value=data.greeting;$("greetingCurrentText").textContent=data.greeting;$("greetingLinkText").value=data.link_text||"";$("greetingLinkUrl").value=data.link_url||"";$("greetingStatus").textContent=""}
  }catch(err){$("greetingCurrentText").textContent="取得できませんでした";$("greetingStatus").textContent="読み込み失敗："+String(err.message||err)}
  finally{$("greetingSave").disabled=false}
 }
@@ -896,9 +900,13 @@ $("greetingCancel").addEventListener("click",()=>$("greetingDialog").close());
 $("greetingForm").addEventListener("submit",async e=>{
  e.preventDefault();
  const store=$("greetingStore").value,greeting=$("greetingText").value.trim();
+ const link_text=$("greetingLinkText").value.trim(),link_url=$("greetingLinkUrl").value.trim();
  if(!greeting)return;
+ if(Boolean(link_text)!==Boolean(link_url)){$("greetingStatus").textContent="リンク文字列とURLは両方入力してください。";return}
+ if(link_text&&!greeting.includes(link_text)){$("greetingStatus").textContent="リンクにする文字列を本文内に入力してください。";return}
+ if(link_url){try{const url=new URL(link_url);if(url.protocol!=="https:"||url.username||url.password)throw Error("invalid")}catch{$("greetingStatus").textContent="リンク先は有効なhttps://のURLを入力してください。";return}}
  $("greetingSave").disabled=true;$("greetingStatus").textContent="保存中…";
- try{await call("staff_set_greeting",{store,greeting});$("greetingCurrentText").textContent=greeting;$("greetingStatus").textContent="保存しました";$("greetingDialog").close()}
+ try{await call("staff_set_greeting",{store,greeting,link_text,link_url});$("greetingCurrentText").textContent=greeting;$("greetingStatus").textContent="保存しました";$("greetingDialog").close()}
  catch(err){$("greetingStatus").textContent="保存失敗："+String(err.message||err)}
  finally{$("greetingSave").disabled=false}
 });
