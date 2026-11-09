@@ -873,7 +873,10 @@ if(staffView==="all")html+='<tr class="group"><td colspan="'+(daysIn()+5)+'">'+l
 for(const t of list){const entries=byId.get(t.exa_id)||new Map(),valid=[...entries.values()].filter(r=>r.work_date<today()&&(!isDummy(t))&&!r.is_dummy_shift&&per.has(t.exa_id+"|"+r.work_date));const historical=historyPerformances.filter(p=>p.exa_id===t.exa_id&&p.attendance_status!=="absent");const avg=historical.length?(historical.reduce((sum,p)=>sum+p.customer_count,0)/historical.length).toFixed(1):"—";
 const rawName=String(t.stage_name||"ID "+t.exa_id);
 const nameParts=rawName.match(/^(.+?)-([^-]+)-$/);
-const stageName=nameParts?nameParts[1]:rawName,kana=nameParts?nameParts[2]:"";
+const stageName=nameParts?nameParts[1]:rawName;
+const officialRoseReadings={31:{name:"和泉",kana:"いずみ"},65:{name:"奈々",kana:"なな"},90:{name:"藤沢",kana:"ふじさわ"},121:{name:"広瀬",kana:"ひろせ"},130:{name:"黒木",kana:"くろき"},138:{name:"雪村",kana:"ゆきむら"},151:{name:"上戸",kana:"うえと"},191:{name:"松井",kana:"まつい"}};
+const knownReading=officialRoseReadings[t.exa_id];
+const kana=nameParts?nameParts[2]:(knownReading&&knownReading.name===stageName?knownReading.kana:"");
 const upcoming=futureShifts.some(r=>r.exa_id===t.exa_id&&r.work_date>=today()&&!r.is_dummy_shift&&!r.is_pre_off);
 const outside=group==="real"&&!upcoming&&!["long_leave","pending_documents","provisional_hidden"].includes(t.operating_category);
 const latestDates=futureShifts.filter(r=>r.exa_id===t.exa_id&&!r.is_dummy_shift&&!r.is_pre_off).map(r=>r.work_date).sort();
