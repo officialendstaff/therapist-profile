@@ -73,11 +73,18 @@ const $=id=>document.getElementById(id);
 const search=new URLSearchParams(location.search);
 const store=search.get("store");
 const embedded=search.get("embed")==="1";
-const trustedParents=new Set(["https://rose-gentleman.com","https://www.rose-gentleman.com","https://officialendstaff.github.io"]);
+const allowedEmbedOrigins={
+ "Grand Luxe":new Set(["https://grandluxe-osaka.com","https://www.grandluxe-osaka.com"]),
+ "LUXY OSAKA":new Set(["https://luxy-spa.com","https://www.luxy-spa.com"]),
+ "Un Secret":new Set(["https://unsecret-osaka.com","https://www.unsecret-osaka.com"]),
+ "薔薇と紳士":new Set(["https://rose-gentleman.com","https://www.rose-gentleman.com"]),
+ "BUSTY OSAKA":new Set(["https://busty-osaka.com","https://www.busty-osaka.com"])
+};
 let parentOrigin="";
 if(embedded){
  try{parentOrigin=new URL(document.referrer).origin}catch{}
- if(store!=="薔薇と紳士"||!trustedParents.has(parentOrigin)){
+ const trusted=parentOrigin==="https://officialendstaff.github.io"||allowedEmbedOrigins[store]?.has(parentOrigin);
+ if(!trusted){
   document.body.textContent="このサイトからはチャットを利用できません。";
   return;
  }
