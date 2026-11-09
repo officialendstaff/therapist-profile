@@ -362,6 +362,20 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
   height:34px;min-height:34px;padding:0 9px!important;font-size:11px!important
  }
 }
+/* Keep two-row chat heading consistent for customers with or without other-store history. */
+#app .chat-pane .thread-heading{align-content:center!important;row-gap:6px!important;min-height:88px!important}
+#app .chat-pane .thread-heading .related,
+#app .chat-pane .thread-heading .related:empty{
+ flex:0 0 100%!important;width:100%!important;min-height:24px!important;
+ margin:0!important;display:flex!important;align-items:center!important;flex-wrap:wrap;gap:6px;
+}
+#app .chat-pane .thread-heading .related .related-label{color:#75879b;font-size:11px;font-weight:700;white-space:nowrap}
+#app .chat-pane .thread-heading .related .related-store-link{
+ display:inline-flex;align-items:center;justify-content:center;
+ min-height:24px!important;padding:3px 8px!important;
+ border:1px solid;border-radius:5px;font-size:11px;font-weight:750;white-space:nowrap
+}
+@media(max-width:700px){#app .chat-pane .thread-heading{min-height:84px!important}}
 </style></head><body>
 <div id="authLoading" role="status" aria-live="polite"><span class="auth-spinner" aria-hidden="true"></span><span>管理者認証を確認中…</span></div>
 <div id="gate" class="lg-interview-login" hidden><div class="auth-card">
@@ -698,13 +712,18 @@ async function openThread(id,options={}){
   }
   drawList();
   const rel=$("relatedThreads");rel.replaceChildren();
-  if(data.related?.length){
-   const label=document.createElement("span");label.textContent="他店舗履歴：";rel.append(label);
-   for(const item of data.related){
-    const link=document.createElement("button");link.type="button";link.textContent=item.store_key;
-    link.addEventListener("click",()=>{if($("store").value!=="all"){$("store").value="all";void loadList()}void openThread(item.id)});
-    rel.append(link);
-   }
+  const relatedLabel=document.createElement("span");
+  relatedLabel.className="related-label";
+  relatedLabel.textContent="他店舗履歴：";
+  rel.append(relatedLabel);
+  for(const item of data.related||[]){
+   const link=document.createElement("button");link.type="button";
+   const storeName=item.store_key==="LUXY"?"LUXY OSAKA":String(item.store_key||"");
+   link.textContent=storeName;link.className="related-store-link";
+   const theme=SHOP_THEME[storeName];
+   if(theme){link.style.background=theme.bg;link.style.color=theme.fg;link.style.borderColor=theme.border}
+   link.addEventListener("click",()=>{if($("store").value!=="all"){$("store").value="all";void loadList()}void openThread(item.id)});
+   rel.append(link);
   }
   const pane=$("messages");
   const wasAtBottom=pane.scrollHeight-pane.scrollTop-pane.clientHeight<90;
