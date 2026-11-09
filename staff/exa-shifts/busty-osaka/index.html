@@ -1026,11 +1026,7 @@ async function loadPersonRegistry(exaId){
    if(matches.error)throw matches.error;
    if(request!==registryRequest)return;
    if(matches.data.length){
-    const ids=matches.data.map(x=>x.interview_applicant_id);
-    const found=await client.from("interview_applicants").select("id,name,stage_name,shop,hire_shop,status").in("id",ids);
-    if(found.error)throw found.error;
-    if(request!==registryRequest)return;
-    $("personRegistryState").textContent="紐づけ済み："+(found.data||[]).map(x=>[x.name||"氏名未登録",x.status||"状態未記録"].join("／")).join("、");
+    $("personRegistryState").textContent="紐づけ済み";
     return;
    }
   }
