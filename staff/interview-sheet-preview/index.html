@@ -750,6 +750,28 @@ html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!imp
 .metrics-v8-media{grid-template-rows:repeat(6,minmax(0,1fr))!important}
 .metrics-v8-comparison{grid-template-rows:repeat(6,minmax(0,1fr))!important}
 .metrics-other-media-hover{cursor:help;text-decoration:underline dotted;text-underline-offset:3px}
+</style><style id="metrics-kpi-legibility-20261109">
+/* Interview metrics KPI: readable label on the left, value aligned to the far right. */
+#storeMetricsHeader .metrics-kpi{
+ display:flex!important;flex-direction:row!important;align-items:center!important;
+ justify-content:space-between!important;gap:8px!important;
+ padding:6px 12px!important;
+}
+#storeMetricsHeader .metrics-kpi small{
+ display:block!important;min-width:0!important;flex:1 1 auto!important;
+ color:#405b7a!important;font-size:12px!important;font-weight:750!important;
+ line-height:1.25!important;white-space:nowrap!important;
+}
+#storeMetricsHeader .metrics-kpi strong{
+ display:block!important;flex:0 0 auto!important;margin-left:auto!important;
+ color:#102f52!important;font-size:20px!important;font-weight:850!important;
+ line-height:1.1!important;text-align:right!important;font-variant-numeric:tabular-nums!important;
+}
+@media(max-width:760px){
+ #storeMetricsHeader .metrics-kpi{padding:6px 8px!important;gap:5px!important}
+ #storeMetricsHeader .metrics-kpi small{font-size:10px!important}
+ #storeMetricsHeader .metrics-kpi strong{font-size:17px!important}
+}
 </style></head><body>
 <header class="header"><button class="brand" id="home"><img id="homeAvatar" src="./icons/recruit-180.png" alt="" onerror="this.style.display='none'"><span id="homeLabel">TOP</span></button><div class="header-actions"><button id="manualInterviewOpen" type="button">面接登録</button><button id="sound">通知設定</button></div></header>
 <section class="calendar" aria-label="月間カレンダー"><div class="cal-head"><button id="prev" aria-label="前月">◀</button><span id="month"></span><button id="next" aria-label="翌月">▶</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="days" id="days"></div></section>
