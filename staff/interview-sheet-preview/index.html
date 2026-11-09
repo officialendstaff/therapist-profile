@@ -1821,6 +1821,7 @@ chart.append(compare);
  };
  const fixedMedia=displayMediaOrder;
  const previewMediaColors=['#359af0','#ef6b9a','#9b85d0','#d77979','#43b4a9','#8294a9','#ee965a','#ddab46','#82bb2d','#4f9ab6','#ba85d9','#aeb9c8'];
+ const ageApplicants=allApplicants.filter(a=>dateInPeriod(firstDate(a)));
  const activeOtherMediaNames=lineOtherMediaNames(annual?mediaCounts(ageApplicants):mediaNowRaw);
  const otherMediaHover=activeOtherMediaNames.length?activeOtherMediaNames.map(x=>x.name+'：'+x.count+'件').join('\n'):'LINEに媒体の具体名なし';
  const setOtherHover=(element,name)=>{if(name==='その他'){element.title=otherMediaHover;element.classList.add('metrics-other-media-hover');}else{element.title=name;}};
@@ -1862,7 +1863,6 @@ chart.append(compare);
  const ageBins=['18〜19歳','20〜24歳','25〜29歳','30〜34歳','35〜39歳','40〜44歳','45歳以上','年齢不明'];
  const ageCount=new Array(ageBins.length).fill(0);
  // LINEの初回メッセージに明記された年齢のみ採用する。推測・生年月日推定は行わない。
- const ageApplicants=allApplicants.filter(a=>dateInPeriod(firstDate(a)));
  for(const a of ageApplicants){
   const first=(a.messages||[]).slice().sort((x,y)=>String(x.receivedAt||'').localeCompare(String(y.receivedAt||'')))[0];
   const message=String(first?.text||'');
