@@ -4,14 +4,18 @@ const STAFF_URL="/therapist-profile/staff/booking-chat/rose-push-v1.html?store="
 self.addEventListener("install",event=>event.waitUntil(self.skipWaiting()));
 self.addEventListener("activate",event=>event.waitUntil(self.clients.claim()));
 self.addEventListener("push",event=>{
- event.waitUntil(self.registration.showNotification("L GROUP｜新着チャット",{
+ event.waitUntil((async()=>{
+  // App-icon notification dot while the installed PWA is closed (best effort).
+  try{if(self.navigator&&"setAppBadge" in self.navigator)await self.navigator.setAppBadge();}catch{}
+  return self.registration.showNotification("L GROUP｜新着チャット",{
   body:"新しいお問い合わせがあります。チャット管理をご確認ください。",
   tag:"lgroup-new-chat",
   renotify:true,
   requireInteraction:true,
   data:{url:STAFF_URL},
   icon:"/therapist-profile/staff/interview-sheet-preview/icons/recruit-180.png"
- }));
+ });
+ })());
 });
 self.addEventListener("notificationclick",event=>{
  event.notification.close();
