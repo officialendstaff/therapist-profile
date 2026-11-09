@@ -646,7 +646,11 @@ html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!imp
 .notification-option>p{margin:8px 0}
 #lineVoiceTest{border:1px solid #d0e0ec;background:#edf5fb;color:#376e96}
 #sound[data-push-enabled="true"]{border-color:#a5d2b6;background:#eff8f2;color:#227d4e}
-</style><style id="temporarily-disabled-sales-20261107">#metricsSalesTab:disabled{opacity:.45!important;cursor:not-allowed!important;pointer-events:none!important;box-shadow:none!important}</style><style id="interview-metrics-v8-live">
+</style><style id="temporarily-disabled-sales-20261107">#metricsSalesTab:disabled{opacity:.45!important;cursor:not-allowed!important;pointer-events:none!important;box-shadow:none!important}</style><style id="interview-metrics-v8-live">/* v8プレビューと公開ページの光沢・年齢グラデーションを一致させる */
+.metrics-v8-trend-bar{box-shadow:inset 1px 0 rgba(255,255,255,.35),inset -1px 0 rgba(0,0,0,.06)}
+.metrics-v8-media-row .metrics-v8-fill,.metrics-v8-compare-line .metrics-v8-fill{box-shadow:inset 0 1px rgba(255,255,255,.28)}
+.metrics-v8-age-row .metrics-v8-fill{box-shadow:inset 0 1px rgba(255,255,255,.1)}
+
 #storeMetricsHeader{gap:10px!important;align-items:center!important}
 #storeMetricsHeader .metrics-mode-tabs{flex:none}
 #metricsInterviewTab{font-size:0!important}
@@ -1714,7 +1718,9 @@ chart.append(compare);
   const heading=document.createElement('div');heading.className='metrics-v8-heading';heading.textContent=title;
   el.append(heading);parent.append(el);return el;
  };
- const fixedMedia=[...new Set([...mediaNames,'HP','記載なし'])];
+ const fixedMedia=['その他','エステラブワーク','エステアイ','リラクジョブ','バニラ','02','HP','Richセラピ','X','エステクイーン','エステ魂','メンエスリクルート','メンズエステワーク','記載なし'];
+ const previewMediaColors=['#aeb9c8','#ba85d9','#ef6b9a','#359af0','#ee965a','#82bb2d','#4f9ab6','#bf7f64','#6f76df','#43b4a9','#ddab46','#9b85d0','#d77979','#8294a9'];
+ const previewMediaColor=(name)=>{const i=fixedMedia.indexOf(name);return i>=0?previewMediaColors[i]:mediaColor(name)};
  const countBars=(holder,counts,ready)=>{
   const names=fixedMedia;
   const max=Math.max(1,...names.map(n=>counts.get(n)||0));
@@ -1723,7 +1729,7 @@ chart.append(compare);
    const row=document.createElement('div');row.className='metrics-v8-media-row';
    const lab=document.createElement('span');lab.textContent=mediaChartLabel(n);lab.title=n;
    const track=document.createElement('div');track.className='metrics-v8-track';
-   const v=counts.get(n)||0;const bar=document.createElement('div');bar.className='metrics-v8-fill';bar.style.width=v/max*100+'%';bar.style.background=mediaColor(n);track.append(bar);
+   const v=counts.get(n)||0;const bar=document.createElement('div');bar.className='metrics-v8-fill';bar.style.width=v/max*100+'%';bar.style.background=previewMediaColor(n);track.append(bar);
    const num=document.createElement('b');num.textContent=ready?String(v):'—';
    row.append(lab,track,num);grid.append(row);
   }
@@ -1735,7 +1741,7 @@ chart.append(compare);
   for(const n of fixedMedia){
    const item=document.createElement('div');item.className='metrics-v8-compare-item';
    const head=document.createElement('strong');head.textContent=mediaChartLabel(n);head.title=n;item.append(head);
-   for(const [label,counts,ready,color] of [[oldLabel,oldCounts,oldReady,'#adb8c8'],[nowLabel,nowCounts,nowReady,mediaColor(n)]]){
+   for(const [label,counts,ready,color] of [[oldLabel,oldCounts,oldReady,'#adb8c8'],[nowLabel,nowCounts,nowReady,previewMediaColor(n)]]){
     const line=document.createElement('div');line.className='metrics-v8-compare-line';
     const tag=document.createElement('span');tag.textContent=label;
     const track=document.createElement('div');track.className='metrics-v8-track';
@@ -1762,7 +1768,8 @@ chart.append(compare);
   ageCount[idx]++;
  }
  const shopName=shop==='LUXY'?'LUXY OSAKA':shop;
- const shopColor=shop==='all'?'#568DB9':(COLOR_THEME.shops[shopName]?.fg||'#568DB9');
+ const previewShopColors={'Grand Luxe':'#d9778c','LUXY OSAKA':'#568db9','薔薇と紳士':'#8b76c4','Un Secret':'#399768','BUSTY OSAKA':'#d7a45d'};
+ const shopColor=shop==='all'?'linear-gradient(90deg,#d9778c,#568db9,#399768,#d7a45d,#8b76c4)':(previewShopColors[shopName]||'#568db9');
  const ageGraph=(holder)=>{
   const all=ageCount.reduce((a,b)=>a+b,0);
   const total=document.createElement('span');total.className='metrics-v8-age-total';total.textContent=lineReady?'合計 '+all+'人':'合計 —人';
@@ -1804,7 +1811,7 @@ chart.append(compare);
   values.forEach(([inquiry,interview],i)=>{
    const group=document.createElement('div');group.className='metrics-v8-trend-group';
    for(const [n,color] of [[inquiry,'#1688F0'],[interview,'#F24D99']]){
-    const bar=document.createElement('div');bar.className='metrics-v8-trend-bar';bar.style.background=color;bar.style.height=(n===null?0:Math.max(n?1:0,n/max*85))+'%';bar.title=n===null?'未取得':n+'件';
+    const bar=document.createElement('div');bar.className='metrics-v8-trend-bar';bar.style.background=color==='#1688F0'?'linear-gradient(180deg,#a6d9ff 0%,#64b5f8 28%,#1688f0 100%)':'linear-gradient(180deg,#ffc4df 0%,#f887ba 35%,#f24d99 100%)';bar.style.height=(n===null?0:Math.max(n?1:0,n/max*85))+'%';bar.title=n===null?'未取得':n+'件';
     if(n){const tag=document.createElement('span');tag.textContent=n;bar.append(tag)}
     group.append(bar);
    }
