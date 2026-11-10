@@ -57,10 +57,10 @@ html.embedded,body.embedded{height:100%;overflow:hidden;width:var(--embed-width,
 .embedded.keyboard-active .composer textarea{max-height:90px}
 
 /* First contact: optional CTI reference details */
-#firstUse{width:100%;max-width:440px;margin:auto;padding:25px 20px;display:flex;flex-direction:column;gap:20px}
-#firstUse h1{font-size:20px;text-align:center;margin:0;color:#24364c}
-#firstUse .first-intro{font-size:14px;line-height:1.85;margin:0;color:#34495f}
-#firstUse .first-note{font-size:12px;color:#6a7b8c;margin:7px 0 0;line-height:1.6}
+#firstUse{width:100%;max-width:440px;margin:0 auto;padding:18px 20px 32px;display:flex;flex:1 1 auto;min-height:0;flex-direction:column;gap:14px;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scroll-padding-top:14px;scroll-padding-bottom:22px}
+#firstUse h1{font-size:19px;text-align:center;margin:0;color:#24364c;flex:none}
+#firstUse .first-intro{font-size:14px;line-height:1.6;margin:0;color:#34495f}
+#firstUse .first-note{font-size:12px;color:#6a7b8c;margin:6px 0 0;line-height:1.5}
 #firstUse label{display:block;font-size:14px;font-weight:750;margin-bottom:8px;color:#293f56}
 #firstUse input{font:inherit;width:100%;min-width:0;border:1px solid #cbd8e5;border-radius:9px;padding:13px;font-size:16px;min-height:49px;color:#24364c;background:#fff}
 #firstUse input:focus{outline:2px solid #87b5d2;outline-offset:1px}
@@ -70,7 +70,12 @@ html.embedded,body.embedded{height:100%;overflow:hidden;width:var(--embed-width,
 #firstUse .phone-line input{flex:1;font-variant-numeric:tabular-nums;letter-spacing:.09em}
 #firstUse .first-error{font-size:12px;color:#b63752;margin:4px 0 0}
 #firstUse .first-start{width:100%;padding:14px 16px;background:var(--accent);color:#fff;border:0;border-radius:10px;font-weight:800;font-size:15px}
-@media(max-width:380px){#firstUse .phone-prefix{padding:0 8px;font-size:15px}#firstUse .phone-line{gap:5px}}
+.profile-screen .shell{height:var(--profile-viewport-height,100dvh);min-height:0;max-height:var(--profile-viewport-height,100dvh);overflow:hidden}
+.profile-screen #firstUseForm{display:flex;flex-direction:column;gap:14px}
+.profile-screen #firstUseForm>div{margin-bottom:0!important}
+.profile-screen #firstUse input{scroll-margin-top:14px;scroll-margin-bottom:24px}
+@media(max-width:380px){#firstUse .phone-prefix{padding:0 8px;font-size:15px}#firstUse .phone-line{gap:5px}#firstUse{padding:14px 14px 24px;gap:12px}}
+@media(max-height:550px){#firstUse{gap:10px;padding-top:10px}#firstUse h1{font-size:17px}#firstUse .first-intro{line-height:1.5}}
 </style></head><body><main class="shell">
 <section id="chooser" hidden><h1>L GROUP チャット</h1><p>ご相談する店舗をお選びください。<br>店舗ごとに会話履歴を分けて管理しています。</p><div class="stores" id="storeLinks"></div></section>
 <section id="firstUse" hidden>
@@ -351,12 +356,12 @@ async function init(profile=null){
  setReady(false);clearErr();
  try{
   token=await loadTokenFromParent();
-  if(!token&&!profile){$("firstUse").hidden=false;return}
+  if(!token&&!profile){$("firstUse").hidden=false;document.documentElement.classList.add("profile-screen");syncFirstUseViewport();return}
   let data;
   try{data=await api({action:"guest_init",store,token:token||undefined,...(!token&&profile?profile:{})})}
   catch(e){if(e.status===401&&token){token="";clearToken();data=await api({action:"guest_init",store})}else throw e}
   if(data.token){token=data.token;saveToken(token)}
-  $("firstUse").hidden=true;
+  $("firstUse").hidden=true;document.documentElement.classList.remove("profile-screen");
   if(!token)throw Error("no_session");
   greetingText=typeof data.greeting==="string"&&data.greeting.trim()?data.greeting:"お気軽にお問い合わせください。";
   $("timeline").replaceChildren();lastId=0;greetingShownKey="";
@@ -399,6 +404,31 @@ $("firstUseForm").addEventListener("submit",async e=>{
  try{await init({display_name:$("firstName").value.trim(),phone_suffix:digits})}
  finally{button.disabled=false}
 });
+function syncFirstUseViewport(){
+ if(!$("firstUse")||$("firstUse").hidden)return;
+ const viewport=window.visualViewport;
+ const available=(viewport&&Number.isFinite(viewport.height)?viewport.height:window.innerHeight);
+ const parentLimit=embedded&&parentViewportHeight>0?parentViewportHeight:Infinity;
+ const height=Math.floor(Math.min(available,parentLimit));
+ if(height>=150)document.documentElement.style.setProperty("--profile-viewport-height",height+"px");
+}
+function scrollFirstUseToField(field){
+ if($("firstUse").hidden)return;
+ syncFirstUseViewport();
+ requestAnimationFrame(()=>field.scrollIntoView({block:"center",inline:"nearest",behavior:"instant"}));
+}
+for(const id of ["firstName","firstPhone"]){
+ $(id).addEventListener("focus",event=>{
+  scrollFirstUseToField(event.target);
+  setTimeout(()=>scrollFirstUseToField(event.target),280);
+ });
+}
+$("firstName").setAttribute("enterkeyhint","next");
+$("firstPhone").setAttribute("enterkeyhint","done");
+$("firstName").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.isComposing){e.preventDefault();$("firstPhone").focus()}});
+$("firstPhone").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.isComposing){e.preventDefault();e.target.blur()}});
+window.visualViewport?.addEventListener("resize",()=>{syncFirstUseViewport();const focused=document.activeElement;if(focused?.id==="firstName"||focused?.id==="firstPhone")scrollFirstUseToField(focused)});
+window.addEventListener("resize",syncFirstUseViewport);
 void init();
 })();
 </script></body></html>
