@@ -1473,7 +1473,9 @@ function renderSalesMetrics(){
  const month=$('storeMetricsMonth').value;
  const ready=salesMetricsData.status==='ready'&&salesMetricsData.month===month;
  const rows=ready?salesMetricsData.rows:[];
- if($('storeMetricsShop').value==='薔薇と紳士'){renderRoseSalesMetrics(root,month,rows,ready);return}
+ const parentShop=(()=>{try{return window.parent!==window?window.parent.document.getElementById('metricsHeaderShop')?.value:null}catch{return null}})();
+ const activeSalesShop=parentShop||$('storeMetricsShop').value;
+ if(activeSalesShop==='薔薇と紳士'||activeSalesShop==='all'){renderRoseSalesMetrics(root,month,rows,ready);return}
  const stores=salesStoreMap.map(([key,name],i)=>{
   const data=rows.filter(r=>r.store_key===key);
   return {key,name,short:['Grand Luxe','LUXY','Un Secret','薔薇と紳士','BUSTY'][i],has:data.length>0,days:data.length,payoutAvailable:data.length>0&&data.every(r=>r.therapist_payout_yen!==null&&r.therapist_payout_yen!==undefined),totals:salesTotal(data)};
