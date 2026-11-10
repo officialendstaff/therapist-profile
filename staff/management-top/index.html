@@ -243,7 +243,7 @@ body:has(.lg-interview-login:not(.hide):not(.hidden)) .page>.topbar{display:none
 .recontact-button:hover{background:#ffe5dd}
 .contact-time{white-space:nowrap;font-variant-numeric:tabular-nums;color:#41566f;font-size:13px!important}
 @media(max-width:650px){.dialog{width:calc(100vw - 18px)}.dialog-head{padding:13px 14px}.dialog-head h2{font-size:16px}.dialog-header-controls select{min-width:0;width:120px;padding:8px}.list-wrap{padding:0 10px 14px}.list-wrap th,.list-wrap td{padding:10px 8px;font-size:12px}}
-</style></head>
+</style><style id="management-birthday-current-month-20261110">.birthday-today{background:#fff2db!important}.birthday-today .therapist-name-cell strong{color:#a25300!important}.birthday-today td:nth-child(3){color:#a25300;font-weight:800}</style></head>
 <body>
 <header><div class="brand">L GROUP<small>MANAGEMENT SYSTEM</small></div><div class="header-right"><span id="asOf">集計基準日 —</span><span id="userName"></span><button class="refresh hidden" id="refresh" type="button">情報更新</button><button id="logout" class="hidden">ログアウト</button></div></header>
 <div id="login" class="lg-interview-login hidden"><div class="auth-card"><aside class="auth-brand-panel" aria-hidden="true"><div class="auth-brand-top"><div class="auth-brand-symbol">L</div><div class="auth-brand-name">L GROUP<small>INTERNAL MANAGEMENT</small></div></div><div class="auth-brand-middle"><span class="auth-brand-kicker">STAFF MANAGEMENT SYSTEM</span><h1 class="auth-brand-title">L GROUP<br>MANAGEMENT.</h1><p class="auth-brand-description">日々の管理業務を、もっとスマートに。<br>すべての情報をひとつの場所で。</p></div><div class="auth-brand-bottom"><span>STAFF PORTAL</span><span>L GROUP © 2026</span></div></aside><div class="auth-form-panel"><p class="auth-eyebrow">WELCOME BACK</p><h2>総合管理ログイン</h2><div class="auth-mode-label"><span>管理者</span></div><form id="loginForm"><p class="auth-help">既存の管理者アカウントと同じID・PASSを使用します。</p><label for="email">ID（メールアドレス）<input id="email" type="email" autocomplete="username" required></label><label for="password">PASS<input id="password" type="password" autocomplete="current-password" required></label><div id="loginError" role="alert"></div><button type="submit">ログイン</button></form><p class="auth-footnote">AUTHORIZED PERSONNEL ONLY</p></div></div></div>
@@ -253,7 +253,7 @@ body:has(.lg-interview-login:not(.hide):not(.hidden)) .page>.topbar{display:none
  <div class="dashboard action-dashboard">
   <section class="panel action-panel final-panel"><h2><span>◷</span>最終出勤</h2><div class="count" id="finalCount">—<small>名</small></div><div class="sub">退勤前に次回シフトを決める！</div><button data-open="final">対象者を確認</button></section>
   <section class="panel action-panel outside-panel"><h2><span>◫</span>実働外</h2><div class="count" id="outsideCount">—<small>名</small></div><div class="sub">本人に連絡して次回出勤を確保！</div><button data-open="outside">連絡対象者を確認</button></section>
-  <section class="panel birthday-panel"><h2><span>♧</span>誕生日</h2><div class="count" id="birthdayCount">—<small>名</small></div><div class="sub">前後3日間</div><button data-open="birthday">一覧を確認</button></section>
+  <section class="panel birthday-panel"><h2><span>♧</span>誕生日</h2><div class="count" id="birthdayCount">—<small>名</small></div><div class="sub">今月の誕生日</div><button data-open="birthday">一覧を確認</button></section>
  </div>
 
  <h2 class="section-heading">管理メニュー</h2>
@@ -330,7 +330,7 @@ async function load(){
 const configs={
  final:{title:"本日が最終出勤",sub:"",action:"退勤までに次回シフトを決める！",note:"退勤時刻を確認し、本人と次回の出勤日を調整してください。",key:"final_today",last:"本日の退勤"},
  outside:{title:"次回出勤未定",sub:"",action:"本人に連絡して次回出勤を確保！",note:"対象者に連絡し、次回出勤の予定を確認してください。",key:"outside",last:"最終出勤日"},
- birthday:{title:"誕生日",sub:"誕生日の前後3日間",key:"birthday",last:"誕生日"}
+ birthday:{title:"誕生日",sub:"今月の誕生日",key:"birthday",last:"誕生日"}
 };
 function render(){
  if(!mode)return;const cfg=configs[mode],store=$("storeFilter").value;
@@ -344,7 +344,7 @@ function render(){
     const x=a.last_date||"9999-12-31",y=b.last_date||"9999-12-31";
     return x.localeCompare(y)||String(a.store).localeCompare(String(b.store))||Number(a.exa_id)-Number(b.exa_id);
   }
-  return Math.abs(Number(a.offset))-Math.abs(Number(b.offset))||Number(a.offset)-Number(b.offset)||String(a.store).localeCompare(String(b.store));
+  return String(a.birthday||"").localeCompare(String(b.birthday||""))||String(a.store).localeCompare(String(b.store))||Number(a.exa_id)-Number(b.exa_id);
  });
  text($("dialogTitle"),cfg.title+"｜"+rows.length+"名");text($("dialogSub"),cfg.sub||"");
  const actionBox=$("dialogAction");
@@ -366,7 +366,8 @@ function render(){
   row.append(nameCell);
   if(mode==="birthday"){
    const offset=Number(person.offset);
-   const birthday=(person.birthday||"—")+(offset===0?"（当日）":offset<0?"（"+Math.abs(offset)+"日前）":"（"+offset+"日後）");
+   const birthday=(person.birthday||"—")+(offset===0?"（本日）":"");
+   if(offset===0)row.classList.add("birthday-today");
    row.append(mk("td",birthday));
    const cell=document.createElement("td"),label=document.createElement("span");label.textContent="在籍管理（一時停止中）";label.setAttribute("aria-disabled","true");cell.append(label);row.append(cell);
   }else{
