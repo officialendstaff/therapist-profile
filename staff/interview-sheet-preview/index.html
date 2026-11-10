@@ -801,6 +801,30 @@ html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!imp
  #storeMetricsHeader .metrics-kpi small{font-size:10px!important}
  #storeMetricsHeader .metrics-kpi strong{font-size:17px!important}
 }
+</style><style id="rose-sales-dashboard-20261110">
+.rose-sales{--rose:#d7789c;padding:10px 12px 15px;background:#f2f5f9;color:#233850}
+.rose-sales-header{display:flex;align-items:center;justify-content:space-between;margin:0 0 9px;gap:12px}
+.rose-sales-header strong{font-size:17px}.rose-sales-header small{font-size:11px;color:#728298}
+.rose-sales-panel{border:1px solid #dbe3ed;border-radius:7px;background:#fff;min-width:0;overflow:hidden}
+.rose-sales-panel h3{margin:0;padding:10px 13px;border-bottom:1px solid #e7ecf3;font-size:13px}
+.rose-trend{height:clamp(240px,37vh,355px);padding:7px 12px 4px}
+.rose-trend svg{width:100%;height:100%;display:block}
+.rose-sales-bottom{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:10px}
+.rose-sales-body{padding:12px;min-width:0}
+.rose-donut-wrap{display:flex;align-items:center;justify-content:space-around;gap:10px;min-height:166px}
+.rose-donut{width:min(145px,56%);aspect-ratio:1;border-radius:50%;position:relative;flex-shrink:0}
+.rose-donut:after{content:"";position:absolute;inset:25%;background:#fff;border-radius:50%}
+.rose-donut-center{position:absolute;z-index:1;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;font-size:20px;font-weight:850}
+.rose-donut-center small{font-size:10px;color:#75869b;font-weight:650}
+.rose-sales-legend{display:grid;gap:12px;font-size:11px;min-width:0}
+.rose-sales-legend b{font-size:14px}.rose-sales-legend i{width:9px;height:9px;display:inline-block;border-radius:2px;margin-right:5px}
+.rose-sales-kpi{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.rose-sales-kpi>div{padding:12px 7px;background:#f5f7fa;border-radius:5px;text-align:center}
+.rose-sales-kpi small{display:block;font-size:10px;color:#697c90}.rose-sales-kpi b{display:block;font-size:clamp(15px,1.4vw,23px);margin:7px 0;color:#243952}
+.rose-sales-warning{color:#a26738;font-size:11px;line-height:1.6;margin:9px 0 0}
+.rose-sales-foot{font-size:10px;color:#738399;line-height:1.55;margin:8px 3px}
+@media(max-width:1100px){.rose-sales-bottom{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){.rose-sales-bottom{grid-template-columns:1fr}.rose-sales{padding:7px}.rose-trend{height:250px}.rose-donut{width:138px}}
 </style></head><body>
 <header class="header"><button class="brand" id="home"><img id="homeAvatar" src="./icons/recruit-180.png" alt="" onerror="this.style.display='none'"><span id="homeLabel">TOP</span></button><div class="header-actions"><button id="manualInterviewOpen" type="button">面接登録</button><button id="sound">通知設定</button></div></header>
 <section class="calendar" aria-label="月間カレンダー"><div class="cal-head"><button id="prev" aria-label="前月">◀</button><span id="month"></span><button id="next" aria-label="翌月">▶</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="days" id="days"></div></section>
@@ -1402,11 +1426,54 @@ async function refreshSalesAnnualMetrics(){
  }
  renderSalesMetrics();
 }
+function renderRoseSalesMetrics(root,month,rows,ready){
+ const roseRows=rows.filter(r=>r.store_key==='薔薇と紳士'),total=salesTotal(roseRows);
+ const number=n=>Math.round(n).toLocaleString('ja-JP');
+ const valid=ready&&roseRows.length>0,year=Number(month.slice(0,4));
+ const v=(key)=>valid?number(total[key]):'—';
+ const sum=total.new_contracts_count+total.repeat_contracts_count;
+ const contractsValid=valid&&sum===total.contracts_count&&sum>0;
+ const names=['売上','本数','顧客','新規','出勤','着信'];
+ const fields=['revenue_yen','contracts_count','repeat_contracts_count','new_contracts_count','active_staff_count','inbound_people'];
+ const colors=['#4384e8','#ed5652','#efb72e','#30a46c','#ed8c41','#32a9ba'];
+ function donut(items,totalValue,caption){
+  const ok=items.every(item=>Number.isFinite(item.value)&&item.value>=0)&&totalValue>0&&items.reduce((a,b)=>a+b.value,0)===totalValue;
+  if(!ok)return '<p class="rose-sales-warning">内訳と成約本数が一致しないため、構成比は表示していません。</p>'+items.map(i=>'<div style="margin-top:12px;font-size:12px">'+i.label+'　<strong>'+number(i.value)+'</strong></div>').join('');
+  let deg=0;
+  const stops=items.map(item=>{const start=deg;deg+=item.value/totalValue*360;return item.color+' '+start+'deg '+deg+'deg'}).join(',');
+  return '<div class="rose-donut-wrap"><div class="rose-donut" style="background:conic-gradient('+stops+')"><span class="rose-donut-center">'+number(totalValue)+'<small>'+caption+'</small></span></div><div class="rose-sales-legend">'+items.map(item=>'<div><div><i style="background:'+item.color+'"></i>'+item.label+'</div><b>'+number(item.value)+'</b> <small>'+(item.value/totalValue*100).toFixed(1)+'%</small></div>').join('')+'</div></div>';
+ }
+ function panel(title,body){return '<section class="rose-sales-panel"><h3>'+title+'</h3><div class="rose-sales-body">'+body+'</div></section>'}
+ function kpi(label,value,unit){return '<div><small>'+label+'</small><b>'+value+'</b><small>'+unit+'</small></div>'}
+ root.innerHTML='<div class="rose-sales"><div class="rose-sales-header"><strong>薔薇と紳士｜営業数値</strong><small>'+month.replace('-','年')+'月</small></div>'+
+ '<section class="rose-sales-panel"><h3>年間営業推移｜売上・本数・顧客・新規・出勤・着信</h3><div class="rose-trend" id="roseSalesTrend"></div></section>'+
+ '<div class="rose-sales-bottom">'+
+ panel('営業実績｜成約内訳',valid?donut([{label:'顧客',value:total.repeat_contracts_count,color:'#d7789c'},{label:'新規',value:total.new_contracts_count,color:'#6c93c9'}],total.contracts_count,'成約本数'):'<p>データ未取得</p>')+
+ panel('集客・出勤','<div class="rose-sales-kpi">'+kpi('着信人数',v('inbound_people'),'人')+kpi('出勤延べ',v('active_staff_count'),'人日')+kpi('成約本数',v('contracts_count'),'本')+kpi('成約 / 出勤',valid&&total.active_staff_count?(total.contracts_count/total.active_staff_count).toFixed(2):'—','本/人日')+'</div>')+
+ panel('指名実績｜構成比',valid?donut([{label:'フリー',value:total.free_count,color:'#d7789c'},{label:'ネット',value:total.net_nominations_count,color:'#63a3d7'},{label:'本指名',value:total.regular_nominations_count,color:'#e3af65'}],total.contracts_count,'成約本数'):'<p>データ未取得</p>')+
+ panel('利益・報酬','<div class="rose-sales-kpi">'+kpi('利益平均',valid?number(total.profit_yen/roseRows.length):'—','円/日')+kpi('単価平均',valid&&total.contracts_count?number(total.profit_yen/total.contracts_count):'—','円/本')+kpi('女子報酬平均',valid&&total.contracts_count&&roseRows.every(r=>r.therapist_payout_yen!=null)?number(total.therapist_payout_yen/total.contracts_count):'—','円/本')+kpi('利益総額',valid?number(total.profit_yen):'—','円')+'</div>')+
+ '</div><p class="rose-sales-foot">出典：EXA日別レポート。年間グラフは各指標の最大月を100とする相対指数です（旧スプレッドの指数計算式とは異なります）。指名内訳が成約本数と不一致の場合は構成比を計算しません。</p></div>';
+ const host=document.getElementById('roseSalesTrend'), annual=salesAnnualState;
+ if(annual.year!==year||annual.status==='loading'||annual.status==='idle'){host.textContent='年間データを読み込み中です';return}
+ if(annual.status!=='ready'){host.textContent='年間データを取得できませんでした';return}
+ const monthly=annual.months.filter(r=>r.store_key==='薔薇と紳士');
+ const map=new Map(monthly.map(r=>[Number(r.month.slice(-2)),r]));
+ const max=fields.map(f=>Math.max(0,...monthly.map(r=>Number(r[f])||0)));
+ const w=1100,h=280,l=38,t=28,b=32,right=12;
+ const x=m=>l+(m-1)*(w-l-right)/11,y=n=>t+(100-n)*(h-t-b)/100;
+ let svg='<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" aria-label="月別相対指数の折れ線グラフ">';
+ for(let j=0;j<=100;j+=25)svg+='<line x1="'+l+'" y1="'+y(j)+'" x2="'+(w-right)+'" y2="'+y(j)+'" stroke="#e4eaf1"/><text x="'+(l-7)+'" y="'+(y(j)+4)+'" text-anchor="end" font-size="11" fill="#75849a">'+j+'</text>';
+ for(let m=1;m<=12;m++)svg+='<text x="'+x(m)+'" y="'+(h-8)+'" text-anchor="middle" font-size="11" fill="#75849a">'+m+'月</text>';
+ fields.forEach((f,i)=>{if(!max[i])return;let path='',prior=0;for(let m=1;m<=12;m++){const r=map.get(m);if(!r){prior=0;continue}const val=(Number(r[f])||0)/max[i]*100;path+=(prior===m-1?' L ':' M ')+x(m).toFixed(1)+' '+y(val).toFixed(1);prior=m}svg+='<path d="'+path+'" stroke="'+colors[i]+'" stroke-width="2.5" fill="none" stroke-linejoin="round"/>';});
+ svg+='</svg><div style="display:flex;flex-wrap:wrap;justify-content:center;gap:7px 17px;font-size:11px;color:#52647c">'+names.map((n,i)=>'<span><i style="background:'+colors[i]+';width:9px;height:9px;display:inline-block;margin-right:5px"></i>'+n+'</span>').join('')+'</div>';
+ host.innerHTML=svg;
+}
 function renderSalesMetrics(){
  const root=$('salesMetricsBody');if(!root||root.hidden||$('storeMetrics').hidden)return;
  const month=$('storeMetricsMonth').value;
  const ready=salesMetricsData.status==='ready'&&salesMetricsData.month===month;
  const rows=ready?salesMetricsData.rows:[];
+ if($('storeMetricsShop').value==='薔薇と紳士'){renderRoseSalesMetrics(root,month,rows,ready);return}
  const stores=salesStoreMap.map(([key,name],i)=>{
   const data=rows.filter(r=>r.store_key===key);
   return {key,name,short:['Grand Luxe','LUXY','Un Secret','薔薇と紳士','BUSTY'][i],has:data.length>0,days:data.length,payoutAvailable:data.length>0&&data.every(r=>r.therapist_payout_yen!==null&&r.therapist_payout_yen!==undefined),totals:salesTotal(data)};
