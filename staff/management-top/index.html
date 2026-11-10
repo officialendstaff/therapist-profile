@@ -354,7 +354,7 @@ function render(){
  text($("dialogActionTitle"),cfg.action||"");
  text($("dialogActionNote"),cfg.note||"");
  const tr=document.createElement("tr");
- const heads=mode==="birthday"?["店舗","源氏名","誕生日","確認"]:["店舗","源氏名",cfg.last,"対応状況","最終対応日時"];
+ const heads=mode==="birthday"?["店舗","源氏名","誕生日"]:["店舗","源氏名",cfg.last,"対応状況","最終対応日時"];
  for(const h of heads)tr.append(mk("th",h));
  $("listHead").replaceChildren(tr);$("listBody").replaceChildren();
  if(!rows.length){const row=document.createElement("tr"),cell=mk("td","該当者はいません。");cell.colSpan=heads.length;cell.className="empty";row.append(cell);$("listBody").append(row);return}
@@ -369,7 +369,6 @@ function render(){
    const birthday=(person.birthday||"—")+(offset===0?"（本日）":"");
    if(offset===0)row.classList.add("birthday-today");
    row.append(mk("td",birthday));
-   const cell=document.createElement("td"),label=document.createElement("span");label.textContent="在籍管理（一時停止中）";label.setAttribute("aria-disabled","true");cell.append(label);row.append(cell);
   }else{
    let dateText=person.last_date||"記録なし";
    if(mode==="final"){
