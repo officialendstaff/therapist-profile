@@ -34,7 +34,7 @@ textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft
 .send{border:0;border-radius:12px;background:var(--accent);color:#fff;font-weight:750;padding:0 20px;height:46px;white-space:nowrap}
 .help{font-size:10px;color:#8a99a9;margin-top:8px;line-height:1.6}
 .notice{padding:11px 14px;margin:12px 16px 0;border-radius:8px;border:1px solid #e8cfb7;color:#8e6134;background:#fff8ef;font-size:12px;line-height:1.7}
-.notice[hidden],#chatScreen[hidden],#chooser[hidden]{display:none!important}
+.notice[hidden],#chatScreen[hidden],#chooser[hidden],#firstUse[hidden]{display:none!important}
 #chooser{margin:auto;padding:45px 20px;text-align:center;max-width:550px}
 #chooser h1{font-size:22px}#chooser p{font-size:13px;color:#6d8298;line-height:2}
 .stores{display:grid;gap:9px;margin:28px auto}.stores a{padding:17px;border:1px solid #d8e4ed;border-radius:10px;text-decoration:none;color:#2a4e72;background:#f9fbfd;font-size:14px;font-weight:700}
@@ -55,8 +55,32 @@ html.embedded,body.embedded{height:100%;overflow:hidden;width:var(--embed-width,
 .embedded.keyboard-active .composer{padding:8px 10px 8px;flex-shrink:0}
 .embedded.keyboard-active .chat{padding-bottom:10px}
 .embedded.keyboard-active .composer textarea{max-height:90px}
+
+/* First contact: optional CTI reference details */
+#firstUse{width:100%;max-width:440px;margin:auto;padding:25px 20px;display:flex;flex-direction:column;gap:20px}
+#firstUse h1{font-size:20px;text-align:center;margin:0;color:#24364c}
+#firstUse .first-intro{font-size:14px;line-height:1.85;margin:0;color:#34495f}
+#firstUse .first-note{font-size:12px;color:#6a7b8c;margin:7px 0 0;line-height:1.6}
+#firstUse label{display:block;font-size:14px;font-weight:750;margin-bottom:8px;color:#293f56}
+#firstUse input{font:inherit;width:100%;min-width:0;border:1px solid #cbd8e5;border-radius:9px;padding:13px;font-size:16px;min-height:49px;color:#24364c;background:#fff}
+#firstUse input:focus{outline:2px solid #87b5d2;outline-offset:1px}
+#firstUse .optional{font-weight:500;color:#718496;font-size:12px}
+#firstUse .phone-line{display:flex;align-items:stretch;gap:8px}
+#firstUse .phone-prefix{display:flex;align-items:center;justify-content:center;white-space:nowrap;background:#f0f3f7;border:1px solid #dce4eb;border-radius:9px;padding:0 12px;font-size:17px;font-weight:750;letter-spacing:.015em;color:#53687a}
+#firstUse .phone-line input{flex:1;font-variant-numeric:tabular-nums;letter-spacing:.09em}
+#firstUse .first-error{font-size:12px;color:#b63752;margin:4px 0 0}
+#firstUse .first-start{width:100%;padding:14px 16px;background:var(--accent);color:#fff;border:0;border-radius:10px;font-weight:800;font-size:15px}
+@media(max-width:380px){#firstUse .phone-prefix{padding:0 8px;font-size:15px}#firstUse .phone-line{gap:5px}}
 </style></head><body><main class="shell">
 <section id="chooser" hidden><h1>L GROUP チャット</h1><p>ご相談する店舗をお選びください。<br>店舗ごとに会話履歴を分けて管理しています。</p><div class="stores" id="storeLinks"></div></section>
+<section id="firstUse" hidden>
+<h1>チャットでお問い合わせ</h1>
+<div><p class="first-intro">当店の利用履歴がある会員様は、スムーズなご案内のため、お名前と携帯電話番号の下6桁をご入力ください。</p><p class="first-note">※入力は任意です。未入力でもチャットをご利用いただけます。</p></div>
+<form id="firstUseForm">
+<div style="margin-bottom:18px"><label for="firstName">お名前 <span class="optional">（任意）</span></label><input id="firstName" maxlength="60" autocomplete="name" placeholder="例：タナカ"></div>
+<div style="margin-bottom:20px"><label for="firstPhone">携帯電話番号の下6桁 <span class="optional">（任意）</span></label><div class="phone-line"><span class="phone-prefix" aria-hidden="true">×××-××</span><input id="firstPhone" type="text" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="020302" aria-label="携帯電話番号の下6桁"></div><p class="first-error" id="firstPhoneError" role="alert" hidden></p></div>
+<button type="submit" id="firstStart" class="first-start">チャットを開始する</button>
+</form></section>
 <section id="chatScreen" hidden style="display:flex;flex:1;flex-direction:column;min-height:0">
 <header class="topbar"><div class="mark">L</div><div><div class="title" id="storeTitle">チャット</div><div class="subtitle">L GROUP ONLINE CHAT</div></div><div class="state"><i class="dot"></i><span id="connection">接続中</span></div></header>
 <div class="notice" id="error" role="alert" hidden></div>
@@ -323,14 +347,16 @@ function clearToken(){
  try{localStorage.removeItem(key)}catch{}
  shareToken("lgroup.chat.clearToken");
 }
-async function init(){
+async function init(profile=null){
  setReady(false);clearErr();
  try{
   token=await loadTokenFromParent();
+  if(!token&&!profile){$("firstUse").hidden=false;return}
   let data;
-  try{data=await api({action:"guest_init",store,token:token||undefined})}
+  try{data=await api({action:"guest_init",store,token:token||undefined,...(!token&&profile?profile:{})})}
   catch(e){if(e.status===401&&token){token="";clearToken();data=await api({action:"guest_init",store})}else throw e}
   if(data.token){token=data.token;saveToken(token)}
+  $("firstUse").hidden=true;
   if(!token)throw Error("no_session");
   greetingText=typeof data.greeting==="string"&&data.greeting.trim()?data.greeting:"お気軽にお問い合わせください。";
   $("timeline").replaceChildren();lastId=0;greetingShownKey="";
@@ -358,6 +384,21 @@ $("composer").addEventListener("submit",async e=>{
 $("draft").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!("isComposing" in e&&e.isComposing)){e.preventDefault();$("composer").requestSubmit()}});
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)void poll()});
 setInterval(()=>void poll(),8000);
+$("firstPhone").addEventListener("input",e=>{e.target.value=e.target.value.replace(/[^0-9]/g,"").slice(0,6);$("firstPhoneError").hidden=true});
+$("firstUseForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ const digits=$("firstPhone").value;
+ if(digits.length!==0&&digits.length!==6){
+  $("firstPhoneError").textContent="入力する場合は下6桁を入力してください。";
+  $("firstPhoneError").hidden=false;
+  $("firstPhone").focus();
+  return;
+ }
+ const button=$("firstStart");
+ button.disabled=true;
+ try{await init({display_name:$("firstName").value.trim(),phone_suffix:digits})}
+ finally{button.disabled=false}
+});
 void init();
 })();
 </script></body></html>
