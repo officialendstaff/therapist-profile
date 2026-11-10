@@ -198,7 +198,7 @@ async function staffMetricsView(){
   syncStaffHomeHeader();
   $("metricsLogin").classList.add("hidden");
   $("metricsFrame").classList.remove("hidden");
-  if(!$("metricsFrame").getAttribute("src"))$("metricsFrame").src="./?standaloneMetrics=1&v=20261109-kpi-and-media-display&nocache="+Date.now();
+  if(!$("metricsFrame").getAttribute("src"))$("metricsFrame").src="./?standaloneMetrics=1&v=20261110-rose-donuts&nocache="+Date.now();
   return true;
  }catch{return false}
 }
@@ -218,7 +218,7 @@ async function check(){
  await syncInterviewHomeHeader(profile.data.display_name);
  $("metricsLogin").classList.add("hidden");
  $("metricsFrame").classList.remove("hidden");
- if(!$("metricsFrame").getAttribute("src"))$("metricsFrame").src="./?standaloneMetrics=1&v=20261109-kpi-and-media-display&nocache="+Date.now();
+ if(!$("metricsFrame").getAttribute("src"))$("metricsFrame").src="./?standaloneMetrics=1&v=20261110-rose-donuts&nocache="+Date.now();
 }
 $("metricsLoginForm").addEventListener("submit",async e=>{
  e.preventDefault();
@@ -264,6 +264,7 @@ function bindMetricsHeaderControls(){
   if(!select)return;
   select.value=outerShop.value;
   select.dispatchEvent(new Event("change",{bubbles:true}));
+  try{view?.renderSalesMetrics?.();}catch(error){console.warn('営業数値表示切替',error)}
   sync();
  });
  $("metricsHeaderPrevYear").addEventListener("click",()=>setYear(-1));
