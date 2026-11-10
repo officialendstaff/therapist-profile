@@ -98,7 +98,7 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
  #pushEnable,#pushTest{padding:8px 9px;font-size:11px}
  #pushStatus{flex-basis:100%;order:7;max-width:none}
 }
-</style><style id="lg-chat-customer-suffix-20261110">#app .thread-list .thread .sub{flex-wrap:wrap;justify-content:flex-start;gap:5px 10px}#app .thread-list .customer-phone-suffix{font-size:12px;font-weight:700;color:#48627c;font-variant-numeric:tabular-nums}</style><style id="lg-chat-unified-header-v1">
+</style><style id="lg-chat-header-phone-20261110">#threadTitle .chat-header-phone-suffix{display:inline-flex;align-items:center;margin-left:12px;padding:3px 8px;border-radius:5px;background:#edf4fb;color:#275f86;font-size:13px;font-weight:750;font-variant-numeric:tabular-nums;white-space:nowrap}@media(max-width:700px){#threadTitle .chat-header-phone-suffix{margin-left:5px;font-size:12px}}</style><style id="lg-chat-customer-suffix-20261110">#app .thread-list .thread .sub{flex-wrap:wrap;justify-content:flex-start;gap:5px 10px}#app .thread-list .customer-phone-suffix{font-size:12px;font-weight:700;color:#48627c;font-variant-numeric:tabular-nums}</style><style id="lg-chat-unified-header-v1">
 #app>header.lg-common-header{box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;flex-wrap:nowrap;gap:14px;width:100%;min-height:64px;height:64px;padding:0 18px;background:#1e293b;color:#fff;border-bottom:1px solid #344155}
 #app>header.lg-common-header .lg-header-brand{display:flex;align-items:center;gap:10px;min-width:0;flex:0 0 auto}
 #app>header.lg-common-header .lg-header-home{display:inline-flex;align-items:center;gap:8px;color:#fff;text-decoration:none;white-space:nowrap;font-size:13px;font-weight:750}
@@ -551,7 +551,15 @@ function mergeReadAcknowledgements(threads){
 }
 let currentCustomerId="",currentCustomerName="",nameSaving=false;
 function showCustomerTitle(thread){
- $("threadTitle").replaceChildren(makeStoreLabel(thread.store_key),document.createTextNode("｜"+nameOf(thread)));
+ const title=$("threadTitle");
+ title.replaceChildren(makeStoreLabel(thread.store_key),document.createTextNode("｜"+nameOf(thread)));
+ const digits=String(thread.booking_chat_visitors?.phone||"");
+ if(/^[0-9]{6}$/.test(digits)){
+  const suffix=document.createElement("span");
+  suffix.className="chat-header-phone-suffix";
+  suffix.textContent="電話下6桁："+digits;
+  title.append(suffix);
+ }
 }
 function syncCustomerName(visitorId,newName){
  for(const thread of items){
