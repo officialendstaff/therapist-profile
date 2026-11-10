@@ -1552,6 +1552,10 @@ async function refreshSalesMetrics(){
 }
 function setMetricsMode(mode){
  const sales=mode==='sales'&&!$('metricsSalesTab').disabled;
+ if(sales&&$('storeMetricsShop').value==='all'){
+  $('storeMetricsShop').value='薔薇と紳士';
+  $('storeMetricsShop').dispatchEvent(new Event('change',{bubbles:true}));
+ }
  $('metricsInterviewTab').setAttribute('aria-selected',String(!sales));
  $('metricsSalesTab').setAttribute('aria-selected',String(sales));
  $('storeMetricsBody').hidden=sales;
