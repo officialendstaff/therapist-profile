@@ -82,7 +82,7 @@ html.embedded,body.embedded{height:100%;overflow:hidden;width:var(--embed-width,
 <h1>チャットでお問い合わせ</h1>
 <div><p class="first-intro">当店の利用履歴がある会員様は、スムーズなご案内のため、お名前と携帯電話番号の下6桁をご入力ください。</p><p class="first-note">※入力は任意です。未入力でもチャットをご利用いただけます。</p></div>
 <form id="firstUseForm">
-<div style="margin-bottom:18px"><label for="firstName">お名前 <span class="optional">（任意）</span></label><input id="firstName" maxlength="60" autocomplete="name" placeholder="例：タナカ"></div>
+<div style="margin-bottom:18px"><label for="firstName">お名前 <span class="optional">（任意）</span></label><input id="firstName" maxlength="60" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="例：タナカ"></div>
 <div style="margin-bottom:20px"><label for="firstPhone">携帯電話番号の下6桁 <span class="optional">（任意）</span></label><div class="phone-line"><span class="phone-prefix" aria-hidden="true">×××-××</span><input id="firstPhone" type="text" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="020302" aria-label="携帯電話番号の下6桁"></div><p class="first-error" id="firstPhoneError" role="alert" hidden></p></div>
 <button type="submit" id="firstStart" class="first-start">チャットを開始する</button>
 </form></section>
