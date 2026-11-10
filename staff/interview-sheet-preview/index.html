@@ -1118,7 +1118,8 @@ function openPendingActionPage(label,record,mode='登録',returnPage=null){
  form.append(note,preview);let saving=false;form.onsubmit=async e=>{e.preventDefault();if(saving)return;
   const selectedStaff=CHART_STAFF_SOURCE.find(x=>x.name===staff.value);
   if(!chosen||!selectedStaff||!date.value||!time.value||chosen!==staff.value+' '+time.value){note.textContent='上部タイムチャートで担当者と時間を選択してください。';return}
-  if(!record.accountId||!record.lineUserId){note.textContent='LINE応募者との紐付け情報がありません。保存できません。';return}
+  if(mode==='登録'&&(!record.accountId||!record.lineUserId)){note.textContent='LINE応募者との紐付け情報がありません。保存できません。';return}
+  if(mode!=='登録'&&!record.interviewId){note.textContent='面接IDがありません。日程変更を保存できません。';return}
   const token=sessionStorage.getItem('interview_staff_session_v2')||localStorage.getItem('interview_staff_session_v2');
   if(!token){note.textContent='認証が必要です。LINE通知一覧でログインしてください。';return}
   saving=true;preview.disabled=true;note.textContent='面接を登録しています…';
