@@ -1234,7 +1234,7 @@ function isExpiredUnscheduled(record){
 }
 function recordsForLivePage(page){
  const today=dateKey(new Date());
- return liveInterviewLists.rows.filter(r=>{
+ const filtered=liveInterviewLists.rows.filter(r=>{
   const day=r.date.slice(0,10),done=['来店済み','採用','不採用','辞退','在籍','入店'].includes(r.status);
   const closed=['キャンセル','無断トビ','トビ（キャンセル）','返信なし'].includes(r.status);
   const unscheduled=['日程未定','日程調整中'].includes(r.status);
@@ -1245,7 +1245,18 @@ function recordsForLivePage(page){
   if(page==='日程調整'||page==='日程変更')return unscheduled&&!expired&&!done;
   if(page==='不届き者')return expired||['無断トビ','トビ（キャンセル）'].includes(r.status);
   return false;
- }).sort((a,b)=>['今日の予定','明日以降'].includes(page)?a.date.localeCompare(b.date):b.date.localeCompare(a.date));
+ }).sort((a,b)=>['今日の予定','明日以降'].includes(page)?a.date.localeCompare(b.date):b.date.localeCompare(a.date)||Number(a.interviewId)-Number(b.interviewId):b.date.localeCompare(a.date)||Number(b.interviewId)-Number(a.interviewId));
+ if(page!=='不届き者')return filtered;
+ // Keep separate interview/history records in the database; show only the latest
+ // missed appointment per linked LINE applicant in the bad-attendance list.
+ const seen=new Set();
+ return filtered.filter(r=>{
+  if(!r.accountId||!r.lineUserId)return true;
+  const key=String(r.accountId)+':'+String(r.lineUserId);
+  if(seen.has(key))return false;
+  seen.add(key);
+  return true;
+ });
 }
 async function saveLiveConfirmation(record,kind,button){if(!record.interviewId)return;const token=sessionStorage.getItem('interview_staff_session_v2')||localStorage.getItem('interview_staff_session_v2');if(!token){appNotice('面接管理にログインしてください');return}button.disabled=true;try{const res=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'set_interview_confirmation',token,interview_id:record.interviewId,kind})});const data=await res.json();if(!res.ok||!data.ok)throw Error(data.error||'保存に失敗しました');record.confirmationLineSent=!!data.interview.confirmation_line_sent;record.confirmed=!!data.interview.confirmed;await refreshInterviewLists();updateSidebarCounts()}catch(e){button.disabled=false;appNotice('確認状態を保存できませんでした：'+e.message)}}
 const LINE_SEEN_KEY='interview_new_line_seen_at_v1';let lineNewCount=0;
