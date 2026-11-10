@@ -270,7 +270,7 @@ body:has(.lg-interview-login:not(.hide):not(.hidden)) .page>.topbar{display:none
  <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
   <div class="dialog-head"><div><h2 id="dialogTitle">一覧</h2><p id="dialogSub"></p></div><div class="dialog-header-controls"><select id="storeFilter" aria-label="店舗を絞り込む"><option value="all">全店舗</option><option value="rose">薔薇と紳士</option><option value="busty">BUSTY OSAKA</option><option value="grandluxe">Grand Luxe</option><option value="luxy">LUXY OSAKA</option><option value="unsecret">Un Secret</option></select><button class="close" id="close" aria-label="閉じる">閉じる ×</button></div></div>
   <div id="dialogAction" class="dialog-action hidden" role="note"><strong id="dialogActionTitle"></strong><span id="dialogActionNote"></span></div>
-  <div class="filters" id="dialogFilters"><input id="search" type="search" placeholder="源氏名・EXA IDで検索" aria-label="一覧内を検索"></div>
+  
   <div class="list-wrap"><table><thead id="listHead"></thead><tbody id="listBody"></tbody></table></div>
  </section>
 </div>
@@ -333,10 +333,9 @@ const configs={
  birthday:{title:"誕生日",sub:"誕生日の前後3日間",key:"birthday",last:"誕生日"}
 };
 function render(){
- if(!mode)return;const cfg=configs[mode],q=mode==="birthday"?$("search").value.trim().toLowerCase():"",store=$("storeFilter").value;
+ if(!mode)return;const cfg=configs[mode],store=$("storeFilter").value;
  $("storeFilter").classList.remove("hidden");
- $("dialogFilters").classList.toggle("hidden",mode!=="birthday");
- const rows=(data[cfg.key]||[]).filter(r=>(store==="all"||r.store===store)&&(!q||String(r.name||"").toLowerCase().includes(q)||String(r.exa_id||"").includes(q))).sort((a,b)=>{
+ const rows=(data[cfg.key]||[]).filter(r=>(store==="all"||r.store===store)).sort((a,b)=>{
   if(mode==="final"){
     const x=a.end_minutes==null?Infinity:Number(a.end_minutes),y=b.end_minutes==null?Infinity:Number(b.end_minutes);
     return x-y||String(a.store).localeCompare(String(b.store))||Number(a.exa_id)-Number(b.exa_id);
@@ -400,10 +399,10 @@ function render(){
  }
 
 }
-function open(type){mode=type;$("search").value="";$("storeFilter").value="all";$("overlay").classList.remove("hidden");render();if(type==="birthday")$("search").focus()}
+function open(type){mode=type;$("storeFilter").value="all";$("overlay").classList.remove("hidden");render()}
 function close(){mode=null;$("overlay").classList.add("hidden")}
 document.querySelectorAll("[data-open]").forEach(b=>b.addEventListener("click",()=>open(b.dataset.open)));
-$("search").addEventListener("input",render);$("storeFilter").addEventListener("change",render);
+$("storeFilter").addEventListener("change",render);
 function formatContactTime(iso){
  const d=new Date(iso);
  if(!Number.isFinite(d.getTime()))return "日時不明";
