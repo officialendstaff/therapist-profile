@@ -551,15 +551,7 @@ function mergeReadAcknowledgements(threads){
 }
 let currentCustomerId="",currentCustomerName="",nameSaving=false;
 function showCustomerTitle(thread){
- const title=$("threadTitle");
- title.replaceChildren(makeStoreLabel(thread.store_key),document.createTextNode("｜"+nameOf(thread)));
- const digits=String(thread.booking_chat_visitors?.phone||"");
- if(/^[0-9]{6}$/.test(digits)){
-  const suffix=document.createElement("span");
-  suffix.className="chat-header-phone-suffix";
-  suffix.textContent="電話下6桁："+digits;
-  title.append(suffix);
- }
+ $("threadTitle").replaceChildren(makeStoreLabel(thread.store_key),document.createTextNode("｜"+nameOf(thread)));
 }
 function syncCustomerName(visitorId,newName){
  for(const thread of items){
@@ -666,7 +658,13 @@ async function call(action,params={}){
  catch(e){if(e.status===401)unauthorized();throw e}
 }
 function isUnread(t){return !!(t.last_customer_message_at&&(!t.staff_last_read_at||new Date(t.last_customer_message_at)>new Date(t.staff_last_read_at)))}
-function nameOf(t){const visitor=t.booking_chat_visitors;const saved=typeof visitor?.display_name==="string"?visitor.display_name.trim():"";return saved||String(t.visitor_id||"").slice(0,8)+" 様"}
+function nameOf(t){
+ const visitor=t.booking_chat_visitors;
+ const saved=typeof visitor?.display_name==="string"?visitor.display_name.trim():"";
+ const base=saved||String(t.visitor_id||"").slice(0,8);
+ const digits=String(visitor?.phone||"");
+ return base+(/^[0-9]{6}$/.test(digits)?" "+digits:"")+" 様";
+}
 function drawList(){
  const list=$("threads");list.replaceChildren();
  let unread=0;
@@ -679,8 +677,6 @@ function drawList(){
   const time=document.createElement("time");time.textContent=labelTime(t.updated_at);heading.append(strong,time);
   const desc=document.createElement("div");desc.className="sub";
   const customer=makeStoreLabel(t.store_key);desc.append(customer);
-  const phoneSuffix=String(t.booking_chat_visitors?.phone||"");
-  if(/^[0-9]{6}$/.test(phoneSuffix)){const suffix=document.createElement("span");suffix.className="customer-phone-suffix";suffix.textContent="電話下6桁："+phoneSuffix;desc.append(suffix)}
   if(t.status==="blocked"){const badge=document.createElement("span");badge.className="tag";badge.textContent="ブロック中";desc.append(badge)}else if(isUnread(t)){const badge=document.createElement("span");badge.className="tag chat-unread-badge";badge.textContent="1";desc.append(badge)}
   btn.append(heading,desc);btn.addEventListener("click",()=>void openThread(t.id));list.append(btn);
  }
