@@ -1267,7 +1267,7 @@ function recordsForLivePage(page){
   if(page==='日程調整'||page==='日程変更')return unscheduled&&!expired&&!done;
   if(page==='不届き者')return expired||['無断トビ','トビ（キャンセル）'].includes(r.status);
   return false;
- }).sort((a,b)=>['今日の予定','明日以降'].includes(page)?a.date.localeCompare(b.date):b.date.localeCompare(a.date)||Number(a.interviewId)-Number(b.interviewId):b.date.localeCompare(a.date)||Number(b.interviewId)-Number(a.interviewId));
+ }).sort((a,b)=>['今日の予定','明日以降'].includes(page)?(a.date.localeCompare(b.date)||Number(a.interviewId)-Number(b.interviewId)):(b.date.localeCompare(a.date)||Number(b.interviewId)-Number(a.interviewId)));
  if(page!=='不届き者')return filtered;
  // Keep separate interview/history records in the database; show only the latest
  // missed appointment per linked LINE applicant in the bad-attendance list.
