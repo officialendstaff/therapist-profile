@@ -825,6 +825,48 @@ html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!imp
 .rose-sales-foot{font-size:10px;color:#738399;line-height:1.55;margin:8px 3px}
 @media(max-width:1100px){.rose-sales-bottom{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.rose-sales-bottom{grid-template-columns:1fr}.rose-sales{padding:7px}.rose-trend{height:250px}.rose-donut{width:138px}}
+</style><style id="sales-unified-layout-20261111">
+#salesMetricsBody:not([hidden]){overflow:auto!important;height:calc(100% - 42px)!important;padding:8px 12px 12px!important;display:block!important}
+.unified-sales{display:flex;flex-direction:column;gap:9px;color:#273d58}
+.unified-sales-title{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.unified-sales-title>div{display:flex;align-items:baseline;gap:12px}
+.unified-sales-title span{color:#8092a9;font-size:10px;letter-spacing:.1em;font-weight:800}
+.unified-sales-title strong{font-size:16px}
+.unified-sales-title>small{font-size:11px;color:#718198}
+.unified-sales-summary{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.unified-sales-summary-item{display:grid;grid-template-columns:1fr auto;align-items:center;gap:3px 6px;background:#fff;border:1px solid #dce4ef;border-top:3px solid var(--sales-accent);border-radius:7px;padding:9px 11px}
+.unified-sales-summary-item span{font-size:11px;color:#60748e;font-weight:700;grid-column:1/-1}
+.unified-sales-summary-item b{font-size:clamp(18px,1.75vw,25px);font-variant-numeric:tabular-nums}
+.unified-sales-summary-item small{font-size:10px;color:#70849a}
+.unified-sales-layout{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:minmax(210px,1fr) minmax(215px,auto);gap:9px}
+.unified-sales-card{background:#fff;border:1px solid #dce5ef;border-radius:7px;overflow:hidden;min-width:0}
+.unified-sales-card h3{font-size:12px;margin:0;font-weight:800;color:#2d4663;padding:9px 12px;border-bottom:1px solid #e8eef5}
+.unified-sales-trend-card{grid-column:1/-1}
+.unified-sales-chart-head{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e8eef5}
+.unified-sales-chart-head h3{border:0}
+.unified-sales-chart-head>div{display:flex;gap:5px;margin-right:9px}
+.unified-sales-chart-tab{cursor:pointer;background:#f6f8fb;border:1px solid #dce4ed;border-radius:4px;font-size:11px;font-weight:700;padding:5px 12px;color:#5d718c}
+.unified-sales-chart-tab.active{background:#e9f0f8;color:#244e81;border-color:#a9c5e3}
+.unified-sales-trend{height:clamp(190px,28vh,260px);padding:5px 12px 0}
+.unified-sales-trend svg{display:block;width:100%;height:100%}
+.unified-sales-card-body{padding:10px 13px}
+.unified-sales-bar-row{display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:3px 10px;margin:9px 0;font-size:12px}
+.unified-sales-bar-label{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between}
+.unified-sales-bar-label b{font-size:14px;color:#243b57}
+.unified-sales-bar-label small,.unified-sales-bar-row>small{font-size:10px;color:#6e8198}
+.unified-sales-bar-track{background:#edf1f7;border-radius:3px;height:9px;overflow:hidden}
+.unified-sales-bar-track i{display:block;height:100%;border-radius:3px}
+.unified-sales-footnote{padding:0 13px 10px;margin:0;color:#74849a;font-size:10px}
+.unified-sales-profit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.unified-sales-stat{text-align:center;padding:10px 5px;background:#f5f7fa;border-radius:5px}
+.unified-sales-stat span,.unified-sales-stat small{display:block;color:#72839b;font-size:10px}
+.unified-sales-stat strong{display:block;font-size:clamp(16px,1.7vw,23px);margin:7px 0 2px;font-variant-numeric:tabular-nums}
+.unified-sales-stat em{display:block;font-size:10px;font-style:normal}
+.unified-sales-note{color:#895e39;font-size:11px}
+.unified-sales-source{font-size:10px;color:#74869b;margin:0;line-height:1.45}
+.unified-sales-empty{display:grid;place-items:center;height:100%;min-height:85px;color:#8a99aa;font-size:12px}
+@media(max-width:950px){.unified-sales-summary{grid-template-columns:repeat(3,minmax(0,1fr))}.unified-sales-layout{grid-template-columns:repeat(2,minmax(0,1fr))}.unified-sales-trend-card{grid-column:1/-1}}
+@media(max-width:600px){.unified-sales-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.unified-sales-layout{grid-template-columns:1fr}.unified-sales-title>div{flex-direction:column;gap:2px}.unified-sales-trend{height:225px}}
 </style></head><body>
 <header class="header"><button class="brand" id="home"><img id="homeAvatar" src="./icons/recruit-180.png" alt="" onerror="this.style.display='none'"><span id="homeLabel">TOP</span></button><div class="header-actions"><button id="manualInterviewOpen" type="button">面接登録</button><button id="sound">通知設定</button></div></header>
 <section class="calendar" aria-label="月間カレンダー"><div class="cal-head"><button id="prev" aria-label="前月">◀</button><span id="month"></span><button id="next" aria-label="翌月">▶</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="days" id="days"></div></section>
@@ -1460,47 +1502,85 @@ async function refreshSalesAnnualMetrics(){
  }
  renderSalesMetrics();
 }
-function renderRoseSalesMetrics(root,month,rows,ready){
- const roseRows=rows.filter(r=>r.store_key==='薔薇と紳士'),total=salesTotal(roseRows);
- const number=n=>Math.round(n).toLocaleString('ja-JP');
- const valid=ready&&roseRows.length>0,year=Number(month.slice(0,4));
- const v=(key)=>valid?number(total[key]):'—';
- const sum=total.new_contracts_count+total.repeat_contracts_count;
- const contractsValid=valid&&sum===total.contracts_count&&sum>0;
- const names=['売上','本数','顧客','新規','出勤','着信'];
- const fields=['revenue_yen','contracts_count','repeat_contracts_count','new_contracts_count','active_staff_count','inbound_people'];
- const colors=['#4384e8','#ed5652','#efb72e','#30a46c','#ed8c41','#32a9ba'];
- function donut(items,totalValue,caption){
-  const ok=items.every(item=>Number.isFinite(item.value)&&item.value>=0)&&totalValue>0&&items.reduce((a,b)=>a+b.value,0)===totalValue;
-  if(!ok)return '<p class="rose-sales-warning">内訳と成約本数が一致しないため、構成比は表示していません。</p>'+items.map(i=>'<div style="margin-top:12px;font-size:12px">'+i.label+'　<strong>'+number(i.value)+'</strong></div>').join('');
-  let deg=0;
-  const stops=items.map(item=>{const start=deg;deg+=item.value/totalValue*360;return item.color+' '+start+'deg '+deg+'deg'}).join(',');
-  return '<div class="rose-donut-wrap"><div class="rose-donut" style="background:conic-gradient('+stops+')"><span class="rose-donut-center">'+number(totalValue)+'<small>'+caption+'</small></span></div><div class="rose-sales-legend">'+items.map(item=>'<div><div><i style="background:'+item.color+'"></i>'+item.label+'</div><b>'+number(item.value)+'</b> <small>'+(item.value/totalValue*100).toFixed(1)+'%</small></div>').join('')+'</div></div>';
- }
- function panel(title,body){return '<section class="rose-sales-panel"><h3>'+title+'</h3><div class="rose-sales-body">'+body+'</div></section>'}
- function kpi(label,value,unit){return '<div><small>'+label+'</small><b>'+value+'</b><small>'+unit+'</small></div>'}
- root.innerHTML='<div class="rose-sales"><div class="rose-sales-header"><strong>薔薇と紳士｜営業数値</strong><small>'+month.replace('-','年')+'月</small></div>'+
- '<section class="rose-sales-panel"><h3>年間営業推移｜売上・本数・顧客・新規・出勤・着信</h3><div class="rose-trend" id="roseSalesTrend"></div></section>'+
- '<div class="rose-sales-bottom">'+
- panel('営業実績｜成約内訳',valid?donut([{label:'顧客',value:total.repeat_contracts_count,color:'#d7789c'},{label:'新規',value:total.new_contracts_count,color:'#6c93c9'}],total.contracts_count,'成約本数'):'<p>データ未取得</p>')+
- panel('集客・出勤','<div class="rose-sales-kpi">'+kpi('着信人数',v('inbound_people'),'人')+kpi('出勤延べ',v('active_staff_count'),'人日')+kpi('成約本数',v('contracts_count'),'本')+kpi('成約 / 出勤',valid&&total.active_staff_count?(total.contracts_count/total.active_staff_count).toFixed(2):'—','本/人日')+'</div>')+
- panel('指名実績｜構成比',valid?donut([{label:'フリー',value:total.free_count,color:'#d7789c'},{label:'ネット',value:total.net_nominations_count,color:'#63a3d7'},{label:'本指名',value:total.regular_nominations_count,color:'#e3af65'}],total.contracts_count,'成約本数'):'<p>データ未取得</p>')+
- panel('利益・報酬','<div class="rose-sales-kpi">'+kpi('利益平均',valid?number(total.profit_yen/roseRows.length):'—','円/日')+kpi('単価平均',valid&&total.contracts_count?number(total.profit_yen/total.contracts_count):'—','円/本')+kpi('女子報酬平均',valid&&total.contracts_count&&roseRows.every(r=>r.therapist_payout_yen!=null)?number(total.therapist_payout_yen/total.contracts_count):'—','円/本')+kpi('利益総額',valid?number(total.profit_yen):'—','円')+'</div>')+
- '</div><p class="rose-sales-foot">出典：EXA日別レポート。年間グラフは各指標の最大月を100とする相対指数です（旧スプレッドの指数計算式とは異なります）。指名内訳が成約本数と不一致の場合は構成比を計算しません。</p></div>';
- const host=document.getElementById('roseSalesTrend'), annual=salesAnnualState;
- if(annual.year!==year||annual.status==='loading'||annual.status==='idle'){host.textContent='年間データを読み込み中です';return}
- if(annual.status!=='ready'){host.textContent='年間データを取得できませんでした';return}
- const monthly=annual.months.filter(r=>r.store_key==='薔薇と紳士');
- const map=new Map(monthly.map(r=>[Number(r.month.slice(-2)),r]));
- const max=fields.map(f=>Math.max(0,...monthly.map(r=>Number(r[f])||0)));
- const w=1100,h=280,l=38,t=28,b=32,right=12;
- const x=m=>l+(m-1)*(w-l-right)/11,y=n=>t+(100-n)*(h-t-b)/100;
- let svg='<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" aria-label="月別相対指数の折れ線グラフ">';
- for(let j=0;j<=100;j+=25)svg+='<line x1="'+l+'" y1="'+y(j)+'" x2="'+(w-right)+'" y2="'+y(j)+'" stroke="#e4eaf1"/><text x="'+(l-7)+'" y="'+(y(j)+4)+'" text-anchor="end" font-size="11" fill="#75849a">'+j+'</text>';
- for(let m=1;m<=12;m++)svg+='<text x="'+x(m)+'" y="'+(h-8)+'" text-anchor="middle" font-size="11" fill="#75849a">'+m+'月</text>';
- fields.forEach((f,i)=>{if(!max[i])return;let path='',prior=0;for(let m=1;m<=12;m++){const r=map.get(m);if(!r){prior=0;continue}const val=(Number(r[f])||0)/max[i]*100;path+=(prior===m-1?' L ':' M ')+x(m).toFixed(1)+' '+y(val).toFixed(1);prior=m}svg+='<path d="'+path+'" stroke="'+colors[i]+'" stroke-width="2.5" fill="none" stroke-linejoin="round"/>';});
- svg+='</svg><div style="display:flex;flex-wrap:wrap;justify-content:center;gap:7px 17px;font-size:11px;color:#52647c">'+names.map((n,i)=>'<span><i style="background:'+colors[i]+';width:9px;height:9px;display:inline-block;margin-right:5px"></i>'+n+'</span>').join('')+'</div>';
- host.innerHTML=svg;
+function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
+ const storeKey=selectedStore||'薔薇と紳士';
+ const storeLabel=storeKey==='LUXY'?'LUXY OSAKA':storeKey;
+ const filtered=rows.filter(r=>r.store_key===storeKey);
+ const total=salesTotal(filtered);
+ const valid=ready&&filtered.length>0;
+ const year=Number(month.slice(0,4));
+ const number=n=>Number.isFinite(n)?Math.round(n).toLocaleString('ja-JP'):'—';
+ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const tone=(salesAnnualShopColors.find(x=>x[0]===storeKey)||[])[1]||'#527eac';
+ const value=(field,unit='')=>valid?number(total[field])+unit:'—';
+ const ratio=(n,d)=>valid&&d?((n/d)*100).toFixed(1)+'%':'—';
+ const splitOK=valid&&total.new_contracts_count+total.repeat_contracts_count===total.contracts_count;
+ const nominationsOK=valid&&total.free_count+total.net_nominations_count+total.regular_nominations_count===total.contracts_count;
+ const payReady=valid&&filtered.every(r=>r.therapist_payout_yen!=null);
+ const card=(title,content,foot='')=>'<section class="unified-sales-card"><h3>'+title+'</h3><div class="unified-sales-card-body">'+content+'</div>'+(foot?'<p class="unified-sales-footnote">'+foot+'</p>':'')+'</section>';
+ const stat=(label,n,unit,sub='')=>'<div class="unified-sales-stat"><span>'+label+'</span><strong>'+n+'</strong><small>'+unit+'</small>'+(sub?'<em>'+sub+'</em>':'')+'</div>';
+ const kpi=(label,n,unit)=>'<div class="unified-sales-summary-item"><span>'+label+'</span><b>'+n+'</b><small>'+unit+'</small></div>';
+ const bars=(parts,base)=>parts.map(p=>{
+  const pct=base>0?p.count/base*100:0;
+  return '<div class="unified-sales-bar-row"><div class="unified-sales-bar-label"><span>'+p.name+'</span><b>'+number(p.count)+' <small>本</small></b></div><div class="unified-sales-bar-track"><i style="width:'+Math.min(100,Math.max(0,pct))+'%;background:'+p.color+'"></i></div><small>'+ (valid&&base>0?pct.toFixed(1)+'%':'—')+'</small></div>';
+ }).join('');
+ const split=[
+  {name:'新規',count:total.new_contracts_count,color:'#6d94ce'},
+  {name:'顧客',count:total.repeat_contracts_count,color:'#cc759b'}
+ ];
+ const nominations=[
+  {name:'フリー',count:total.free_count,color:'#76a6da'},
+  {name:'ネット',count:total.net_nominations_count,color:'#36a795'},
+  {name:'本指名',count:total.regular_nominations_count,color:'#d8a45b'}
+ ];
+ const summary='<div class="unified-sales-summary">'+[
+  kpi('成約本数',value('contracts_count'),'本'),
+  kpi('新規',value('new_contracts_count'),'本'),
+  kpi('顧客',value('repeat_contracts_count'),'本'),
+  kpi('利益総額',value('profit_yen'),'円'),
+  kpi('出勤延べ',value('active_staff_count'),'人日'),
+  kpi('着信人数',value('inbound_people'),'人')
+ ].join('')+'</div>';
+ const salesContent=valid?bars(split,total.contracts_count):'<div class="unified-sales-empty">対象月のデータは未登録です</div>';
+ const nominationContent=valid?bars(nominations,total.contracts_count):'<div class="unified-sales-empty">指名内訳のデータは未登録です</div>';
+ const correction='<div class="unified-sales-note">'+(splitOK?'成約内訳：一致':'成約内訳：不一致（Excelの原票確認が必要）')+'　／　'+(nominationsOK?'指名内訳：一致':'指名内訳：未照合・不一致')+'</div>';
+ root.innerHTML='<div class="unified-sales" style="--sales-accent:'+tone+'">'+
+ '<div class="unified-sales-title"><div><span>SALES PERFORMANCE</span><strong>'+esc(storeLabel)+'｜営業数値</strong></div><small>'+esc(month.replace('-','年'))+'月 ・ 登録 '+filtered.length+'日分</small></div>'+
+ summary+
+ '<div class="unified-sales-layout">'+
+ '<section class="unified-sales-card unified-sales-trend-card"><div class="unified-sales-chart-head"><h3>年間推移</h3><div><button type="button" class="unified-sales-chart-tab active" data-chart="contracts_count">成約本数</button><button type="button" class="unified-sales-chart-tab" data-chart="profit_yen">利益</button><button type="button" class="unified-sales-chart-tab" data-chart="revenue_yen">売上</button></div></div><div id="unifiedSalesTrend" class="unified-sales-trend"></div></section>'+
+ card('成約内訳',salesContent,splitOK?'新規＋顧客＝成約本数':'内訳と成約本数が一致していません')+
+ card('指名内訳',nominationContent,nominationsOK?'フリー＋ネット＋本指名＝成約本数':'不一致でも取得した値をそのまま表示しています')+
+ card('利益・報酬','<div class="unified-sales-profit">'+
+ stat('利益平均',valid&&filtered.length?number(total.profit_yen/filtered.length):'—','円／登録日')+
+ stat('利益単価',valid&&total.contracts_count?number(total.profit_yen/total.contracts_count):'—','円／本')+
+ stat('女子報酬平均',payReady&&total.contracts_count?number(total.therapist_payout_yen/total.contracts_count):'—','円／本')+
+ stat('成約／出勤',valid&&total.active_staff_count?(total.contracts_count/total.active_staff_count).toFixed(2):'—','本／人日')+'</div>')+
+ '</div>'+correction+
+ '<p class="unified-sales-source">集計元：登録済みEXA日別レポート。未登録日は0として扱わず、年間推移にはデータのある月のみ表示します。指名内訳は原票の登録値です。</p></div>';
+ const annual=salesAnnualState,host=root.querySelector('#unifiedSalesTrend');
+ const chart=(field)=>{
+  const labels={contracts_count:'成約本数（本）',profit_yen:'利益（円）',revenue_yen:'売上（円）'};
+  if(annual.year!==year||['loading','idle'].includes(annual.status)){host.innerHTML='<p class="unified-sales-empty">年間データを読み込み中です</p>';return}
+  if(annual.status!=='ready'){host.innerHTML='<p class="unified-sales-empty">年間データを取得できませんでした</p>';return}
+  const monthly=annual.months.filter(r=>r.store_key===storeKey);
+  if(!monthly.length){host.innerHTML='<p class="unified-sales-empty">年間データは未登録です</p>';return}
+  const monthMap=new Map(monthly.map(r=>[Number(r.month.slice(-2)),r]));
+  const max=Math.max(1,...monthly.map(r=>Number(r[field])||0));
+  const w=1040,h=255,l=65,t=22,b=39,right=21,plot=h-t-b;
+  const x=m=>l+(m-1)*(w-l-right)/11;
+  const y=v=>t+plot*(1-v/max);
+  let svg='<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" role="img" aria-label="'+labels[field]+'の月別推移">';
+  for(let i=0;i<=4;i++){const val=max*i/4,yy=y(val);svg+='<line x1="'+l+'" x2="'+(w-right)+'" y1="'+yy+'" y2="'+yy+'" stroke="#e5ebf2"/><text x="'+(l-9)+'" y="'+(yy+4)+'" font-size="12" text-anchor="end" fill="#74849a">'+(val>=10000?(val/10000).toFixed(1)+'万':number(val))+'</text>'}
+  for(let m=1;m<=12;m++)svg+='<text x="'+x(m)+'" y="'+(h-10)+'" font-size="12" text-anchor="middle" fill="#718398">'+m+'月</text>';
+  let points=[],segment=[];
+  const finish=()=>{if(segment.length>1)points.push('<polyline points="'+segment.join(' ')+'" fill="none" stroke="'+tone+'" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>');segment=[]};
+  for(let m=1;m<=12;m++){const r=monthMap.get(m);if(!r){finish();continue}const v=Number(r[field])||0;segment.push(x(m)+','+y(v));points.push('<circle cx="'+x(m)+'" cy="'+y(v)+'" r="4" fill="'+tone+'"><title>'+m+'月：'+number(v)+'（登録'+r.days+'日）</title></circle>')}
+  finish();svg+=points.join('')+'</svg>';
+  host.innerHTML=svg;
+ };
+ root.querySelectorAll('[data-chart]').forEach(btn=>btn.addEventListener('click',()=>{root.querySelectorAll('[data-chart]').forEach(b=>b.classList.toggle('active',b===btn));chart(btn.dataset.chart)}));
+ chart('contracts_count');
 }
 function renderSalesMetrics(){
  const root=$('salesMetricsBody');if(!root||root.hidden||$('storeMetrics').hidden)return;
@@ -1509,7 +1589,7 @@ function renderSalesMetrics(){
  const rows=ready?salesMetricsData.rows:[];
  const parentShop=(()=>{try{return window.parent!==window?window.parent.document.getElementById('metricsHeaderShop')?.value:null}catch{return null}})();
  const activeSalesShop=parentShop||$('storeMetricsShop').value;
- if(activeSalesShop==='薔薇と紳士'||activeSalesShop==='all'){renderRoseSalesMetrics(root,month,rows,ready);return}
+ if(activeSalesShop!=='all'){renderRoseSalesMetrics(root,month,rows,ready,activeSalesShop);return}
  const stores=salesStoreMap.map(([key,name],i)=>{
   const data=rows.filter(r=>r.store_key===key);
   return {key,name,short:['Grand Luxe','LUXY','Un Secret','薔薇と紳士','BUSTY'][i],has:data.length>0,days:data.length,payoutAvailable:data.length>0&&data.every(r=>r.therapist_payout_yen!==null&&r.therapist_payout_yen!==undefined),totals:salesTotal(data)};
@@ -1588,10 +1668,7 @@ async function refreshSalesMetrics(){
 }
 function setMetricsMode(mode){
  const sales=mode==='sales'&&!$('metricsSalesTab').disabled;
- if(sales&&$('storeMetricsShop').value==='all'){
-  $('storeMetricsShop').value='薔薇と紳士';
-  $('storeMetricsShop').dispatchEvent(new Event('change',{bubbles:true}));
- }
+
  $('metricsInterviewTab').setAttribute('aria-selected',String(!sales));
  $('metricsSalesTab').setAttribute('aria-selected',String(sales));
  $('storeMetricsBody').hidden=sales;
