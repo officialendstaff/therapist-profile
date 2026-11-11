@@ -866,8 +866,8 @@ const dayCounts=new Map();
 for(let n=1;n<=daysIn();n++){
  const date=dayStr(n);
  const r=shifts.filter(x=>x.work_date===date);
- const active=r.filter(x=>rosterIds.has(x.exa_id)&&existing.get(x.exa_id)?.operating_category!=="not_used"&&!x.is_dummy_shift&&!isDummy(existing.get(x.exa_id)||{})).length;
- const dummyTotal=r.filter(x=>rosterIds.has(x.exa_id)&&existing.get(x.exa_id)?.operating_category!=="not_used"&&(x.is_dummy_shift||isDummy(existing.get(x.exa_id)||{}))).length;
+ const active=r.filter(x=>rosterIds.has(x.exa_id)&&existing.get(x.exa_id)?.operating_category!=="not_used"&&!x.is_dummy_shift&&!isDummy(existing.get(x.exa_id)||{})&&!x.is_pre_off&&!absence.has(x.exa_id+"|"+date)).length;
+ const dummyTotal=r.filter(x=>rosterIds.has(x.exa_id)&&existing.get(x.exa_id)?.operating_category!=="not_used"&&(x.is_dummy_shift||isDummy(existing.get(x.exa_id)||{}))&&!x.is_pre_off&&!absence.has(x.exa_id+"|"+date)).length;
  dayCounts.set(date,{real:active,dummy:dummyTotal,all:active+dummyTotal});
 }
 const countHeader=staffView==="real"?"在籍（"+real.length+"名）":staffView==="dummy"?"退店（"+dummy.length+"名）":"在籍（"+real.length+"名）／退店（"+dummy.length+"名）";
@@ -891,7 +891,7 @@ const upcoming=futureShifts.some(r=>r.exa_id===t.exa_id&&r.work_date>=today()&&!
 const outside=group==="real"&&!upcoming&&!["long_leave","pending_documents","provisional_hidden"].includes(t.operating_category);
 const latestDates=futureShifts.filter(r=>r.exa_id===t.exa_id&&!r.is_dummy_shift&&!r.is_pre_off).map(r=>r.work_date).sort();
 const lastKnownDate=latestDates.length?latestDates[latestDates.length-1]:null;
-const days=[...entries.values()].filter(r=>!r.is_dummy_shift).length;
+const days=[...entries.values()].filter(r=>!r.is_dummy_shift&&!r.is_pre_off&&!absence.has(t.exa_id+"|"+r.work_date)).length;
 const zeros=valid.filter(r=>!absence.has(t.exa_id+"|"+r.work_date)&&per.get(t.exa_id+"|"+r.work_date)===0).length;
 const categoryClass={provisional_hidden:"state-provisional",pending_documents:"state-paperwork",long_leave:"state-leave",dummy_use:"state-dummy"}[t.operating_category]||(group==="dummy"?"state-dummy":"");
 html+='<tr class="'+(outside?'outside-roster':'')+'"><td class="staff-name '+categoryClass+'"><button type="button" class="name-editor" data-staff-id="'+t.exa_id+'" title="出勤管理区分を変更">'+safe(stageName)+'</button><span class="staff-exa-id" title="EXA管理ID">ID '+t.exa_id+'</span>'+(kana?'<span class="reading">'+safe(kana)+'</span>':'')+'</td>';
