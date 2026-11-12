@@ -1544,12 +1544,12 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
   {name:'本指名',count:total.regular_nominations_count,color:'#d8a45b'}
  ];
  const summary='<div class="unified-sales-summary">'+[
-  kpi('成約本数',value('contracts_count'),'本'),
-  kpi('新規',value('new_contracts_count'),'本'),
-  kpi('顧客',value('repeat_contracts_count'),'本'),
-  kpi('利益総額',value('profit_yen'),'円'),
-  kpi('出勤延べ',value('active_staff_count'),'人日'),
-  kpi('着信人数',value('inbound_people'),'人')
+  kpi('成約',value('contracts_count'),'本'),
+  kpi('利益',value('profit_yen'),'円'),
+  kpi('着信',value('inbound_people'),'件'),
+  kpi('顧客',value('repeat_contracts_count'),'名'),
+  kpi('新規',value('new_contracts_count'),'名'),
+  kpi('出勤',value('active_staff_count'),'名')
  ].join('')+'</div>';
  const salesContent=valid?bars(split,total.contracts_count):'<div class="unified-sales-empty">対象月のデータは未登録です</div>';
  const nominationContent=valid?bars(nominations,total.contracts_count):'<div class="unified-sales-empty">指名内訳のデータは未登録です</div>';
