@@ -825,6 +825,16 @@ html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!imp
 .rose-sales-foot{font-size:10px;color:#738399;line-height:1.55;margin:8px 3px}
 @media(max-width:1100px){.rose-sales-bottom{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.rose-sales-bottom{grid-template-columns:1fr}.rose-sales{padding:7px}.rose-trend{height:250px}.rose-donut{width:138px}}
+</style><style id="sales-header-kpis-20261112">
+/* Sales KPI strip occupies the header row; graphs and data remain unchanged. */
+#storeMetricsHeader>.sales-header-kpis{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:6px!important;flex:1 1 auto;min-width:0}
+#storeMetricsHeader .sales-header-kpis .unified-sales-summary-item{display:flex;align-items:center;justify-content:space-between;gap:5px;min-width:0;height:48px;padding:5px 8px;border:1px solid #d1deed;border-radius:5px;border-top:2px solid var(--sales-accent);background:#f5f8fd;overflow:hidden}
+#storeMetricsHeader .sales-header-kpis .unified-sales-summary-item span{min-width:0;flex:1 1 auto;color:#405b7a;font-size:11px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#storeMetricsHeader .sales-header-kpis .unified-sales-summary-item b{flex:0 0 auto;color:#102f52;font-size:clamp(14px,1.45vw,20px);font-weight:850;white-space:nowrap;font-variant-numeric:tabular-nums}
+#storeMetricsHeader .sales-header-kpis .unified-sales-summary-item small{flex:0 0 auto;color:#70849a;font-size:9px;white-space:nowrap}
+#storeMetricsHeader:has(.sales-header-kpis)>.store-metrics-kpis{display:none!important}
+@media(max-width:1100px){#storeMetricsHeader:has(.sales-header-kpis){flex-wrap:wrap!important}#storeMetricsHeader>.sales-header-kpis{flex-basis:100%}}
+@media(max-width:650px){#storeMetricsHeader>.sales-header-kpis{grid-template-columns:repeat(3,minmax(0,1fr))!important}#storeMetricsHeader .sales-header-kpis .unified-sales-summary-item{height:44px;padding:4px 6px}#storeMetricsHeader .sales-header-kpis .unified-sales-summary-item b{font-size:15px}}
 </style><style id="sales-unified-layout-20261111">
 #salesMetricsBody:not([hidden]){overflow:auto!important;height:calc(100% - 42px)!important;padding:8px 12px 12px!important;display:block!important}
 .unified-sales{display:flex;flex-direction:column;gap:9px;color:#273d58}
@@ -1543,6 +1553,8 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
  ].join('')+'</div>';
  const salesContent=valid?bars(split,total.contracts_count):'<div class="unified-sales-empty">対象月のデータは未登録です</div>';
  const nominationContent=valid?bars(nominations,total.contracts_count):'<div class="unified-sales-empty">指名内訳のデータは未登録です</div>';
+ const previousHeaderKpis=document.querySelector('#storeMetricsHeader>.sales-header-kpis');
+ if(previousHeaderKpis)previousHeaderKpis.remove();
  root.innerHTML='<div class="unified-sales" style="--sales-accent:'+tone+'">'+
  summary+
  '<div class="unified-sales-layout">'+
@@ -1556,6 +1568,8 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
  stat('成約／出勤',valid&&total.active_staff_count?(total.contracts_count/total.active_staff_count).toFixed(2):'—','本／人日')+'</div>')+
  '</div></div>';
  '<p class="unified-sales-source">集計元：登録済みEXA日別レポート。未登録日は0として扱わず、年間推移にはデータのある月のみ表示します。指名内訳は原票の登録値です。</p></div>';
+ const salesKpis=root.querySelector('.unified-sales-summary');
+ if(salesKpis){salesKpis.classList.add('sales-header-kpis');document.getElementById('storeMetricsHeader')?.append(salesKpis);}
  const annual=salesAnnualState,host=root.querySelector('#unifiedSalesTrend');
  const chart=(field)=>{
   const labels={contracts_count:'成約本数（本）',profit_yen:'利益（円）',revenue_yen:'売上（円）'};
@@ -1588,6 +1602,7 @@ function renderSalesMetrics(){
  const parentShop=(()=>{try{return window.parent!==window?window.parent.document.getElementById('metricsHeaderShop')?.value:null}catch{return null}})();
  const activeSalesShop=parentShop||$('storeMetricsShop').value;
  if(activeSalesShop!=='all'){renderRoseSalesMetrics(root,month,rows,ready,activeSalesShop);return}
+ document.querySelector('#storeMetricsHeader>.sales-header-kpis')?.remove();
  const stores=salesStoreMap.map(([key,name],i)=>{
   const data=rows.filter(r=>r.store_key===key);
   return {key,name,short:['Grand Luxe','LUXY','Un Secret','薔薇と紳士','BUSTY'][i],has:data.length>0,days:data.length,payoutAvailable:data.length>0&&data.every(r=>r.therapist_payout_yen!==null&&r.therapist_payout_yen!==undefined),totals:salesTotal(data)};
@@ -1671,6 +1686,7 @@ function setMetricsMode(mode){
  $('metricsSalesTab').setAttribute('aria-selected',String(sales));
  $('storeMetricsBody').hidden=sales;
  $('salesMetricsBody').hidden=!sales;
+ if(!sales)document.querySelector('#storeMetricsHeader>.sales-header-kpis')?.remove();
  if(sales)refreshSalesMetrics();else renderStoreMetrics();
 }
 document.getElementById('metricsInterviewTab').addEventListener('click',()=>setMetricsMode('interview'));
