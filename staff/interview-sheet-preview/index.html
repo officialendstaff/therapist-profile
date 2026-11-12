@@ -1543,9 +1543,7 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
  ].join('')+'</div>';
  const salesContent=valid?bars(split,total.contracts_count):'<div class="unified-sales-empty">対象月のデータは未登録です</div>';
  const nominationContent=valid?bars(nominations,total.contracts_count):'<div class="unified-sales-empty">指名内訳のデータは未登録です</div>';
- const correction='<div class="unified-sales-note">'+(splitOK?'成約内訳：一致':'成約内訳：不一致（Excelの原票確認が必要）')+'　／　'+(nominationsOK?'指名内訳：一致':'指名内訳：未照合・不一致')+'</div>';
  root.innerHTML='<div class="unified-sales" style="--sales-accent:'+tone+'">'+
- '<div class="unified-sales-title"><div><span>SALES PERFORMANCE</span><strong>'+esc(storeLabel)+'｜営業数値</strong></div><small>'+esc(month.replace('-','年'))+'月 ・ 登録 '+filtered.length+'日分</small></div>'+
  summary+
  '<div class="unified-sales-layout">'+
  '<section class="unified-sales-card unified-sales-trend-card"><div class="unified-sales-chart-head"><h3>年間推移</h3><div><button type="button" class="unified-sales-chart-tab active" data-chart="contracts_count">成約本数</button><button type="button" class="unified-sales-chart-tab" data-chart="profit_yen">利益</button><button type="button" class="unified-sales-chart-tab" data-chart="revenue_yen">売上</button></div></div><div id="unifiedSalesTrend" class="unified-sales-trend"></div></section>'+
@@ -1556,7 +1554,7 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
  stat('利益単価',valid&&total.contracts_count?number(total.profit_yen/total.contracts_count):'—','円／本')+
  stat('女子報酬平均',payReady&&total.contracts_count?number(total.therapist_payout_yen/total.contracts_count):'—','円／本')+
  stat('成約／出勤',valid&&total.active_staff_count?(total.contracts_count/total.active_staff_count).toFixed(2):'—','本／人日')+'</div>')+
- '</div>'+correction+
+ '</div></div>';
  '<p class="unified-sales-source">集計元：登録済みEXA日別レポート。未登録日は0として扱わず、年間推移にはデータのある月のみ表示します。指名内訳は原票の登録値です。</p></div>';
  const annual=salesAnnualState,host=root.querySelector('#unifiedSalesTrend');
  const chart=(field)=>{
