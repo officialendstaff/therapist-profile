@@ -835,6 +835,10 @@ html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!imp
 #storeMetricsHeader:has(.sales-header-kpis)>.store-metrics-kpis{display:none!important}
 @media(max-width:1100px){#storeMetricsHeader:has(.sales-header-kpis){flex-wrap:wrap!important}#storeMetricsHeader>.sales-header-kpis{flex-basis:100%}}
 @media(max-width:650px){#storeMetricsHeader>.sales-header-kpis{grid-template-columns:repeat(3,minmax(0,1fr))!important}#storeMetricsHeader .sales-header-kpis .unified-sales-summary-item{height:44px;padding:4px 6px}#storeMetricsHeader .sales-header-kpis .unified-sales-summary-item b{font-size:15px}}
+</style><style id="sales-demo-seven-line-20261112">
+.unified-sales-trend{height:clamp(400px,56vh,560px)!important;min-height:400px!important;padding:5px 14px 8px!important}
+.unified-sales-trend-card .unified-sales-chart-head h3{border:0!important}
+@media(max-width:700px){.unified-sales-trend-card{overflow-x:auto!important}.unified-sales-trend{min-width:850px!important;height:420px!important}}
 </style><style id="sales-unified-layout-20261111">
 #salesMetricsBody:not([hidden]){overflow:auto!important;height:calc(100% - 42px)!important;padding:8px 12px 12px!important;display:block!important}
 .unified-sales{display:flex;flex-direction:column;gap:9px;color:#273d58}
@@ -1558,7 +1562,7 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
  root.innerHTML='<div class="unified-sales" style="--sales-accent:'+tone+'">'+
  summary+
  '<div class="unified-sales-layout">'+
- '<section class="unified-sales-card unified-sales-trend-card"><div class="unified-sales-chart-head"><h3>年間推移</h3><div><button type="button" class="unified-sales-chart-tab active" data-chart="contracts_count">成約本数</button><button type="button" class="unified-sales-chart-tab" data-chart="profit_yen">利益</button><button type="button" class="unified-sales-chart-tab" data-chart="revenue_yen">売上</button></div></div><div id="unifiedSalesTrend" class="unified-sales-trend"></div></section>'+
+ '<section class="unified-sales-card unified-sales-trend-card"><div class="unified-sales-chart-head"><h3>'+year+'年指数（仮データによる表示確認）</h3></div><div id="unifiedSalesTrend" class="unified-sales-trend"></div></section>'+
  card('成約内訳',salesContent,splitOK?'新規＋顧客＝成約本数':'内訳と成約本数が一致していません')+
  card('指名内訳',nominationContent,nominationsOK?'フリー＋ネット＋本指名＝成約本数':'不一致でも取得した値をそのまま表示しています')+
  card('利益・報酬','<div class="unified-sales-profit">'+
@@ -1570,29 +1574,51 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
  '<p class="unified-sales-source">集計元：登録済みEXA日別レポート。未登録日は0として扱わず、年間推移にはデータのある月のみ表示します。指名内訳は原票の登録値です。</p></div>';
  const salesKpis=root.querySelector('.unified-sales-summary');
  if(salesKpis){salesKpis.classList.add('sales-header-kpis');document.getElementById('storeMetricsHeader')?.append(salesKpis);}
- const annual=salesAnnualState,host=root.querySelector('#unifiedSalesTrend');
- const chart=(field)=>{
-  const labels={contracts_count:'成約本数（本）',profit_yen:'利益（円）',revenue_yen:'売上（円）'};
-  if(annual.year!==year||['loading','idle'].includes(annual.status)){host.innerHTML='<p class="unified-sales-empty">年間データを読み込み中です</p>';return}
-  if(annual.status!=='ready'){host.innerHTML='<p class="unified-sales-empty">年間データを取得できませんでした</p>';return}
-  const monthly=annual.months.filter(r=>r.store_key===storeKey);
-  if(!monthly.length){host.innerHTML='<p class="unified-sales-empty">年間データは未登録です</p>';return}
-  const monthMap=new Map(monthly.map(r=>[Number(r.month.slice(-2)),r]));
-  const max=Math.max(1,...monthly.map(r=>Number(r[field])||0));
-  const w=1040,h=255,l=65,t=22,b=39,right=21,plot=h-t-b;
-  const x=m=>l+(m-1)*(w-l-right)/11;
-  const y=v=>t+plot*(1-v/max);
-  let svg='<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" role="img" aria-label="'+labels[field]+'の月別推移">';
-  for(let i=0;i<=4;i++){const val=max*i/4,yy=y(val);svg+='<line x1="'+l+'" x2="'+(w-right)+'" y1="'+yy+'" y2="'+yy+'" stroke="#e5ebf2"/><text x="'+(l-9)+'" y="'+(yy+4)+'" font-size="12" text-anchor="end" fill="#74849a">'+(val>=10000?(val/10000).toFixed(1)+'万':number(val))+'</text>'}
-  for(let m=1;m<=12;m++)svg+='<text x="'+x(m)+'" y="'+(h-10)+'" font-size="12" text-anchor="middle" fill="#718398">'+m+'月</text>';
-  let points=[],segment=[];
-  const finish=()=>{if(segment.length>1)points.push('<polyline points="'+segment.join(' ')+'" fill="none" stroke="'+tone+'" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>');segment=[]};
-  for(let m=1;m<=12;m++){const r=monthMap.get(m);if(!r){finish();continue}const v=Number(r[field])||0;segment.push(x(m)+','+y(v));points.push('<circle cx="'+x(m)+'" cy="'+y(v)+'" r="4" fill="'+tone+'"><title>'+m+'月：'+number(v)+'（登録'+r.days+'日）</title></circle>')}
-  finish();svg+=points.join('')+'</svg>';
-  host.innerHTML=svg;
+
+ const host=root.querySelector('#unifiedSalesTrend');
+ // Preview-only values: do not persist to Supabase or mix with EXA actuals.
+ const demo={
+  profit_yen:[16.47,15.64,16.10,14.04,14.80,15.40,14.72,15.18,16.08,15.73,16.20],
+  contracts_count:[18.83,17.97,18.40,15.40,16.70,17.23,15.69,16.35,17.40,18.10,17.65],
+  repeat_contracts_count:[13.73,12.13,12.43,11.33,11.80,12.43,11.25,11.70,12.34,12.75,12.10],
+  new_contracts_count:[5.10,5.60,5.17,4.47,4.90,4.80,4.44,4.65,5.06,5.35,5.55],
+  active_staff_count:[9.73,9.93,10.53,8.73,9.20,10.00,8.56,9.15,9.65,10.30,9.87],
+  inbound_people:[28.17,29.54,26.68,24.90,25.87,27.10,27.88,28.45,29.05,28.32,29.60],
+  real_working_average:[22.20,21.70,22.50,21.40,22.10,22.80,23.10,22.50,23.30,23.80,24.20]
  };
- root.querySelectorAll('[data-chart]').forEach(btn=>btn.addEventListener('click',()=>{root.querySelectorAll('[data-chart]').forEach(b=>b.classList.toggle('active',b===btn));chart(btn.dataset.chart)}));
- chart('contracts_count');
+ const series=[
+  {label:'利益平均',field:'profit_yen',color:'#4987e8'},
+  {label:'本数平均',field:'contracts_count',color:'#ee4942'},
+  {label:'顧客平均',field:'repeat_contracts_count',color:'#eab527'},
+  {label:'新規平均',field:'new_contracts_count',color:'#2ca965'},
+  {label:'出勤平均',field:'active_staff_count',color:'#ff8033'},
+  {label:'着信平均',field:'inbound_people',color:'#35b7c9'},
+  {label:'実働平均',field:'real_working_average',color:'#9b65bf'}
+ ];
+ const w=1160,h=440,left=54,right=25,top=62,bottom=37,plot=h-top-bottom;
+ const x=m=>left+(m-1)*(w-left-right)/11;
+ const y=v=>top+plot*(1-v/35);
+ let svg='<svg viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="'+year+'年、7系列の仮データ折れ線グラフ" style="width:100%;height:100%;display:block">';
+ let lx=left+170;
+ series.forEach(def=>{svg+='<rect x="'+lx+'" y="22" width="9" height="9" fill="'+def.color+'"/><text x="'+(lx+15)+'" y="31" fill="#546477" font-size="12">'+def.label+'</text>';lx+=125;});
+ for(let value=0;value<=35;value+=5){
+  const yy=y(value);
+  svg+='<line x1="'+left+'" y1="'+yy+'" x2="'+(w-right)+'" y2="'+yy+'" stroke="#d8dfe7" stroke-width="1"/>';
+  svg+='<text x="'+(left-8)+'" y="'+(yy+4)+'" text-anchor="end" font-size="12" fill="#68778a">'+value.toFixed(2)+'</text>';
+ }
+ for(let m=1;m<=12;m++)svg+='<text x="'+x(m)+'" y="'+(h-8)+'" text-anchor="middle" font-size="12" fill="#556578">'+m+'月</text>';
+ series.forEach(def=>{
+  const vals=demo[def.field],coords=vals.map((v,i)=>x(i+1)+','+y(v)).join(' ');
+  svg+='<polyline points="'+coords+'" fill="none" stroke="'+def.color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+  vals.forEach((v,i)=>{
+   const px=x(i+1),py=y(v);
+   svg+='<rect x="'+(px-3.5)+'" y="'+(py-3.5)+'" width="7" height="7" fill="'+def.color+'"/>';
+   svg+='<text x="'+px+'" y="'+(py-10)+'" text-anchor="middle" font-size="10" font-weight="600" fill="'+def.color+'">'+v.toFixed(2)+'</text>';
+  });
+ });
+ svg+='</svg>';
+ host.innerHTML=svg;
+
 }
 function renderSalesMetrics(){
  const root=$('salesMetricsBody');if(!root||root.hidden||$('storeMetrics').hidden)return;
