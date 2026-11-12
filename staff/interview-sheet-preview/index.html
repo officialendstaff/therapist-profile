@@ -845,6 +845,9 @@ html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!imp
 .unified-sales-trend-card .unified-sales-chart-head h3{border:0!important}
 @media(max-width:950px){#salesMetricsBody:not([hidden]){overflow:auto!important}#salesMetricsBody:not([hidden])>.unified-sales{height:auto!important}#salesMetricsBody:not([hidden]) .unified-sales-layout{display:grid!important;grid-template-rows:none!important}#salesMetricsBody:not([hidden]) .unified-sales-trend{height:420px!important;min-height:420px!important}}
 @media(max-width:700px){.unified-sales-trend-card{overflow-x:auto!important}.unified-sales-trend{min-width:850px!important}}
+
+.unified-sales-trend-card{border-top:1px solid #dce5ef!important}
+.unified-sales-trend{padding-top:10px!important}
 </style><style id="sales-unified-layout-20261111">
 #salesMetricsBody:not([hidden]){overflow:auto!important;height:calc(100% - 42px)!important;padding:8px 12px 12px!important;display:block!important}
 .unified-sales{display:flex;flex-direction:column;gap:9px;color:#273d58}
@@ -1568,7 +1571,7 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
  root.innerHTML='<div class="unified-sales" style="--sales-accent:'+tone+'">'+
  summary+
  '<div class="unified-sales-layout">'+
- '<section class="unified-sales-card unified-sales-trend-card"><div class="unified-sales-chart-head"><h3>'+year+'年指数（仮データによる表示確認）</h3></div><div id="unifiedSalesTrend" class="unified-sales-trend"></div></section>'+
+ '<section class="unified-sales-card unified-sales-trend-card"><div id="unifiedSalesTrend" class="unified-sales-trend"></div></section>'+
  card('成約内訳',salesContent,splitOK?'新規＋顧客＝成約本数':'内訳と成約本数が一致していません')+
  card('指名内訳',nominationContent,nominationsOK?'フリー＋ネット＋本指名＝成約本数':'不一致でも取得した値をそのまま表示しています')+
  card('利益・報酬','<div class="unified-sales-profit">'+
@@ -1601,27 +1604,45 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
   {label:'着信平均',field:'inbound_people',color:'#35b7c9'},
   {label:'実働平均',field:'real_working_average',color:'#9b65bf'}
  ];
- const w=1160,h=440,left=54,right=25,top=62,bottom=37,plot=h-top-bottom;
- const x=m=>left+(m-1)*(w-left-right)/11;
+
+ const w=1160,h=440,left=66,right=36,top=54,bottom=39,plot=h-top-bottom;
+ const x=m=>left+22+(m-1)*(w-left-right-44)/11;
  const y=v=>top+plot*(1-v/35);
  let svg='<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="'+year+'年、7系列の仮データ折れ線グラフ" style="width:100%;height:100%;display:block">';
- let lx=left+170;
- series.forEach(def=>{svg+='<rect x="'+lx+'" y="22" width="9" height="9" fill="'+def.color+'"/><text x="'+(lx+15)+'" y="31" fill="#546477" font-size="12">'+def.label+'</text>';lx+=125;});
+ let lx=left+135;
+ series.forEach(def=>{svg+='<rect x="'+lx+'" y="19" width="9" height="9" fill="'+def.color+'"/><text x="'+(lx+15)+'" y="28" fill="#43556a" font-size="12" font-weight="700">'+def.label+'</text>';lx+=125;});
  for(let value=0;value<=35;value+=5){
   const yy=y(value);
   svg+='<line x1="'+left+'" y1="'+yy+'" x2="'+(w-right)+'" y2="'+yy+'" stroke="#d8dfe7" stroke-width="1"/>';
-  svg+='<text x="'+(left-8)+'" y="'+(yy+4)+'" text-anchor="end" font-size="12" fill="#68778a">'+value.toFixed(2)+'</text>';
+  svg+='<text x="'+(left-11)+'" y="'+(yy+4)+'" text-anchor="end" font-size="12" fill="#68778a">'+value.toFixed(2)+'</text>';
  }
  for(let m=1;m<=12;m++)svg+='<text x="'+x(m)+'" y="'+(h-8)+'" text-anchor="middle" font-size="12" fill="#556578">'+m+'月</text>';
+ // Draw all lines and points first, keeping labels on a separate overlay.
  series.forEach(def=>{
   const vals=demo[def.field],coords=vals.map((v,i)=>x(i+1)+','+y(v)).join(' ');
-  svg+='<polyline points="'+coords+'" fill="none" stroke="'+def.color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+  svg+='<polyline points="'+coords+'" fill="none" stroke="'+def.color+'" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>';
   vals.forEach((v,i)=>{
    const px=x(i+1),py=y(v);
-   svg+='<rect x="'+(px-3.5)+'" y="'+(py-3.5)+'" width="7" height="7" fill="'+def.color+'"/>';
-   svg+='<text x="'+px+'" y="'+(py-10)+'" text-anchor="middle" font-size="10" font-weight="600" fill="'+def.color+'">'+v.toFixed(2)+'</text>';
+   svg+='<rect x="'+(px-3.4)+'" y="'+(py-3.4)+'" width="6.8" height="6.8" fill="'+def.color+'"/>';
   });
  });
+ // Within each month, space labels vertically to prevent collisions between nearby series.
+ for(let i=0;i<11;i++){
+  const labels=series.map(def=>({value:demo[def.field][i],color:def.color,anchor:y(demo[def.field][i])-11}));
+  labels.sort((a,b)=>a.anchor-b.anchor);
+  const minGap=19;
+  for(let j=1;j<labels.length;j++)labels[j].pos=Math.max(labels[j].anchor,(labels[j-1].pos??labels[j-1].anchor)+minGap);
+  if(labels.length)labels[0].pos=labels[0].anchor;
+  for(let j=1;j<labels.length;j++)labels[j].pos=Math.max(labels[j].anchor,labels[j-1].pos+minGap);
+  const overflow=labels[labels.length-1].pos-(h-bottom-13);
+  if(overflow>0)for(const item of labels)item.pos-=overflow;
+  for(const item of labels){
+   const px=x(i+1),labelY=item.pos;
+   if(Math.abs(labelY-item.anchor)>8)svg+='<line x1="'+px+'" y1="'+(y(item.value)-3)+'" x2="'+px+'" y2="'+(labelY+3)+'" stroke="'+item.color+'" stroke-width=".8" opacity=".7"/>';
+   svg+='<rect x="'+(px-23)+'" y="'+(labelY-12)+'" width="46" height="16" rx="3" fill="white" fill-opacity=".94"/>';
+   svg+='<text x="'+px+'" y="'+labelY+'" text-anchor="middle" font-size="12" font-weight="800" fill="'+item.color+'">'+item.value.toFixed(2)+'</text>';
+  }
+ }
  svg+='</svg>';
  host.innerHTML=svg;
 
