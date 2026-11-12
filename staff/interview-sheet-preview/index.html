@@ -1620,10 +1620,10 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
  // Draw all lines and points first, keeping labels on a separate overlay.
  series.forEach(def=>{
   const vals=demo[def.field],coords=vals.map((v,i)=>x(i+1)+','+y(v)).join(' ');
-  svg+='<polyline points="'+coords+'" fill="none" stroke="'+def.color+'" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>';
+  svg+='<polyline points="'+coords+'" fill="none" stroke="'+def.color+'" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>';
   vals.forEach((v,i)=>{
    const px=x(i+1),py=y(v);
-   svg+='<rect x="'+(px-3.4)+'" y="'+(py-3.4)+'" width="6.8" height="6.8" fill="'+def.color+'"/>';
+   svg+='<rect x="'+(px-2.6)+'" y="'+(py-3.4)+'" width="5.2" height="5.2" fill="'+def.color+'"/>';
   });
  });
  // Within each month, space labels vertically to prevent collisions between nearby series.
@@ -1638,7 +1638,7 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
   if(overflow>0)for(const item of labels)item.pos-=overflow;
   for(const item of labels){
    const px=x(i+1),labelY=item.pos;
-   if(Math.abs(labelY-item.anchor)>8)svg+='<line x1="'+px+'" y1="'+(y(item.value)-3)+'" x2="'+px+'" y2="'+(labelY+3)+'" stroke="'+item.color+'" stroke-width=".8" opacity=".7"/>';
+   if(Math.abs(labelY-item.anchor)>8)svg+='<line x1="'+px+'" y1="'+(y(item.value)-3)+'" x2="'+px+'" y2="'+(labelY+3)+'" stroke="'+item.color+'" stroke-width=".6" opacity=".7"/>';
    svg+='<rect x="'+(px-21)+'" y="'+(labelY-12)+'" width="42" height="15" rx="2" fill="white" fill-opacity=".90"/>';
    svg+='<text x="'+px+'" y="'+labelY+'" text-anchor="middle" font-size="11" font-weight="500" fill="'+item.color+'" opacity=".88">'+item.value.toFixed(2)+'</text>';
   }
