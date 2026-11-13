@@ -1747,7 +1747,7 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
  let lx=left+115;
  for(const def of series){
   const available=def.values.some(v=>v!=null);
-  svg+='<rect x="'+lx+'" y="19" width="9" height="9" fill="'+(available?def.color:'#c8d2df')+'"/><text x="'+(lx+14)+'" y="28" fill="'+(available?'#43556a':'#a1afc0')+'" font-size="11" font-weight="500">'+(def.field==='profit_yen'?'利益平均':def.label)+'</text>';
+  svg+='<rect x="'+lx+'" y="20" width="7" height="7" fill="'+(available?def.color:'#c8d2df')+'"/><text x="'+(lx+11)+'" y="27" fill="'+(available?'#43556a':'#a1afc0')+'" font-size="9" font-weight="400">'+(def.field==='profit_yen'?'利益平均':def.label)+'</text>';
   lx+=129;
  }
  for(let i=0;i<=10;i++){
