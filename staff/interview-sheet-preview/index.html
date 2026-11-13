@@ -900,6 +900,20 @@ html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!imp
 .sales-compare-legend span:first-child::before{border-color:#98a4b5;border-top-style:dashed}
 .sales-compare-foot{font-size:11px;color:#65768d;line-height:1.7;margin:8px 0 0}
 @media(max-width:700px){#salesMetricsBody:not([hidden]) .sales-compare-box{padding:12px 8px;overflow-x:auto}.sales-compare-head{flex-wrap:wrap}.sales-compare-box svg{min-width:700px}}
+</style><style id="sales-twelve-kpis-layout-20261113">
+/* Twelve compact metrics in two rows. The graph's SVG data and line styling are unchanged. */
+#storeMetricsHeader>.sales-header-kpis{grid-template-columns:repeat(6,minmax(0,1fr))!important;grid-template-rows:repeat(2,minmax(0,1fr))!important;gap:5px!important}
+#storeMetricsHeader .sales-header-kpis .unified-sales-summary-item{height:38px!important;min-height:38px!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:center!important;gap:2px!important;padding:3px 8px!important}
+#storeMetricsHeader .sales-header-kpis .unified-sales-summary-item span{flex:none!important;font-size:10px!important;font-weight:600!important}
+#storeMetricsHeader .sales-header-kpis .unified-sales-summary-item b{font-size:clamp(11px,1.1vw,15px)!important;font-weight:750!important;line-height:1.2!important}
+#storeMetricsHeader .sales-header-kpis .unified-sales-summary-item small{display:none!important}
+#storeMetricsHeader .sales-header-kpis .unified-sales-summary-item b .sales-kpi-avg{color:#173a60}
+#storeMetricsHeader .sales-header-kpis .unified-sales-summary-item b .sales-kpi-slash{color:#9aacc1;margin:0 5px;font-weight:400}
+#storeMetricsHeader .sales-header-kpis .unified-sales-summary-item b .sales-kpi-total{color:#506b88;font-size:.91em;font-weight:650}
+#storeMetricsHeader .sales-header-kpis .unified-sales-summary-item b .sales-kpi-hint{font-size:9px;font-weight:500;color:#8295ab;margin-left:4px}
+#salesMetricsBody:not([hidden]) .unified-sales-layout{grid-template-rows:minmax(330px,1fr)!important;grid-template-columns:minmax(0,1fr)!important}
+#salesMetricsBody:not([hidden]) .unified-sales-layout>.unified-sales-trend-card{grid-row:1!important;grid-column:1!important}
+@media(max-width:800px){#storeMetricsHeader>.sales-header-kpis{grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:repeat(4,minmax(0,1fr))!important}#storeMetricsHeader .sales-header-kpis .unified-sales-summary-item{height:42px!important}}
 </style></head><body>
 <header class="header"><button class="brand" id="home"><img id="homeAvatar" src="./icons/recruit-180.png" alt="" onerror="this.style.display='none'"><span id="homeLabel">TOP</span></button><div class="header-actions"><button id="manualInterviewOpen" type="button">面接登録</button><button id="sound">通知設定</button></div></header>
 <section class="calendar" aria-label="月間カレンダー"><div class="cal-head"><button id="prev" aria-label="前月">◀</button><span id="month"></span><button id="next" aria-label="翌月">▶</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="days" id="days"></div></section>
@@ -1635,7 +1649,21 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
  const monthlyActual=filtered.some(r=>r.monthly_source);
  const card=(title,content,foot='')=>'<section class="unified-sales-card"><h3>'+title+'</h3><div class="unified-sales-card-body">'+content+'</div>'+(foot?'<p class="unified-sales-footnote">'+foot+'</p>':'')+'</section>';
  const stat=(label,n,unit,sub='')=>'<div class="unified-sales-stat"><span>'+label+'</span><strong>'+n+'</strong><small>'+unit+'</small>'+(sub?'<em>'+sub+'</em>':'')+'</div>';
- const kpi=(label,n,unit)=>'<div class="unified-sales-summary-item"><span>'+label+'</span><b>'+n+'</b><small>'+unit+'</small></div>';
+ // For partial-month source reports, a verified count of reporting days is unavailable.
+ const sourceRow=filtered.find(r=>r.monthly_source);
+ const completedMonth=Boolean(sourceRow&&sourceRow.source_status!=='partial_actual');
+ const calendarDays=new Date(Number(month.slice(0,4)),Number(month.slice(5,7)),0).getDate();
+ const annualClosure=(month.slice(5,7)==='01'||month.slice(5,7)==='12')?1:0;
+ const averageDays=monthlyActual?(completedMonth?calendarDays-annualClosure:null):filtered.length;
+ const mean=field=>valid&&averageDays>0?Number(total[field])/averageDays:null;
+ const decimal=n=>n==null||!Number.isFinite(n)?'—':n.toLocaleString('ja-JP',{minimumFractionDigits:1,maximumFractionDigits:1});
+ const kpi=(label,n,unit)=>'<div class="unified-sales-summary-item"><span>'+label+'（'+unit+'）</span><b>'+n+'</b></div>';
+ const dual=(label,field,unit,allowed=true)=>{
+  const avg=allowed?mean(field):null;
+  const sum=valid&&allowed?number(total[field]):'—';
+  return kpi(label,'<span class="sales-kpi-avg">'+decimal(avg)+'</span><span class="sales-kpi-slash">/</span><span class="sales-kpi-total">'+sum+'</span>',unit);
+ };
+ const single=(label,val,unit)=>kpi(label,val,unit);
  const bars=(parts,base)=>parts.map(p=>{
   const pct=base>0?p.count/base*100:0;
   return '<div class="unified-sales-bar-row"><div class="unified-sales-bar-label"><span>'+p.name+'</span><b>'+number(p.count)+' <small>本</small></b></div><div class="unified-sales-bar-track"><i style="width:'+Math.min(100,Math.max(0,pct))+'%;background:'+p.color+'"></i></div><small>'+ (valid&&base>0?pct.toFixed(1)+'%':'—')+'</small></div>';
@@ -1650,13 +1678,18 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
   {name:'本指名',count:total.regular_nominations_count,color:'#d8a45b'}
  ];
  const summary='<div class="unified-sales-summary">'+[
-  kpi('成約',value('contracts_count'),'本'),
-  kpi('利益',value('profit_yen'),'円'),
-  kpi('着信',value('inbound_people'),'件'),
-  kpi('顧客',value('repeat_contracts_count'),'名'),
-  kpi('新規',value('new_contracts_count'),'名'),
-  kpi('出勤',value('active_staff_count'),'名'),
-  kpi('利益単価',valid&&total.contracts_count?number(total.profit_yen/total.contracts_count):'—','円/本')
+  dual('成約','contracts_count','本'),
+  dual('利益','profit_yen','円'),
+  dual('着信','inbound_people','件'),
+  dual('出勤','active_staff_count','名'),
+  single('報酬平均',payReady&&total.contracts_count?number(total.therapist_payout_yen/total.contracts_count):'—','円'),
+  single('稼働',valid&&total.active_staff_count?(total.contracts_count/total.active_staff_count).toFixed(2):'—','本/名'),
+  dual('顧客','repeat_contracts_count','名'),
+  dual('新規','new_contracts_count','名'),
+  dual('本指名','regular_nominations_count','件',nominationsReady),
+  dual('ネット','net_nominations_count','件',nominationsReady),
+  dual('フリー','free_count','件',nominationsReady),
+  dual('新規着信','new_inbound_people','件')
  ].join('')+'</div>';
  const salesContent=valid?bars(split,total.contracts_count):'<div class="unified-sales-empty">対象月のデータは未登録です</div>';
  const nominationContent=nominationsReady?bars(nominations,total.contracts_count):'<div class="unified-sales-empty">EXAのネット指名・本指名は未取得です。フリーも確定するまで表示しません。</div>';
@@ -1666,15 +1699,7 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
  summary+
  '<div class="unified-sales-layout">'+
  '<section class="unified-sales-card unified-sales-trend-card"><div id="unifiedSalesTrend" class="unified-sales-trend"></div></section>'+
- card('成約内訳',salesContent,splitOK?'新規＋顧客＝成約本数':'内訳と成約本数が一致していません')+
- card('指名内訳',nominationContent,!nominationsReady?'EXA指名実績の取得待ち':nominationsOK?'フリー＋ネット＋本指名＝成約本数':'指名内訳に不一致があります')+
- card('利益・報酬','<div class="unified-sales-profit">'+
- stat('利益平均',valid&&(monthlyActual?total.contracts_count:filtered.length)?number(total.profit_yen/(monthlyActual?total.contracts_count:filtered.length)):'—',monthlyActual?'円／本':'円／登録日')+
- stat('利益単価',valid&&total.contracts_count?number(total.profit_yen/total.contracts_count):'—','円／本')+
- stat('女子報酬平均',payReady&&total.contracts_count?number(total.therapist_payout_yen/total.contracts_count):'—','円／本')+
- stat('成約／出勤',valid&&total.active_staff_count?(total.contracts_count/total.active_staff_count).toFixed(2):'—','本／人日')+'</div>')+
  '</div></div>';
- '<p class="unified-sales-source">集計元：登録済みEXA日別レポート。未登録日は0として扱わず、年間推移にはデータのある月のみ表示します。指名内訳は原票の登録値です。</p></div>';
  const salesKpis=root.querySelector('.unified-sales-summary');
  if(salesKpis){salesKpis.classList.add('sales-header-kpis');document.getElementById('storeMetricsHeader')?.append(salesKpis);}
 
