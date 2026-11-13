@@ -243,7 +243,20 @@ body:has(.lg-interview-login:not(.hide):not(.hidden)) .page>.topbar{display:none
 .recontact-button:hover{background:#ffe5dd}
 .contact-time{white-space:nowrap;font-variant-numeric:tabular-nums;color:#41566f;font-size:13px!important}
 @media(max-width:650px){.dialog{width:calc(100vw - 18px)}.dialog-head{padding:13px 14px}.dialog-head h2{font-size:16px}.dialog-header-controls select{min-width:0;width:120px;padding:8px}.list-wrap{padding:0 10px 14px}.list-wrap th,.list-wrap td{padding:10px 8px;font-size:12px}}
-</style><style id="management-birthday-current-month-20261110">.birthday-today{background:#fff2db!important}.birthday-today .therapist-name-cell strong{color:#a25300!important}.birthday-today td:nth-child(3){color:#a25300;font-weight:800}</style></head>
+</style><style id="management-birthday-current-month-20261110">.birthday-today{background:#fff2db!important}.birthday-today .therapist-name-cell strong{color:#a25300!important}.birthday-today td:nth-child(3){color:#a25300;font-weight:800}</style><style id="management-birthday-five-store-status-20261113">
+#listBody tr.birthday-today td{background:#fff0cf!important;border-bottom-color:#efce82!important}
+#listBody tr.birthday-today td:first-child{box-shadow:inset 4px 0 #d99825}
+#listBody tr.birthday-today .therapist-name-cell strong{color:#9e4f0c!important;font-weight:800}
+#listBody tr.birthday-past td{background:#f3f5f8!important;color:#627085}
+#listBody tr.birthday-past td:first-child{box-shadow:inset 4px 0 #a5b0bd}
+#listBody tr.birthday-upcoming td{background:#fff!important}
+.birthday-state-badge{display:inline-block;min-width:72px;text-align:center;padding:5px 9px;border-radius:5px;font-size:11px;font-weight:800;white-space:nowrap}
+.birthday-state-today{background:#b66a11;color:#fff}
+.birthday-state-past{background:#dce2e9;color:#4a596b}
+.birthday-state-upcoming{background:#e5f1fa;color:#23618f}
+.birthday-state-unknown{background:#f0f0f0;color:#666}
+.birthday-date-cell{font-variant-numeric:tabular-nums;font-weight:700}
+</style></head>
 <body>
 <header><div class="brand">L GROUP<small>MANAGEMENT SYSTEM</small></div><div class="header-right"><span id="asOf">集計基準日 —</span><span id="userName"></span><button class="refresh hidden" id="refresh" type="button">情報更新</button><button id="logout" class="hidden">ログアウト</button></div></header>
 <div id="login" class="lg-interview-login hidden"><div class="auth-card"><aside class="auth-brand-panel" aria-hidden="true"><div class="auth-brand-top"><div class="auth-brand-symbol">L</div><div class="auth-brand-name">L GROUP<small>INTERNAL MANAGEMENT</small></div></div><div class="auth-brand-middle"><span class="auth-brand-kicker">STAFF MANAGEMENT SYSTEM</span><h1 class="auth-brand-title">L GROUP<br>MANAGEMENT.</h1><p class="auth-brand-description">日々の管理業務を、もっとスマートに。<br>すべての情報をひとつの場所で。</p></div><div class="auth-brand-bottom"><span>STAFF PORTAL</span><span>L GROUP © 2026</span></div></aside><div class="auth-form-panel"><p class="auth-eyebrow">WELCOME BACK</p><h2>総合管理ログイン</h2><div class="auth-mode-label"><span>管理者</span></div><form id="loginForm"><p class="auth-help">既存の管理者アカウントと同じID・PASSを使用します。</p><label for="email">ID（メールアドレス）<input id="email" type="email" autocomplete="username" required></label><label for="password">PASS<input id="password" type="password" autocomplete="current-password" required></label><div id="loginError" role="alert"></div><button type="submit">ログイン</button></form><p class="auth-footnote">AUTHORIZED PERSONNEL ONLY</p></div></div></div>
@@ -322,7 +335,7 @@ async function load(){
   if(contactResult.error)throw contactResult.error;
   data=r.data||data;
   // Keep all EXA sources connected; only limit the management TOP presentation.
-  data={...data,...Object.fromEntries(["final_today","outside","birthday"].map(category=>[category,(data[category]||[]).filter(person=>visibleActionStores.has(person.store))]))};
+  data={...data,...Object.fromEntries(["final_today","outside"].map(category=>[category,(data[category]||[]).filter(person=>visibleActionStores.has(person.store))]))};
   contacts=new Map((contactResult.data||[]).map(x=>[x.store_code+":"+x.exa_id,x.contacted_at]));
   for(const [category,element] of [["final_today","finalCount"],["outside","outsideCount"],["birthday","birthdayCount"]])
    $(element).innerHTML=String((data[category]||[]).length)+'<small>名</small>';
@@ -348,7 +361,10 @@ function render(){
     const x=a.last_date||"9999-12-31",y=b.last_date||"9999-12-31";
     return x.localeCompare(y)||String(a.store).localeCompare(String(b.store))||Number(a.exa_id)-Number(b.exa_id);
   }
-  return String(a.birthday||"").localeCompare(String(b.birthday||""))||String(a.store).localeCompare(String(b.store))||Number(a.exa_id)-Number(b.exa_id);
+  // Current day first, followed by elapsed birthdays and then upcoming birthdays.
+  const rank=p=>p.offset===null||p.offset===undefined||p.offset===""||!Number.isFinite(Number(p.offset))?3:Number(p.offset)===0?0:Number(p.offset)<0?1:2;
+  return rank(a)-rank(b) || (rank(a)===1?Number(b.offset)-Number(a.offset):Number(a.offset)-Number(b.offset)) ||
+   String(a.store).localeCompare(String(b.store))||Number(a.exa_id)-Number(b.exa_id);
  });
  text($("dialogTitle"),cfg.title+"｜"+rows.length+"名");text($("dialogSub"),cfg.sub||"");
  const actionBox=$("dialogAction");
@@ -358,7 +374,7 @@ function render(){
  text($("dialogActionTitle"),cfg.action||"");
  text($("dialogActionNote"),cfg.note||"");
  const tr=document.createElement("tr");
- const heads=mode==="birthday"?["店舗","源氏名","誕生日"]:["店舗","源氏名",cfg.last,"対応状況","最終対応日時"];
+ const heads=mode==="birthday"?["店舗","源氏名","誕生日","区分"]:["店舗","源氏名",cfg.last,"対応状況","最終対応日時"];
  for(const h of heads)tr.append(mk("th",h));
  $("listHead").replaceChildren(tr);$("listBody").replaceChildren();
  if(!rows.length){const row=document.createElement("tr"),cell=mk("td","該当者はいません。");cell.colSpan=heads.length;cell.className="empty";row.append(cell);$("listBody").append(row);return}
@@ -369,10 +385,16 @@ function render(){
   nameCell.append(mk("strong",person.name||"名称未設定"));
   row.append(nameCell);
   if(mode==="birthday"){
+   // Offset is supplied by the overview RPC: negative=elapsed, zero=today, positive=upcoming.
+   // If absent, derive the date from the displayed month/day in JST; never guess malformed dates.
    const offset=Number(person.offset);
-   const birthday=(person.birthday||"—")+(offset===0?"（本日）":"");
-   if(offset===0)row.classList.add("birthday-today");
-   row.append(mk("td",birthday));
+   const validOffset=person.offset!==null&&person.offset!==undefined&&person.offset!==""&&Number.isFinite(offset);
+   const state=validOffset?(offset===0?"today":offset<0?"past":"upcoming"):"unknown";
+   row.classList.add("birthday-"+state);
+   const dateCell=mk("td",person.birthday||"—");dateCell.className="birthday-date-cell";row.append(dateCell);
+   const stateCell=document.createElement("td");
+   const badge=mk("span",state==="today"?"本日":state==="past"?"経過済み":state==="upcoming"?"これから":"確認不可");
+   badge.className="birthday-state-badge birthday-state-"+state;stateCell.append(badge);row.append(stateCell);
   }else{
    let dateText=person.last_date||"記録なし";
    if(mode==="final"){
