@@ -256,6 +256,14 @@ body:has(.lg-interview-login:not(.hide):not(.hidden)) .page>.topbar{display:none
 .birthday-state-upcoming{background:#e5f1fa;color:#23618f}
 .birthday-state-unknown{background:#f0f0f0;color:#666}
 .birthday-date-cell{font-variant-numeric:tabular-nums;font-weight:700}
+</style><style id="management-birthday-month-navigation-20261113">
+.birthday-month-nav{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.birthday-month-nav.hidden{display:none!important}
+.birthday-month-nav button{border:1px solid #c8d4e3;background:#fff;color:#344d69;border-radius:5px;padding:7px 11px;font-size:12px;font-weight:700;cursor:pointer}
+.birthday-month-nav button.active{background:#1b304b;border-color:#1b304b;color:#fff}
+.birthday-month-nav button:disabled{opacity:.65;cursor:wait}
+.birthday-month-nav strong{font-size:12px;color:#30465f;margin-left:6px;font-variant-numeric:tabular-nums}
+@media(max-width:790px){.dialog-head{flex-wrap:wrap}.dialog-header-controls{flex-wrap:wrap;justify-content:flex-end}.birthday-month-nav{order:2;width:100%;justify-content:flex-start}}
 </style></head>
 <body>
 <header><div class="brand">L GROUP<small>MANAGEMENT SYSTEM</small></div><div class="header-right"><span id="asOf">集計基準日 —</span><span id="userName"></span><button class="refresh hidden" id="refresh" type="button">情報更新</button><button id="logout" class="hidden">ログアウト</button></div></header>
@@ -282,7 +290,7 @@ body:has(.lg-interview-login:not(.hide):not(.hidden)) .page>.topbar{display:none
 <main id="staffApp" class="hidden" style="max-width:820px"><div class="page-head"><div><h1>スタッフ管理</h1><p>許可された面接管理ページへ移動できます。</p></div></div><nav class="menus" aria-label="スタッフメニュー" style="grid-template-columns:1fr"><a class="menu-card" href="../interview-management/" target="_blank" rel="noopener noreferrer"><span class="icon">▤</span><strong>面接管理</strong><small>担当店舗の応募・面接情報</small><span class="arrow">↗</span></a></nav></main>
 <div id="overlay" class="overlay hidden" role="presentation">
  <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
-  <div class="dialog-head"><div><h2 id="dialogTitle">一覧</h2><p id="dialogSub"></p></div><div class="dialog-header-controls"><select id="storeFilter" aria-label="店舗を絞り込む"><option value="all">対象2店舗</option><option value="rose">薔薇と紳士</option><option value="busty">BUSTY OSAKA</option></select><button class="close" id="close" aria-label="閉じる">閉じる ×</button></div></div>
+  <div class="dialog-head"><div><h2 id="dialogTitle">一覧</h2><p id="dialogSub"></p></div><div class="dialog-header-controls"><div id="birthdayMonthNav" class="birthday-month-nav hidden" aria-label="誕生日の対象月"><button type="button" id="birthdayPrevMonth">前月</button><button type="button" id="birthdayCurrentMonth">当月</button><button type="button" id="birthdayNextMonth">翌月</button><strong id="birthdayMonthLabel" aria-live="polite"></strong></div><select id="storeFilter" aria-label="店舗を絞り込む"><option value="all">対象2店舗</option><option value="rose">薔薇と紳士</option><option value="busty">BUSTY OSAKA</option></select><button class="close" id="close" aria-label="閉じる">閉じる ×</button></div></div>
   <div id="dialogAction" class="dialog-action hidden" role="note"><strong id="dialogActionTitle"></strong><span id="dialogActionNote"></span></div>
   
   <div class="list-wrap"><table><thead id="listHead"></thead><tbody id="listBody"></tbody></table></div>
@@ -300,6 +308,38 @@ const visibleActionStores=new Set(["rose","busty"]);
 const links={rose:"../exa-shifts/",busty:"../exa-shifts/busty-osaka/",grandluxe:"../exa-shifts/grand-luxe/",luxy:"../exa-shifts/luxy-osaka/",unsecret:"../exa-shifts/un-secret/"};
 let data={final_today:[],outside:[],birthday:[],connected_stores:[],unconnected_stores:[]},mode=null,authorized=false;
 let contacts=new Map();let contactSaving=false;
+let birthdayMonthOffset=0,birthdayMonthRows=null,birthdayMonthLoading=false,birthdayMonthError="",birthdayMonthRequest=0;
+const birthdayToday=()=>new Date(new Date().toLocaleString("en-US",{timeZone:"Asia/Tokyo"}));
+function birthdayMonthKey(offset){
+ const today=birthdayToday();
+ return today.getFullYear()+"-"+String(today.getMonth()+offset+1).padStart(2,"0").replace(/^(-?\d+)$/,(_,n)=>n);
+}
+function birthdayTargetDate(offset){
+ const date=birthdayToday();
+ return new Date(date.getFullYear(),date.getMonth()+offset,1);
+}
+function birthdayPeriodLabel(){
+ const d=birthdayTargetDate(birthdayMonthOffset);
+ return d.getFullYear()+"年"+(d.getMonth()+1)+"月";
+}
+async function loadBirthdayMonth(){
+ if(mode!=="birthday")return;
+ const request=++birthdayMonthRequest;
+ birthdayMonthLoading=true;birthdayMonthError="";birthdayMonthRows=null;render();
+ const target=birthdayTargetDate(birthdayMonthOffset);
+ const month=target.getFullYear()+"-"+String(target.getMonth()+1).padStart(2,"0")+"-01";
+ try{
+  const result=await client.rpc("management_birthdays_by_month",{p_month:month});
+  if(result.error)throw result.error;
+  if(request!==birthdayMonthRequest)return;
+  birthdayMonthRows=Array.isArray(result.data?.birthdays)?result.data.birthdays:[];
+ }catch(error){
+  if(request!==birthdayMonthRequest)return;
+  birthdayMonthError=String(error.message||error);
+ }finally{
+  if(request===birthdayMonthRequest){birthdayMonthLoading=false;if(mode==="birthday")render()}
+ }
+}
 const text=(e,v)=>{e.textContent=String(v??"")};
 const mk=(tag,value)=>{const e=document.createElement(tag);text(e,value);return e};
 function showLogin(error=""){$("refresh").classList.add("hidden");$("app").classList.add("hidden");$("staffApp").classList.add("hidden");$("login").classList.remove("hidden");$("logout").classList.add("hidden");text($("loginError"),error)}
@@ -352,7 +392,17 @@ const configs={
 function render(){
  if(!mode)return;const cfg=configs[mode],store=$("storeFilter").value;
  $("storeFilter").classList.remove("hidden");
- const rows=(data[cfg.key]||[]).filter(r=>(store==="all"||r.store===store)).sort((a,b)=>{
+ const nav=$("birthdayMonthNav");
+ nav.classList.toggle("hidden",mode!=="birthday");
+ if(mode==="birthday"){
+  text($("birthdayMonthLabel"),birthdayPeriodLabel());
+  for(const [id,offset] of [["birthdayPrevMonth",-1],["birthdayCurrentMonth",0],["birthdayNextMonth",1]]){
+   const button=$(id);button.classList.toggle("active",birthdayMonthOffset===offset);
+   button.disabled=birthdayMonthLoading&&birthdayMonthOffset===offset;
+  }
+ }
+ const birthdayRecords=mode==="birthday"?(birthdayMonthRows||[]):data[cfg.key]||[];
+ const rows=birthdayRecords.filter(r=>(store==="all"||r.store===store)).sort((a,b)=>{
   if(mode==="final"){
     const x=a.end_minutes==null?Infinity:Number(a.end_minutes),y=b.end_minutes==null?Infinity:Number(b.end_minutes);
     return x-y||String(a.store).localeCompare(String(b.store))||Number(a.exa_id)-Number(b.exa_id);
@@ -366,7 +416,8 @@ function render(){
   return rank(a)-rank(b) || (rank(a)===1?Number(b.offset)-Number(a.offset):Number(a.offset)-Number(b.offset)) ||
    String(a.store).localeCompare(String(b.store))||Number(a.exa_id)-Number(b.exa_id);
  });
- text($("dialogTitle"),cfg.title+"｜"+rows.length+"名");text($("dialogSub"),cfg.sub||"");
+ text($("dialogTitle"),cfg.title+"｜"+(mode==="birthday"&&birthdayMonthLoading?"読込中":mode==="birthday"&&birthdayMonthError?"取得エラー":rows.length+"名"));
+ text($("dialogSub"),mode==="birthday"?birthdayPeriodLabel()+"の誕生日":cfg.sub||"");
  const actionBox=$("dialogAction");
  actionBox.classList.toggle("hidden",!cfg.action);
  actionBox.classList.toggle("urgent",mode==="final");
@@ -377,7 +428,7 @@ function render(){
  const heads=mode==="birthday"?["店舗","源氏名","誕生日","区分"]:["店舗","源氏名",cfg.last,"対応状況","最終対応日時"];
  for(const h of heads)tr.append(mk("th",h));
  $("listHead").replaceChildren(tr);$("listBody").replaceChildren();
- if(!rows.length){const row=document.createElement("tr"),cell=mk("td","該当者はいません。");cell.colSpan=heads.length;cell.className="empty";row.append(cell);$("listBody").append(row);return}
+ if(!rows.length){const row=document.createElement("tr"),cell=mk("td",mode==="birthday"&&birthdayMonthLoading?"読み込み中です。":mode==="birthday"&&birthdayMonthError?"誕生日を取得できませんでした。":"該当者はいません。");cell.colSpan=heads.length;cell.className="empty";row.append(cell);$("listBody").append(row);return}
  for(const person of rows){
   const row=document.createElement("tr");
   row.append(mk("td",names[person.store]||person.store));
@@ -389,7 +440,7 @@ function render(){
    // If absent, derive the date from the displayed month/day in JST; never guess malformed dates.
    const offset=Number(person.offset);
    const validOffset=person.offset!==null&&person.offset!==undefined&&person.offset!==""&&Number.isFinite(offset);
-   const state=validOffset?(offset===0?"today":offset<0?"past":"upcoming"):"unknown";
+   const state=birthdayMonthOffset===-1?"past":birthdayMonthOffset===1?"upcoming":validOffset?(offset===0?"today":offset<0?"past":"upcoming"):"unknown";
    row.classList.add("birthday-"+state);
    const dateCell=mk("td",person.birthday||"—");dateCell.className="birthday-date-cell";row.append(dateCell);
    const stateCell=document.createElement("td");
@@ -427,6 +478,7 @@ function render(){
 }
 function open(type){
  mode=type;
+ if(type==="birthday"){birthdayMonthOffset=0;birthdayMonthRows=null;birthdayMonthError="";}
  const selector=$("storeFilter");
  const storeOptions=type==="birthday"
   ?[["all","全5店舗"],["grandluxe","Grand Luxe"],["luxy","LUXY OSAKA"],["unsecret","Un Secret"],["rose","薔薇と紳士"],["busty","BUSTY OSAKA"]]
@@ -434,11 +486,19 @@ function open(type){
  selector.replaceChildren(...storeOptions.map(([value,label])=>{const option=document.createElement("option");option.value=value;option.textContent=label;return option}));
  selector.value="all";
  $("overlay").classList.remove("hidden");
- render();
+ if(type==="birthday")void loadBirthdayMonth();
+ else render();
 }
-function close(){mode=null;$("overlay").classList.add("hidden")}
+function close(){mode=null;birthdayMonthRequest++;birthdayMonthLoading=false;$("overlay").classList.add("hidden")}
 document.querySelectorAll("[data-open]").forEach(b=>b.addEventListener("click",()=>open(b.dataset.open)));
 $("storeFilter").addEventListener("change",render);
+for(const [buttonId,offset] of [["birthdayPrevMonth",-1],["birthdayCurrentMonth",0],["birthdayNextMonth",1]]){
+ $(buttonId).addEventListener("click",()=>{
+  if(mode!=="birthday"||birthdayMonthOffset===offset)return;
+  birthdayMonthOffset=offset;
+  void loadBirthdayMonth();
+ });
+}
 function formatContactTime(iso){
  const d=new Date(iso);
  if(!Number.isFinite(d.getTime()))return "日時不明";
