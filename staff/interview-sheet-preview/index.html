@@ -827,7 +827,7 @@ html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!imp
 @media(max-width:650px){.rose-sales-bottom{grid-template-columns:1fr}.rose-sales{padding:7px}.rose-trend{height:250px}.rose-donut{width:138px}}
 </style><style id="sales-header-kpis-20261112">
 /* Sales KPI strip occupies the header row; graphs and data remain unchanged. */
-#storeMetricsHeader>.sales-header-kpis{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:6px!important;flex:1 1 auto;min-width:0}
+#storeMetricsHeader>.sales-header-kpis{display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;gap:6px!important;flex:1 1 auto;min-width:0}
 #storeMetricsHeader .sales-header-kpis .unified-sales-summary-item{display:flex;align-items:center;justify-content:space-between;gap:5px;min-width:0;height:48px;padding:5px 8px;border:1px solid #d1deed;border-radius:5px;border-top:2px solid var(--sales-accent);background:#f5f8fd;overflow:hidden}
 #storeMetricsHeader .sales-header-kpis .unified-sales-summary-item span{min-width:0;flex:1 1 auto;color:#405b7a;font-size:11px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #storeMetricsHeader .sales-header-kpis .unified-sales-summary-item b{flex:0 0 auto;color:#102f52;font-size:clamp(14px,1.45vw,20px);font-weight:850;white-space:nowrap;font-variant-numeric:tabular-nums}
@@ -1655,7 +1655,8 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
   kpi('着信',value('inbound_people'),'件'),
   kpi('顧客',value('repeat_contracts_count'),'名'),
   kpi('新規',value('new_contracts_count'),'名'),
-  kpi('出勤',value('active_staff_count'),'名')
+  kpi('出勤',value('active_staff_count'),'名'),
+  kpi('利益単価',valid&&total.contracts_count?number(total.profit_yen/total.contracts_count):'—','円/本')
  ].join('')+'</div>';
  const salesContent=valid?bars(split,total.contracts_count):'<div class="unified-sales-empty">対象月のデータは未登録です</div>';
  const nominationContent=nominationsReady?bars(nominations,total.contracts_count):'<div class="unified-sales-empty">EXAのネット指名・本指名は未取得です。フリーも確定するまで表示しません。</div>';
