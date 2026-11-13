@@ -1619,6 +1619,7 @@ function renderSalesYearComparison(root,year,shop){
  }
  const selected=rows=>rows.filter(r=>shop==='all'||r.store_key===shop);
  const currentRows=selected(currentState.rows);
+ const completedRows=currentRows.filter(r=>r.source_status!=='partial_actual');
  const previousRows=previousState?selected(previousState.rows):[];
  const fields=['contracts_count','profit_yen','inbound_people','active_staff_count',
   'repeat_contracts_count','new_contracts_count','regular_nominations_count',
@@ -1626,16 +1627,16 @@ function renderSalesYearComparison(root,year,shop){
  const complete=(rows,field)=>rows.length>0&&rows.every(r=>r[field]!=null&&Number.isFinite(Number(r[field]))&&
   (!['regular_nominations_count','net_nominations_count','free_count'].includes(field)||r.nomination_ready!==false));
  const sum=(rows,field)=>complete(rows,field)?rows.reduce((acc,r)=>acc+Number(r[field]),0):null;
- const activeMonths=new Set(currentRows.map(r=>r.month));
+ const activeMonths=new Set(completedRows.map(r=>r.month));
  const months=activeMonths.size;
- const totalContracts=sum(currentRows,'contracts_count');
- const totalStaff=sum(currentRows,'active_staff_count');
- const totalPayout=sum(currentRows,'therapist_payout_yen');
+ const totalContracts=sum(completedRows,'contracts_count');
+ const totalStaff=sum(completedRows,'active_staff_count');
+ const totalPayout=sum(completedRows,'therapist_payout_yen');
  const fmt=n=>n==null||!Number.isFinite(n)?'—':Math.round(n).toLocaleString('ja-JP');
  const avg=n=>n==null||!months?'—':(n/months).toLocaleString('ja-JP',{minimumFractionDigits:1,maximumFractionDigits:1});
  const esc=x=>String(x).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
  const dual=(label,field,unit)=>{
-  const n=sum(currentRows,field);
+  const n=sum(completedRows,field);
   return '<div class="unified-sales-summary-item"><span class="sales-kpi-label">'+label+'（'+unit+'）</span><b class="sales-kpi-value"><span class="sales-kpi-avg">'+avg(n)+'</span><span class="sales-kpi-slash">/</span><span class="sales-kpi-total">'+fmt(n)+'</span></b></div>';
  };
  const single=(label,n,unit)=>'<div class="unified-sales-summary-item"><span class="sales-kpi-label">'+label+'（'+unit+'）</span><b class="sales-kpi-value">'+(n==null?'—':n)+'</b></div>';
@@ -1710,7 +1711,8 @@ function renderSalesYearComparison(root,year,shop){
  });
  box.append(svg);
  const foot=document.createElement('p');foot.className='sales-compare-foot';
- foot.textContent='月別実績（'+unit+'）を比較。年間カードは登録済み'+months+'か月の月平均／累計。未取得月は0扱いしません。';
+ const partialRows=currentRows.filter(r=>r.source_status==='partial_actual');
+ foot.textContent='月別実績（'+unit+'）を比較。年間カードは確定済み'+months+'か月の月平均／累計。'+(partialRows.length?'途中実績は年間カードから除外し、グラフにのみ表示しています。':'')+'未取得月は0扱いしません。';
  box.append(foot);
 }
 function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
@@ -1816,7 +1818,7 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
  const hostWidth=host.clientWidth||w,hostHeight=host.clientHeight||470;
  const h=Math.max(300,Math.round(w*hostHeight/hostWidth));
  const left=66,right=36,top=43,bottom=33,plot=h-top-bottom;
- const axisMin=3,axisMax=45;
+ const axisMin=0,axisMax=42;
  const x=m=>left+22+(m-1)*(w-left-right-44)/11;
  const y=v=>top+plot*(1-(v-axisMin)/(axisMax-axisMin));
  let svg='<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="'+year+'年、登録済み営業実績の月別平均推移" style="width:100%;height:100%;display:block;font-family:Arial,Helvetica,sans-serif">';
