@@ -1594,17 +1594,18 @@ function renderSalesYearComparison(root,year,shop){
  root.replaceChildren();
  const box=document.createElement('div');box.className='sales-compare-box';root.append(box);
  const row=document.createElement('div');row.className='sales-compare-head';
- const name=document.createElement('strong');name.textContent=(shop==='all'?'全店舗':shop==='LUXY'?'LUXY OSAKA':shop)+'｜前年・当年比較';
+ const name=document.createElement('strong');name.textContent=(shop==='all'?'全店舗':shop==='LUXY'?'LUXY OSAKA':shop)+(year===2025?'｜2025年実績':'｜前年・当年比較');
  const selector=document.createElement('select');selector.setAttribute('aria-label','比較指標');
  for(const [field,label] of salesCompareFields){const option=document.createElement('option');option.value=field;option.textContent=label;selector.append(option)}
  selector.value=salesCompareField;selector.addEventListener('change',()=>{salesCompareField=selector.value;renderSalesMetrics()});
  row.append(name,selector);box.append(row);
- fetchSalesComparisonYear(year-1);fetchSalesComparisonYear(year);
- const priorState=salesCompareCache.get(year-1),currentState=salesCompareCache.get(year);
- if(priorState.status==='loading'||currentState.status==='loading'){
+ if(year>2025)fetchSalesComparisonYear(year-1);
+ fetchSalesComparisonYear(year);
+ const priorState=year>2025?salesCompareCache.get(year-1):null,currentState=salesCompareCache.get(year);
+ if((priorState&&priorState.status==='loading')||currentState.status==='loading'){
   const p=document.createElement('p');p.className='sales-annual-message';p.textContent='前年と当年の実績を読み込み中です';box.append(p);return;
  }
- if(priorState.status!=='ready'||currentState.status!=='ready'){
+ if((priorState&&priorState.status!=='ready')||currentState.status!=='ready'){
   const p=document.createElement('p');p.className='sales-annual-message';p.textContent='年間実績を取得できませんでした。認証と取得状況をご確認ください。';box.append(p);return;
  }
  const [field,label,unit]=salesCompareFields.find(v=>v[0]===salesCompareField);
@@ -1612,14 +1613,14 @@ function renderSalesYearComparison(root,year,shop){
   const rows=salesCompareCache.get(yr).rows;
   return Array.from({length:12},(_,i)=>salesComparisonMetric(rows.filter(r=>r.month===yr+'-'+String(i+1).padStart(2,'0')&&(shop==='all'||r.store_key===shop)),field));
  };
- const previous=values(year-1),current=values(year);
+ const previous=year>2025?values(year-1):Array(12).fill(null),current=values(year);
  const present=[...previous,...current].filter(v=>Number.isFinite(v));
  if(!present.length){
   const p=document.createElement('p');p.className='sales-annual-message';p.textContent='この指標の登録済み実績はありません。未登録月は0扱いしていません。';box.append(p);return;
  }
  const legend=document.createElement('div');legend.className='sales-compare-legend';
- const older=document.createElement('span');older.textContent='前年 '+(year-1)+'年';
- const newer=document.createElement('span');newer.textContent='当年 '+year+'年';legend.append(older,newer);box.append(legend);
+ if(year>2025){const older=document.createElement('span');older.textContent='前年 '+(year-1)+'年';legend.append(older)}
+ const newer=document.createElement('span');newer.textContent=(year===2025?'実績 ':'当年 ')+year+'年';legend.append(newer);box.append(legend);
  const W=1160,H=455,L=86,R=35,T=39,B=49;
  const bottom=0,maximum=Math.max(1,...present)*1.15;
  const xx=i=>L+i*(W-L-R)/11,yy=v=>T+(H-T-B)*(1-(v-bottom)/(maximum-bottom));
@@ -1639,7 +1640,7 @@ function renderSalesYearComparison(root,year,shop){
  });
  box.append(svg);
  const foot=document.createElement('p');foot.className='sales-compare-foot';
- foot.textContent='前年はグレー点線、当年は青実線。登録済みデータのみを表示し、未取得月は0として扱いません。'+(field==='real_working_average'?' 実働平均は保存済み値がある場合のみ表示します。':'');
+ foot.textContent=(year===2025?'2025年の登録済み実績を青実線で表示。':'前年はグレー点線、当年は青実線。')+'登録済みデータのみを表示し、未取得月は0として扱いません。'+(field==='real_working_average'?' 実働平均は保存済み値がある場合のみ表示します。':'');
  box.append(foot);
 }
 function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
