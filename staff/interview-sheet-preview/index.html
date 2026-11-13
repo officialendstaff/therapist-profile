@@ -1756,7 +1756,17 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
   svg+='<line x1="'+left+'" y1="'+yy+'" x2="'+(w-right)+'" y2="'+yy+'" stroke="'+(i%2===0?'#d9e1ea':'#edf1f5')+'" stroke-width="'+(i%2===0?'0.9':'0.6')+'"/>';
   svg+='<text x="'+(left-11)+'" y="'+(yy+4)+'" text-anchor="end" font-size="9" fill="#738398">'+v.toFixed(1)+'</text>';
  }
- for(let m=1;m<=12;m++)svg+='<text x="'+x(m)+'" y="'+(h-8)+'" text-anchor="middle" font-size="10" fill="#65758a">'+m+'月</text>';
+ for(let m=1;m<=12;m++){
+  const monthKey=year+'-'+String(m).padStart(2,'0');
+  const monthlyRow=annualByMonth.get(monthKey);
+  const partial=monthlyRow?.source_status==='partial_actual'&&Number(monthlyRow.reported_days)>0;
+  const monthLabel=m+'月'+(partial?'*':'');
+  svg+='<text x="'+x(m)+'" y="'+(h-8)+'" text-anchor="middle" font-size="10" fill="#65758a">'+monthLabel+'</text>';
+ }
+ const partialMonths=[...annualByMonth.values()].filter(r=>r.source_status==='partial_actual'&&Number(r.reported_days)>0);
+ if(partialMonths.length){
+  svg+='<text x="'+(w-right-4)+'" y="'+(top-16)+'" text-anchor="end" font-size="9" fill="#74849a">* '+partialMonths.map(r=>Number(r.month.slice(5,7))+'月：'+Number(r.reported_days)+'日分').join('、')+'</text>';
+ }
  for(const def of series){
   let path='',previous=-2;
   def.values.forEach((v,idx)=>{
