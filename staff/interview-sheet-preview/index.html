@@ -890,6 +890,16 @@ html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!imp
 .unified-sales-empty{display:grid;place-items:center;height:100%;min-height:85px;color:#8a99aa;font-size:12px}
 @media(max-width:950px){.unified-sales-summary{grid-template-columns:repeat(3,minmax(0,1fr))}.unified-sales-layout{grid-template-columns:repeat(2,minmax(0,1fr))}.unified-sales-trend-card{grid-column:1/-1}}
 @media(max-width:600px){.unified-sales-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.unified-sales-layout{grid-template-columns:1fr}.unified-sales-title>div{flex-direction:column;gap:2px}.unified-sales-trend{height:225px}}
+</style><style id="sales-year-comparison-20261113">
+#salesMetricsBody:not([hidden]) .sales-compare-box{background:#fff;border:1px solid #dce5ef;border-radius:8px;padding:18px 22px;min-height:465px}
+.sales-compare-head{display:flex;justify-content:space-between;align-items:center;gap:15px}
+.sales-compare-head strong{font-size:16px;color:#263d57}
+.sales-compare-head select{min-width:160px;padding:8px 10px;border:1px solid #bdcad9;border-radius:5px;background:white;font-size:13px}
+.sales-compare-legend{display:flex;gap:30px;justify-content:center;margin:14px 0 8px;font-size:13px;color:#485c74}
+.sales-compare-legend span::before{content:"";display:inline-block;width:24px;border-top:3px solid #2872c7;vertical-align:middle;margin-right:8px}
+.sales-compare-legend span:first-child::before{border-color:#98a4b5;border-top-style:dashed}
+.sales-compare-foot{font-size:11px;color:#65768d;line-height:1.7;margin:8px 0 0}
+@media(max-width:700px){#salesMetricsBody:not([hidden]) .sales-compare-box{padding:12px 8px;overflow-x:auto}.sales-compare-head{flex-wrap:wrap}.sales-compare-box svg{min-width:700px}}
 </style></head><body>
 <header class="header"><button class="brand" id="home"><img id="homeAvatar" src="./icons/recruit-180.png" alt="" onerror="this.style.display='none'"><span id="homeLabel">TOP</span></button><div class="header-actions"><button id="manualInterviewOpen" type="button">面接登録</button><button id="sound">通知設定</button></div></header>
 <section class="calendar" aria-label="月間カレンダー"><div class="cal-head"><button id="prev" aria-label="前月">◀</button><span id="month"></span><button id="next" aria-label="翌月">▶</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="days" id="days"></div></section>
@@ -1525,6 +1535,87 @@ async function refreshSalesAnnualMetrics(){
  }
  renderSalesMetrics();
 }
+
+let salesDisplayPeriod='monthly',salesCompareField='contracts_count';
+const salesCompareFields=[
+ ['profit_yen','利益平均','円／登録日'],['contracts_count','本数平均','本／登録日'],
+ ['repeat_contracts_count','顧客平均','名／登録日'],['new_contracts_count','新規平均','名／登録日'],
+ ['active_staff_count','出勤平均','名／登録日'],['inbound_people','着信平均','件／登録日'],
+ ['real_working_average','実働平均','']];
+const salesCompareCache=new Map();
+function fetchSalesComparisonYear(year){
+ if(salesCompareCache.has(year))return;
+ const state={status:'loading',rows:[]};salesCompareCache.set(year,state);
+ const token=sessionStorage.getItem('interview_staff_session_v2')||localStorage.getItem('interview_staff_session_v2');
+ if(!token){state.status='login-required';return}
+ fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access',{
+  method:'POST',cache:'no-store',headers:{'Content-Type':'application/json'},
+  body:JSON.stringify({action:'sales_metrics_yearly',token,year})
+ }).then(async res=>{const data=await res.json();if(!res.ok||!data.ok||!Array.isArray(data.months))throw Error(data.error||'read_failed');state.rows=data.months;state.status='ready'})
+ .catch(err=>{state.status='error';state.error=String(err)})
+ .finally(()=>{if(salesDisplayPeriod==='annual'&&!$('salesMetricsBody').hidden)renderSalesMetrics()});
+}
+function salesComparisonMetric(rows,field){
+ if(field==='real_working_average'){
+  const available=rows.filter(r=>r[field]!=null&&Number.isFinite(Number(r[field])));
+  return available.length?available.reduce((sum,r)=>sum+Number(r[field]),0)/available.length:null;
+ }
+ const available=rows.filter(r=>r[field]!=null&&Number.isFinite(Number(r[field]))&&Number(r.days)>0);
+ const days=available.reduce((sum,r)=>sum+Number(r.days),0);
+ return days?available.reduce((sum,r)=>sum+Number(r[field]),0)/days:null;
+}
+function renderSalesYearComparison(root,year,shop){
+ root.replaceChildren();
+ const box=document.createElement('div');box.className='sales-compare-box';root.append(box);
+ const row=document.createElement('div');row.className='sales-compare-head';
+ const name=document.createElement('strong');name.textContent=(shop==='all'?'全店舗':shop==='LUXY'?'LUXY OSAKA':shop)+'｜前年・当年比較';
+ const selector=document.createElement('select');selector.setAttribute('aria-label','比較指標');
+ for(const [field,label] of salesCompareFields){const option=document.createElement('option');option.value=field;option.textContent=label;selector.append(option)}
+ selector.value=salesCompareField;selector.addEventListener('change',()=>{salesCompareField=selector.value;renderSalesMetrics()});
+ row.append(name,selector);box.append(row);
+ fetchSalesComparisonYear(year-1);fetchSalesComparisonYear(year);
+ const priorState=salesCompareCache.get(year-1),currentState=salesCompareCache.get(year);
+ if(priorState.status==='loading'||currentState.status==='loading'){
+  const p=document.createElement('p');p.className='sales-annual-message';p.textContent='前年と当年の実績を読み込み中です';box.append(p);return;
+ }
+ if(priorState.status!=='ready'||currentState.status!=='ready'){
+  const p=document.createElement('p');p.className='sales-annual-message';p.textContent='年間実績を取得できませんでした。認証と取得状況をご確認ください。';box.append(p);return;
+ }
+ const [field,label,unit]=salesCompareFields.find(v=>v[0]===salesCompareField);
+ const values=yr=>{
+  const rows=salesCompareCache.get(yr).rows;
+  return Array.from({length:12},(_,i)=>salesComparisonMetric(rows.filter(r=>r.month===yr+'-'+String(i+1).padStart(2,'0')&&(shop==='all'||r.store_key===shop)),field));
+ };
+ const previous=values(year-1),current=values(year);
+ const present=[...previous,...current].filter(v=>Number.isFinite(v));
+ if(!present.length){
+  const p=document.createElement('p');p.className='sales-annual-message';p.textContent='この指標の登録済み実績はありません。未登録月は0扱いしていません。';box.append(p);return;
+ }
+ const legend=document.createElement('div');legend.className='sales-compare-legend';
+ const older=document.createElement('span');older.textContent='前年 '+(year-1)+'年';
+ const newer=document.createElement('span');newer.textContent='当年 '+year+'年';legend.append(older,newer);box.append(legend);
+ const W=1160,H=455,L=86,R=35,T=39,B=49;
+ const bottom=0,maximum=Math.max(1,...present)*1.15;
+ const xx=i=>L+i*(W-L-R)/11,yy=v=>T+(H-T-B)*(1-(v-bottom)/(maximum-bottom));
+ const svg=salesAnnualSvgElement('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':label+'の'+(year-1)+'年と'+year+'年比較'});
+ svg.style.cssText='width:100%;height:100%;display:block;font-family:Arial,sans-serif';
+ for(let i=0;i<=4;i++){const val=maximum*i/4,y=yy(val);svg.append(salesAnnualSvgElement('line',{x1:L,y1:y,x2:W-R,y2:y,stroke:'#e0e7f0'}));svg.append(salesAnnualSvgElement('text',{x:L-10,y:y+4,'font-size':12,'text-anchor':'end',fill:'#66778e'},field==='profit_yen'?Math.round(val).toLocaleString('ja-JP'):val.toFixed(1)))}
+ for(let i=0;i<12;i++)svg.append(salesAnnualSvgElement('text',{x:xx(i),y:H-16,'font-size':13,'text-anchor':'middle',fill:'#53657b'},i+1+'月'));
+ [[previous,'#98a4b5',year-1],[current,'#2872c7',year]].forEach(([series,color,yr])=>{
+  let path='',last=-2;
+  series.forEach((val,i)=>{if(!Number.isFinite(val)){last=-2;return}path+=(last===i-1?' L ':' M ')+xx(i).toFixed(1)+' '+yy(val).toFixed(1);last=i;});
+  svg.append(salesAnnualSvgElement('path',{d:path,fill:'none',stroke:color,'stroke-width':yr===year?2.6:2,'stroke-dasharray':yr===year?'':'7 5'}));
+  series.forEach((val,i)=>{if(!Number.isFinite(val))return;
+   const p=salesAnnualSvgElement('circle',{cx:xx(i),cy:yy(val),r:4,fill:'#fff',stroke:color,'stroke-width':2});
+   p.append(salesAnnualSvgElement('title',{},yr+'年'+(i+1)+'月：'+val.toLocaleString('ja-JP',{maximumFractionDigits:2})+unit));svg.append(p);
+   svg.append(salesAnnualSvgElement('text',{x:xx(i),y:yy(val)+(yr===year?-12:19),'font-size':11,'text-anchor':'middle',fill:color},val.toLocaleString('ja-JP',{maximumFractionDigits:1})));
+  });
+ });
+ box.append(svg);
+ const foot=document.createElement('p');foot.className='sales-compare-foot';
+ foot.textContent='前年はグレー点線、当年は青実線。登録済みデータのみを表示し、未取得月は0として扱いません。'+(field==='real_working_average'?' 実働平均は保存済み値がある場合のみ表示します。':'');
+ box.append(foot);
+}
 function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
  const storeKey=selectedStore||'薔薇と紳士';
  const storeLabel=storeKey==='LUXY'?'LUXY OSAKA':storeKey;
@@ -1654,6 +1745,9 @@ function renderSalesMetrics(){
  const rows=ready?salesMetricsData.rows:[];
  const parentShop=(()=>{try{return window.parent!==window?window.parent.document.getElementById('metricsHeaderShop')?.value:null}catch{return null}})();
  const activeSalesShop=parentShop||$('storeMetricsShop').value;
+ const periodControls=document.getElementById('interviewPeriodSwitch');
+ if(periodControls)for(const button of periodControls.querySelectorAll('button'))button.classList.toggle('active',button.dataset.period===salesDisplayPeriod);
+ if(salesDisplayPeriod==='annual'){renderSalesYearComparison(root,Number(month.slice(0,4)),activeSalesShop);return}
  if(activeSalesShop!=='all'){renderRoseSalesMetrics(root,month,rows,ready,activeSalesShop);return}
  document.querySelector('#storeMetricsHeader>.sales-header-kpis')?.remove();
  const stores=salesStoreMap.map(([key,name],i)=>{
@@ -1752,7 +1846,7 @@ function bindInterviewMetricsPeriod(){
  const group=document.createElement('div');group.id='interviewPeriodSwitch';group.className='interview-period-switch';
  for(const [key,label] of [['annual','年間'],['monthly','月間']]){
   const button=document.createElement('button');button.type='button';button.textContent=label;button.dataset.period=key;
-  button.addEventListener('click',()=>{interviewMetricsPeriod=key;renderStoreMetrics()});
+  button.addEventListener('click',()=>{if(!$('salesMetricsBody').hidden){salesDisplayPeriod=key;renderSalesMetrics()}else{interviewMetricsPeriod=key;renderStoreMetrics()}});
   group.append(button);
  }
  hdr.querySelector('.metrics-mode-tabs')?.after(group);
