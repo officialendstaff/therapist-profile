@@ -115,12 +115,27 @@ header.lg-common-header .lg-header-home img{width:27px!important;height:32px!imp
 #metricsHeaderYear{min-width:76px!important;color:#fff!important;font-size:12px!important;font-weight:800!important;text-align:center!important}
 .lg-common-header .lg-account-menu>summary{height:26px!important;padding:0 10px!important;font-size:12px!important}
 @media(max-width:650px){header.lg-common-header{height:49px!important;min-height:49px!important;max-height:49px!important}}
+</style><style id="metrics-header-period-move-20261113">
+.metrics-header-separator{height:20px;width:1px;background:#63758c;opacity:.65;margin:0 2px}
+.metrics-header-period{display:inline-flex;align-items:center;gap:4px}
+.metrics-header-period button{height:26px!important;min-width:42px!important;padding:0 7px!important;background:#f5f7fc!important;color:#344968!important;border:1px solid #aabdd1!important;font-size:11px!important}
+.metrics-header-period button[aria-pressed="true"]{background:#dceafa!important;color:#184e86!important;border-color:#74a9db!important}
+#metricsHeaderMonthLabel{min-width:35px;text-align:center;color:#fff;font-size:12px;font-weight:700}
+@media(max-width:1050px){.metrics-header-controls{gap:4px!important}.metrics-header-controls select{min-width:100px!important;max-width:120px!important}.metrics-header-period button{min-width:36px!important;padding:0 5px!important}}
 </style></head>
 <body><div class="page"><header class="topbar lg-common-header"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ移動" aria-label="総合管理TOPへ移動"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span id="lgHeaderHomeLabel">TOP</span></a><div class="metrics-header-right"><div id="metricsHeaderControls" class="metrics-header-controls" hidden aria-label="数値管理の表示切替">
 <select id="metricsHeaderShop" aria-label="店舗切替"><option value="all">全店舗</option><option value="Grand Luxe">Grand Luxe</option><option value="LUXY">LUXY</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select>
 <button type="button" id="metricsHeaderPrevYear" class="arrow" aria-label="前年">◀</button>
 <strong id="metricsHeaderYear" aria-live="polite">2026年</strong>
 <button type="button" id="metricsHeaderNextYear" class="arrow" aria-label="翌年">▶</button>
+<span class="metrics-header-separator" aria-hidden="true"></span>
+<div id="metricsHeaderPeriod" class="metrics-header-period" role="group" aria-label="集計期間">
+<button type="button" id="metricsHeaderAnnual" aria-pressed="false">年間</button>
+<button type="button" id="metricsHeaderMonthly" aria-pressed="true">月間</button>
+</div>
+<button type="button" id="metricsHeaderPrevMonth" class="arrow" aria-label="前月">◀</button>
+<strong id="metricsHeaderMonthLabel" aria-live="polite">11月</strong>
+<button type="button" id="metricsHeaderNextMonth" class="arrow" aria-label="翌月">▶</button>
 </div><details id="lgAccountMenu" class="lg-account-menu" hidden><summary aria-label="アカウントメニューを開く">アカウント</summary><div class="lg-account-panel" role="group" aria-label="アカウント操作"><strong class="lg-account-identity" id="lgAccountIdentity">認証確認中</strong><a href="/therapist-profile/staff/interview-sheet-preview/?account=1">アカウント画面</a><button type="button" id="lgAccountLogout">ログアウト</button></div></details></div></header>
 <section id="metricsLogin" class="lg-interview-login metrics-login hidden"><div class="auth-card"><aside class="auth-brand-panel" aria-hidden="true"><div class="auth-brand-top"><div class="auth-brand-symbol">L</div><div class="auth-brand-name">L GROUP<small>INTERNAL MANAGEMENT</small></div></div><div class="auth-brand-middle"><span class="auth-brand-kicker">STAFF MANAGEMENT SYSTEM</span><h1 class="auth-brand-title">ANALYTICS<br>MANAGEMENT.</h1><p class="auth-brand-description">日々の管理業務を、もっとスマートに。<br>すべての情報をひとつの場所で。</p></div><div class="auth-brand-bottom"><span>STAFF PORTAL</span><span>L GROUP © 2026</span></div></aside><div class="auth-form-panel"><p class="auth-eyebrow">WELCOME BACK</p><h2>数値管理ログイン</h2><div class="auth-mode-label"><span>管理者</span></div><form id="metricsLoginForm"><p class="auth-help">既存の管理者アカウントと同じID・PASSを使用します。</p><label for="metricsEmail">ID（メールアドレス）<input id="metricsEmail" type="email" autocomplete="username" required></label><label for="metricsPassword">PASS<input id="metricsPassword" type="password" autocomplete="current-password" required></label><div id="metricsLoginError" role="alert"></div><button type="submit">ログイン</button></form><p class="auth-footnote">AUTHORIZED PERSONNEL ONLY</p></div></div></section>
 <iframe id="metricsFrame" class="frame hidden" title="数値管理ダッシュボード" allow="clipboard-write"></iframe></div>
@@ -247,6 +262,17 @@ function bindMetricsHeaderControls(){
   const year=Number(month.value.slice(0,4));
   yearLabel.textContent=year+"年";
   $("metricsHeaderNextYear").disabled=year>=new Date().getFullYear();
+  const activeSales=Boolean(target("salesMetricsBody")&&!target("salesMetricsBody").hidden);
+  const annual=activeSales?view?.salesDisplayPeriod==="annual":view?.interviewMetricsPeriod==="annual";
+  $("metricsHeaderAnnual").setAttribute("aria-pressed",String(annual));
+  $("metricsHeaderMonthly").setAttribute("aria-pressed",String(!annual));
+  $("metricsHeaderMonthLabel").textContent=Number(month.value.slice(5,7))+"月";
+  const nextLimit=new Date();const nextMonth=String(Number(month.value.slice(0,4))+Math.floor(Number(month.value.slice(5,7))/12))+"-"+String(Number(month.value.slice(5,7))%12+1).padStart(2,"0");
+  $("metricsHeaderNextMonth").disabled=month.value>=nextLimit.getFullYear()+"-"+String(nextLimit.getMonth()+1).padStart(2,"0");
+  $("metricsHeaderPrevMonth").disabled=month.value<="2025-01";
+  $("metricsHeaderPrevMonth").hidden=annual;
+  $("metricsHeaderNextMonth").hidden=annual;
+  $("metricsHeaderMonthLabel").hidden=annual;
  }
  function setYear(delta){
   if(toolbar.hidden)return;
@@ -272,11 +298,29 @@ function bindMetricsHeaderControls(){
  });
  $("metricsHeaderPrevYear").addEventListener("click",()=>setYear(-1));
  $("metricsHeaderNextYear").addEventListener("click",()=>setYear(1));
+ for(const [id,period] of [["metricsHeaderAnnual","annual"],["metricsHeaderMonthly","monthly"]]){
+  $(id).addEventListener("click",()=>{
+   if(toolbar.hidden)return;
+   const internalButton=target("interviewPeriodSwitch")?.querySelector('[data-period="'+period+'"]');
+   internalButton?.click();
+   sync();
+  });
+ }
+ $("metricsHeaderPrevMonth").addEventListener("click",()=>{target("storeMetricsPrev")?.click();sync()});
+ $("metricsHeaderNextMonth").addEventListener("click",()=>{target("storeMetricsNext")?.click();sync()});
  frame.addEventListener("load",()=>{
   if(observer){observer.disconnect();observer=null;}
   if(view)view.removeEventListener("interview-auth-ready",sync);
   try{
    inside=frame.contentDocument;view=frame.contentWindow;
+   if(inside){
+    inside.documentElement.classList.add("metrics-in-standalone-header");
+    if(!inside.getElementById("metricsHeaderConsolidationStyle")){
+     const style=inside.createElement("style");style.id="metricsHeaderConsolidationStyle";
+     style.textContent="#storeMetricsHeader #interviewPeriodSwitch,#storeMetricsHeader #metricsInnerMonthNav{display:none!important}";
+     inside.head.append(style);
+    }
+   }
    if(!inside||!target("storeMetricsShop")){toolbar.hidden=true;return;}
    observer=new MutationObserver(sync);
    const month=target("storeMetricsMonth"),panel=target("storeMetrics");
