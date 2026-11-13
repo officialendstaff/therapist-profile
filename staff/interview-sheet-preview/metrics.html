@@ -262,12 +262,11 @@ function bindMetricsHeaderControls(){
   const year=Number(month.value.slice(0,4));
   yearLabel.textContent=year+"年";
   $("metricsHeaderNextYear").disabled=year>=new Date().getFullYear();
-  const activeSales=Boolean(target("salesMetricsBody")&&!target("salesMetricsBody").hidden);
-  const annual=activeSales?view?.salesDisplayPeriod==="annual":view?.interviewMetricsPeriod==="annual";
+  const annual=Boolean(target("interviewPeriodSwitch")?.querySelector('button[data-period="annual"].active'));
   $("metricsHeaderAnnual").setAttribute("aria-pressed",String(annual));
   $("metricsHeaderMonthly").setAttribute("aria-pressed",String(!annual));
   $("metricsHeaderMonthLabel").textContent=Number(month.value.slice(5,7))+"月";
-  const nextLimit=new Date();const nextMonth=String(Number(month.value.slice(0,4))+Math.floor(Number(month.value.slice(5,7))/12))+"-"+String(Number(month.value.slice(5,7))%12+1).padStart(2,"0");
+  const nextLimit=new Date();
   $("metricsHeaderNextMonth").disabled=month.value>=nextLimit.getFullYear()+"-"+String(nextLimit.getMonth()+1).padStart(2,"0");
   $("metricsHeaderPrevMonth").disabled=month.value<="2025-01";
   $("metricsHeaderPrevMonth").hidden=annual;
