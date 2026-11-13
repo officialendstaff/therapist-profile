@@ -897,7 +897,7 @@ html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!imp
 .sales-compare-head select{min-width:160px;padding:8px 10px;border:1px solid #bdcad9;border-radius:5px;background:white;font-size:13px}
 .sales-compare-legend{display:flex;gap:30px;justify-content:center;margin:14px 0 8px;font-size:13px;color:#485c74}
 .sales-compare-legend span::before{content:"";display:inline-block;width:24px;border-top:3px solid #2872c7;vertical-align:middle;margin-right:8px}
-.sales-compare-legend span:first-child::before{border-color:#98a4b5;border-top-style:dashed}
+.sales-compare-legend.has-previous span:first-child::before{border-color:#98a4b5;border-top-style:dashed}
 .sales-compare-foot{font-size:11px;color:#65768d;line-height:1.7;margin:8px 0 0}
 @media(max-width:700px){#salesMetricsBody:not([hidden]) .sales-compare-box{padding:12px 8px;overflow-x:auto}.sales-compare-head{flex-wrap:wrap}.sales-compare-box svg{min-width:700px}}
 </style><style id="sales-twelve-kpis-layout-20261113">
@@ -1618,7 +1618,7 @@ function renderSalesYearComparison(root,year,shop){
  if(!present.length){
   const p=document.createElement('p');p.className='sales-annual-message';p.textContent='この指標の登録済み実績はありません。未登録月は0扱いしていません。';box.append(p);return;
  }
- const legend=document.createElement('div');legend.className='sales-compare-legend';
+ const legend=document.createElement('div');legend.className='sales-compare-legend'+(year>2025?' has-previous':'');
  if(year>2025){const older=document.createElement('span');older.textContent='前年 '+(year-1)+'年';legend.append(older)}
  const newer=document.createElement('span');newer.textContent=(year===2025?'実績 ':'当年 ')+year+'年';legend.append(newer);box.append(legend);
  const W=1160,H=455,L=86,R=35,T=39,B=49;
