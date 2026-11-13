@@ -425,7 +425,17 @@ function render(){
  }
 
 }
-function open(type){mode=type;$("storeFilter").value="all";$("overlay").classList.remove("hidden");render()}
+function open(type){
+ mode=type;
+ const selector=$("storeFilter");
+ const storeOptions=type==="birthday"
+  ?[["all","全5店舗"],["grandluxe","Grand Luxe"],["luxy","LUXY OSAKA"],["unsecret","Un Secret"],["rose","薔薇と紳士"],["busty","BUSTY OSAKA"]]
+  :[["all","対象2店舗"],["rose","薔薇と紳士"],["busty","BUSTY OSAKA"]];
+ selector.replaceChildren(...storeOptions.map(([value,label])=>{const option=document.createElement("option");option.value=value;option.textContent=label;return option}));
+ selector.value="all";
+ $("overlay").classList.remove("hidden");
+ render();
+}
 function close(){mode=null;$("overlay").classList.add("hidden")}
 document.querySelectorAll("[data-open]").forEach(b=>b.addEventListener("click",()=>open(b.dataset.open)));
 $("storeFilter").addEventListener("change",render);
