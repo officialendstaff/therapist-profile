@@ -528,7 +528,8 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&mode)close()});
 $("refresh").addEventListener("click",load);
 // A new JST operating date always starts with unchecked contact statuses.
 // Refresh the overview if the page stays open across the date boundary.
-const managementJstDate=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+// Both displayed stores close at 04:00 JST; use the prior business day until closing.
+const managementJstDate=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date(Date.now()-4*60*60*1000));
 let managementShownDate=managementJstDate();
 async function refreshOnOperatingDateChange(){
  const today=managementJstDate();
