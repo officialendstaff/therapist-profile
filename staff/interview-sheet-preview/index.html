@@ -1760,7 +1760,7 @@ function renderSalesMetrics(){
  const activeSalesShop=parentShop||$('storeMetricsShop').value;
  const periodControls=document.getElementById('interviewPeriodSwitch');
  if(periodControls)for(const button of periodControls.querySelectorAll('button'))button.classList.toggle('active',button.dataset.period===salesDisplayPeriod);
- if(salesDisplayPeriod==='annual'){renderSalesYearComparison(root,Number(month.slice(0,4)),activeSalesShop);return}
+ if(salesDisplayPeriod==='annual'){document.querySelector('#storeMetricsHeader>.sales-header-kpis')?.remove();renderSalesYearComparison(root,Number(month.slice(0,4)),activeSalesShop);return}
  if(activeSalesShop!=='all'){renderRoseSalesMetrics(root,month,rows,ready,activeSalesShop);return}
  document.querySelector('#storeMetricsHeader>.sales-header-kpis')?.remove();
  const stores=salesStoreMap.map(([key,name],i)=>{
