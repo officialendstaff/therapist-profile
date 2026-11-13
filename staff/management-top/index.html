@@ -310,10 +310,6 @@ let data={final_today:[],outside:[],birthday:[],connected_stores:[],unconnected_
 let contacts=new Map();let contactSaving=false;
 let birthdayMonthOffset=0,birthdayMonthRows=null,birthdayMonthLoading=false,birthdayMonthError="",birthdayMonthRequest=0;
 const birthdayToday=()=>new Date(new Date().toLocaleString("en-US",{timeZone:"Asia/Tokyo"}));
-function birthdayMonthKey(offset){
- const today=birthdayToday();
- return today.getFullYear()+"-"+String(today.getMonth()+offset+1).padStart(2,"0").replace(/^(-?\d+)$/,(_,n)=>n);
-}
 function birthdayTargetDate(offset){
  const date=birthdayToday();
  return new Date(date.getFullYear(),date.getMonth()+offset,1);
@@ -411,10 +407,11 @@ function render(){
     const x=a.last_date||"9999-12-31",y=b.last_date||"9999-12-31";
     return x.localeCompare(y)||String(a.store).localeCompare(String(b.store))||Number(a.exa_id)-Number(b.exa_id);
   }
-  // Current day first, followed by elapsed birthdays and then upcoming birthdays.
+  // Adjacent months use calendar date order; the current month highlights today's birthdays first.
+  const day=p=>Number(String(p.birthday||"").split("/")[1])||99;
+  if(birthdayMonthOffset!==0)return day(a)-day(b)||String(a.store).localeCompare(String(b.store))||Number(a.exa_id)-Number(b.exa_id);
   const rank=p=>p.offset===null||p.offset===undefined||p.offset===""||!Number.isFinite(Number(p.offset))?3:Number(p.offset)===0?0:Number(p.offset)<0?1:2;
-  return rank(a)-rank(b) || (rank(a)===1?Number(b.offset)-Number(a.offset):Number(a.offset)-Number(b.offset)) ||
-   String(a.store).localeCompare(String(b.store))||Number(a.exa_id)-Number(b.exa_id);
+  return rank(a)-rank(b)||day(a)-day(b)||String(a.store).localeCompare(String(b.store))||Number(a.exa_id)-Number(b.exa_id);
  });
  text($("dialogTitle"),cfg.title+"｜"+(mode==="birthday"&&birthdayMonthLoading?"読込中":mode==="birthday"&&birthdayMonthError?"取得エラー":rows.length+"名"));
  text($("dialogSub"),mode==="birthday"?birthdayPeriodLabel()+"の誕生日":cfg.sub||"");
