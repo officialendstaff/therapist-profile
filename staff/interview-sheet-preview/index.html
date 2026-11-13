@@ -2165,10 +2165,27 @@ function sheetMediaNames(value){
  if(!names.length)return ['記載なし'];
  return [...new Set(names.map(name=>normalizedRecruitMedia(mediaNames.includes(name)||name==='HP'||name==='記載なし'||/^その他[（(].+[）)]$/.test(name)?name:'その他（'+name+'）')))];
 }
+// Resolve a linked sheet's source from the corresponding LINE applicant only when
+// the sheet source has not been explicitly supplied. interviewId is provided by
+// metrics_sheets; never match by display name or by month.
+const linkedInterviewsById=new Map(allInterviews.map(r=>[String(r.interviewId),r]));
+function attendedSheetMediaNames(sheet){
+ const explicit=String(sheet.source||'').trim();
+ if(explicit&&normalizedRecruitMedia(explicit)!=='記載なし')return sheetMediaNames(explicit);
+ const linked=sheet.interviewId==null?null:linkedInterviewsById.get(String(sheet.interviewId));
+ if(linked&&linked.accountId&&linked.lineUserId&&lineReady){
+  const applicant=allApplicants.find(a=>String(a.accountId)===String(linked.accountId)&&String(a.lineUserId)===String(linked.lineUserId));
+  if(applicant){
+   const fromLine=mediaOf(applicant).map(normalizedRecruitMedia).filter(n=>n!=='記載なし');
+   if(fromLine.length)return [...new Set(fromLine)];
+  }
+ }
+ return sheetMediaNames(explicit);
+}
 const attendanceStatuses=new Set(['来店済み','採用','不採用','在籍','入店','辞退']);
 const attendedSheets=storeMetricsSheets.filter(x=>attendanceStatuses.has(x.status)&&String(x.month||'')===month&&matchShop(x.shop));
 const attendedMediaRaw=new Map();
-for(const sheet of attendedSheets)for(const name of sheetMediaNames(sheet.source))attendedMediaRaw.set(name,(attendedMediaRaw.get(name)||0)+1);
+for(const sheet of attendedSheets)for(const name of attendedSheetMediaNames(sheet))attendedMediaRaw.set(name,(attendedMediaRaw.get(name)||0)+1);
 const attendedManualInterviews=interviews.filter(r=>r.isManual&&attendanceStatuses.has(r.status));
 for(const manual of attendedManualInterviews){const name=normalizedRecruitMedia(manual.recruitSource);attendedMediaRaw.set(name,(attendedMediaRaw.get(name)||0)+1)}
 const attendedMedia=groupedMediaCounts(attendedMediaRaw);
@@ -2210,7 +2227,7 @@ pie.append(pieRow);chart.append(pie);
 const compare=panel('');
 
 const priorSheets=storeMetricsSheets.filter(x=>attendanceStatuses.has(x.status)&&String(x.month||'')===previousKey&&matchShop(x.shop));
-const priorMediaRaw=new Map();for(const x of priorSheets)for(const name of sheetMediaNames(x.source))priorMediaRaw.set(name,(priorMediaRaw.get(name)||0)+1);
+const priorMediaRaw=new Map();for(const x of priorSheets)for(const name of attendedSheetMediaNames(x))priorMediaRaw.set(name,(priorMediaRaw.get(name)||0)+1);
 const priorManualInterviews=allInterviews.filter(r=>r.isManual&&attendanceStatuses.has(r.status)&&String(r.date||'').slice(0,7)===previousKey);
 for(const manual of priorManualInterviews){const name=normalizedRecruitMedia(manual.recruitSource);priorMediaRaw.set(name,(priorMediaRaw.get(name)||0)+1)}
 const priorMedia=groupedMediaCounts(priorMediaRaw);
@@ -2429,7 +2446,7 @@ chart.append(compare);
   const yy=String(sh.month||'').slice(0,4);
   if(yy!==String(yr)&&yy!==String(yr-1))continue;
   const dest=yy===String(yr)?annualMediaRaw:previousAnnualMediaRaw;
-  for(const n of sheetMediaNames(sh.source))dest.set(n,(dest.get(n)||0)+1);
+  for(const n of attendedSheetMediaNames(sh))dest.set(n,(dest.get(n)||0)+1);
  }
  for(const row of allInterviews){
   if(!row.isManual||!attendanceStatuses.has(row.status))continue;
