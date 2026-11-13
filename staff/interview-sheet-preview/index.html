@@ -2059,7 +2059,7 @@ function mediaOf(a){
  for(const t of texts){for(const match of t.matchAll(labels)){if(match[1].trim())values.push(match[1].trim())}}
  if(!values.length){
   for(const t of texts)for(const line of t.split(/[\n\r]/).map(x=>x.trim())){
-   if(mediaNames.some(n=>line===n||line===n+'から'||line===n+'です')||/^(?:(?:オフィシャル|お店の|店舗の|公式)?(?:ホームページ|HP)|公式サイト)(?:から|です)?$/.test(line))values.push(line);
+   if(mediaNames.some(n=>line===n||line===n+'から'||line===n+'です')||/^(?:COCOA|ココア)(?:から|です)?$/i.test(line.normalize('NFKC').replace(/\s+/g,''))||/^(?:(?:オフィシャル|お店の|店舗の|公式)?(?:ホームページ|HP)|公式サイト)(?:から|です)?$/.test(line))values.push(line);
   }
  }
  if(!values.length)return ['記載なし'];
@@ -2094,7 +2094,7 @@ function normalizedRecruitMedia(name){
  // Sentences of greeting/acknowledgement are not advertising sources.
  if(/^(?:よろしく|宜しく|お願い(?:します|いたします|致します)|ありがとう|有難う|お世話にな|承知しました|了解しました|はじめまして|初めまして|こんにちは|こんばんは|お疲れ様|お疲れさま)/.test(compact))return '記載なし';
  if(/^(?:エステラブ|エステラブワーク)$/.test(compact))return 'エステラブワーク';
- if(/^cocoa$/i.test(compact)||compact==='ココア')return 'ココア';
+ if(/^(?:cocoa|ココア)(?:から|です)?$/i.test(compact))return 'ココア';
  if(compact==='その他')return 'その他';
  const known=mediaNames.find(m=>m!== 'その他'&&m.toLowerCase()===compact.toLowerCase());
  if(known)return known;
