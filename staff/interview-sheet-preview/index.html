@@ -890,6 +890,29 @@ html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!imp
 .unified-sales-empty{display:grid;place-items:center;height:100%;min-height:85px;color:#8a99aa;font-size:12px}
 @media(max-width:950px){.unified-sales-summary{grid-template-columns:repeat(3,minmax(0,1fr))}.unified-sales-layout{grid-template-columns:repeat(2,minmax(0,1fr))}.unified-sales-trend-card{grid-column:1/-1}}
 @media(max-width:600px){.unified-sales-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.unified-sales-layout{grid-template-columns:1fr}.unified-sales-title>div{flex-direction:column;gap:2px}.unified-sales-trend{height:225px}}
+</style><style id="sales-clarity-20261113">
+/* Each line has an independent labeled lane: no overlapping seven-series value tags. */
+#salesMetricsBody:not([hidden]) .unified-sales-layout{grid-template-rows:minmax(475px,1fr) auto!important;gap:12px!important}
+#salesMetricsBody:not([hidden]) .unified-sales-trend{min-height:470px!important;padding:4px 12px 8px!important}
+#salesMetricsBody:not([hidden]) .unified-sales-trend svg{min-height:460px!important}
+#salesMetricsBody:not([hidden]) .unified-sales-card{border-color:#d8e2ed!important}
+#salesMetricsBody:not([hidden]) .unified-sales-card h3{font-size:14px!important;font-weight:700!important;padding:12px 15px!important;color:#213a55!important;letter-spacing:.02em}
+#salesMetricsBody:not([hidden]) .unified-sales-card-body{padding:12px 16px!important}
+#salesMetricsBody:not([hidden]) .unified-sales-bar-row{margin:10px 0 16px!important;gap:7px 12px!important;font-size:13px!important}
+#salesMetricsBody:not([hidden]) .unified-sales-bar-label b{font-size:17px!important;font-weight:700!important;font-variant-numeric:tabular-nums!important}
+#salesMetricsBody:not([hidden]) .unified-sales-bar-label small,
+#salesMetricsBody:not([hidden]) .unified-sales-bar-row>small{font-size:11px!important}
+#salesMetricsBody:not([hidden]) .unified-sales-bar-track{height:10px!important;background:#ecf0f5!important}
+#salesMetricsBody:not([hidden]) .unified-sales-footnote{font-size:11px!important;line-height:1.5!important;margin:6px 15px 12px!important;color:#718096!important}
+#salesMetricsBody:not([hidden]) .unified-sales-profit{gap:9px!important}
+#salesMetricsBody:not([hidden]) .unified-sales-stat{padding:13px 6px!important;background:#f2f5f9!important}
+#salesMetricsBody:not([hidden]) .unified-sales-stat span{font-size:11px!important;color:#4c6078!important}
+#salesMetricsBody:not([hidden]) .unified-sales-stat strong{font-size:clamp(17px,1.7vw,24px)!important;font-weight:750!important;margin:5px 0 1px!important;color:#183451!important}
+#salesMetricsBody:not([hidden]) .unified-sales-stat small{font-size:11px!important;color:#687d94!important}
+@media(max-width:950px){
+ #salesMetricsBody:not([hidden]) .unified-sales-layout{grid-template-rows:none!important}
+ #salesMetricsBody:not([hidden]) .unified-sales-trend{min-width:860px!important}
+}
 </style></head><body>
 <header class="header"><button class="brand" id="home"><img id="homeAvatar" src="./icons/recruit-180.png" alt="" onerror="this.style.display='none'"><span id="homeLabel">TOP</span></button><div class="header-actions"><button id="manualInterviewOpen" type="button">面接登録</button><button id="sound">通知設定</button></div></header>
 <section class="calendar" aria-label="月間カレンダー"><div class="cal-head"><button id="prev" aria-label="前月">◀</button><span id="month"></span><button id="next" aria-label="翌月">▶</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="days" id="days"></div></section>
@@ -1605,44 +1628,31 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
   {label:'実働平均',field:'real_working_average',color:'#9b65bf'}
  ];
 
- const w=1160,h=440,left=66,right=36,top=54,bottom=39,plot=h-top-bottom;
- const x=m=>left+22+(m-1)*(w-left-right-44)/11;
- const y=v=>top+plot*(1-v/35);
- let svg='<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="'+year+'年、7系列の仮データ折れ線グラフ" style="width:100%;height:100%;display:block;font-family:Arial,Helvetica,sans-serif">';
- let lx=left+135;
- series.forEach(def=>{svg+='<rect x="'+lx+'" y="19" width="9" height="9" fill="'+def.color+'"/><text x="'+(lx+15)+'" y="28" fill="#43556a" font-size="11" font-weight="500">'+def.label+'</text>';lx+=125;});
- for(let value=0;value<=35;value+=5){
-  const yy=y(value);
-  svg+='<line x1="'+left+'" y1="'+yy+'" x2="'+(w-right)+'" y2="'+yy+'" stroke="#d8dfe7" stroke-width="1"/>';
-  svg+='<text x="'+(left-11)+'" y="'+(yy+4)+'" text-anchor="end" font-size="11" font-weight="400" fill="#738398">'+value.toFixed(2)+'</text>';
- }
- for(let m=1;m<=12;m++)svg+='<text x="'+x(m)+'" y="'+(h-8)+'" text-anchor="middle" font-size="11" font-weight="400" fill="#65758a">'+m+'月</text>';
- // Draw all lines and points first, keeping labels on a separate overlay.
- series.forEach(def=>{
-  const vals=demo[def.field],coords=vals.map((v,i)=>x(i+1)+','+y(v)).join(' ');
-  svg+='<polyline points="'+coords+'" fill="none" stroke="'+def.color+'" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>';
+
+ // Small multiples: preserve all monthly values while preventing label collisions.
+ const w=1160,h=552,left=138,right=32,top=45,rowH=66,bottom=42;
+ const months=11;
+ const x=m=>left+24+(m-1)*(w-left-right-48)/11;
+ let svg='<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="'+year+'年の7指標の月別推移。指標ごとに縦軸の範囲を調整した比較グラフ" style="width:100%;height:100%;display:block;font-family:Arial,Helvetica,sans-serif">';
+ svg+='<text x="18" y="24" font-size="12" fill="#52667c">月別推移</text><text x="'+(w-right)+'" y="24" text-anchor="end" font-size="10" fill="#738398">指標ごとに縦軸は独立・数値は表示確認用</text>';
+ series.forEach((def,j)=>{
+  const vals=demo[def.field];
+  const rowTop=top+j*rowH;
+  const low=Math.min(...vals),high=Math.max(...vals),span=Math.max(high-low,0.5);
+  const bottomLine=rowTop+47;
+  const py=v=>rowTop+39-((v-low)/span)*16;
+  svg+='<rect x="5" y="'+(rowTop-4)+'" width="'+(w-10)+'" height="'+(rowH-2)+'" fill="'+(j%2?'#ffffff':'#f7f9fc')+'"/>';
+  svg+='<rect x="14" y="'+(rowTop+11)+'" width="8" height="8" rx="1" fill="'+def.color+'"/>';
+  svg+='<text x="30" y="'+(rowTop+20)+'" font-size="13" font-weight="700" fill="#263b54">'+def.label+'</text>';
+  svg+='<line x1="'+left+'" y1="'+bottomLine+'" x2="'+(w-right)+'" y2="'+bottomLine+'" stroke="#e7edf4" stroke-width="1"/>';
+  svg+='<polyline points="'+vals.map((v,i)=>x(i+1)+','+py(v)).join(' ')+'" fill="none" stroke="'+def.color+'" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>';
   vals.forEach((v,i)=>{
-   const px=x(i+1),py=y(v);
-   svg+='<rect x="'+(px-2.6)+'" y="'+(py-3.4)+'" width="5.2" height="5.2" fill="'+def.color+'"/>';
+   const xx=x(i+1),yy=py(v);
+   svg+='<circle cx="'+xx+'" cy="'+yy+'" r="2.8" fill="'+def.color+'"/>';
+   svg+='<text x="'+xx+'" y="'+(yy-9)+'" text-anchor="middle" font-size="11.5" font-weight="600" fill="'+def.color+'">'+v.toFixed(2)+'</text>';
   });
  });
- // Within each month, space labels vertically to prevent collisions between nearby series.
- for(let i=0;i<11;i++){
-  const labels=series.map(def=>({value:demo[def.field][i],color:def.color,anchor:y(demo[def.field][i])-11}));
-  labels.sort((a,b)=>a.anchor-b.anchor);
-  const minGap=17;
-  for(let j=1;j<labels.length;j++)labels[j].pos=Math.max(labels[j].anchor,(labels[j-1].pos??labels[j-1].anchor)+minGap);
-  if(labels.length)labels[0].pos=labels[0].anchor;
-  for(let j=1;j<labels.length;j++)labels[j].pos=Math.max(labels[j].anchor,labels[j-1].pos+minGap);
-  const overflow=labels[labels.length-1].pos-(h-bottom-13);
-  if(overflow>0)for(const item of labels)item.pos-=overflow;
-  for(const item of labels){
-   const px=x(i+1),labelY=item.pos;
-   if(Math.abs(labelY-item.anchor)>8)svg+='<line x1="'+px+'" y1="'+(y(item.value)-3)+'" x2="'+px+'" y2="'+(labelY+3)+'" stroke="'+item.color+'" stroke-width=".6" opacity=".7"/>';
-   svg+='<rect x="'+(px-21)+'" y="'+(labelY-12)+'" width="42" height="15" rx="2" fill="white" fill-opacity=".90"/>';
-   svg+='<text x="'+px+'" y="'+labelY+'" text-anchor="middle" font-size="11" font-weight="500" fill="'+item.color+'" opacity=".88">'+item.value.toFixed(2)+'</text>';
-  }
- }
+ for(let m=1;m<=12;m++)svg+='<text x="'+x(m)+'" y="'+(h-15)+'" text-anchor="middle" font-size="12" font-weight="600" fill="#53667d">'+m+'月</text>';
  svg+='</svg>';
  host.innerHTML=svg;
 
