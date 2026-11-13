@@ -914,6 +914,18 @@ html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!imp
 #salesMetricsBody:not([hidden]) .unified-sales-layout{grid-template-rows:minmax(330px,1fr)!important;grid-template-columns:minmax(0,1fr)!important}
 #salesMetricsBody:not([hidden]) .unified-sales-layout>.unified-sales-trend-card{grid-row:1!important;grid-column:1!important}
 @media(max-width:800px){#storeMetricsHeader>.sales-header-kpis{grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:repeat(4,minmax(0,1fr))!important}#storeMetricsHeader .sales-header-kpis .unified-sales-summary-item{height:42px!important}}
+</style><style id="sales-kpi-visibility-hotfix-20261113">
+/* KPI cards: override older generic span rule, which was shrinking numeric values to 10px. */
+#storeMetricsHeader:has(>.sales-header-kpis){display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:0!important;min-height:116px!important;height:auto!important;padding:4px 0 7px!important}
+#storeMetricsHeader>.sales-header-kpis{width:100%!important;flex:0 0 auto!important;display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;grid-template-rows:repeat(2,50px)!important;gap:6px!important}
+#storeMetricsHeader>.sales-header-kpis>.unified-sales-summary-item{height:50px!important;min-height:50px!important;display:flex!important;flex-direction:column!important;justify-content:space-evenly!important;align-items:flex-start!important;gap:1px!important;padding:6px 10px!important;background:#f5f8fd!important;border:1px solid #d4e0ef!important;border-top:2px solid var(--sales-accent)!important;overflow:hidden!important}
+#storeMetricsHeader>.sales-header-kpis>.unified-sales-summary-item>.sales-kpi-label{display:block!important;width:100%!important;min-height:0!important;flex:0 0 auto!important;line-height:1.3!important;font-size:11px!important;font-weight:650!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+#storeMetricsHeader>.sales-header-kpis>.unified-sales-summary-item>b.sales-kpi-value{display:block!important;width:100%!important;min-width:0!important;flex:0 0 auto!important;line-height:1.3!important;font-size:16px!important;font-weight:750!important;white-space:nowrap!important;overflow:visible!important}
+#storeMetricsHeader>.sales-header-kpis>.unified-sales-summary-item>b.sales-kpi-value>span.sales-kpi-avg{display:inline!important;flex:none!important;font-size:16px!important;font-weight:750!important;line-height:1.3!important;color:#173a60!important;overflow:visible!important}
+#storeMetricsHeader>.sales-header-kpis>.unified-sales-summary-item>b.sales-kpi-value>span.sales-kpi-total{display:inline!important;flex:none!important;font-size:15px!important;font-weight:650!important;line-height:1.3!important;color:#4b6683!important;overflow:visible!important}
+#storeMetricsHeader>.sales-header-kpis>.unified-sales-summary-item>b.sales-kpi-value>span.sales-kpi-slash{display:inline!important;flex:none!important;font-size:14px!important;font-weight:400!important;line-height:1.3!important;margin:0 6px!important;color:#a0aec0!important;overflow:visible!important}
+#salesMetricsBody:not([hidden]){height:calc(100% - 122px)!important;padding-top:6px!important}
+@media(max-width:800px){#storeMetricsHeader>.sales-header-kpis{grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:repeat(4,50px)!important}#storeMetricsHeader:has(>.sales-header-kpis){min-height:228px!important}#salesMetricsBody:not([hidden]){height:calc(100% - 238px)!important}}
 </style></head><body>
 <header class="header"><button class="brand" id="home"><img id="homeAvatar" src="./icons/recruit-180.png" alt="" onerror="this.style.display='none'"><span id="homeLabel">TOP</span></button><div class="header-actions"><button id="manualInterviewOpen" type="button">面接登録</button><button id="sound">通知設定</button></div></header>
 <section class="calendar" aria-label="月間カレンダー"><div class="cal-head"><button id="prev" aria-label="前月">◀</button><span id="month"></span><button id="next" aria-label="翌月">▶</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="days" id="days"></div></section>
@@ -1654,10 +1666,10 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
  const completedMonth=Boolean(sourceRow&&sourceRow.source_status!=='partial_actual');
  const calendarDays=new Date(Number(month.slice(0,4)),Number(month.slice(5,7)),0).getDate();
  const annualClosure=(month.slice(5,7)==='01'||month.slice(5,7)==='12')?1:0;
- const averageDays=monthlyActual?(completedMonth?calendarDays-annualClosure:null):filtered.length;
+ const averageDays=monthlyActual?(sourceRow.reported_days>0?Number(sourceRow.reported_days):(completedMonth?calendarDays-annualClosure:null)):filtered.length;
  const mean=field=>valid&&averageDays>0?Number(total[field])/averageDays:null;
  const decimal=n=>n==null||!Number.isFinite(n)?'—':n.toLocaleString('ja-JP',{minimumFractionDigits:1,maximumFractionDigits:1});
- const kpi=(label,n,unit)=>'<div class="unified-sales-summary-item"><span>'+label+'（'+unit+'）</span><b>'+n+'</b></div>';
+ const kpi=(label,n,unit)=>'<div class="unified-sales-summary-item"><span class="sales-kpi-label">'+label+'（'+unit+'）</span><b class="sales-kpi-value">'+n+'</b></div>';
  const dual=(label,field,unit,allowed=true)=>{
   const avg=allowed?mean(field):null;
   const sum=valid&&allowed?number(total[field]):'—';
