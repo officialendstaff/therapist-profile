@@ -526,6 +526,21 @@ $("listBody").addEventListener("click",e=>{
 $("close").addEventListener("click",close);$("overlay").addEventListener("click",e=>{if(e.target===$("overlay"))close()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&mode)close()});
 $("refresh").addEventListener("click",load);
+// A new JST operating date always starts with unchecked contact statuses.
+// Refresh the overview if the page stays open across the date boundary.
+const managementJstDate=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+let managementShownDate=managementJstDate();
+async function refreshOnOperatingDateChange(){
+ const today=managementJstDate();
+ if(today===managementShownDate)return;
+ managementShownDate=today;
+ contacts.clear();
+ if(authorized)await load();
+ else if(mode)render();
+}
+setInterval(()=>{void refreshOnOperatingDateChange()},15000);
+window.addEventListener("focus",()=>{void refreshOnOperatingDateChange()});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)void refreshOnOperatingDateChange()});
 $("loginForm").addEventListener("submit",async e=>{e.preventDefault();if(!client)return;text($("loginError"),"確認中…");
  const r=await client.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});
  if(r.error){text($("loginError"),"ログインできません。入力内容をご確認ください。");return}
