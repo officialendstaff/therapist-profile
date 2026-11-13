@@ -1701,7 +1701,7 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
  })}));
  const observed=series.flatMap(def=>def.values.filter(v=>v!=null));
  if(!observed.length){host.textContent='この年の月別実績は登録されていません';return}
- const w=1160,h=440,left=66,right=36,top=54,bottom=39,plot=h-top-bottom;
+ const w=1160,h=470,left=66,right=36,top=54,bottom=39,plot=h-top-bottom;
  const axisMax=Math.ceil(Math.max(10,...observed)*1.15/5)*5;
  const x=m=>left+22+(m-1)*(w-left-right-44)/11;
  const y=v=>top+plot*(1-v/axisMax);
@@ -1712,12 +1712,12 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
   svg+='<rect x="'+lx+'" y="19" width="9" height="9" fill="'+(available?def.color:'#c8d2df')+'"/><text x="'+(lx+14)+'" y="28" fill="'+(available?'#43556a':'#a1afc0')+'" font-size="11" font-weight="500">'+(def.field==='profit_yen'?'利益平均':def.label)+'</text>';
   lx+=129;
  }
- for(let i=0;i<=5;i++){
-  const v=axisMax*i/5,yy=y(v);
-  svg+='<line x1="'+left+'" y1="'+yy+'" x2="'+(w-right)+'" y2="'+yy+'" stroke="#d8dfe7" stroke-width="1"/>';
-  svg+='<text x="'+(left-11)+'" y="'+(yy+4)+'" text-anchor="end" font-size="11" fill="#738398">'+v.toFixed(1)+'</text>';
+ for(let i=0;i<=10;i++){
+  const v=axisMax*i/10,yy=y(v);
+  svg+='<line x1="'+left+'" y1="'+yy+'" x2="'+(w-right)+'" y2="'+yy+'" stroke="'+(i%2===0?'#d9e1ea':'#edf1f5')+'" stroke-width="'+(i%2===0?'0.9':'0.6')+'"/>';
+  svg+='<text x="'+(left-11)+'" y="'+(yy+4)+'" text-anchor="end" font-size="9" fill="#738398">'+v.toFixed(1)+'</text>';
  }
- for(let m=1;m<=12;m++)svg+='<text x="'+x(m)+'" y="'+(h-8)+'" text-anchor="middle" font-size="11" fill="#65758a">'+m+'月</text>';
+ for(let m=1;m<=12;m++)svg+='<text x="'+x(m)+'" y="'+(h-8)+'" text-anchor="middle" font-size="10" fill="#65758a">'+m+'月</text>';
  for(const def of series){
   let path='',previous=-2;
   def.values.forEach((v,idx)=>{
@@ -1734,7 +1734,7 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
  for(let i=0;i<12;i++){
   const labels=series.filter(def=>def.values[i]!=null).map(def=>({value:def.values[i],color:def.color,anchor:y(def.values[i])-11}));
   labels.sort((a,b)=>a.anchor-b.anchor);
-  for(let j=0;j<labels.length;j++)labels[j].pos=j===0?labels[j].anchor:Math.max(labels[j].anchor,labels[j-1].pos+16);
+  for(let j=0;j<labels.length;j++)labels[j].pos=j===0?labels[j].anchor:Math.max(labels[j].anchor,labels[j-1].pos+13);
   if(labels.length&&labels[labels.length-1].pos>h-bottom-10){
    const adjust=labels[labels.length-1].pos-(h-bottom-10);
    labels.forEach(v=>v.pos-=adjust);
@@ -1742,8 +1742,8 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
   for(const item of labels){
    const px=x(i+1);
    if(Math.abs(item.pos-item.anchor)>8)svg+='<line x1="'+px+'" y1="'+(y(item.value)-3)+'" x2="'+px+'" y2="'+(item.pos+3)+'" stroke="'+item.color+'" stroke-width=".6"/>';
-   svg+='<rect x="'+(px-21)+'" y="'+(item.pos-12)+'" width="42" height="15" rx="2" fill="white" fill-opacity=".90"/>';
-   svg+='<text x="'+px+'" y="'+item.pos+'" text-anchor="middle" font-size="11" fill="'+item.color+'">'+item.value.toFixed(2)+'</text>';
+   svg+='<rect x="'+(px-17)+'" y="'+(item.pos-10)+'" width="34" height="12" rx="2" fill="white" fill-opacity=".85"/>';
+   svg+='<text x="'+px+'" y="'+item.pos+'" text-anchor="middle" font-size="9" font-weight="400" fill="'+item.color+'">'+item.value.toFixed(2)+'</text>';
   }
  }
  svg+='</svg>';
