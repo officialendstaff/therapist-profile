@@ -1631,6 +1631,8 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
  const splitOK=valid&&total.new_contracts_count+total.repeat_contracts_count===total.contracts_count;
  const nominationsOK=valid&&total.free_count+total.net_nominations_count+total.regular_nominations_count===total.contracts_count;
  const payReady=valid&&filtered.every(r=>r.therapist_payout_yen!=null);
+ const nominationsReady=valid&&filtered.every(r=>!r.monthly_source||r.nomination_ready===true);
+ const monthlyActual=filtered.some(r=>r.monthly_source);
  const card=(title,content,foot='')=>'<section class="unified-sales-card"><h3>'+title+'</h3><div class="unified-sales-card-body">'+content+'</div>'+(foot?'<p class="unified-sales-footnote">'+foot+'</p>':'')+'</section>';
  const stat=(label,n,unit,sub='')=>'<div class="unified-sales-stat"><span>'+label+'</span><strong>'+n+'</strong><small>'+unit+'</small>'+(sub?'<em>'+sub+'</em>':'')+'</div>';
  const kpi=(label,n,unit)=>'<div class="unified-sales-summary-item"><span>'+label+'</span><b>'+n+'</b><small>'+unit+'</small></div>';
@@ -1656,7 +1658,7 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
   kpi('出勤',value('active_staff_count'),'名')
  ].join('')+'</div>';
  const salesContent=valid?bars(split,total.contracts_count):'<div class="unified-sales-empty">対象月のデータは未登録です</div>';
- const nominationContent=valid?bars(nominations,total.contracts_count):'<div class="unified-sales-empty">指名内訳のデータは未登録です</div>';
+ const nominationContent=nominationsReady?bars(nominations,total.contracts_count):'<div class="unified-sales-empty">EXAのネット指名・本指名は未取得です。フリーも確定するまで表示しません。</div>';
  const previousHeaderKpis=document.querySelector('#storeMetricsHeader>.sales-header-kpis');
  if(previousHeaderKpis)previousHeaderKpis.remove();
  root.innerHTML='<div class="unified-sales" style="--sales-accent:'+tone+'">'+
@@ -1664,9 +1666,9 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
  '<div class="unified-sales-layout">'+
  '<section class="unified-sales-card unified-sales-trend-card"><div id="unifiedSalesTrend" class="unified-sales-trend"></div></section>'+
  card('成約内訳',salesContent,splitOK?'新規＋顧客＝成約本数':'内訳と成約本数が一致していません')+
- card('指名内訳',nominationContent,nominationsOK?'フリー＋ネット＋本指名＝成約本数':'不一致でも取得した値をそのまま表示しています')+
+ card('指名内訳',nominationContent,!nominationsReady?'EXA指名実績の取得待ち':nominationsOK?'フリー＋ネット＋本指名＝成約本数':'指名内訳に不一致があります')+
  card('利益・報酬','<div class="unified-sales-profit">'+
- stat('利益平均',valid&&filtered.length?number(total.profit_yen/filtered.length):'—','円／登録日')+
+ stat('利益平均',valid&&(monthlyActual?total.contracts_count:filtered.length)?number(total.profit_yen/(monthlyActual?total.contracts_count:filtered.length)):'—',monthlyActual?'円／本':'円／登録日')+
  stat('利益単価',valid&&total.contracts_count?number(total.profit_yen/total.contracts_count):'—','円／本')+
  stat('女子報酬平均',payReady&&total.contracts_count?number(total.therapist_payout_yen/total.contracts_count):'—','円／本')+
  stat('成約／出勤',valid&&total.active_staff_count?(total.contracts_count/total.active_staff_count).toFixed(2):'—','本／人日')+'</div>')+
@@ -1770,6 +1772,7 @@ function renderSalesMetrics(){
  const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const valueOf=(metric,store)=>{
   if(!store.has||metric.unsupported||metric.requiresPayout&&!store.payoutAvailable)return null;
+  if(['free_count','net_nominations_count','regular_nominations_count'].includes(metric.field)&&rows.some(r=>r.store_key===store.key&&r.monthly_source&&!r.nomination_ready))return null;
   const value=metric.field?store.totals[metric.field]:metric.value(store.totals,store.days);
   return Number.isFinite(value)?value:null;
  };
