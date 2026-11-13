@@ -1740,10 +1740,15 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
  })}));
  const observed=series.flatMap(def=>def.values.filter(v=>v!=null));
  if(!observed.length){host.textContent='この年の月別実績は登録されていません';return}
- const w=1160,h=470,left=66,right=36,top=54,bottom=39,plot=h-top-bottom;
- const axisMax=Math.ceil(Math.max(10,...observed)*1.15/5)*5;
+ // Match the SVG viewBox to the visible chart area, preserving text proportions
+ // without the large top/bottom letterboxing of a fixed-aspect viewBox.
+ const w=1160;
+ const hostWidth=host.clientWidth||w,hostHeight=host.clientHeight||470;
+ const h=Math.max(300,Math.round(w*hostHeight/hostWidth));
+ const left=66,right=36,top=43,bottom=33,plot=h-top-bottom;
+ const axisMin=3,axisMax=45;
  const x=m=>left+22+(m-1)*(w-left-right-44)/11;
- const y=v=>top+plot*(1-v/axisMax);
+ const y=v=>top+plot*(1-(v-axisMin)/(axisMax-axisMin));
  let svg='<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="'+year+'年、登録済み営業実績の月別平均推移" style="width:100%;height:100%;display:block;font-family:Arial,Helvetica,sans-serif">';
  let lx=left+115;
  for(const def of series){
@@ -1751,10 +1756,10 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
   svg+='<rect x="'+lx+'" y="20" width="7" height="7" fill="'+(available?def.color:'#c8d2df')+'"/><text x="'+(lx+11)+'" y="27" fill="'+(available?'#43556a':'#a1afc0')+'" font-size="9" font-weight="400">'+(def.field==='profit_yen'?'利益平均':def.label)+'</text>';
   lx+=129;
  }
- for(let i=0;i<=10;i++){
-  const v=axisMax*i/10,yy=y(v);
-  svg+='<line x1="'+left+'" y1="'+yy+'" x2="'+(w-right)+'" y2="'+yy+'" stroke="'+(i%2===0?'#d9e1ea':'#edf1f5')+'" stroke-width="'+(i%2===0?'0.9':'0.6')+'"/>';
-  svg+='<text x="'+(left-11)+'" y="'+(yy+4)+'" text-anchor="end" font-size="9" fill="#738398">'+v.toFixed(1)+'</text>';
+ for(let v=axisMin;v<=axisMax;v+=3){
+  const yy=y(v),major=(v-axisMin)%6===0;
+  svg+='<line x1="'+left+'" y1="'+yy+'" x2="'+(w-right)+'" y2="'+yy+'" stroke="'+(major?'#d9e1ea':'#edf1f5')+'" stroke-width="'+(major?'0.9':'0.6')+'"/>';
+  if(major)svg+='<text x="'+(left-11)+'" y="'+(yy+4)+'" text-anchor="end" font-size="9" fill="#738398">'+v+'</text>';
  }
  for(let m=1;m<=12;m++){
   svg+='<text x="'+x(m)+'" y="'+(h-8)+'" text-anchor="middle" font-size="10" fill="#65758a">'+m+'月</text>';
