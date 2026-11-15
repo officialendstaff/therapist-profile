@@ -1762,6 +1762,41 @@ function renderSalesYearComparison(root,year,shop){
    point.append(tip);svg.append(point);
   });
  });
+ // Show the exact daily average at every data point for both years.
+ // Position prior-year labels to the left and current-year labels to the right;
+ // offset vertically when several series meet at similar values.
+ for(let monthIndex=0;monthIndex<12;monthIndex++){
+  for(const dashed of [true,false]){
+   const entries=lines.filter(line=>line.dashed===dashed&&line.values[monthIndex]!=null)
+    .map(line=>({line,value:line.values[monthIndex],position:y(line.values[monthIndex])}))
+    .sort((a,b)=>a.position-b.position);
+   const minGap=14;
+   let previous=-Infinity;
+   for(const entry of entries){
+    entry.labelY=Math.max(T+9,entry.position-7,previous+minGap);
+    previous=entry.labelY;
+   }
+   const maxY=H-B-7;
+   if(entries.length&&entries[entries.length-1].labelY>maxY){
+    const shift=entries[entries.length-1].labelY-maxY;
+    entries.forEach(entry=>entry.labelY-=shift);
+   }
+   entries.forEach(({line,value,labelY})=>{
+    const displayValue=line.field==='profit_yen'
+     ?(value/10000).toLocaleString('ja-JP',{maximumFractionDigits:1})+'万'
+     :value.toLocaleString('ja-JP',{minimumFractionDigits:1,maximumFractionDigits:1});
+    const label=salesAnnualSvgElement('text',{
+     x:x(monthIndex)+(dashed?-8:8),y:Math.max(T+7,Math.min(H-B-5,labelY)),
+     'font-size':10,'font-weight':dashed?500:700,
+     'text-anchor':dashed?'end':'start',
+     fill:line.color,opacity:dashed?0.8:1,
+     stroke:'#ffffff','stroke-width':3,'stroke-linejoin':'round',
+     'paint-order':'stroke'
+    },displayValue);
+    svg.append(label);
+   });
+  }
+ }
  box.append(svg);
 }
 function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
