@@ -1967,7 +1967,7 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
  let storedTargets={};try{storedTargets=JSON.parse(localStorage.getItem(targetStorageKey)||'{}')||{}}catch{}
  const targetHitboxes=[];
  for(const [targetIndex,targetMonth] of targetMonths.entries()){
-  if(!targetMonth.startsWith(year+'-'))continue;
+  if(targetIndex!==1||!targetMonth.startsWith(year+'-'))continue;
   const monthNumber=Number(targetMonth.slice(5,7)),pointX=x(monthNumber);
   const labels=[];
   for(const def of series){
