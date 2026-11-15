@@ -1677,10 +1677,10 @@ function renderSalesYearComparison(root,year,shop){
   single('稼働',workload,'名/本'),
   dual('顧客','repeat_contracts_count','名'),
   dual('新規','new_contracts_count','名'),
+  dual('新規着信','new_inbound_people','件'),
   dual('本指名','regular_nominations_count','件'),
   dual('ネット','net_nominations_count','件'),
-  dual('フリー','free_count','件'),
-  dual('新規着信','new_inbound_people','件')
+  dual('フリー','free_count','件')
  ].join('')+'</div>';
  const header=document.getElementById('storeMetricsHeader');
  if(header)header.insertAdjacentHTML('beforeend',html);
