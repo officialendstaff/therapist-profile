@@ -1957,8 +1957,56 @@ function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
    svg+='<text x="'+px+'" y="'+item.pos+'" text-anchor="middle" font-size="9" font-weight="400" fill="'+item.color+'">'+item.value.toFixed(2)+'</text>';
   }
  }
+
+ // Monthly targets: plot only the current and following month, separately from actual lines.
+ // Values are per operating day, matching the existing seven chart series.
+ const today=new Date(),targetMonths=[today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0'),
+  new Date(today.getFullYear(),today.getMonth()+1,1).getFullYear()+'-'+String(new Date(today.getFullYear(),today.getMonth()+1,1).getMonth()+1).padStart(2,'0')];
+ const targetDefaults={'薔薇と紳士':{'profit_yen':16.67,'contracts_count':18.14,'repeat_contracts_count':13,'new_contracts_count':5.14,'active_staff_count':10.07,'inbound_people':29.24}};
+ const targetStorageKey='lg-sales-chart-targets-v1';
+ let storedTargets={};try{storedTargets=JSON.parse(localStorage.getItem(targetStorageKey)||'{}')||{}}catch{}
+ const targetHitboxes=[];
+ for(const [targetIndex,targetMonth] of targetMonths.entries()){
+  if(!targetMonth.startsWith(year+'-'))continue;
+  const monthNumber=Number(targetMonth.slice(5,7)),pointX=x(monthNumber);
+  const labels=[];
+  for(const def of series){
+   const storageId=storeKey+'|'+targetMonth+'|'+def.field;
+   const saved=storedTargets[storageId];
+   const baseline=targetDefaults[storeKey]?.[def.field];
+   const target=saved===null?null:(Number.isFinite(Number(saved))&&saved!==undefined?Number(saved):baseline);
+   if(target==null||!Number.isFinite(target))continue;
+   labels.push({def,target,storageId,anchor:y(target)-9});
+  }
+  labels.sort((a,b)=>a.anchor-b.anchor);
+  labels.forEach((item,i)=>{item.pos=i===0?Math.max(top+12,item.anchor):Math.max(item.anchor,labels[i-1].pos+15)});
+  if(labels.length&&labels[labels.length-1].pos>h-bottom-13){
+   const offset=labels[labels.length-1].pos-(h-bottom-13);labels.forEach(item=>item.pos-=offset);
+  }
+  for(const item of labels){
+   const {def,target,storageId}=item,py=y(target),pos=item.pos;
+   svg+='<polygon points="'+pointX+','+(py-4)+' '+(pointX+4)+','+py+' '+pointX+','+(py+4)+' '+(pointX-4)+','+py+'" fill="white" stroke="'+def.color+'" stroke-width="1.5"/>';
+   const label='目標 '+target.toFixed(2);
+   const textX=pointX+(targetIndex===0?-8:8),anchor=targetIndex===0?'end':'start';
+   svg+='<text x="'+textX+'" y="'+pos+'" text-anchor="'+anchor+'" font-size="8" fill="'+def.color+'" stroke="#fff" stroke-width="2.5" paint-order="stroke" style="cursor:pointer">'+label+'</text>';
+   targetHitboxes.push({x:textX,y:pos,storageId,def,target,targetMonth});
+  }
+ }
  svg+='</svg>';
  host.innerHTML=svg;
+ host.onclick=event=>{
+  const rect=host.querySelector('svg')?.getBoundingClientRect();if(!rect)return;
+  const mx=(event.clientX-rect.left)*w/rect.width,my=(event.clientY-rect.top)*h/rect.height;
+  const hit=targetHitboxes.find(t=>Math.abs(mx-t.x)<48&&Math.abs(my-t.y)<9);
+  if(!hit)return;
+  const value=prompt(hit.targetMonth+' '+hit.def.label+' の1日目標値を入力してください（空欄で削除）',String(hit.target));
+  if(value===null)return;
+  const next=value.trim()===''?null:Number(value);
+  if(next!==null&&(!Number.isFinite(next)||next<0)){alert('0以上の数値を入力してください');return;}
+  let data={};try{data=JSON.parse(localStorage.getItem(targetStorageKey)||'{}')||{}}catch{}
+  data[hit.storageId]=next;localStorage.setItem(targetStorageKey,JSON.stringify(data));
+  renderSalesMetrics();
+ };
 
 }
 function renderSalesMetrics(){
