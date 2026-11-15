@@ -926,6 +926,15 @@ html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!imp
 #storeMetricsHeader>.sales-header-kpis>.unified-sales-summary-item>b.sales-kpi-value>span.sales-kpi-slash{display:inline!important;flex:none!important;font-size:14px!important;font-weight:400!important;line-height:1.3!important;margin:0 6px!important;color:#a0aec0!important;overflow:visible!important}
 #salesMetricsBody:not([hidden]){height:calc(100% - 122px)!important;padding-top:6px!important}
 @media(max-width:800px){#storeMetricsHeader>.sales-header-kpis{grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:repeat(4,50px)!important}#storeMetricsHeader:has(>.sales-header-kpis){min-height:228px!important}#salesMetricsBody:not([hidden]){height:calc(100% - 238px)!important}}
+</style><style id="sales-annual-no-scroll-20261115">
+/* Annual comparison: fit the chart into the visible metrics area without a vertical scrollbar. */
+#salesMetricsBody:has(.sales-compare-box):not([hidden]){overflow:hidden!important;padding-bottom:7px!important;min-height:0!important}
+#salesMetricsBody:has(.sales-compare-box) .sales-compare-box{height:100%!important;min-height:0!important;max-height:100%!important;box-sizing:border-box!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;padding:10px 16px 5px!important}
+#salesMetricsBody:has(.sales-compare-box) .sales-compare-head,
+#salesMetricsBody:has(.sales-compare-box) .sales-compare-legend{flex:none!important}
+#salesMetricsBody:has(.sales-compare-box) .sales-compare-legend{margin:7px 0 3px!important}
+#salesMetricsBody:has(.sales-compare-box) .sales-compare-box>svg{flex:1 1 0!important;min-height:0!important;height:0!important;width:100%!important}
+@media(max-width:700px){#salesMetricsBody:has(.sales-compare-box) .sales-compare-box{overflow-x:auto!important}}
 </style></head><body>
 <header class="header"><button class="brand" id="home"><img id="homeAvatar" src="./icons/recruit-180.png" alt="" onerror="this.style.display='none'"><span id="homeLabel">TOP</span></button><div class="header-actions"><button id="manualInterviewOpen" type="button">面接登録</button><button id="sound">通知設定</button></div></header>
 <section class="calendar" aria-label="月間カレンダー"><div class="cal-head"><button id="prev" aria-label="前月">◀</button><span id="month"></span><button id="next" aria-label="翌月">▶</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="days" id="days"></div></section>
@@ -1705,10 +1714,7 @@ function renderSalesYearComparison(root,year,shop){
   });
  });
  box.append(svg);
- const foot=document.createElement('p');foot.className='sales-compare-foot';
- const partialRows=currentRows.filter(r=>r.source_status==='partial_actual');
- foot.textContent='月別実績（'+unit+'）を比較。年間カードは登録済み営業日'+days+'日の日平均／累計（途中実績も含む）。未取得月は0扱いしません。';
- box.append(foot);
+
 }
 function renderRoseSalesMetrics(root,month,rows,ready,selectedStore){
  const storeKey=selectedStore||'薔薇と紳士';
