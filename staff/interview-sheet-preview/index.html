@@ -1658,14 +1658,14 @@ function renderSalesYearComparison(root,year,shop){
   return '<div class="unified-sales-summary-item" title="日平均 / 累計（営業日数：'+days+'日）"><span class="sales-kpi-label">'+label+'（'+unit+'）</span><b class="sales-kpi-value"><span class="sales-kpi-avg">'+avg(n)+'</span><span class="sales-kpi-slash">/</span><span class="sales-kpi-total">'+fmt(n)+'</span></b></div>';
  };
  const single=(label,n,unit)=>'<div class="unified-sales-summary-item"><span class="sales-kpi-label">'+label+'（'+unit+'）</span><b class="sales-kpi-value">'+(n==null?'—':n)+'</b></div>';
- const salary=totalPayout>0&&totalStaff!=null?((totalStaff/totalPayout)).toLocaleString('ja-JP',{maximumFractionDigits:7}):null;
+ const salary=totalStaff>0&&totalPayout!=null?fmt(totalPayout/totalStaff):null;
  const workload=totalContracts>0&&totalStaff!=null?(totalStaff/totalContracts).toFixed(2):null;
  const html='<div class="unified-sales-summary sales-header-kpis" style="--sales-accent:#527eac">'+[
   dual('成約','contracts_count','本'),
   dual('利益','profit_yen','円'),
   dual('着信','inbound_people','件'),
   dual('出勤','active_staff_count','名'),
-  single('報酬平均',salary,'名/円'),
+  single('報酬平均',salary,'円/名'),
   single('稼働',workload,'名/本'),
   dual('顧客','repeat_contracts_count','名'),
   dual('新規','new_contracts_count','名'),
