@@ -942,6 +942,13 @@ html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!imp
 .sales-compare-swatch{display:inline-block;width:15px;height:3px;border-radius:2px}
 .sales-compare-year-guide{font-size:11px;color:#76869b;margin-left:8px}
 #salesMetricsBody:has(.sales-compare-box) .sales-compare-box>svg{min-width:0!important}
+</style><style id="sales-annual-pay-dual-20261115">
+/* Preserve the existing card dimensions, showing pay per attendance / pay per contract. */
+#storeMetricsHeader>.sales-header-kpis>.sales-pay-dual>.sales-kpi-label{font-size:10px!important;letter-spacing:-.1px!important}
+#storeMetricsHeader>.sales-header-kpis>.sales-pay-dual>b.sales-kpi-value{font-size:14px!important;letter-spacing:-.2px!important}
+#storeMetricsHeader>.sales-header-kpis>.sales-pay-dual>b.sales-kpi-value>span.sales-kpi-avg,
+#storeMetricsHeader>.sales-header-kpis>.sales-pay-dual>b.sales-kpi-value>span.sales-kpi-total{font-size:14px!important}
+#storeMetricsHeader>.sales-header-kpis>.sales-pay-dual>b.sales-kpi-value>span.sales-kpi-slash{font-size:13px!important;margin:0 4px!important}
 </style></head><body>
 <header class="header"><button class="brand" id="home"><img id="homeAvatar" src="./icons/recruit-180.png" alt="" onerror="this.style.display='none'"><span id="homeLabel">TOP</span></button><div class="header-actions"><button id="manualInterviewOpen" type="button">面接登録</button><button id="sound">通知設定</button></div></header>
 <section class="calendar" aria-label="月間カレンダー"><div class="cal-head"><button id="prev" aria-label="前月">◀</button><span id="month"></span><button id="next" aria-label="翌月">▶</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="days" id="days"></div></section>
@@ -1658,14 +1665,15 @@ function renderSalesYearComparison(root,year,shop){
   return '<div class="unified-sales-summary-item" title="日平均 / 累計（営業日数：'+days+'日）"><span class="sales-kpi-label">'+label+'（'+unit+'）</span><b class="sales-kpi-value"><span class="sales-kpi-avg">'+avg(n)+'</span><span class="sales-kpi-slash">/</span><span class="sales-kpi-total">'+fmt(n)+'</span></b></div>';
  };
  const single=(label,n,unit)=>'<div class="unified-sales-summary-item"><span class="sales-kpi-label">'+label+'（'+unit+'）</span><b class="sales-kpi-value">'+(n==null?'—':n)+'</b></div>';
- const salary=totalStaff>0&&totalPayout!=null?fmt(totalPayout/totalStaff):null;
+ const salary=totalStaff>0&&totalPayout!=null?fmt(totalPayout/totalStaff):'—';
+ const salaryPerContract=totalContracts>0&&totalPayout!=null?fmt(totalPayout/totalContracts):'—';
  const workload=totalContracts>0&&totalStaff!=null?(totalStaff/totalContracts).toFixed(2):null;
  const html='<div class="unified-sales-summary sales-header-kpis" style="--sales-accent:#527eac">'+[
   dual('成約','contracts_count','本'),
   dual('利益','profit_yen','円'),
   dual('着信','inbound_people','件'),
   dual('出勤','active_staff_count','名'),
-  single('報酬平均',salary,'円/名'),
+  '<div class="unified-sales-summary-item sales-pay-dual"><span class="sales-kpi-label">報酬平均（円/名・円/本）</span><b class="sales-kpi-value"><span class="sales-kpi-avg">'+salary+'</span><span class="sales-kpi-slash">/</span><span class="sales-kpi-total">'+salaryPerContract+'</span></b></div>',
   single('稼働',workload,'名/本'),
   dual('顧客','repeat_contracts_count','名'),
   dual('新規','new_contracts_count','名'),
