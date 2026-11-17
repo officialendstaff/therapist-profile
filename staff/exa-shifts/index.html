@@ -824,10 +824,10 @@ client.from("exa_rose_roster_current").select("exa_id,roster_name")
 const [a,b,c,d,e,future,sv,sl,roster]=responses;
 const err=[a,b,c,d,e,future,sv,sl,roster].find(r=>r.error)?.error;
 if(err){showMsg("読み込みエラー："+err.message,true);return;}
-// 薔薇と紳士：掲載整理で除外指定されたEXA ID。サーバー同期で在籍一覧に再流入しても画面へ戻さない。
-const hiddenRosterIds=new Set([157,194,168,113,169,185,175,79,183,181]);
-rosterIds=new Set((roster.data||[]).map(r=>Number(r.exa_id)).filter(id=>!hiddenRosterIds.has(id)));
-therapists=(a.data||[]).filter(t=>!hiddenRosterIds.has(Number(t.exa_id))&&(rosterIds.has(Number(t.exa_id))||t.operating_category==="not_used"));shifts=b.data||[];performances=c.data||[];historyPerformances=e.data||[];futureShifts=future.data||[];
+// 在籍一覧はEXA在籍マスターのEXA IDを唯一の表示基準とする。
+// 個別IDの固定除外は行わず、退店・追加はマスター更新で反映する。
+rosterIds=new Set((roster.data||[]).map(r=>Number(r.exa_id)));
+therapists=(a.data||[]).filter(t=>rosterIds.has(Number(t.exa_id)));shifts=b.data||[];performances=c.data||[];historyPerformances=e.data||[];futureShifts=future.data||[];
 surveyScores=sv.data||[];surveyLinks=sl.data||[];
 $("monthLabel").textContent=month.replace("-","年")+"月";
 $("message").textContent="";
