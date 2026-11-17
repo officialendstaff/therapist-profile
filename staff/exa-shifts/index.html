@@ -981,9 +981,8 @@ const cellClasses=[group==="dummy"?"dummy":"",day===today()?"today":"",dayType(d
 html+='<td class="'+cellClasses+'">';
 if(r?.is_pre_off)html+="<strong class='pre-off-label'>事前</strong>";
 else if(planned){
- const planText=range({start_minutes:planned.start,end_minutes:planned.end});
- if(r) html+='<span class="dec-exa-shift" title="EXA登録済み">'+safe(range(r))+'</span><span class="dec-plan-sub" title="12月参考案">案 '+safe(planText)+'</span>';
- else html+='<span class="dec-plan-shift" title="EXA未登録・入力参考案：'+safe(planText)+'">案'+safe(planText)+'</span>';
+ // Show December draft hours exactly as November hours; keep draft/EXA distinction in data only.
+ html+=safe(range(r||{start_minutes:planned.start,end_minutes:planned.end}));
 }
 else if(r&&past&&group==="real"&&!r.is_dummy_shift)html+='<button type="button" class="edit-count '+(absence.has(t.exa_id+"|"+day)?"absent-entry":"")+'" data-id="'+t.exa_id+'" data-date="'+day+'">'+(absence.has(t.exa_id+"|"+day)?"当欠":value===undefined?"＋":value)+'</button>';
 else if(r&&group==="dummy")html+=safe(range(r));
