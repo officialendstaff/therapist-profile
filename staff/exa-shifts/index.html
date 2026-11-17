@@ -219,10 +219,23 @@ footer{display:none}
 .shift-table.dummy-layout tbody tr:not(.group) td:nth-child(n+5){
  width:82px!important;min-width:82px!important;max-width:82px!important;
 }
-.shift-table.dummy-layout thead tr:first-child th:nth-child(5),
-.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(5){
- position:static!important;left:auto!important;background:inherit;
+/* The fifth column in the dummy roster is December 1, not a pinned metric.
+   Restore the same weekday/date backgrounds used from December 2 onward. */
+.shift-table.dummy-layout thead tr:first-child th:nth-child(5).day-heading{
+ position:sticky!important;top:0!important;left:auto!important;right:auto!important;
+ background:#deebf8!important;z-index:8!important;
 }
+.shift-table.dummy-layout thead tr.daily-totals th:first-child.day-total{
+ background:#eff5fc!important;
+}
+.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(5){
+ position:static!important;left:auto!important;right:auto!important;z-index:auto!important;
+ background:#faf4f6!important;
+}
+.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(5).saturday{background:#f1f7ff!important}
+.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(5).sunday,
+.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(5).holiday{background:#fff2f3!important}
+.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(5).today{background:#d7e9fa!important}
 
 /* A copied time gives inline confirmation without moving the monthly table. */
 .shift-table .copy-exa{position:relative;transition:background-color .15s,border-color .15s,color .15s}
