@@ -919,9 +919,9 @@ const cellClasses=[group==="dummy"?"dummy":"",day===today()?"today":"",dayType(d
 html+='<td class="'+cellClasses+'">';
 if(r?.is_pre_off)html+="<strong class='pre-off-label'>事前</strong>";
 else if(r&&past&&group==="real"&&!r.is_dummy_shift)html+='<button type="button" class="edit-count '+(absence.has(t.exa_id+"|"+day)?"absent-entry":"")+'" data-id="'+t.exa_id+'" data-date="'+day+'">'+(absence.has(t.exa_id+"|"+day)?"当欠":value===undefined?"＋":value)+'</button>';
+else if(r&&group==="dummy")html+=safe(range(r));
 else if(r&&!past)html+=safe(range(r));
-else if(r&&past&&group==="dummy")html+="—";
-else if(r&&past&&r.is_dummy_shift)html+="—";
+else if(r&&past&&r.is_dummy_shift)html+=safe(range(r));
 else html+='<small> </small>';
 html+="</td>";
 }
