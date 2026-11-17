@@ -210,13 +210,8 @@ footer{display:none}
 .shift-table .copy-exa:hover{background:#d4eafd;border-color:#5f9dca}
 .shift-table .copy-exa.copy-pair{font-size:10px}
 
-/* December dummy shifts: keep start and end on separate lines within each day. */
-.shift-table.dummy-layout .dec-plan-shift{
- display:inline-flex!important;flex-direction:column;align-items:center;justify-content:center;
- box-sizing:border-box;max-width:100%;padding:1px 2px;
- font-size:10px!important;line-height:1.18;white-space:normal!important;overflow:hidden!important;
-}
-.shift-table.dummy-layout .dec-plan-shift .plan-time{display:block;white-space:nowrap;font-variant-numeric:tabular-nums}
+/* December draft times match November time notation and column widths. */
+.shift-table.dummy-layout .dec-plan-shift{display:inline-block!important;box-sizing:border-box;max-width:100%;padding:1px 2px;font-size:10px!important;line-height:1.4;white-space:nowrap!important;overflow:hidden!important}
 .shift-table.dummy-layout tbody tr:not(.group) td:nth-child(n+5){overflow:hidden!important}
 /* Dummy view has three metric columns, not four. */
 .shift-table.dummy-layout thead tr:first-child th.day-heading,
@@ -986,9 +981,9 @@ const cellClasses=[group==="dummy"?"dummy":"",day===today()?"today":"",dayType(d
 html+='<td class="'+cellClasses+'">';
 if(r?.is_pre_off)html+="<strong class='pre-off-label'>事前</strong>";
 else if(planned){
- const planText=exaFourDigit(planned.start).replace(/^(\d{2})(\d{2})$/,"$1:$2")+"〜"+exaFourDigit(planned.end).replace(/^(\d{2})(\d{2})$/,"$1:$2");
+ const planText=range({start_minutes:planned.start,end_minutes:planned.end});
  if(r) html+='<span class="dec-exa-shift" title="EXA登録済み">'+safe(range(r))+'</span><span class="dec-plan-sub" title="12月参考案">案 '+safe(planText)+'</span>';
- else html+='<span class="dec-plan-shift" title="EXA未登録・入力参考案：'+safe(planText)+'"><span class="plan-time">'+safe(exaFourDigit(planned.start).slice(0,2)+":"+exaFourDigit(planned.start).slice(2))+'</span><span class="plan-time">〜'+safe(exaFourDigit(planned.end).slice(0,2)+":"+exaFourDigit(planned.end).slice(2))+'</span></span>';
+ else html+='<span class="dec-plan-shift" title="EXA未登録・入力参考案：'+safe(planText)+'">案'+safe(planText)+'</span>';
 }
 else if(r&&past&&group==="real"&&!r.is_dummy_shift)html+='<button type="button" class="edit-count '+(absence.has(t.exa_id+"|"+day)?"absent-entry":"")+'" data-id="'+t.exa_id+'" data-date="'+day+'">'+(absence.has(t.exa_id+"|"+day)?"当欠":value===undefined?"＋":value)+'</button>';
 else if(r&&group==="dummy")html+=safe(range(r));
