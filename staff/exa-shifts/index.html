@@ -938,8 +938,17 @@ if(staffView==="dummy")html+='<th class="stat-heading" rowspan="2">登録曜日<
 else html+='<th class="stat-heading" rowspan="2">稼働</th><th class="stat-heading" rowspan="2">出勤</th><th class="stat-heading" rowspan="2">無報</th><th class="stat-heading" rowspan="2">評価</th>';
 for(let n=1;n<=daysIn();n++){const d=dayStr(n),kind=dayType(d);html+='<th class="day-heading '+kind+(d===today()?" today-marker":"")+'"><button type="button" data-day="'+d+'">'+n+'日</button></th>';}
 html+='</tr><tr class="daily-totals">';
-for(let n=1;n<=daysIn();n++){const d=dayStr(n),kind=dayType(d);const suggested=isDecemberPlan?dummy.filter(t=>decemberDummyPlan(t.exa_id,d)).length:0;
- html+='<th class="day-total '+kind+(d===today()?" today-marker":"")+'" title="EXA保存済み出勤人数／参考案は別集計">'+dayCounts.get(d)[staffView]+'人'+(isDecemberPlan&&staffView!=="real"?'<span class="dec-plan-count">案'+suggested+'人</span>':'')+'</th>'; }
+for(let n=1;n<=daysIn();n++){
+ const d=dayStr(n),kind=dayType(d);
+ const saved=dayCounts.get(d);
+ // In December, count the union of saved shifts and visible dummy placements.
+ // This affects only the monthly display, never EXA records or performance totals.
+ const savedDummyIds=new Set(shifts.filter(x=>x.work_date===d&&rosterIds.has(x.exa_id)&&!x.is_pre_off&&!absence.has(x.exa_id+"|"+d)&&(x.is_dummy_shift||isDummy(existing.get(x.exa_id)||{}))).map(x=>x.exa_id));
+ const plannedDummyIds=isDecemberPlan?dummy.filter(t=>decemberDummyPlan(t.exa_id,d)).map(t=>t.exa_id):[];
+ const visibleDummyCount=isDecemberPlan?new Set([...savedDummyIds,...plannedDummyIds]).size:saved.dummy;
+ const shownCount=staffView==="real"?saved.real:staffView==="dummy"?visibleDummyCount:saved.real+visibleDummyCount;
+ html+='<th class="day-total '+kind+(d===today()?" today-marker":"")+'">'+shownCount+'人</th>';
+}
 html+='</tr></thead><tbody>';
 for(const [label,list,group] of [["在籍",real,"real"],["退店",dummy,"dummy"]]){if(staffView!=="all"&&staffView!==group)continue;
 if(staffView==="all")html+='<tr class="group"><td colspan="'+(daysIn()+5)+'">'+label+"（"+list.length+"名）</td></tr>";
