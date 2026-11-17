@@ -946,16 +946,18 @@ const survey=surveyScores.find(x=>x.sheet_person_id===surveyId);
 const responseCount=survey?.response_count??0;
 // 最新のアンケートを優先。未集計の場合のみ過去の採点控えを表示（回答数を合算しない）。
 const latestCount=Number(survey?.response_count||0);
-const latestScore=latestCount>0&&survey?.score_100!=null&&Number.isFinite(Number(survey.score_100))?Number(survey.score_100):null;
+// 全区分共通：回答3件以上のみ公開評価を表示。1〜2件の参考点数も出勤表には表示しない。
+// 最新集計に回答がある場合は旧基準へのフォールバックを禁止し、古い評価への巻き戻りを防止。
+const latestScore=latestCount>=3&&survey?.score_100!=null&&Number.isFinite(Number(survey.score_100))?Number(survey.score_100):null;
 const historicalCount=Number(t.historical_survey_count||0);
-const historicalScore=historicalCount>0&&t.historical_survey_score!=null&&Number.isFinite(Number(t.historical_survey_score))?Number(t.historical_survey_score):null;
+const historicalScore=historicalCount>=3&&t.historical_survey_score!=null&&Number.isFinite(Number(t.historical_survey_score))?Number(t.historical_survey_score):null;
 const usingCurrent=latestScore!==null;
-const evaluation=usingCurrent?latestScore:historicalScore;
-const effectiveCount=usingCurrent?latestCount:historicalCount;
-const provisional=evaluation!==null&&effectiveCount<3;
-const scoreClass=evaluation===null?"":provisional?"score-provisional":evaluation>=95?"score-high":"score-low";
-const scoreText=evaluation===null?"—":evaluation.toFixed(1)+(provisional?"※":"");
-const scoreTitle=evaluation===null?"評価回答なし":(usingCurrent?"最新アンケート":"過去採点控え（2026-11-07保存・最新と合算なし）")+"／回答"+effectiveCount+"件／平均"+evaluation.toFixed(1)+"点"+(provisional?"／3件未満の参考値":"");
+const evaluation=usingCurrent?latestScore:(latestCount===0?historicalScore:null);
+const effectiveCount=usingCurrent?latestCount:(latestCount===0?historicalCount:latestCount);
+const provisional=false;
+const scoreClass=evaluation===null?"":evaluation>=95?"score-high":"score-low";
+const scoreText=evaluation===null?"—":evaluation.toFixed(1);
+const scoreTitle=evaluation===null?(effectiveCount>0?"回答"+effectiveCount+"件：3件未満のため評価非表示":"評価回答なし"):(usingCurrent?"最新アンケート":"過去採点控え（2026-11-07保存・最新と合算なし）")+"／回答"+effectiveCount+"件／平均"+evaluation.toFixed(1)+"点";
 
 
 html+='<tr class="'+(outside?'outside-roster':'')+'"><td class="staff-name '+categoryClass+'"><button type="button" class="name-editor" data-staff-id="'+t.exa_id+'" title="出勤管理区分を変更">'+safe(stageName)+'</button><span class="staff-exa-id" title="EXA管理ID">ID '+t.exa_id+'</span>'+(kana?'<span class="reading">'+safe(kana)+'</span>':'')+((group==="dummy"&&staffView==="dummy"&&evaluation!==null)?'<span class="historical-score-inline '+(provisional?'provisional':'')+'" title="'+safe(scoreTitle)+'">評価 '+safe(scoreText)+' <small>('+effectiveCount+'件)</small></span>':'')+'</td>';
