@@ -193,6 +193,9 @@ footer{display:none}
 .shift-table .dec-plan-sub{display:block;color:#9a7027;font-size:9px;white-space:nowrap}
 .dec-plan-notice{font-size:12px;background:#fff8e9;border:1px solid #e2c389;padding:6px 10px;margin:5px 0 8px;border-radius:5px;color:#65450f}
 .shift-table th .dec-plan-count{display:block;font-size:9px;color:#996b1f;font-weight:400;white-space:nowrap}
+.shift-table .historical-score-inline{display:block;font-size:10px;color:#44536c;margin-top:2px;white-space:nowrap}
+.shift-table .historical-score-inline.provisional{color:#8b795d}
+.shift-table td.score-provisional{background:#f3f3f2;color:#7a7163}
 /* Dummy EXA paste helpers, independent of public therapist pages. */
 .shift-table.dummy-layout thead tr:first-child th:nth-child(2),
 .shift-table.dummy-layout tbody tr:not(.group) td:nth-child(2){width:100px!important;min-width:100px!important;left:116px!important}
@@ -816,7 +819,7 @@ async function load(){
 if(!authorized)return;showMsg("Supabaseを読み込み中…");
 const start=month+"-01",end=dayStr(daysIn());
 const responses=staffReadOnly?(await staffRead("shift",{store:"rose",month})).rows.map(data=>({data,error:null})):await Promise.all([
-client.from("exa_shift_therapists").select("exa_id,stage_name,residency,employment_status,operating_category,evaluation_score").eq("store_code","rose"),
+client.from("exa_shift_therapists").select("exa_id,stage_name,residency,employment_status,operating_category,evaluation_score,historical_survey_count,historical_survey_score,historical_survey_source").eq("store_code","rose"),
 client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_dummy_shift,is_pre_off").eq("store_code","rose").gte("work_date",start).lte("work_date",end).order("work_date"),
 client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code","rose").gte("work_date",start).lte("work_date",end),
 client.from("exa_shift_sync_runs").select("finished_at,record_count,mode").eq("store_code","rose").eq("state","success").order("finished_at",{ascending:false}).limit(1),
@@ -923,7 +926,23 @@ for(let n=1;n<=daysIn();n++){const d=dayStr(n),kind=dayType(d);const suggested=i
  html+='<th class="day-total '+kind+(d===today()?" today-marker":"")+'" title="EXA保存済み出勤人数／参考案は別集計">'+dayCounts.get(d)[staffView]+'人'+(isDecemberPlan&&staffView!=="real"?'<span class="dec-plan-count">案'+suggested+'人</span>':'')+'</th>'; }
 html+='</tr></thead><tbody>';
 for(const [label,list,group] of [["在籍",real,"real"],["退店",dummy,"dummy"]]){if(staffView!=="all"&&staffView!==group)continue;
-if(staffView==="all")html+='<tr class="group"><td colspan="'+(daysIn()+5)+'">'+label+"（"+list.length+"名）</td></tr>";
+if(staffView==="all")const surveyId=surveyLinks.find(l=>l.exa_id===t.exa_id)?.sheet_person_id;
+const survey=surveyScores.find(x=>x.sheet_person_id===surveyId);
+const responseCount=survey?.response_count??0;
+// 最新のアンケートを優先。未集計の場合のみ過去の採点控えを表示（回答数を合算しない）。
+const latestCount=Number(survey?.response_count||0);
+const latestScore=latestCount>0&&survey?.score_100!=null&&Number.isFinite(Number(survey.score_100))?Number(survey.score_100):null;
+const historicalCount=Number(t.historical_survey_count||0);
+const historicalScore=historicalCount>0&&t.historical_survey_score!=null&&Number.isFinite(Number(t.historical_survey_score))?Number(t.historical_survey_score):null;
+const usingCurrent=latestScore!==null;
+const evaluation=usingCurrent?latestScore:historicalScore;
+const effectiveCount=usingCurrent?latestCount:historicalCount;
+const provisional=evaluation!==null&&effectiveCount<3;
+const scoreClass=evaluation===null?"":provisional?"score-provisional":evaluation>=95?"score-high":"score-low";
+const scoreText=evaluation===null?"—":evaluation.toFixed(1)+(provisional?"※":"");
+const scoreTitle=evaluation===null?"評価回答なし":(usingCurrent?"最新アンケート":"過去採点控え（2026-11-07保存・最新と合算なし）")+"／回答"+effectiveCount+"件／平均"+evaluation.toFixed(1)+"点"+(provisional?"／3件未満の参考値":"");
+
+html+='<tr class="group"><td colspan="'+(daysIn()+5)+'">'+label+"（"+list.length+"名）</td></tr>";
 for(const t of list){const entries=byId.get(t.exa_id)||new Map(),valid=[...entries.values()].filter(r=>r.work_date<today()&&(!isDummy(t))&&!r.is_dummy_shift&&per.has(t.exa_id+"|"+r.work_date));const historical=historyPerformances.filter(p=>p.exa_id===t.exa_id&&p.attendance_status!=="absent");const avg=historical.length?(historical.reduce((sum,p)=>sum+p.customer_count,0)/historical.length).toFixed(1):"—";
 const rawName=String(t.stage_name||"ID "+t.exa_id);
 const nameParts=rawName.match(/^(.+?)-([^-]+)-$/);
@@ -938,14 +957,7 @@ const lastKnownDate=latestDates.length?latestDates[latestDates.length-1]:null;
 const days=[...entries.values()].filter(r=>!r.is_dummy_shift&&!r.is_pre_off&&!absence.has(t.exa_id+"|"+r.work_date)).length;
 const zeros=valid.filter(r=>!absence.has(t.exa_id+"|"+r.work_date)&&per.get(t.exa_id+"|"+r.work_date)===0).length;
 const categoryClass={provisional_hidden:"state-provisional",pending_documents:"state-paperwork",long_leave:"state-leave",dummy_use:"state-dummy"}[t.operating_category]||(group==="dummy"?"state-dummy":"");
-html+='<tr class="'+(outside?'outside-roster':'')+'"><td class="staff-name '+categoryClass+'"><button type="button" class="name-editor" data-staff-id="'+t.exa_id+'" title="出勤管理区分を変更">'+safe(stageName)+'</button><span class="staff-exa-id" title="EXA管理ID">ID '+t.exa_id+'</span>'+(kana?'<span class="reading">'+safe(kana)+'</span>':'')+'</td>';
-const surveyId=surveyLinks.find(l=>l.exa_id===t.exa_id)?.sheet_person_id;
-const survey=surveyScores.find(x=>x.sheet_person_id===surveyId);
-const responseCount=survey?.response_count??0;
-const evaluation=responseCount>=3&&survey?.score_100!==null&&Number.isFinite(Number(survey?.score_100))?Number(survey.score_100):null;
-const scoreClass=evaluation===null?"":evaluation>=95?"score-high":"score-low";
-const scoreText=evaluation===null?"—":evaluation.toFixed(1);
-const scoreTitle=!survey?"アンケート未連携":responseCount<=2?"回答数 "+responseCount+"件：3件未満のため点数非表示":"回答数 "+responseCount+"件／アンケート平均（100点満点）";
+html+='<tr class="'+(outside?'outside-roster':'')+'"><td class="staff-name '+categoryClass+'"><button type="button" class="name-editor" data-staff-id="'+t.exa_id+'" title="出勤管理区分を変更">'+safe(stageName)+'</button><span class="staff-exa-id" title="EXA管理ID">ID '+t.exa_id+'</span>'+(kana?'<span class="reading">'+safe(kana)+'</span>':'')+((group==="dummy"&&staffView==="dummy"&&evaluation!==null)?'<span class="historical-score-inline '+(provisional?'provisional':'')+'" title="'+safe(scoreTitle)+'">評価 '+safe(scoreText)+' <small>('+effectiveCount+'件)</small></span>':'')+'</td>';
 if(staffView==="dummy"){
  const reference=isDecemberPlan?decemberDummyPattern(t.exa_id):null;
  const pattern=reference||dummyPattern(t.exa_id);
