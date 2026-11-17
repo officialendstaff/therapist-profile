@@ -631,7 +631,7 @@ header.lg-common-header .lg-header-home{font-size:17px!important;font-weight:700
 
 <p id="message" class="muted" role="status" aria-live="polite"></p>
 
-<div class="panel monthly-panel"><div class="row space month-heading"><h2>月間シフト</h2><div class="shift-status-legend" aria-label="区分別配色の凡例"><span><i class="swatch provisional"></i>仮登</span><span><i class="swatch paperwork"></i>書類</span><span><i class="swatch leave"></i>長休</span><span><i class="swatch outside"></i>実外</span><span><i class="swatch dummy"></i>ダミー</span></div><div class="staff-filter" role="group" aria-label="表示区分"><button type="button" data-show-staff="real" class="active">在籍</button><button type="button" data-show-staff="dummy">退店</button><button type="button" data-show-staff="all">全件</button></div></div><div id="decPlanNotice" class="dec-plan-notice" hidden>2026年12月 ダミー参考配置案（EXA未登録）｜点線「案」＝入力参考・EXA実績には含まれません。EXA入力後は登録時間を上段に表示。12月31日は店休日のため参考配置なし。</div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
+<div class="panel monthly-panel"><div class="row space month-heading"><h2>月間シフト</h2><div class="shift-status-legend" aria-label="区分別配色の凡例"><span><i class="swatch provisional"></i>仮登</span><span><i class="swatch paperwork"></i>書類</span><span><i class="swatch leave"></i>長休</span><span><i class="swatch outside"></i>実外</span><span><i class="swatch dummy"></i>ダミー</span></div><div class="staff-filter" role="group" aria-label="表示区分"><button type="button" data-show-staff="real" class="active">在籍</button><button type="button" data-show-staff="dummy">退店</button><button type="button" data-show-staff="all">全件</button></div></div><div id="decPlanNotice" hidden></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
 <div id="residencyModal" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="residencyTitle">
 <div id="residencyShade" class="day-modal-shade"></div>
 <div class="panel residency-dialog therapist-detail-dialog">
@@ -839,7 +839,7 @@ therapists=(a.data||[]).filter(t=>rosterIds.has(Number(t.exa_id)));shifts=b.data
 surveyScores=sv.data||[];surveyLinks=sl.data||[];
 $("monthLabel").textContent=month.replace("-","年")+"月";
 $("message").textContent="";
-$("decPlanNotice").hidden=month!=="2026-12";
+$("decPlanNotice").hidden=true;
 renderMonthly();renderDay();}
 // 2026-2027 public holidays/observed holidays from the Cabinet Office list.
 const japanHolidayDates=new Set((
