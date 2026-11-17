@@ -210,6 +210,13 @@ footer{display:none}
 .shift-table .copy-exa:hover{background:#d4eafd;border-color:#5f9dca}
 .shift-table .copy-exa.copy-pair{font-size:10px}
 
+/* Keep the complete start/end time visible in December dummy schedule cells. */
+.shift-table.dummy-layout thead tr:first-child th.day-heading,
+.shift-table.dummy-layout thead tr.daily-totals th.day-total,
+.shift-table.dummy-layout tbody tr:not(.group) td:nth-child(n+5){
+  width:142px!important;min-width:142px!important;max-width:142px!important;
+}
+.shift-table.dummy-layout .dec-plan-shift{font-size:11px;white-space:nowrap;overflow:visible;letter-spacing:0}
 /* Dummy view has three metric columns, not four. */
 .shift-table.dummy-layout thead tr:first-child th.day-heading,
 .shift-table.dummy-layout thead tr.daily-totals th.day-total,
@@ -978,7 +985,7 @@ const cellClasses=[group==="dummy"?"dummy":"",day===today()?"today":"",dayType(d
 html+='<td class="'+cellClasses+'">';
 if(r?.is_pre_off)html+="<strong class='pre-off-label'>事前</strong>";
 else if(planned){
- const planText=range({start_minutes:planned.start,end_minutes:planned.end});
+ const planText=exaFourDigit(planned.start).replace(/^(\d{2})(\d{2})$/,"$1:$2")+"〜"+exaFourDigit(planned.end).replace(/^(\d{2})(\d{2})$/,"$1:$2");
  if(r) html+='<span class="dec-exa-shift" title="EXA登録済み">'+safe(range(r))+'</span><span class="dec-plan-sub" title="12月参考案">案 '+safe(planText)+'</span>';
  else html+='<span class="dec-plan-shift" title="EXA未登録・入力参考案">案 '+safe(planText)+'</span>';
 }
