@@ -188,6 +188,11 @@ footer{display:none}
   z-index:8!important;
 }
 .residency-dialog{position:relative;z-index:1;width:410px;max-width:90vw;padding:22px}.residency-dialog h2{margin:0 0 12px;font-size:19px}.residency-dialog label{display:block;margin:14px 0 7px;font-size:13px;font-weight:700}.residency-dialog select{width:100%;padding:11px;border:1px solid #b6c6d8;border-radius:7px;background:#fff}.staff-name .name-editor{border:none;background:none;padding:0;color:inherit;font-weight:700;font-size:14px;text-align:left;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px}.staff-name .name-editor:hover,.staff-name .name-editor:focus-visible{color:#2466a3;text-decoration-color:#2466a3;outline-offset:2px}.staff-name .name-editor:after{content:" ✎";font-size:10px;color:#8299ad}
+.shift-table .dec-plan-shift{display:inline-block;background:#fff7e5;border:1px dashed #d5a045;color:#795112;border-radius:4px;padding:1px 3px;font-size:10px;line-height:1.4;white-space:nowrap}
+.shift-table .dec-exa-shift{display:block;font-size:10px;font-weight:600;white-space:nowrap}
+.shift-table .dec-plan-sub{display:block;color:#9a7027;font-size:9px;white-space:nowrap}
+.dec-plan-notice{font-size:12px;background:#fff8e9;border:1px solid #e2c389;padding:6px 10px;margin:5px 0 8px;border-radius:5px;color:#65450f}
+.shift-table th .dec-plan-count{display:block;font-size:9px;color:#996b1f;font-weight:400;white-space:nowrap}
 /* Dummy EXA paste helpers, independent of public therapist pages. */
 .shift-table.dummy-layout thead tr:first-child th:nth-child(2),
 .shift-table.dummy-layout tbody tr:not(.group) td:nth-child(2){width:100px!important;min-width:100px!important;left:116px!important}
@@ -623,7 +628,7 @@ header.lg-common-header .lg-header-home{font-size:17px!important;font-weight:700
 
 <p id="message" class="muted" role="status" aria-live="polite"></p>
 
-<div class="panel monthly-panel"><div class="row space month-heading"><h2>月間シフト</h2><div class="shift-status-legend" aria-label="区分別配色の凡例"><span><i class="swatch provisional"></i>仮登</span><span><i class="swatch paperwork"></i>書類</span><span><i class="swatch leave"></i>長休</span><span><i class="swatch outside"></i>実外</span><span><i class="swatch dummy"></i>ダミー</span></div><div class="staff-filter" role="group" aria-label="表示区分"><button type="button" data-show-staff="real" class="active">在籍</button><button type="button" data-show-staff="dummy">退店</button><button type="button" data-show-staff="all">全件</button></div></div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
+<div class="panel monthly-panel"><div class="row space month-heading"><h2>月間シフト</h2><div class="shift-status-legend" aria-label="区分別配色の凡例"><span><i class="swatch provisional"></i>仮登</span><span><i class="swatch paperwork"></i>書類</span><span><i class="swatch leave"></i>長休</span><span><i class="swatch outside"></i>実外</span><span><i class="swatch dummy"></i>ダミー</span></div><div class="staff-filter" role="group" aria-label="表示区分"><button type="button" data-show-staff="real" class="active">在籍</button><button type="button" data-show-staff="dummy">退店</button><button type="button" data-show-staff="all">全件</button></div></div><div id="decPlanNotice" class="dec-plan-notice" hidden>2026年12月 ダミー参考配置案（EXA未登録）｜点線「案」＝入力参考・EXA実績には含まれません。EXA入力後は登録時間を上段に表示。12月31日は店休日のため参考配置なし。</div><div class="table-scroll"><table class="shift-table" id="monthly"></table></div></div>
 <div id="residencyModal" class="day-modal hide" role="dialog" aria-modal="true" aria-labelledby="residencyTitle">
 <div id="residencyShade" class="day-modal-shade"></div>
 <div class="panel residency-dialog therapist-detail-dialog">
@@ -831,6 +836,7 @@ therapists=(a.data||[]).filter(t=>rosterIds.has(Number(t.exa_id)));shifts=b.data
 surveyScores=sv.data||[];surveyLinks=sl.data||[];
 $("monthLabel").textContent=month.replace("-","年")+"月";
 $("message").textContent="";
+$("decPlanNotice").hidden=month!=="2026-12";
 renderMonthly();renderDay();}
 // 2026-2027 public holidays/observed holidays from the Cabinet Office list.
 const japanHolidayDates=new Set((
@@ -856,6 +862,40 @@ function dummyPattern(id){
   multiple:times.length>1
  };
 }
+// 2026年12月のみのEXA入力参考案。EXA実データへの書き込み・実績集計への算入はしない。
+const DEC_2026_DUMMY_PLAN={
+ 134:{days:[1,3,0],start:600,end:1080}, // 綾瀬
+ 201:{days:[2,4,0],start:600,end:1080}, // 紅月
+ 111:{days:[1,5,0],start:630,end:1140}, // 石川
+ 167:{days:[2,3,6],start:660,end:1140}, // 春日
+ 173:{days:[1,4,0],start:690,end:1200}, // 神崎
+ 41:{days:[1,3,0],start:720,end:1260}, // 更科
+ 42:{days:[2,5,0],start:840,end:1380}, // 結城
+ 66:{days:[1,4],start:780,end:1320}, // 明希
+ 75:{days:[2,3,0],start:900,end:1440}, // 如月
+ 89:{days:[1,5],start:960,end:1500}, // 宇佐美
+ 129:{days:[3,6],start:780,end:1320}, // 松嶋
+ 142:{days:[2,0],start:1020,end:1560}, // 葉月
+ 143:{days:[1,3],start:1080,end:1620}, // 松岡
+ 164:{days:[2,4],start:720,end:1260}, // 流川
+ 166:{days:[3,0],start:1140,end:1680}, // 中村
+ 174:{days:[1,6],start:840,end:1380}, // 一色
+ 176:{days:[2,5],start:1140,end:1680}, // 松山
+ 189:{days:[3,4],start:1080,end:1620}, // 藤咲
+ 192:{days:[4,0],start:1080,end:1620}, // 水原
+ 196:{days:[2,6],start:1200,end:1680} // 神田
+};
+function decemberDummyPlan(id,date){
+ if(month!=="2026-12"||date==="2026-12-31")return null;
+ const rule=DEC_2026_DUMMY_PLAN[id];
+ return rule&&rule.days.includes(new Date(date+"T00:00:00Z").getUTCDay())?rule:null;
+}
+function decemberDummyPattern(id){
+ const rule=DEC_2026_DUMMY_PLAN[id];
+ if(!rule)return null;
+ const weekdays=[...rule.days].sort((a,b)=>(a+6)%7-(b+6)%7).map(d=>weekdayNames[d]).join("・");
+ return {weekdays,start:exaFourDigit(rule.start),end:exaFourDigit(rule.end)};
+}
 let staffView="real";
 function renderMonthly(){
 const existing=staffById(), byId=new Map();
@@ -872,13 +912,15 @@ for(let n=1;n<=daysIn();n++){
  const dummyTotal=r.filter(x=>rosterIds.has(x.exa_id)&&existing.get(x.exa_id)?.operating_category!=="not_used"&&(x.is_dummy_shift||isDummy(existing.get(x.exa_id)||{}))&&!x.is_pre_off&&!absence.has(x.exa_id+"|"+date)).length;
  dayCounts.set(date,{real:active,dummy:dummyTotal,all:active+dummyTotal});
 }
+const isDecemberPlan=month==="2026-12";
 const countHeader=staffView==="real"?"在籍（"+real.length+"名）":staffView==="dummy"?"退店（"+dummy.length+"名）":"在籍（"+real.length+"名）／退店（"+dummy.length+"名）";
 let html='<thead><tr><th class="staff-heading" rowspan="2"><span>'+countHeader+'</span></th>';
 if(staffView==="dummy")html+='<th class="stat-heading" rowspan="2">登録曜日</th><th class="stat-heading" rowspan="2">出勤</th><th class="stat-heading" rowspan="2">退勤</th>';
 else html+='<th class="stat-heading" rowspan="2">稼働</th><th class="stat-heading" rowspan="2">出勤</th><th class="stat-heading" rowspan="2">無報</th><th class="stat-heading" rowspan="2">評価</th>';
 for(let n=1;n<=daysIn();n++){const d=dayStr(n),kind=dayType(d);html+='<th class="day-heading '+kind+(d===today()?" today-marker":"")+'"><button type="button" data-day="'+d+'">'+n+'日</button></th>';}
 html+='</tr><tr class="daily-totals">';
-for(let n=1;n<=daysIn();n++){const d=dayStr(n),kind=dayType(d);html+='<th class="day-total '+kind+(d===today()?" today-marker":"")+'" title="その日の出勤人数">'+dayCounts.get(d)[staffView]+'人</th>';}
+for(let n=1;n<=daysIn();n++){const d=dayStr(n),kind=dayType(d);const suggested=isDecemberPlan?dummy.filter(t=>decemberDummyPlan(t.exa_id,d)).length:0;
+ html+='<th class="day-total '+kind+(d===today()?" today-marker":"")+'" title="EXA保存済み出勤人数／参考案は別集計">'+dayCounts.get(d)[staffView]+'人'+(isDecemberPlan&&staffView!=="real"?'<span class="dec-plan-count">案'+suggested+'人</span>':'')+'</th>'; }
 html+='</tr></thead><tbody>';
 for(const [label,list,group] of [["在籍",real,"real"],["退店",dummy,"dummy"]]){if(staffView!=="all"&&staffView!==group)continue;
 if(staffView==="all")html+='<tr class="group"><td colspan="'+(daysIn()+5)+'">'+label+"（"+list.length+"名）</td></tr>";
@@ -905,19 +947,26 @@ const scoreClass=evaluation===null?"":evaluation>=95?"score-high":"score-low";
 const scoreText=evaluation===null?"—":evaluation.toFixed(1);
 const scoreTitle=!survey?"アンケート未連携":responseCount<=2?"回答数 "+responseCount+"件：3件未満のため点数非表示":"回答数 "+responseCount+"件／アンケート平均（100点満点）";
 if(staffView==="dummy"){
- const pattern=dummyPattern(t.exa_id);
+ const reference=isDecemberPlan?decemberDummyPattern(t.exa_id):null;
+ const pattern=reference||dummyPattern(t.exa_id);
  const timeButton=(v,label)=>v?'<button type="button" class="copy-exa" data-copy-exa="'+v+'" title="'+label+' '+v+' をコピー">'+v+'</button>':'—';
- html+='<td class="stat-cell weekday-cell" title="保存済みシフトから抽出した曜日">'+safe(pattern.weekdays)+'</td>';
+ html+='<td class="stat-cell weekday-cell" title="'+(reference?"12月EXA入力参考曜日（未登録）":"保存済みシフトから抽出した曜日")+'">'+safe(pattern.weekdays)+'</td>';
  html+='<td class="stat-cell">'+timeButton(pattern.start,"出勤")+'</td>';
  html+='<td class="stat-cell">'+timeButton(pattern.end,"退勤")+'</td>';
 }else{
  html+='<td class="stat-cell"><strong>'+avg+'</strong></td><td class="stat-cell">'+days+'</td><td class="stat-cell '+(zeros>0?'unpaid-positive':'')+'">'+zeros+'</td><td class="stat-cell '+scoreClass+'" title="'+safe(scoreTitle)+'">'+scoreText+'</td>';
 }
 for(let n=1;n<=daysIn();n++){const day=dayStr(n),r=entries.get(day),value=per.get(t.exa_id+"|"+day),past=day<today();
+const planned=group==="dummy"?decemberDummyPlan(t.exa_id,day):null;
 const cellClasses=[group==="dummy"?"dummy":"",day===today()?"today":"",dayType(day),
  lastKnownDate===day?"last-scheduled":"",r?.is_pre_off?"pre-off":"",outside?"outside-cell":""].filter(Boolean).join(" ");
 html+='<td class="'+cellClasses+'">';
 if(r?.is_pre_off)html+="<strong class='pre-off-label'>事前</strong>";
+else if(planned){
+ const planText=range({start_minutes:planned.start,end_minutes:planned.end});
+ if(r) html+='<span class="dec-exa-shift" title="EXA登録済み">'+safe(range(r))+'</span><span class="dec-plan-sub" title="12月参考案">案 '+safe(planText)+'</span>';
+ else html+='<span class="dec-plan-shift" title="EXA未登録・入力参考案">案 '+safe(planText)+'</span>';
+}
 else if(r&&past&&group==="real"&&!r.is_dummy_shift)html+='<button type="button" class="edit-count '+(absence.has(t.exa_id+"|"+day)?"absent-entry":"")+'" data-id="'+t.exa_id+'" data-date="'+day+'">'+(absence.has(t.exa_id+"|"+day)?"当欠":value===undefined?"＋":value)+'</button>';
 else if(r&&group==="dummy")html+=safe(range(r));
 else if(r&&!past)html+=safe(range(r));
