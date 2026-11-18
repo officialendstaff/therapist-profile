@@ -3118,17 +3118,13 @@ html.personal-mobile-embed .lg-interview-account-popup{display:none!important}
    if(sessionStorage.getItem('mattan-recruit-auth')!==before)ok=await restore();
   }
   if(mobileEmbedded){if(!ok){const paneReason=message.textContent||'管理者プロフィールまたは認証セッションを取得できませんでした。';showEmbeddedAuthError();const pane=document.getElementById('personalMobileAuthError');if(pane){const reason=document.createElement('small');reason.textContent='確認内容：'+paneReason;reason.style.cssText='max-width:340px;overflow-wrap:anywhere;color:#667085';pane.append(reason)}}return}
-  dialog.classList.toggle('open',!ok);
-  if(ok&&new URLSearchParams(location.search).get('account')==='1'){
-   dialog.classList.add('open');
-   const url=new URL(location.href);url.searchParams.delete('account');
-   history.replaceState(history.state,'',url.pathname+url.search+url.hash);
-  }
+  if(!ok)location.replace('../management-top/');
+  dialog.classList.remove('open');
  }).catch(error=>{
   console.error('面接管理の認証復元:',error);
   message.textContent='認証状態を確認できませんでした。';
   if(mobileEmbedded)showEmbeddedAuthError();
-  else dialog.classList.add('open');
+  else location.replace('../management-top/');
  });
 })();
 </script>
