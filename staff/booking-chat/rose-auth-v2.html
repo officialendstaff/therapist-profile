@@ -753,7 +753,11 @@ function renderMessageLinks(element,body){
 function appendMessage(message){
  const el=document.createElement("div");el.className="bubble"+(message.sender==="staff"?" mine":"");
  renderMessageLinks(el,message.body);
- const time=document.createElement("span");time.textContent=(message.sender==="staff"?"スタッフ":"お客様")+"　"+labelTime(message.created_at);
+ const time=document.createElement("span");
+ const sender=message.sender==="staff"
+  ?("スタッフ："+(typeof message.staff_display_name==="string"&&message.staff_display_name.trim()?message.staff_display_name.trim():"送信者不明"))
+  :"お客様";
+ time.textContent=sender+"　"+labelTime(message.created_at);
  el.append(time);
  if(message.sender==="staff"){
   const button=document.createElement("button");
