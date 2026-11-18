@@ -267,7 +267,7 @@ body:has(.lg-interview-login:not(.hide):not(.hidden)) .page>.topbar{display:none
 </style></head>
 <body>
 <header><div class="brand">L GROUP<small>MANAGEMENT SYSTEM</small></div><div class="header-right"><span id="asOf">集計基準日 —</span><span id="userName"></span><button class="refresh hidden" id="refresh" type="button">情報更新</button><button id="logout" class="hidden">ログアウト</button></div></header>
-<div id="login" class="lg-interview-login hidden"><div class="auth-card"><aside class="auth-brand-panel" aria-hidden="true"><div class="auth-brand-top"><div class="auth-brand-symbol">L</div><div class="auth-brand-name">L GROUP<small>INTERNAL MANAGEMENT</small></div></div><div class="auth-brand-middle"><span class="auth-brand-kicker">STAFF MANAGEMENT SYSTEM</span><h1 class="auth-brand-title">L GROUP<br>MANAGEMENT.</h1><p class="auth-brand-description">日々の管理業務を、もっとスマートに。<br>すべての情報をひとつの場所で。</p></div><div class="auth-brand-bottom"><span>STAFF PORTAL</span><span>L GROUP © 2026</span></div></aside><div class="auth-form-panel"><p class="auth-eyebrow">WELCOME BACK</p><h2>総合管理ログイン</h2><div class="auth-mode-label"><span>管理者</span></div><form id="loginForm"><p class="auth-help">既存の管理者アカウントと同じID・PASSを使用します。</p><label for="email">ID（メールアドレス）<input id="email" type="email" autocomplete="username" required></label><label for="password">PASS<input id="password" type="password" autocomplete="current-password" required></label><div id="loginError" role="alert"></div><button type="submit">ログイン</button></form><p class="auth-footnote">AUTHORIZED PERSONNEL ONLY</p></div></div></div>
+<div id="login" class="lg-interview-login hidden"><div class="auth-card"><aside class="auth-brand-panel" aria-hidden="true"><div class="auth-brand-top"><div class="auth-brand-symbol">L</div><div class="auth-brand-name">L GROUP<small>INTERNAL MANAGEMENT</small></div></div><div class="auth-brand-middle"><span class="auth-brand-kicker">STAFF MANAGEMENT SYSTEM</span><h1 class="auth-brand-title">L GROUP<br>MANAGEMENT.</h1><p class="auth-brand-description">日々の管理業務を、もっとスマートに。<br>すべての情報をひとつの場所で。</p></div><div class="auth-brand-bottom"><span>STAFF PORTAL</span><span>L GROUP © 2026</span></div></aside><div class="auth-form-panel"><p class="auth-eyebrow">WELCOME BACK</p><h2>総合管理ログイン</h2><div class="auth-mode-label"><span>管理者</span></div><form id="loginForm"><p class="auth-help">登録済みの表示名を選択し、PASSを入力してください。</p><label for="staffSelect">スタッフ表示名<select id="staffSelect" required><option value="">読み込み中…</option></select></label><label for="password">PASS<input id="password" type="password" autocomplete="current-password" required></label><div id="loginError" role="alert"></div><button type="submit">ログイン</button></form><p class="auth-footnote">AUTHORIZED PERSONNEL ONLY</p></div></div></div>
 <main id="app" class="hidden">
  
  <h2 class="section-heading action-section-heading">本日の対応事項</h2>
@@ -545,12 +545,47 @@ async function refreshOnOperatingDateChange(){
 setInterval(()=>{void refreshOnOperatingDateChange()},15000);
 window.addEventListener("focus",()=>{void refreshOnOperatingDateChange()});
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)void refreshOnOperatingDateChange()});
-$("loginForm").addEventListener("submit",async e=>{e.preventDefault();if(!client)return;text($("loginError"),"確認中…");
- const r=await client.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});
- if(r.error){text($("loginError"),"ログインできません。入力内容をご確認ください。");return}
- await authorize();
+const staffLoginEndpoint=url+"/functions/v1/staff-display-login";
+async function staffLoginCall(payload){
+ const response=await fetch(staffLoginEndpoint,{method:"POST",headers:{"Content-Type":"application/json","apikey":key},body:JSON.stringify(payload),cache:"no-store"});
+ const result=await response.json().catch(()=>({}));
+ if(!response.ok||!result.ok)throw Error(result.error||"staff_login_failed");
+ return result;
+}
+async function loadStaffNames(){
+ const selector=$("staffSelect");
+ selector.replaceChildren(new Option("読み込み中…",""));
+ selector.disabled=true;
+ try{
+  const result=await staffLoginCall({action:"list"});
+  selector.replaceChildren(new Option("スタッフ名を選択してください",""));
+  for(const staff of result.staff||[]){
+   if(typeof staff.id==="string"&&typeof staff.name==="string")selector.add(new Option(staff.name,staff.id));
+  }
+  selector.disabled=false;
+  if(!(result.staff||[]).length)text($("loginError"),"利用可能なスタッフが登録されていません。");
+ }catch(err){
+  selector.replaceChildren(new Option("スタッフ一覧を取得できません",""));
+  text($("loginError"),"スタッフ一覧を読み込めません。ページを再読み込みしてください。");
+ }
+}
+$("loginForm").addEventListener("submit",async e=>{
+ e.preventDefault();if(!client)return;
+ const staffId=$("staffSelect").value,password=$("password").value;
+ if(!staffId||!password){text($("loginError"),"スタッフ名とPASSを入力してください。");return}
+ const submit=$("loginForm").querySelector('button[type="submit"]');
+ submit.disabled=true;text($("loginError"),"確認中…");
+ try{
+  const result=await staffLoginCall({action:"login",staff_id:staffId,password});
+  const signed=await client.auth.setSession({access_token:result.access_token,refresh_token:result.refresh_token});
+  if(signed.error||!signed.data.session)throw Error("session_failed");
+  $("password").value="";
+  await authorize();
+ }catch(e){text($("loginError"),"ログインできません。スタッフ名とPASSをご確認ください。")}
+ finally{submit.disabled=false}
 });
 $("logout").addEventListener("click",async()=>{await client.auth.signOut({scope:"local"});authorized=false;data={final_today:[],outside:[],birthday:[]};showLogin()});
+void loadStaffNames();
 authorize();
 })();
 </script></body></html>
