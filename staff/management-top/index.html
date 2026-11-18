@@ -393,7 +393,7 @@ async function authorize(){
  if(!staffOnly){
   const {data:assignment,error:assignmentError}=await client.rpc("interview_my_profile");
   const myAssignment=Array.isArray(assignment)?assignment[0]:assignment;
-  const key=!assignmentError&&["owner","president","ota","festival"].includes(myAssignment?.profile_key)?myAssignment.profile_key:null;
+  const key=!assignmentError&&["owner","president","ota","festival","nishii"].includes(myAssignment?.profile_key)?myAssignment.profile_key:null;
   if(key){
    pageCard.href="../manager-schedule/";
    pageCard.target="_blank";pageCard.rel="noopener noreferrer";
