@@ -402,6 +402,14 @@ async function poll(){
  catch(e){if(e.status===401){setReady(false);err("識別情報の有効期限が切れました。ページを再読み込みしてください。")}}
  finally{polling=false}
 }
+if(embedded){
+ window.addEventListener("message",event=>{
+  if(event.source!==window.parent||event.origin!==parentOrigin)return;
+  if(event.data?.type==="lgroup.chat.openProfile"&&event.data.store===store){
+   $("profileEditOpen").click();
+  }
+ });
+}
 $("profileEditOpen").addEventListener("click",async()=>{
  if(!ready||!token)return;
  $("profileEditPanel").hidden=false;$("profileEditMessage").textContent="読み込み中…";
