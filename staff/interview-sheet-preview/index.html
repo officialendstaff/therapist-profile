@@ -2781,11 +2781,17 @@ function renderChart(){ $('selectedDate').textContent=dateKey(selected);$('selec
 const reservedLabel=document.createElement('span');
 reservedLabel.className='staff-label';
 reservedLabel.textContent='ニシイ';
+reservedLabel.style.setProperty('background','#D8C3B4','important');
+reservedLabel.style.setProperty('border-color','#9C7865','important');
+reservedLabel.style.setProperty('color','#593E32','important');
 grid.append(reservedLabel);
 for(let i=0;i<28;i++){
  const reservedSlot=document.createElement('button');
  reservedSlot.type='button';
  reservedSlot.className='slot blocked'+([4,10,16,22].includes(i)?' time-divider':'');
+ reservedSlot.style.setProperty('background','#D8C3B4','important');
+ reservedSlot.style.setProperty('border','1px solid #9C7865','important');
+ reservedSlot.style.setProperty('color','#593E32','important');
  reservedSlot.disabled=true;
  reservedSlot.title='ニシイ：担当登録前';
  grid.append(reservedSlot);
