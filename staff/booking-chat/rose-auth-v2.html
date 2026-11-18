@@ -469,7 +469,7 @@ const API="https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/booking-chat";
 const LOGIN="https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access";
 const SESSION_KEY="interview_staff_session_v2";const $=id=>document.getElementById(id);
 const VAPID_PUBLIC="BCZ_hr99Ujmq2j1M5N8TSo0wP7l2kf62gbwl_Pugx3D3zeHHQHO9shM9HrNNFYN4Lcbmxr3Tjc-usFUPj4L_9UE";
-const SW_URL="/therapist-profile/staff/booking-chat/sw.js";
+const SW_URL="/therapist-profile/staff/booking-chat/sw-chat-v2.js";
 const SW_SCOPE="/therapist-profile/staff/booking-chat/";
 function supportsPush(){return "serviceWorker" in navigator&&"PushManager" in window&&"Notification" in window&&window.isSecureContext}
 function vapidBytes(encoded){
@@ -486,8 +486,8 @@ function pushControls(enabled){
 }
 let pushSubscription=null,pushBusy=false;
 async function existingPushSubscription(){
- const registration=await navigator.serviceWorker.getRegistration(SW_SCOPE);
- return registration?await registration.pushManager.getSubscription():null;
+ const registration=await navigator.serviceWorker.register(SW_URL,{scope:SW_SCOPE,updateViaCache:"none"});
+ return await registration.pushManager.getSubscription();
 }
 async function syncPushIfGranted(){
  if(!supportsPush()){pushLabel("このブラウザでは利用不可。iPhoneはホーム画面に追加して開いてください。");return}
