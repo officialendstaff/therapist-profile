@@ -755,7 +755,7 @@ function appendMessage(message){
  renderMessageLinks(el,message.body);
  const time=document.createElement("span");
  const sender=message.sender==="staff"
-  ?("スタッフ："+(typeof message.staff_display_name==="string"&&message.staff_display_name.trim()?message.staff_display_name.trim():"送信者不明"))
+  ?(typeof message.staff_display_name==="string"&&message.staff_display_name.trim()?message.staff_display_name.trim():"送信者不明")
   :"お客様";
  time.textContent=sender+"　"+labelTime(message.created_at);
  el.append(time);
