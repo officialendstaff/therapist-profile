@@ -398,7 +398,7 @@ async function init(profile=null){
 async function poll(){
  if(!ready||polling||posting||document.hidden)return;
  polling=true;
- try{const data=await api({action:"guest_poll",token,store,after:lastId});setBlocked(data.blocked);if(data.messages?.length){removeWelcome();add(data.messages)}showGreeting(data)}
+ try{const data=await api({action:"guest_poll",token,store,after:lastId});setBlocked(data.blocked);if(Array.isArray(data.deleted_message_ids)){const removed=new Set(data.deleted_message_ids.map(String));for(const node of [...$("timeline").children])if(removed.has(node.dataset.messageId))node.remove()}if(data.messages?.length){removeWelcome();add(data.messages)}showGreeting(data)}
  catch(e){if(e.status===401){setReady(false);err("識別情報の有効期限が切れました。ページを再読み込みしてください。")}}
  finally{polling=false}
 }
