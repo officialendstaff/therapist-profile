@@ -325,7 +325,7 @@ function showGreeting(info={},force=false){
  const key=greetingBusinessDate()+"|"+nextVersion+"|"+nextText+"|"+linkText+"|"+linkUrl;
  greetingText=nextText;greetingUpdatedAt=nextVersion;
  // One notice per visitor and 08:00 JST business day, or when the greeting changes.
- if(key===greetingShownKey||readGreetingSeen()===key)return;
+ if(key===greetingShownKey||(!force&&readGreetingSeen()===key))return;
  greetingShownKey=key;
  saveGreetingSeen(key);
  const banner=document.createElement("div");banner.className="chat-greeting-notice";
