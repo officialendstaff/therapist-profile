@@ -363,7 +363,7 @@ async function authorize(){
   if(!(card instanceof HTMLAnchorElement))continue;
   const name=card.querySelector("strong")?.textContent?.trim();
   const denied=staffOnly&&["面接数値","数値管理"].includes(name);
-  if(name==="面接管理")card.href=staffOnly?"../interview-management/":"../interview-sheet-preview/";
+  if(name==="面接管理")card.href="../interview-sheet-preview/";
   if(denied){
    card.removeAttribute("href");
    card.setAttribute("aria-disabled","true");
