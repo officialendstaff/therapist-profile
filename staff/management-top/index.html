@@ -395,7 +395,7 @@ async function authorize(){
   const myAssignment=Array.isArray(assignment)?assignment[0]:assignment;
   const key=!assignmentError&&["owner","president","ota","festival"].includes(myAssignment?.profile_key)?myAssignment.profile_key:null;
   if(key){
-   pageCard.href="../interview-personal/"+key+"/?section=blocks";
+   pageCard.href="../manager-schedule/";
    pageCard.target="_blank";pageCard.rel="noopener noreferrer";
    pageCard.classList.remove("temporarily-disabled");
    pageCard.removeAttribute("aria-disabled");pageCard.removeAttribute("tabindex");
