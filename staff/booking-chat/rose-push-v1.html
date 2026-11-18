@@ -513,6 +513,21 @@ $("unreadOnly").addEventListener("click",()=>{
  drawList();
 });
 const defaultTitle=document.title;
+let chatToastTimer=null;
+function showNewChatToast(){
+ let toast=document.getElementById("chatNewMessageToast");
+ if(!toast){
+  toast=document.createElement("div");toast.id="chatNewMessageToast";
+  toast.setAttribute("role","status");
+  Object.assign(toast.style,{position:"fixed",right:"16px",bottom:"20px",zIndex:"9999",maxWidth:"min(360px,calc(100vw - 32px))",padding:"14px 18px",borderRadius:"10px",background:"#193c59",color:"#fff",boxShadow:"0 8px 28px #061c3555",fontSize:"14px",fontWeight:"700",cursor:"pointer"});
+  toast.addEventListener("click",()=>{toast.hidden=true;const list=document.getElementById("threads");if(list)list.scrollIntoView({block:"nearest"})});
+  document.body.append(toast);
+ }
+ toast.textContent="新しいお問い合わせがあります。チャット一覧をご確認ください。";
+ toast.hidden=false;
+ if(chatToastTimer)clearTimeout(chatToastTimer);
+ chatToastTimer=setTimeout(()=>{toast.hidden=true;chatToastTimer=null},10000);
+}
 function notificationTone(){
  if(!notifyOn)return;
  try{
@@ -616,7 +631,7 @@ async function loadList(){
   items=mergeReadAcknowledgements(next);
   listInitialized=true;
   drawList();clearError();
-  if(hasNew)notificationTone();
+  if(hasNew){notificationTone();showNewChatToast()}
   if(threadId&&!document.hidden){
    const selected=items.find(t=>t.id===threadId);
    if(selected&&selected.updated_at!==activeThreadUpdatedAt&&!threadOpening){
