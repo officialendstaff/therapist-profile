@@ -29,6 +29,7 @@ const url='https://vjjnkflbfsjihwzjsjpr.supabase.co',key='sb_publishable_J5WCsft
 const db=window.supabase.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storage:sessionStorage,storageKey:'lgroup-staff-personal-auth'}});
 const $=id=>document.getElementById(id),message=$('message'),invite=new URL(location.href).searchParams.get('invite');
 const registering=!!invite;
+if(!registering){location.replace('/therapist-profile/staff/management-top/');return;}
 if(registering){$('nameBox').hidden=false;$('confirmBox').hidden=false;$('loginIdEntry').hidden=true;$('submit').textContent='申請して利用開始';$('password').autocomplete='new-password'}
 function tell(t){message.textContent=t}
 const suffix='@staff-id.example.com';
