@@ -208,6 +208,8 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
  }
  #app .message-list .bubble span{font-size:12px}
 }
+#app .message-list .bubble.mine .message-delete-button{display:inline-block;margin:8px 0 0 12px;padding:3px 9px;border:1px solid #d9a8af;border-radius:5px;background:#fff4f5;color:#a73849;font-size:11px;cursor:pointer}
+#app .message-list .bubble.mine .message-delete-button:disabled{opacity:.5;cursor:wait}
 </style><style id="chat-customer-rename-20261107">
 #app .edit-customer-name{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;align-self:center;flex:0 0 auto;height:29px;min-height:29px;max-height:29px;margin:0 0 0 8px;padding:0 10px;border:1px solid #b9cadb;border-radius:6px;background:#edf3fa;color:#284a70;font-size:12px;font-weight:750;line-height:1;white-space:nowrap;vertical-align:middle}
 #app .edit-customer-name[hidden]{display:none!important}
@@ -743,7 +745,29 @@ function appendMessage(message){
  const el=document.createElement("div");el.className="bubble"+(message.sender==="staff"?" mine":"");
  renderMessageLinks(el,message.body);
  const time=document.createElement("span");time.textContent=(message.sender==="staff"?"スタッフ":"お客様")+"　"+labelTime(message.created_at);
- el.append(time);return el;
+ el.append(time);
+ if(message.sender==="staff"){
+  const button=document.createElement("button");
+  button.type="button";button.className="message-delete-button";button.textContent="削除";
+  button.title="この送信済みメッセージを削除";
+  button.addEventListener("click",async()=>{
+   if(button.disabled||!threadId)return;
+   const targetThread=threadId;
+   if(!window.confirm("この送信済みメッセージを削除しますか？\nお客様の画面からも削除され、元に戻せません。"))return;
+   button.disabled=true;
+   try{
+    await call("staff_delete_message",{thread_id:targetThread,message_id:message.id});
+    if(threadId===targetThread){
+     const node=[...$("messages").children].find(n=>n.dataset.messageId===String(message.id));
+     if(node)node.remove();
+     await openThread(targetThread,{refresh:true});
+    }
+   }catch(error){showError("メッセージを削除できませんでした。（"+String(error.message||error)+"）")}
+   finally{button.disabled=false}
+  });
+  el.append(button);
+ }
+ return el;
 }
 async function openThread(id,options={}){
  if(!token||threadOpening)return;
