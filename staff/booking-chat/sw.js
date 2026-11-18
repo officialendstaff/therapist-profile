@@ -13,7 +13,7 @@ self.addEventListener("push",event=>{
   renotify:true,
   requireInteraction:true,
   data:{url:STAFF_URL},
-  icon:"/therapist-profile/staff/interview-sheet-preview/icons/recruit-180.png"
+  icon:"/therapist-profile/staff/booking-chat/chat-notification-icon.png"
  });
  })());
 });
