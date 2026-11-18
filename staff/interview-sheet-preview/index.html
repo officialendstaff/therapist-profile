@@ -2751,7 +2751,7 @@ async function refreshChartAvailability(){
   if(availability.size!==CHART_STAFF_SOURCE.length*28)throw Error('availability slots missing');
   chartAvailability=availability;chartLoadedDate=date;chartLastFetch=Date.now();chartLoading=false;
   if(previousChoice&&chosen===previousChoice){
-   const match=previousChoice.match(/^(社長|オオタ|村上|お祭り) (\\d{2}):(\\d{2})$/);
+   const match=previousChoice.match(/^(社長|オオタ|村上|お祭り) (\d{2}):(\d{2})$/);
    if(!match||!chartStartSlotAvailable(match[1],date,(Number(match[2])-10)*2+Number(match[3])/30))chosen=null;
   }
   if(registrationSelectionSync)registrationSelectionSync();renderChart();
