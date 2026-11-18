@@ -650,7 +650,14 @@ function makeStoreLabel(storeKey){
 const labelTime=iso=>{const d=new Date(iso);return isNaN(+d)?"":d.toLocaleString("ja-JP",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"})};
 async function request(url,payload){
  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);
- try{const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},cache:"no-store",body:JSON.stringify(payload),signal:controller.signal});const data=await r.json();if(!r.ok||(!data.ok&&url===API)){const e=new Error(data.error||"request_failed");e.status=r.status;throw e}return data;}finally{clearTimeout(timer)}
+ try{
+ const headers={"Content-Type":"application/json"};
+ if(url===API&&typeof payload?.action==="string"&&payload.action.startsWith("staff_")&&token==="jwt-connected"){
+  const jwt=existingAdminJwt();
+  if(!jwt)throw new Error("スタッフログイン情報が見つかりません。");
+  headers.Authorization="Bearer "+jwt;
+ }
+ const r=await fetch(url,{method:"POST",headers,cache:"no-store",body:JSON.stringify(payload),signal:controller.signal});const data=await r.json();if(!r.ok||(!data.ok&&url===API)){const e=new Error(data.error||"request_failed");e.status=r.status;throw e}return data;}finally{clearTimeout(timer)}
 }
 const stored=()=>{try{return sessionStorage.getItem(SESSION_KEY)||localStorage.getItem(SESSION_KEY)||""}catch{return ""}};
 function existingAdminJwt(){try{const raw=localStorage.getItem("mattan-recruit-auth")||sessionStorage.getItem("mattan-recruit-auth");const session=raw?JSON.parse(raw):null;return typeof session?.access_token==="string"?session.access_token:""}catch{return ""}}
@@ -840,6 +847,15 @@ async function connectExisting(){
  if(connecting)return;
  connecting=true;$("connect").disabled=true;$("gateError").textContent="管理者認証を確認しています…";
  try{
+  const personalJwt=existingAdminJwt();
+  if(personalJwt){
+   try{
+    token="jwt-connected";
+    const available=await request(API,{action:"staff_list",store:$("store").value});
+    items=available.threads||[];listInitialized=true;$("gate").hidden=true;$("app").hidden=false;
+    drawList();clearError();$("gateError").textContent="";void syncPushIfGranted();return;
+   }catch(error){token="";}
+  }
   const old=stored();
   if(/^[0-9a-f]{64}$/.test(old)){
    try{
