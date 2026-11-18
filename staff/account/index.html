@@ -17,11 +17,11 @@ button:disabled{opacity:.5;cursor:wait}.row{display:flex;gap:8px;margin-top:20px
 <label for="email">ログインID（メールアドレス）</label><input id="email" type="email" autocomplete="username" maxlength="254">
 <label for="password">パスワード</label><input id="password" type="password" autocomplete="current-password" minlength="12" maxlength="128">
 <div id="confirmBox" hidden><label for="confirm">パスワード確認</label><input id="confirm" type="password" autocomplete="new-password" minlength="12" maxlength="128"></div>
-<div class="row"><button id="submit" type="button">ログイン</button></div>
-<div id="existingBox" hidden style="margin-top:16px;border-top:1px solid #e2e7ef;padding-top:14px">
-<p>すでにこのメールアドレスでアカウントをお持ちの場合は、既存のパスワードでログインして招待を受けてください。新しいパスワードの設定は不要です。</p>
-<button type="button" id="existing" class="secondary" style="width:100%">既存アカウントで招待を受ける</button>
+<div id="existingBox" hidden>
+<p><strong>すでにアカウントがある方</strong>：現在使用しているパスワードで、こちらからスタッフ登録してください。</p>
+<button type="button" id="existing" style="width:100%">既存アカウントでスタッフ登録</button>
 </div>
+<div class="row"><button id="submit" type="button">ログイン</button></div>
 </section>
 <section id="account"><p id="accountName"></p><p id="accountRole"></p><div class="row"><button id="logout" class="secondary" type="button">ログアウト</button></div></section>
 <div id="message" role="status" aria-live="polite"></div>
@@ -33,7 +33,7 @@ const url='https://vjjnkflbfsjihwzjsjpr.supabase.co',key='sb_publishable_J5WCsft
 const db=window.supabase.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storage:sessionStorage,storageKey:'lgroup-staff-personal-auth'}});
 const $=id=>document.getElementById(id),message=$('message'),invite=new URL(location.href).searchParams.get('invite');
 const registering=!!invite;
-if(registering){$('nameBox').hidden=false;$('confirmBox').hidden=false;$('existingBox').hidden=false;$('submit').textContent='新規アカウントを作って登録';$('password').autocomplete='new-password'}
+if(registering){$('nameBox').hidden=false;$('confirmBox').hidden=true;$('existingBox').hidden=false;$('submit').textContent='新しいメールアドレスで登録する';$('submit').classList.add('secondary');$('password').autocomplete='current-password';$('submit').onclick=()=>{if($('confirmBox').hidden){$('confirmBox').hidden=false;$('submit').textContent='新規アカウントを作成';$('submit').classList.remove('secondary');$('password').autocomplete='new-password';tell('新規アカウントのパスワードを設定してください。');return}return registerNew()}}
 async function claimExisting(){
  const email=$('email').value.trim().toLowerCase(),password=$('password').value,displayName=$('displayName').value.trim();
  if(!registering||!displayName||!email||!password){tell('スタッフ名・メールアドレス・現在のパスワードを入力してください。');return}
@@ -56,7 +56,7 @@ async function who(){
  $('form').style.display='none';$('account').style.display='block';$('accountName').textContent=(profile?.display_name||'スタッフ')+'（'+user.email+'）';
  $('accountRole').textContent=pe?'権限確認ができません。':!profile?'スタッフ登録が見つかりません。':!profile.approved_at?'管理者の承認待ちです。':'アカウント認証済み・承認済み';
 }
-$('submit').onclick=async()=>{
+async function registerNew(){
  const email=$('email').value.trim().toLowerCase(),password=$('password').value; 
  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||password.length<12||password.length>128){tell('メールアドレスと12文字以上のパスワードを入力してください。');return}
  $('submit').disabled=true;tell('確認中です。');
@@ -74,7 +74,8 @@ $('submit').onclick=async()=>{
   $('password').value='';tell('');await who();
  }
  }catch{tell('通信に失敗しました。再度お試しください。')}finally{$('submit').disabled=false}
-};
+}
+if(!registering)$('submit').onclick=registerNew;
 $('logout').onclick=async()=>{await db.auth.signOut();tell('ログアウトしました。');await who()};
 if(!registering)void who();
 })();
