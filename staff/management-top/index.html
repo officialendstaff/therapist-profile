@@ -358,12 +358,28 @@ async function authorize(){
  $("refresh").classList.remove("hidden");
  text($("userName"),profile.data.display_name||(staffOnly?"スタッフ":"管理者"));
  $("login").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");
- // Staff can see final/outside/birthday, interview management, view-only shifts and chat.
+ // Keep the management TOP identical for both roles; unavailable cards stay visible but cannot open.
  for(const card of document.querySelectorAll("#app .menus .menu-card")){
+  if(!(card instanceof HTMLAnchorElement))continue;
   const name=card.querySelector("strong")?.textContent?.trim();
-  if(staffOnly&&["面接数値","数値管理"].includes(name))card.classList.add("hidden");
-  else card.classList.remove("hidden");
-  if(name==="面接管理"&&card instanceof HTMLAnchorElement)card.href=staffOnly?"../interview-management/":"../interview-sheet-preview/";
+  const denied=staffOnly&&["面接数値","数値管理"].includes(name);
+  if(name==="面接管理")card.href=staffOnly?"../interview-management/":"../interview-sheet-preview/";
+  if(denied){
+   card.removeAttribute("href");
+   card.setAttribute("aria-disabled","true");
+   card.setAttribute("tabindex","-1");
+   card.setAttribute("title","スタッフ権限では利用できません");
+   card.classList.add("temporarily-disabled");
+  }else{
+   if(name==="面接数値")card.href="../interview-sheet-preview/metrics.html?view=interview";
+   if(name==="数値管理")card.href="../interview-sheet-preview/metrics.html?view=sales";
+   card.removeAttribute("aria-disabled");
+   card.removeAttribute("tabindex");
+   card.removeAttribute("title");
+   card.classList.remove("temporarily-disabled");
+  }
+  const arrow=card.querySelector(".arrow");
+  if(arrow)arrow.textContent=denied?"—":"↗";
  }
  await load();
 }
