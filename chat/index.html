@@ -291,16 +291,22 @@ function add(messages){
 }
 let greetingShownKey="";
 let greetingUpdatedAt="";
-const tokyoDate=()=>new Intl.DateTimeFormat("sv-SE",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+// A new greeting day begins at 08:00 JST, after the 05:00 business close.
+const greetingBusinessDate=()=>new Intl.DateTimeFormat("sv-SE",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date(Date.now()-8*60*60*1000));
+const greetingSeenStorageKey=()=> "lgroup_chat_greeting_seen_v2_"+encodeURIComponent(store)+"_"+(token||"guest");
+function readGreetingSeen(){try{return localStorage.getItem(greetingSeenStorageKey())||""}catch{return ""}}
+function saveGreetingSeen(value){try{localStorage.setItem(greetingSeenStorageKey(),value)}catch{}}
 function showGreeting(info={},force=false){
  const nextText=typeof info.greeting==="string"&&info.greeting.trim()?info.greeting:greetingText;
  const nextVersion=typeof info.greeting_updated_at==="string"?info.greeting_updated_at:greetingUpdatedAt;
  const linkText=typeof info.greeting_link_text==="string"?info.greeting_link_text:"";
  const linkUrl=typeof info.greeting_link_url==="string"?info.greeting_link_url:"";
- const key=tokyoDate()+"|"+nextVersion+"|"+nextText+"|"+linkText+"|"+linkUrl;
+ const key=greetingBusinessDate()+"|"+nextVersion+"|"+nextText+"|"+linkText+"|"+linkUrl;
  greetingText=nextText;greetingUpdatedAt=nextVersion;
- if(!force&&key===greetingShownKey)return;
+ // One notice per visitor and 08:00 JST business day, or when the greeting changes.
+ if(key===greetingShownKey||readGreetingSeen()===key)return;
  greetingShownKey=key;
+ saveGreetingSeen(key);
  const banner=document.createElement("div");banner.className="chat-greeting-notice";
  banner.dataset.greetingKey=key;
  const body=document.createElement("div");
