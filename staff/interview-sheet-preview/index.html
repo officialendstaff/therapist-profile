@@ -3000,7 +3000,7 @@ html.personal-mobile-embed .lg-interview-account-popup{display:none!important}
 <button id="adminAuthOpen" type="button">ログイン</button>
 <div id="lgInterviewAccountMenu" class="lg-interview-account-popup" hidden role="group" aria-label="アカウント操作">
 <strong id="lgInterviewAccountIdentity">認証確認中</strong>
-<button type="button" id="lgInterviewAccountScreen">アカウント画面</button>
+
 <button type="button" id="lgInterviewAccountLogout">ログアウト</button>
 </div>
 <div id="adminAuthDialog" role="dialog" aria-modal="true" aria-label="面接管理ログイン"><div class="auth-card">
@@ -3032,7 +3032,7 @@ html.personal-mobile-embed .lg-interview-account-popup{display:none!important}
  const setAccountExpanded=expanded=>{accountMenu.hidden=!expanded;open.setAttribute('aria-expanded',String(expanded))};
  document.addEventListener('click',event=>{if(!accountMenu.hidden&&!accountMenu.contains(event.target)&&event.target!==open)setAccountExpanded(false)});
  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!accountMenu.hidden){setAccountExpanded(false);open.focus()}});
- el('lgInterviewAccountScreen').onclick=()=>{setAccountExpanded(false);dialog.classList.add('open')};
+ 
  el('lgInterviewAccountLogout').onclick=()=>{setAccountExpanded(false);logout.click()};
  let mode='admin',role=null;
  const mobileEmbedded=new URLSearchParams(location.search).get('personalMobile')==='1'&&window.parent!==window;
