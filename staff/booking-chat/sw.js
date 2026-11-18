@@ -13,7 +13,7 @@ self.addEventListener("push",event=>{
   renotify:true,
   requireInteraction:true,
   data:{url:STAFF_URL},
-  icon:"/therapist-profile/staff/booking-chat/chat-notification-icon.png"
+  icon:"/therapist-profile/staff/booking-chat/chat-notification-icon.png?v=20261118-2"
  });
  })());
 });
