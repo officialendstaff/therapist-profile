@@ -527,6 +527,8 @@ $("pushTest").addEventListener("click",async()=>{
  if(!pushSubscription||!token)return;
  $("pushTest").disabled=true;pushLabel("テスト通知を送信中…");
  try{
+  const worker=await navigator.serviceWorker.getRegistration(SW_SCOPE);
+  if(worker)await worker.update();
   const result=await call("staff_push_test",{endpoint:pushSubscription.endpoint});
   pushLabel(result.accepted?"配信サーバーが受け付けました。端末の通知をご確認ください。":"通知サーバーへの配信失敗");
  }catch(err){pushLabel("通知テスト失敗："+String(err.message||err))}
