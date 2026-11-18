@@ -76,6 +76,17 @@ html.embedded,body.embedded{height:100%;overflow:hidden;width:var(--embed-width,
 .profile-screen #firstUse input{scroll-margin-top:14px;scroll-margin-bottom:24px}
 @media(max-width:380px){#firstUse .phone-prefix{padding:0 8px;font-size:15px}#firstUse .phone-line{gap:5px}#firstUse{padding:14px 14px 24px;gap:12px}}
 @media(max-height:550px){#firstUse{gap:10px;padding-top:10px}#firstUse h1{font-size:17px}#firstUse .first-intro{line-height:1.5}}
+.profile-edit-button{margin-left:8px;flex:none;border:1px solid #cbd8e5;background:white;color:#35506b;border-radius:9px;padding:7px 9px;font-size:12px;font-weight:700;cursor:pointer}
+.profile-edit-panel{position:absolute;inset:0;z-index:10;background:#fff;display:flex;flex-direction:column;padding:20px;overflow-y:auto;gap:13px;color:#24364c}
+.profile-edit-panel[hidden]{display:none!important}
+.profile-edit-panel h2{font-size:18px;margin:0}
+.profile-edit-panel p{font-size:12px;color:#687b8c;line-height:1.6;margin:0}
+.profile-edit-panel label{display:block;font-size:13px;font-weight:700}
+.profile-edit-panel input{width:100%;height:45px;padding:9px 12px;border:1px solid #cbd8e5;border-radius:9px;font-size:16px}
+.profile-edit-actions{display:flex;gap:9px}
+.profile-edit-actions button{flex:1;border:0;border-radius:9px;padding:12px;cursor:pointer;font-weight:700;background:#e9eef3;color:#24364c}
+.profile-edit-actions #profileSave{background:var(--accent);color:white}
+.profile-edit-message{font-size:12px;color:#a13c50}
 </style></head><body><main class="shell">
 <section id="chooser" hidden><h1>L GROUP チャット</h1><p>ご相談する店舗をお選びください。<br>店舗ごとに会話履歴を分けて管理しています。</p><div class="stores" id="storeLinks"></div></section>
 <section id="firstUse" hidden>
@@ -87,10 +98,20 @@ html.embedded,body.embedded{height:100%;overflow:hidden;width:var(--embed-width,
 <button type="submit" id="firstStart" class="first-start">チャットを開始する</button>
 </form></section>
 <section id="chatScreen" hidden style="display:flex;flex:1;flex-direction:column;min-height:0">
-<header class="topbar"><div class="mark">L</div><div><div class="title" id="storeTitle">チャット</div><div class="subtitle">L GROUP ONLINE CHAT</div></div><div class="state"><i class="dot"></i><span id="connection">接続中</span></div></header>
+<header class="topbar"><div class="mark">L</div><div><div class="title" id="storeTitle">チャット</div><div class="subtitle">L GROUP ONLINE CHAT</div></div><div class="state"><i class="dot"></i><span id="connection">接続中</span></div><button type="button" id="profileEditOpen" class="profile-edit-button" aria-label="お客様情報を登録・変更">お客様情報</button></header>
 <div class="notice" id="error" role="alert" hidden></div>
 <div class="chat" id="timeline" role="log" aria-label="チャット履歴" aria-live="polite"></div>
 <form id="composer" class="composer"><div class="composer-row"><textarea id="draft" rows="1" maxlength="2000" placeholder="メッセージを入力" aria-label="メッセージ" required disabled></textarea><button class="send" id="send" type="submit" disabled>送信</button></div></form>
+</section>
+<section id="profileEditPanel" class="profile-edit-panel" hidden aria-label="お客様情報の登録・変更">
+<h2>お客様情報の登録・変更</h2>
+<p>チャットを開始した後でも登録できます。既存の会話履歴はそのまま残ります。登録は任意です。</p>
+<label for="profileEditName">お名前（任意）</label>
+<input id="profileEditName" maxlength="60" autocomplete="off" placeholder="例：タナカ">
+<label for="profileEditPhone">携帯電話番号の下6桁（任意）</label>
+<input id="profileEditPhone" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="例：123456">
+<div id="profileEditMessage" class="profile-edit-message" role="status" aria-live="polite"></div>
+<div class="profile-edit-actions"><button type="button" id="profileEditCancel">戻る</button><button type="button" id="profileSave">保存する</button></div>
 </section></main>
 <script>
 (()=>{
@@ -381,6 +402,30 @@ async function poll(){
  catch(e){if(e.status===401){setReady(false);err("識別情報の有効期限が切れました。ページを再読み込みしてください。")}}
  finally{polling=false}
 }
+$("profileEditOpen").addEventListener("click",async()=>{
+ if(!ready||!token)return;
+ $("profileEditPanel").hidden=false;$("profileEditMessage").textContent="読み込み中…";
+ try{
+  const data=await api({action:"guest_profile_get",token,store});
+  $("profileEditName").value=data.display_name||"";
+  $("profileEditPhone").value=data.phone_suffix||"";
+  $("profileEditMessage").textContent="";
+ }catch(e){$("profileEditMessage").textContent="情報を取得できませんでした。";}
+});
+$("profileEditCancel").addEventListener("click",()=>{$("profileEditPanel").hidden=true;$("profileEditMessage").textContent=""});
+$("profileEditPhone").addEventListener("input",e=>{e.target.value=e.target.value.replace(/[^0-9]/g,"").slice(0,6)});
+$("profileSave").addEventListener("click",async()=>{
+ const name=$("profileEditName").value.trim();
+ const phone=$("profileEditPhone").value.trim();
+ if(phone&& !/^[0-9]{6}$/.test(phone)){$("profileEditMessage").textContent="電話番号は下6桁で入力してください。";return}
+ const button=$("profileSave");button.disabled=true;$("profileEditMessage").textContent="保存中…";
+ try{
+  await api({action:"guest_profile_update",token,store,display_name:name,phone_suffix:phone});
+  $("profileEditMessage").textContent="保存しました。";
+  $("profileEditPanel").hidden=true;
+ }catch(e){$("profileEditMessage").textContent="保存できませんでした。再度お試しください。"}
+ finally{button.disabled=false}
+});
 $("composer").addEventListener("submit",async e=>{
  e.preventDefault();if(!ready||posting||isBlocked)return;
  const body=$("draft").value.trim();if(!body)return;
