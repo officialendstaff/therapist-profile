@@ -11,20 +11,20 @@ button:disabled{opacity:.5;cursor:wait}.row{display:flex;gap:8px;margin-top:20px
 #message{min-height:25px;color:#8d2b36;margin-top:15px;white-space:pre-wrap;font-size:13px}
 #account{display:none}.small{font-size:12px}
 </style></head><body><main>
-<h1>スタッフアカウント</h1><p>個別ID（メールアドレス）とパスワードでログインします。初回登録には管理者からの招待URLが必要です。</p>
+<h1>スタッフアカウント</h1><p>事前に設定された権限付きの招待URLからID・PASSを登録すると、登録完了後すぐにログインできます。</p>
 <section id="form">
 <div id="nameBox" hidden><label for="displayName">スタッフ表示名</label><input id="displayName" maxlength="50" autocomplete="name"></div>
 <label for="email">ログインID（メールアドレス）</label><input id="email" type="email" autocomplete="username" maxlength="254">
 <label for="password">パスワード</label><input id="password" type="password" autocomplete="current-password" minlength="12" maxlength="128">
 <div id="confirmBox" hidden><label for="confirm">パスワード確認</label><input id="confirm" type="password" autocomplete="new-password" minlength="12" maxlength="128"></div>
 <div id="existingBox" hidden>
-<p><strong>すでにアカウントがある方</strong>：現在使用しているパスワードで、こちらからスタッフ登録してください。</p>
-<button type="button" id="existing" style="width:100%">既存アカウントでスタッフ登録</button>
+<p><strong>すでにアカウントがある方</strong>：現在のパスワードで登録できます。</p>
+<button type="button" id="existing" style="width:100%">既存ID・PASSで申請する</button>
 </div>
 <div class="row"><button id="submit" type="button">ログイン</button></div>
 </section>
 <section id="account"><p id="accountName"></p><p id="accountRole"></p><div class="row"><button id="logout" class="secondary" type="button">ログアウト</button></div></section>
-<div id="message" role="status" aria-live="polite"></div>
+<div id="message" role="status" aria-live="polite"></div><div id="loginLink" hidden style="margin-top:15px"><a href="https://officialendstaff.github.io/therapist-profile/staff/account/" style="display:block;text-align:center;background:#203b61;color:#fff;text-decoration:none;padding:14px;border-radius:9px;font-weight:700">ログイン画面を開く</a></div>
 <p class="small">個別アカウントの登録・認証ページです。面接管理・チャット管理の切り替えが完了するまでは、現在の管理画面とログイン方法は変更されません。</p>
 </main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js"></script>
 <script>
@@ -33,7 +33,7 @@ const url='https://vjjnkflbfsjihwzjsjpr.supabase.co',key='sb_publishable_J5WCsft
 const db=window.supabase.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storage:sessionStorage,storageKey:'lgroup-staff-personal-auth'}});
 const $=id=>document.getElementById(id),message=$('message'),invite=new URL(location.href).searchParams.get('invite');
 const registering=!!invite;
-if(registering){$('nameBox').hidden=false;$('confirmBox').hidden=true;$('existingBox').hidden=false;$('submit').textContent='新しいメールアドレスで登録する';$('submit').classList.add('secondary');$('password').autocomplete='current-password';$('submit').onclick=()=>{if($('confirmBox').hidden){$('confirmBox').hidden=false;$('submit').textContent='新規アカウントを作成';$('submit').classList.remove('secondary');$('password').autocomplete='new-password';tell('新規アカウントのパスワードを設定してください。');return}return registerNew()}}
+if(registering){$('nameBox').hidden=false;$('confirmBox').hidden=true;$('existingBox').hidden=false;$('submit').textContent='新しいID・PASSを設定する';$('submit').classList.add('secondary');$('password').autocomplete='current-password';$('submit').onclick=()=>{if($('confirmBox').hidden){$('confirmBox').hidden=false;$('submit').textContent='申請して利用開始';$('submit').classList.remove('secondary');$('password').autocomplete='new-password';tell('新規アカウントのパスワードを設定してください。');return}return registerNew()}}
 async function claimExisting(){
  const email=$('email').value.trim().toLowerCase(),password=$('password').value,displayName=$('displayName').value.trim();
  if(!registering||!displayName||!email||!password){tell('スタッフ名・メールアドレス・現在のパスワードを入力してください。');return}
@@ -45,7 +45,7 @@ async function claimExisting(){
   const {error:claimError}=await db.rpc('recruit_claim_invite',{p_token:invite,p_display_name:displayName});
   if(claimError){tell('ログインはできましたが招待を受けられませんでした。招待の期限や登録状況をご確認ください。');return}
   $('password').value='';$('confirm').value='';
-  tell('スタッフ登録申請が完了しました。管理者の承認をお待ちください。');await who();
+  tell('登録が完了しました。すぐにログインできます。');$('loginLink').hidden=false;await who();
  }catch{tell('通信に失敗しました。再度お試しください。')}finally{$('existing').disabled=false}
 }
 $('existing').onclick=claimExisting;
@@ -54,7 +54,7 @@ async function who(){
  const {data:{user},error}=await db.auth.getUser();if(error||!user){$('account').style.display='none';$('form').style.display='';return}
  const {data:profile,error:pe}=await db.from('recruit_staff_profiles').select('display_name,role,approved_at').eq('user_id',user.id).maybeSingle();
  $('form').style.display='none';$('account').style.display='block';$('accountName').textContent=(profile?.display_name||'スタッフ')+'（'+user.email+'）';
- $('accountRole').textContent=pe?'権限確認ができません。':!profile?'スタッフ登録が見つかりません。':!profile.approved_at?'管理者の承認待ちです。':'アカウント認証済み・承認済み';
+ $('accountRole').textContent=pe?'権限確認ができません。':!profile?'スタッフ登録が見つかりません。':!profile.approved_at?'旧招待で登録された承認待ちアカウントです。新しい権限付き招待URLから申請してください。':'アカウント認証済み・利用可能';
 }
 async function registerNew(){
  const email=$('email').value.trim().toLowerCase(),password=$('password').value; 
@@ -67,7 +67,7 @@ async function registerNew(){
   const displayName=$('displayName').value.trim();if(!displayName){tell('スタッフ表示名を入力してください。');return}
   const resp=await fetch(url+'/functions/v1/recruit-staff-register',{method:'POST',headers:{'Content-Type':'application/json','apikey':key},body:JSON.stringify({token:invite,email,password,displayName}),cache:'no-store'});
   const body=await resp.json().catch(()=>({}));tell(body.message||'登録処理を確認できませんでした。');
-  if(resp.ok){$('submit').disabled=true;$('password').value='';$('confirm').value=''}
+  if(resp.ok){$('submit').disabled=true;$('password').value='';$('confirm').value='';$('loginLink').hidden=false}
  }else{
   const {data,error}=await db.auth.signInWithPassword({email,password});
   if(error||!data?.user){tell('ログインできません。ID・パスワードをご確認ください。');return}
