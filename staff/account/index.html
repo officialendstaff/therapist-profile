@@ -47,7 +47,7 @@ async function who(){
 async function registerNew(){
  const password=$('password').value;
  const email=registering?null:authEmail($('loginId').value);
- if((!registering&&!email)||password.length<12||password.length>128){tell('ログインIDと12文字以上のパスワードを確認してください。');return}
+ if((!registering&&!email)||(registering&&password.length<12)||password.length>128||(!registering&&!password)){tell(registering?'パスワードは12文字以上で設定してください。':'ログインIDとパスワードを確認してください。');return}
  $('submit').disabled=true;tell('確認中です。');
  try{
  if(registering){
