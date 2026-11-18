@@ -363,6 +363,7 @@ async function authorize(){
   const name=card.querySelector("strong")?.textContent?.trim();
   if(staffOnly&&["面接数値","数値管理"].includes(name))card.classList.add("hidden");
   else card.classList.remove("hidden");
+  if(name==="面接管理"&&card instanceof HTMLAnchorElement)card.href=staffOnly?"../interview-management/":"../interview-sheet-preview/";
  }
  await load();
 }
