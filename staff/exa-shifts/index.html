@@ -723,10 +723,14 @@ const $=id=>document.getElementById(id), today=()=>new Intl.DateTimeFormat("en-C
 let staffReadOnly=false;
 const readonlyApi=URL_SB+"/functions/v1/group-management-readonly";
 async function staffRead(action,params={}){
- const token=sessionStorage.getItem("interview_staff_session_v2")||localStorage.getItem("interview_staff_session_v2");
- if(!token||!/^[0-9a-f]{64}$/.test(token))throw Error("スタッフログインが必要です");
- const r=await fetch(readonlyApi,{method:"POST",headers:{"Content-Type":"application/json","apikey":KEY_SB},cache:"no-store",
-  body:JSON.stringify({action,token,...params})});
+ const session=(await client.auth.getSession()).data?.session;
+ const bearer=session?.access_token;
+ const token=bearer?null:(sessionStorage.getItem("interview_staff_session_v2")||localStorage.getItem("interview_staff_session_v2"));
+ if(!bearer&&(!token||!/^[0-9a-f]{64}$/.test(token)))throw Error("スタッフログインが必要です");
+ const headers={"Content-Type":"application/json","apikey":KEY_SB};
+ if(bearer)headers.Authorization="Bearer "+bearer;
+ const r=await fetch(readonlyApi,{method:"POST",headers,cache:"no-store",
+  body:JSON.stringify({action,...(token?{token}:{}),...params})});
  const result=await r.json();
  if(!r.ok||!result.ok)throw Error(result.error||"閲覧データを取得できませんでした");
  return result;
