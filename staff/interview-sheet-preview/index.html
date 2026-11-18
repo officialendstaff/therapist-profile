@@ -2725,34 +2725,42 @@ document.getElementById('mpSave').onclick=async()=>{const dates=[...mpState.days
 function renderCalendar(){const y=monthView.getFullYear(),m=monthView.getMonth();$('month').textContent=y+'年 '+String(m+1).padStart(2,'0')+'月';const days=$('days');days.replaceChildren();const offset=new Date(y,m,1).getDay(),count=new Date(y,m+1,0).getDate();for(let i=0;i<offset;i++){const b=document.createElement('button');b.className='empty';b.disabled=true;days.append(b)}for(let d=1;d<=count;d++){const day=new Date(y,m,d),b=document.createElement('button');b.textContent=d;b.className=[day.getDay()===0||day.getDay()===6?'weekend':'',dateKey(day)===dateKey(now)?'today':'',dateKey(day)===dateKey(selected)?'selected':''].join(' ');b.disabled=day<now;b.onclick=()=>{selected=day;chosen=null;if(registrationSelectionSync)registrationSelectionSync();renderCalendar();refreshChartAvailability()};days.append(b)}}
 function holiday(d){const y=d.getFullYear(),m=d.getMonth()+1,n=d.getDate(),nth=(mo,k)=>1+(8-new Date(y,mo-1,1).getDay())%7+7*(k-1);const spring=Math.floor(20.8431+.242194*(y-1980)-Math.floor((y-1980)/4)),autumn=Math.floor(23.2488+.242194*(y-1980)-Math.floor((y-1980)/4));const base=new Set(['1-1','2-11','2-23','4-29','5-3','5-4','5-5','8-11','11-3','11-23','3-'+spring,'9-'+autumn,'1-'+nth(1,2),'7-'+nth(7,3),'9-'+nth(9,3),'10-'+nth(10,2)]),days=new Set(),len=Math.round((new Date(y+1,0,1)-new Date(y,0,1))/86400000);for(let i=0;i<len;i++){const t=new Date(y,0,i+1);if(base.has((t.getMonth()+1)+'-'+t.getDate()))days.add(i)}for(const i of [...days]){if(new Date(y,0,i+1).getDay()===0){let j=i+1;while(days.has(j))j++;days.add(j)}}for(let i=1;i<len-1;i++){if(!days.has(i)&&days.has(i-1)&&days.has(i+1))days.add(i)}return days.has(Math.round((d-new Date(y,0,1))/86400000))}
 const CHART_STAFF_SOURCE=[{name:'社長',shop:'Grand Luxe',id:'9bcf0e46-f443-4c8b-8f43-2d99f0cabbc6'},{name:'オオタ',shop:'LUXY',id:'745f4373-dc35-4cf3-ab06-577d54d6694e'},{name:'村上',shop:'薔薇と紳士',id:'72ad8e71-100a-4cb4-8a63-813154b62f99'},{name:'お祭り',shop:'Un Secret',id:'46536af1-b940-47ec-9199-82646072a82f'}];
-const CHART_API='https://vjjnkflbfsjihwzjsjpr.supabase.co/rest/v1/rpc/interview_available_staff';
+const CHART_API='https://vjjnkflbfsjihwzjsjpr.supabase.co/rest/v1/rpc/interview_chart_availability';
 const CHART_KEY='sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos';
 let chartAvailability=new Map(),chartLoadedDate='',chartRequest=0,chartLoading=false,chartError='',chartLastFetch=0;
 async function refreshChartAvailability(){
- const date=dateKey(selected),request=++chartRequest;const previousChoice=chosen;chartAvailability=new Map();chartLoadedDate='';chartLoading=true;chartError='';renderChart();
- const tasks=[];for(const staff of CHART_STAFF_SOURCE)for(let i=0;i<28;i++)tasks.push({staff,i});
- const results=[];let cursor=0;
+ const date=dateKey(selected),request=++chartRequest,previousChoice=chosen;
+ chartAvailability=new Map();chartLoadedDate='';chartLoading=true;chartError='';renderChart();
  try{
-  async function worker(){
-   while(cursor<tasks.length){
-    if(request!==chartRequest)return;
-    const {staff,i}=tasks[cursor++],startMinutes=600+i*30;
-    const start=String(Math.floor(startMinutes/60)).padStart(2,'0')+':'+String(startMinutes%60).padStart(2,'0');
-    const endMinutes=startMinutes+30,end=String(Math.floor(endMinutes/60)).padStart(2,'0')+':'+String(endMinutes%60).padStart(2,'0');
-    const response=await fetch(CHART_API,{method:'POST',headers:{'Content-Type':'application/json','apikey':CHART_KEY,'Authorization':'Bearer '+CHART_KEY},body:JSON.stringify({p_shop:staff.shop,p_date:date,p_start:start,p_end:end}),cache:'no-store'});
-    if(!response.ok)throw Error('availability HTTP '+response.status);
-    const rows=await response.json();
-    if(!Array.isArray(rows))throw Error('availability response invalid');
-    results.push([staff.name+':'+i,rows.some(row=>String(row.interviewer_user_id)===staff.id)]);
-   }
-  }
-  await Promise.all(Array.from({length:8},()=>worker()));
+  // Fetch all four managers and 28 half-hour slots in a single database request.
+  const response=await fetch(CHART_API,{
+   method:'POST',
+   headers:{'Content-Type':'application/json','apikey':CHART_KEY,'Authorization':'Bearer '+CHART_KEY},
+   body:JSON.stringify({p_date:date}),cache:'no-store'
+  });
+  if(!response.ok)throw Error('availability HTTP '+response.status);
+  const rows=await response.json();
+  if(!Array.isArray(rows))throw Error('availability response invalid');
   if(request!==chartRequest||date!==dateKey(selected))return;
-  chartAvailability=new Map(results);chartLoadedDate=date;chartLastFetch=Date.now();chartLoading=false;if(previousChoice&&chosen===previousChoice){const match=previousChoice.match(/^(社長|オオタ|村上|お祭り) (\d{2}):(\d{2})$/);if(!match||!chartStartSlotAvailable(match[1],date,(Number(match[2])-10)*2+Number(match[3])/30))chosen=null;}if(registrationSelectionSync)registrationSelectionSync();renderChart();
+  const byId=new Map(CHART_STAFF_SOURCE.map(staff=>[staff.id,staff.name]));
+  const availability=new Map();
+  for(const row of rows){
+   const staff=byId.get(String(row.interviewer_user_id)),i=Number(row.slot_index);
+   if(staff&&Number.isInteger(i)&&i>=0&&i<28)availability.set(staff+':'+i,row.available===true);
+  }
+  if(availability.size!==CHART_STAFF_SOURCE.length*28)throw Error('availability slots missing');
+  chartAvailability=availability;chartLoadedDate=date;chartLastFetch=Date.now();chartLoading=false;
+  if(previousChoice&&chosen===previousChoice){
+   const match=previousChoice.match(/^(社長|オオタ|村上|お祭り) (\\d{2}):(\\d{2})$/);
+   if(!match||!chartStartSlotAvailable(match[1],date,(Number(match[2])-10)*2+Number(match[3])/30))chosen=null;
+  }
+  if(registrationSelectionSync)registrationSelectionSync();renderChart();
  }catch(error){
   if(request!==chartRequest)return;
   console.warn('対応可能時間の取得に失敗しました',error);
-  chartLoadedDate='';chartLoading=false;chartError='対応可能時間の取得に失敗しました。再読み込みしてください。';renderChart();
+  chartLoadedDate='';chartLoading=false;
+  chartError='対応可能時間の取得に失敗しました。再読み込みしてください。';
+  renderChart();
  }
 }
 function chartBookedSlot(staff,day,hour,minute){const editPanel=$('registrationPanel');const editedId=editPanel&&!editPanel.hidden?Number(editPanel.dataset.editInterviewId||0):0;const slot=hour*60+minute;return (liveInterviewLists.rows||[]).find(r=>{if(editedId&&Number(r.interviewId)===editedId)return false;if(r.staff!==staff||String(r.date||'').slice(0,10)!==day)return false;if(['キャンセル','無断トビ','トビ（キャンセル）','返信なし','日程未定','日程調整中','採用','不採用','辞退'].includes(r.status))return false;const time=String(r.date||'').match(/(?:^|\s)(\d{1,2}):(\d{2})/);if(!time)return false;const start=Number(time[1])*60+Number(time[2]);return slot>=start&&slot<start+(staff==='村上'?90:60)})}
