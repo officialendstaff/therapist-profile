@@ -17,10 +17,6 @@ button:disabled{opacity:.5;cursor:wait}.row{display:flex;gap:8px;margin-top:20px
 <label for="email">ログインID（メールアドレス）</label><input id="email" type="email" autocomplete="username" maxlength="254">
 <label for="password">パスワード</label><input id="password" type="password" autocomplete="current-password" minlength="12" maxlength="128">
 <div id="confirmBox" hidden><label for="confirm">パスワード確認</label><input id="confirm" type="password" autocomplete="new-password" minlength="12" maxlength="128"></div>
-<div id="existingBox" hidden>
-<p><strong>すでにアカウントがある方</strong>：現在のパスワードで登録できます。</p>
-<button type="button" id="existing" style="width:100%">既存ID・PASSで申請する</button>
-</div>
 <div class="row"><button id="submit" type="button">ログイン</button></div>
 </section>
 <section id="account"><p id="accountName"></p><p id="accountRole"></p><div class="row"><button id="logout" class="secondary" type="button">ログアウト</button></div></section>
@@ -33,22 +29,7 @@ const url='https://vjjnkflbfsjihwzjsjpr.supabase.co',key='sb_publishable_J5WCsft
 const db=window.supabase.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storage:sessionStorage,storageKey:'lgroup-staff-personal-auth'}});
 const $=id=>document.getElementById(id),message=$('message'),invite=new URL(location.href).searchParams.get('invite');
 const registering=!!invite;
-if(registering){$('nameBox').hidden=false;$('confirmBox').hidden=true;$('existingBox').hidden=false;$('submit').textContent='新しいID・PASSを設定する';$('submit').classList.add('secondary');$('password').autocomplete='current-password';$('submit').onclick=()=>{if($('confirmBox').hidden){$('confirmBox').hidden=false;$('submit').textContent='申請して利用開始';$('submit').classList.remove('secondary');$('password').autocomplete='new-password';tell('新規アカウントのパスワードを設定してください。');return}return registerNew()}}
-async function claimExisting(){
- const email=$('email').value.trim().toLowerCase(),password=$('password').value,displayName=$('displayName').value.trim();
- if(!registering||!displayName||!email||!password){tell('スタッフ名・メールアドレス・現在のパスワードを入力してください。');return}
- if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(invite)){tell('招待URLが無効です。');return}
- $('existing').disabled=true;tell('既存アカウントを確認しています。');
- try{
-  const {data,error}=await db.auth.signInWithPassword({email,password});
-  if(error||!data?.user){tell('既存のパスワードでログインできませんでした。パスワードを確認してください。');return}
-  const {error:claimError}=await db.rpc('recruit_claim_invite',{p_token:invite,p_display_name:displayName});
-  if(claimError){tell('ログインはできましたが招待を受けられませんでした。招待の期限や登録状況をご確認ください。');return}
-  $('password').value='';$('confirm').value='';
-  tell('登録が完了しました。すぐにログインできます。');$('loginLink').hidden=false;await who();
- }catch{tell('通信に失敗しました。再度お試しください。')}finally{$('existing').disabled=false}
-}
-$('existing').onclick=claimExisting;
+if(registering){$('nameBox').hidden=false;$('confirmBox').hidden=false;$('submit').textContent='申請して利用開始';$('password').autocomplete='new-password'}
 function tell(t){message.textContent=t}
 async function who(){
  const {data:{user},error}=await db.auth.getUser();if(error||!user){$('account').style.display='none';$('form').style.display='';return}
@@ -75,7 +56,7 @@ async function registerNew(){
  }
  }catch{tell('通信に失敗しました。再度お試しください。')}finally{$('submit').disabled=false}
 }
-if(!registering)$('submit').onclick=registerNew;
+$('submit').onclick=registerNew;
 $('logout').onclick=async()=>{await db.auth.signOut();tell('ログアウトしました。');await who()};
 if(!registering)void who();
 })();
