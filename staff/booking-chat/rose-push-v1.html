@@ -373,9 +373,8 @@ function pushControls(enabled){
 }
 let pushSubscription=null,pushBusy=false;
 async function existingPushSubscription(){
- const registration=await navigator.serviceWorker.register(SW_URL,{scope:SW_SCOPE,updateViaCache:"none"});
- try{await registration.update()}catch(error){console.warn("chat_push_worker_update_failed",String(error))}
- return registration.pushManager.getSubscription();
+ const registration=await navigator.serviceWorker.getRegistration(SW_SCOPE);
+ return registration?await registration.pushManager.getSubscription():null;
 }
 async function syncPushIfGranted(){
  if(!supportsPush()){pushLabel("このブラウザでは利用不可。iPhoneはホーム画面に追加して開いてください。");return}
@@ -415,23 +414,8 @@ $("pushTest").addEventListener("click",async()=>{
  if(!pushSubscription||!token)return;
  $("pushTest").disabled=true;pushLabel("テスト通知を送信中…");
  try{
-  const registration=await navigator.serviceWorker.getRegistration(SW_SCOPE);
-  let localStatus="端末内通知の確認不可";
-  try{
-   if(!registration)throw new Error("Service Worker未登録");
-   await registration.showNotification("L GROUP｜通知表示テスト",{
-    body:"この通知が表示されれば、ChromeからWindowsへの表示処理は動作しています。",
-    tag:"lgroup-local-notification-test",
-    requireInteraction:false
-   });
-   localStatus="端末内通知の表示要求成功";
-  }catch(error){localStatus="端末内通知の表示要求失敗："+String(error.message||error)}
-  try{
-   const result=await call("staff_push_test",{endpoint:pushSubscription.endpoint});
-   pushLabel(localStatus+"／配信サーバー受付"+(result.accepted?"成功":"失敗")+"。ポップアップが出ない場合はWindows・Chromeの通知表示設定を確認してください。");
-  }catch(error){
-   pushLabel(localStatus+"／配信テスト失敗："+String(error.message||error));
-  }
+  const result=await call("staff_push_test",{endpoint:pushSubscription.endpoint});
+  pushLabel(result.accepted?"配信サーバーが受け付けました。端末の通知をご確認ください。":"通知サーバーへの配信失敗");
  }catch(err){pushLabel("通知テスト失敗："+String(err.message||err))}
  finally{$("pushTest").disabled=!pushSubscription}
 });
@@ -513,21 +497,6 @@ $("unreadOnly").addEventListener("click",()=>{
  drawList();
 });
 const defaultTitle=document.title;
-let chatToastTimer=null;
-function showNewChatToast(){
- let toast=document.getElementById("chatNewMessageToast");
- if(!toast){
-  toast=document.createElement("div");toast.id="chatNewMessageToast";
-  toast.setAttribute("role","status");
-  Object.assign(toast.style,{position:"fixed",right:"16px",bottom:"20px",zIndex:"9999",maxWidth:"min(360px,calc(100vw - 32px))",padding:"14px 18px",borderRadius:"10px",background:"#193c59",color:"#fff",boxShadow:"0 8px 28px #061c3555",fontSize:"14px",fontWeight:"700",cursor:"pointer"});
-  toast.addEventListener("click",()=>{toast.hidden=true;const list=document.getElementById("threads");if(list)list.scrollIntoView({block:"nearest"})});
-  document.body.append(toast);
- }
- toast.textContent="新しいお問い合わせがあります。チャット一覧をご確認ください。";
- toast.hidden=false;
- if(chatToastTimer)clearTimeout(chatToastTimer);
- chatToastTimer=setTimeout(()=>{toast.hidden=true;chatToastTimer=null},10000);
-}
 function notificationTone(){
  if(!notifyOn)return;
  try{
@@ -631,7 +600,7 @@ async function loadList(){
   items=mergeReadAcknowledgements(next);
   listInitialized=true;
   drawList();clearError();
-  if(hasNew){notificationTone();showNewChatToast()}
+  if(hasNew)notificationTone();
   if(threadId&&!document.hidden){
    const selected=items.find(t=>t.id===threadId);
    if(selected&&selected.updated_at!==activeThreadUpdatedAt&&!threadOpening){
