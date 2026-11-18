@@ -306,7 +306,7 @@ const client=window.supabase?.createClient(url,key,{auth:{persistSession:true,au
 const names={rose:"薔薇と紳士",busty:"BUSTY OSAKA",grandluxe:"Grand Luxe",luxy:"LUXY OSAKA",unsecret:"Un Secret"};
 const visibleActionStores=new Set(["rose","busty"]);
 const links={rose:"../exa-shifts/",busty:"../exa-shifts/busty-osaka/",grandluxe:"../exa-shifts/grand-luxe/",luxy:"../exa-shifts/luxy-osaka/",unsecret:"../exa-shifts/un-secret/"};
-let data={final_today:[],outside:[],birthday:[],connected_stores:[],unconnected_stores:[]},mode=null,authorized=false;
+let data={final_today:[],outside:[],birthday:[],connected_stores:[],unconnected_stores:[]},mode=null,authorized=false,staffRestricted=false;
 let contacts=new Map();let contactSaving=false;
 let birthdayMonthOffset=0,birthdayMonthRows=null,birthdayMonthLoading=false,birthdayMonthError="",birthdayMonthRequest=0;
 const birthdayToday=()=>new Date(new Date().toLocaleString("en-US",{timeZone:"Asia/Tokyo"}));
@@ -325,7 +325,7 @@ async function loadBirthdayMonth(){
  const target=birthdayTargetDate(birthdayMonthOffset);
  const month=target.getFullYear()+"-"+String(target.getMonth()+1).padStart(2,"0")+"-01";
  try{
-  const result=await client.rpc("management_birthdays_by_month",{p_month:month});
+  const result=await client.rpc(staffRestricted?"management_staff_birthdays_by_month":"management_birthdays_by_month",{p_month:month});
   if(result.error)throw result.error;
   if(request!==birthdayMonthRequest)return;
   birthdayMonthRows=Array.isArray(result.data?.birthdays)?result.data.birthdays:[];
@@ -349,24 +349,28 @@ async function authorize(){
  ]);
  if(profile.error||!profile.data?.approved_at){showLogin("このページへの権限がありません。");return}
  const staffOnly=profile.data.role==="custom"&&Array.isArray(profile.data.features)&&profile.data.features.includes("interview");
- if(staffOnly){
-   authorized=false;$("refresh").classList.add("hidden");text($("userName"),profile.data.display_name||"スタッフ");
-   $("login").classList.add("hidden");$("app").classList.add("hidden");
-   $("staffApp").classList.remove("hidden");$("logout").classList.remove("hidden");return;
+ if(!staffOnly&&(can.error||can.data!==true||!["master","full"].includes(profile.data.role))){
+   showLogin("このページへの権限がありません。");return;
  }
- if(can.error||can.data!==true||!["master","full"].includes(profile.data.role)){
-  showLogin("このページへの権限がありません。");return
- }
+ staffRestricted=staffOnly;
  $("staffApp").classList.add("hidden");
- authorized=true;$("refresh").classList.remove("hidden");text($("userName"),profile.data.display_name||"管理者");
+ authorized=true;
+ $("refresh").classList.remove("hidden");
+ text($("userName"),profile.data.display_name||(staffOnly?"スタッフ":"管理者"));
  $("login").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");
+ // Staff can see final/outside/birthday, interview management, view-only shifts and chat.
+ for(const card of document.querySelectorAll("#app .menus .menu-card")){
+  const name=card.querySelector("strong")?.textContent?.trim();
+  if(staffOnly&&["面接数値","数値管理"].includes(name))card.classList.add("hidden");
+  else card.classList.remove("hidden");
+ }
  await load();
 }
 async function load(){
  if(!authorized)return;
  $("refresh").disabled=true;
  try{
-  const [r,contactResult]=await Promise.all([client.rpc("management_top_overview"),client.rpc("management_shift_contact_list")]);
+  const [r,contactResult]=await Promise.all([client.rpc(staffRestricted?"management_staff_top_overview":"management_top_overview"),client.rpc(staffRestricted?"management_staff_shift_contact_list":"management_shift_contact_list")]);
   if(r.error)throw r.error;
   if(contactResult.error)throw contactResult.error;
   data=r.data||data;
@@ -460,7 +464,7 @@ function render(){
    const active=!!at&&contactDay===managementBusinessDay(new Date());
    const overdue=false;
    const label=document.createElement("label");label.className="contact-check";
-   const check=document.createElement("input");check.type="checkbox";check.checked=active;check.disabled=contactSaving;
+   const check=document.createElement("input");check.type="checkbox";check.checked=active;check.disabled=contactSaving||staffRestricted;
    check.dataset.contactStore=person.store;check.dataset.contactExaId=String(person.exa_id);
    label.append(check,mk("span",mode==="final"?"対応済み":"連絡済み"));status.append(label);
    const description=!active?"未対応":mode==="final"?"対応済み・次回未定":"連絡済み・未確定";
@@ -505,7 +509,7 @@ function formatContactTime(iso){
  return new Intl.DateTimeFormat("ja-JP",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}).format(d);
 }
 async function saveContact(store,exaId,isContacted){
- if(contactSaving)return;
+ if(contactSaving||staffRestricted)return;
  contactSaving=true;
  $("listBody").querySelectorAll("input,button").forEach(el=>el.disabled=true);
  try{
@@ -584,7 +588,7 @@ $("loginForm").addEventListener("submit",async e=>{
  }catch(e){text($("loginError"),"ログインできません。スタッフ名とPASSをご確認ください。")}
  finally{submit.disabled=false}
 });
-$("logout").addEventListener("click",async()=>{await client.auth.signOut({scope:"local"});authorized=false;data={final_today:[],outside:[],birthday:[]};showLogin()});
+$("logout").addEventListener("click",async()=>{await client.auth.signOut({scope:"local"});authorized=false;staffRestricted=false;data={final_today:[],outside:[],birthday:[]};showLogin()});
 void loadStaffNames();
 authorize();
 })();
