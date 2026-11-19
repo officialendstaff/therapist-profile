@@ -173,32 +173,37 @@ main{max-width:1100px!important;width:100%!important;margin:0!important;padding:
 .upcoming-list .interview-entry small{display:block;font-size:13px;color:#536d86;line-height:1.5;margin-top:3px}
 .upcoming-list .interview-entry .mini{margin-left:auto}
 
-/* Applicant cards modeled on the existing interview management 明日以降 list */
-main{max-width:none!important;margin:0!important;padding:12px 14px!important}
-.agenda-grid{grid-template-columns:440px minmax(0,1fr)!important;gap:14px!important}
-.schedule-applicant-card{display:grid;grid-template-columns:minmax(135px,1.1fr) 135px 92px minmax(70px,1fr) 144px;gap:8px;align-items:center;background:#fff;border:1px solid #d7e0ec;border-left:3px solid #95a8bd;border-radius:6px;margin:5px 0;padding:8px;font-size:12px;min-height:73px}
-.schedule-applicant-id{display:flex;gap:9px;align-items:center;min-width:0}
-.schedule-applicant-avatar{height:46px;width:46px;min-width:46px;border-radius:50%;overflow:hidden;background:#edf2f7;display:grid;place-items:center;color:#65788c}
+/* Reproduce original interview-management 明日以降 card geometry, not a stretched name/date gap */
+.schedule-applicant-card{
+  box-sizing:border-box;display:grid;
+  grid-template-columns:48px 94px 130px 92px minmax(100px,1fr) 132px;
+  align-items:center;column-gap:8px;
+  background:#fff;border:1px solid #d7e0ec;border-left:3px solid #95a8bd;border-radius:6px;
+  margin:5px 0;padding:6px 9px;min-height:73px;font-size:12px;
+}
+.schedule-applicant-avatar{height:46px;width:46px;border-radius:50%;overflow:hidden;background:#edf2f7;display:grid;place-items:center;color:#65788c}
 .schedule-applicant-avatar img{width:100%;height:100%;object-fit:cover}
 .schedule-applicant-name{display:flex;flex-direction:column;gap:4px;min-width:0;align-items:start}
-.schedule-applicant-name strong{font-size:13px;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.schedule-applicant-name strong{font-size:13px;overflow:hidden;text-overflow:ellipsis;max-width:100%;white-space:nowrap}
 .store-pill{border:1px solid #acc0db;padding:2px 5px;border-radius:3px;color:#335f9d;font-weight:700;font-size:10px;white-space:nowrap}
-.store-pill.rose{color:#c34376;background:#ffeaf2;border-color:#e7a1bf}.store-pill.secret{color:#208371;background:#e1f7f2;border-color:#9bd1c4}.store-pill.grand{color:#8059a5;background:#f2eafb;border-color:#ccb4e3}
-.schedule-interview-datetime{background:#eaf3ff;border:1px solid #b6d1ed;border-radius:4px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;color:#215889;text-align:center;white-space:nowrap}
+.store-pill.rose{color:#c34376;background:#ffeaf2;border-color:#e7a1bf}
+.store-pill.secret{color:#208371;background:#e1f7f2;border-color:#9bd1c4}
+.store-pill.grand{color:#8059a5;background:#f2eafb;border-color:#ccb4e3}
+.schedule-interview-datetime{box-sizing:border-box;width:130px;height:54px;background:#eaf3ff;border:1px solid #b6d1ed;border-radius:4px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#215889;text-align:center;white-space:nowrap}
 .schedule-interview-datetime strong{font-size:11px}.schedule-interview-datetime small{font-size:10px;color:#7888b7}
-.schedule-confirmation,.schedule-applicant-actions{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:3px}
-.schedule-confirmation button{border:1px solid #d2d6dc;background:#e1e4e9;border-radius:4px;color:#8896aa;font-size:10px;font-weight:700;padding:6px 4px}
-.schedule-message{font-size:11px;color:#72849a;min-width:0;overflow:hidden;text-overflow:ellipsis}
-.schedule-applicant-actions{grid-template-columns:1fr 1fr}
-.schedule-applicant-actions button{border:1px solid #d6c6b9;border-radius:4px;padding:6px 2px;color:white;font-size:10px;font-weight:700;white-space:nowrap}
+.schedule-confirmation{display:grid;grid-template-columns:1fr;gap:3px;width:92px}
+.schedule-confirmation button{border:1px solid #d2d6dc;background:#e1e4e9;border-radius:4px;color:#8896aa;font-size:10px;font-weight:700;padding:6px 4px;height:25px}
+.schedule-message{font-size:11px;color:#72849a;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.schedule-applicant-actions{justify-self:end;display:grid;grid-template-columns:repeat(2,65px);gap:4px;width:134px}
+.schedule-applicant-actions button{height:27px;border:1px solid #d6c6b9;border-radius:4px;padding:4px 2px;color:white;font-size:10px;font-weight:700;white-space:nowrap}
 .schedule-applicant-actions .action-register{background:#9eabb8}
 .schedule-applicant-actions .action-change{background:#d39d61}
 .schedule-applicant-actions .action-cancel{background:#c77986}
 .schedule-applicant-actions .action-afterlife{background:#aa6477}
 .agenda-stack .upcoming-list{padding:8px 12px 12px!important}
-@media(max-width:1250px){.agenda-grid{grid-template-columns:390px minmax(0,1fr)!important}.schedule-applicant-card{grid-template-columns:minmax(125px,1fr) 130px 84px 120px;}.schedule-message{display:none}}
-@media(max-width:1050px){.agenda-grid{grid-template-columns:1fr!important}.schedule-applicant-card{grid-template-columns:minmax(125px,1fr) 135px 92px minmax(70px,1fr) 144px}.schedule-message{display:block}}
-@media(max-width:700px){.schedule-applicant-card{grid-template-columns:1fr 130px;gap:8px}.schedule-confirmation,.schedule-message{display:none}.schedule-applicant-actions{grid-column:1/-1;grid-template-columns:repeat(4,1fr)}}
+/* Keep fixed card geometry visible instead of redistributing columns and creating giant gaps. */
+@media(max-width:1150px){.agenda-grid{grid-template-columns:370px minmax(0,1fr)!important}.agenda-stack .upcoming-list{overflow-x:auto!important}.schedule-applicant-card{min-width:760px}}
+@media(max-width:900px){.agenda-grid{grid-template-columns:1fr!important}.schedule-applicant-card{min-width:760px}}
 </style></head><body><header><a class="lg-header-home" href="../management-top/" title="総合管理TOPに戻る"><img src="../interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><a href="../management-top/">総合管理TOPに戻る</a></header><main><div class="alert" id="alert"></div><div class="grid agenda-grid">
 <aside class="side-stack">
 <div class="box"><div class="box-title"><h2>日付を選択</h2><button class="btn btn-today" id="today" type="button">今日</button></div><div class="month-controls"><button class="btn" id="prevMonth">‹</button><b id="monthTitle"></b><button class="btn" id="nextMonth">›</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="calendar" id="calendar"></div><div class="calendar-legend"><span><i class="dot blue"></i>面接</span><span><i class="dot orange"></i>対応不可</span></div></div>
@@ -259,7 +264,7 @@ function render(){
  for(const i of upcoming){
   const name=esc(i.applicant_name||"氏名未取得"),photo=String(i.picture||""),isPhoto=/^https:\/\//.test(photo);
   const avatar=isPhoto?'<img src="'+esc(photo)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.parentElement.classList.add(\'missing-avatar\')">':'<span class="fallback-person">♙</span>';
-  out+='<article class="schedule-applicant-card"><div class="schedule-applicant-id"><div class="schedule-applicant-avatar">'+avatar+'</div><div class="schedule-applicant-name"><strong>'+name+'</strong><span class="store-pill '+shopClass(String(i.shop||""))+'">'+esc(i.shop)+'</span></div></div>'+
+  out+='<article class="schedule-applicant-card"><div class="schedule-applicant-avatar">'+avatar+'</div><div class="schedule-applicant-name"><strong>'+name+'</strong><span class="store-pill '+shopClass(String(i.shop||""))+'">'+esc(i.shop)+'</span></div>'+
   '<div class="schedule-interview-datetime"><strong>'+esc(i.date)+' '+esc(i.time)+'</strong><small>担当：'+esc(me?.name||"本人")+'</small></div>'+
   '<div class="schedule-confirmation"><button type="button" data-open-management="1">LINE送信</button><button type="button" data-open-management="1">確認OK</button></div>'+
   '<div class="schedule-message"><span class="schedule-message-label">'+esc(i.status)+'</span></div>'+
