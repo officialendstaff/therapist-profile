@@ -299,13 +299,32 @@ main>.agenda-grid>.agenda-stack>.box{width:100%;max-width:none}
 </style></head><body><header><a class="lg-header-home" href="../management-top/" title="総合管理TOPに戻る"><img src="../interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><a href="../management-top/">総合管理TOPに戻る</a></header><main><div class="alert" id="alert"></div><div class="grid agenda-grid">
 <aside class="side-stack">
 <div class="box"><div class="box-title"><h2>日付を選択</h2><button class="btn btn-today" id="today" type="button">今日</button></div><div class="month-controls"><button class="btn" id="prevMonth">‹</button><b id="monthTitle"></b><button class="btn" id="nextMonth">›</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="calendar" id="calendar"></div><div class="calendar-legend"><span><i class="dot blue"></i>面接</span><span><i class="dot orange"></i>対応不可</span></div></div>
-<div class="box quick-block"><div class="box-title"><h2>対応不可の設定</h2></div><div class="quick-block-body"><p id="blockSelectedDate"></p><button class="btn primary full" id="addBlock">＋ 対応不可を登録</button><p class="quick-hint">日付を選び、終日または時間帯を登録できます。</p></div></div>
+<div class="box quick-block"><div class="box-title"><h2>対応不可の設定</h2></div><form id="blockForm" class="quick-block-body">
+<div class="block-form-label">登録する日程</div>
+<div class="block-mode">
+<label><input type="radio" name="blockMode" value="single" checked>選択日</label>
+<label><input type="radio" name="blockMode" value="multi">複数日</label>
+<label><input type="radio" name="blockMode" value="daily">毎日</label>
+<label><input type="radio" name="blockMode" value="weekly">毎週</label>
+</div>
+<p id="blockSelectedDate" class="block-selected-day"></p>
+<div id="multiDateArea" hidden><div class="block-inline-head">カレンダーから複数日を選択 <button type="button" class="mini" id="clearDates">選択解除</button></div><div class="selected-dates" id="selectedDates">未選択</div></div>
+<div id="repeatArea" hidden><div class="repeat-dates"><label>開始日<input id="repeatFrom" type="date"></label><label>終了日<input id="repeatTo" type="date"></label></div>
+<div id="weekdayArea" hidden><div class="block-inline-head">曜日を指定（複数可）</div><div class="weekday-choices" id="weekdayChoices">
+<label><input type="checkbox" value="0">日</label><label><input type="checkbox" value="1">月</label><label><input type="checkbox" value="2">火</label><label><input type="checkbox" value="3">水</label><label><input type="checkbox" value="4">木</label><label><input type="checkbox" value="5">金</label><label><input type="checkbox" value="6">土</label>
+</div></div><p class="quick-hint">期間内の日付へ保存（最大90日・自動延長なし）</p></div>
+<div class="block-form-label" style="margin-top:14px">対応不可の時間</div>
+<div class="block-type"><label><input type="radio" name="blockType" value="all" checked>終日不可</label><label><input type="radio" name="blockType" value="time">時間指定</label></div>
+<div id="blockTimeArea" hidden><div id="blockTimeRows"></div><button type="button" class="btn btn-add-range" id="addTimeRange">＋ 時間帯を追加</button><p class="quick-hint">同日にも複数の時間帯を保存できます。</p></div>
+<div id="blockError" class="alert" role="alert"></div>
+<button class="btn primary full" type="submit" id="blockSave">設定を保存</button>
+<p class="quick-hint">保存済みの設定は右側の一覧から個別に解除できます。</p>
+</form></div>
 </aside>
 <section class="agenda-stack">
 <div class="box upcoming-box"><div class="boardhead"><div><h2>今日以降の面接予定 <span id="upcomingCount" class="count-chip">0件</span></h2><p>本人の確定済み予定を日時順に表示</p></div><button class="btn" id="reload" type="button">情報更新</button></div><div id="upcoming" class="upcoming-list"><div class="loading">読み込み中…</div></div></div>
 <div class="box"><div class="boardhead"><div><h2>対応不可日時一覧 <span id="futureBlockCount" class="count-chip">0件</span></h2></div></div><div id="futureBlocks" class="block-list block-list-right"><div class="loading">読み込み中…</div></div></div>
 </section></div><div id="ownActions" hidden></div></main>
-<dialog id="blockDialog"><div class="dialogtitle">対応不可を登録</div><form id="blockForm" class="dialogbody"><label>日付<input id="blockDate" type="date" required></label><label><input id="allDay" type="checkbox" checked style="width:auto;display:inline;margin:0 6px 0 0">終日</label><div id="timeFields" hidden><label>開始<input type="time" id="blockStart" value="19:00"></label><label>終了<input type="time" id="blockEnd" value="23:59"></label></div><div id="blockError" class="alert"></div><div class="dialogbottom"><button class="btn" type="button" data-close="blockDialog">閉じる</button><button class="btn primary" type="submit" id="blockSave">登録</button></div></form></dialog>
 <dialog id="moveDialog"><div class="dialogtitle">自分の面接予定を変更</div><form id="moveForm" class="dialogbody"><p id="moveLabel" style="margin-bottom:14px"></p><label>日付<input type="date" id="moveDate" required></label><label>時刻（30分単位）<input type="time" id="moveTime" min="10:00" max="23:30" step="1800" required></label><div id="moveError" class="alert"></div><div class="dialogbottom"><button class="btn" type="button" data-close="moveDialog">閉じる</button><button class="btn primary" type="submit" id="moveSave">保存</button></div></form></dialog>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js"></script><script>
 (()=>{"use strict";const $=id=>document.getElementById(id),db=window.supabase?.createClient("https://vjjnkflbfsjihwzjsjpr.supabase.co","sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos",{auth:{persistSession:true,autoRefreshToken:true,storage:localStorage,storageKey:"mattan-recruit-auth"}});
