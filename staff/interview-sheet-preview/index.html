@@ -2781,11 +2781,12 @@ async function refreshChartAvailability(){
 function chartBookedSlot(staff,day,hour,minute){const editPanel=$('registrationPanel');const editedId=editPanel&&!editPanel.hidden?Number(editPanel.dataset.editInterviewId||0):0;const slot=hour*60+minute;return (liveInterviewLists.rows||[]).find(r=>{if(editedId&&Number(r.interviewId)===editedId)return false;if(r.staff!==staff||String(r.date||'').slice(0,10)!==day)return false;if(['キャンセル','無断トビ','トビ（キャンセル）','返信なし','日程未定','日程調整中','採用','不採用','辞退'].includes(r.status))return false;const time=String(r.date||'').match(/(?:^|\s)(\d{1,2}):(\d{2})/);if(!time)return false;const start=Number(time[1])*60+Number(time[2]);return slot>=start&&slot<start+(staff==='村上'?90:60)})}
 function chartHalfHourAvailable(staff,day,index){const minutes=600+index*30;return index>=0&&index<28&&chartAvailability.get(staff+':'+index)===true&&!chartBookedSlot(staff,day,Math.floor(minutes/60),minutes%60)}
 function chartStartSlotAvailable(staff,day,index){
- const duration=staff==='村上'?90:60;
- const start=600+index*30;
+ // Corresponding unavailability blocks restrict interview START times.
+ // Example: 18:00〜以降不可 allows 17:30 as the last starting slot.
+ if(index<0||index>=28||chartAvailability.get(staff+':'+index)!==true)return false;
+ const duration=staff==='村上'?90:60, start=600+index*30;
+ // Existing interview conflicts still account for the full appointment length.
  for(let offset=0;offset<duration;offset+=30){
-  const part=index+offset/30;
-  if(part>=28||chartAvailability.get(staff+':'+part)!==true)return false;
   const minutes=start+offset;
   if(chartBookedSlot(staff,day,Math.floor(minutes/60),minutes%60))return false;
  }
