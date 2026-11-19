@@ -371,6 +371,10 @@ main>.agenda-grid>.agenda-stack>.box{width:100%;max-width:none}
 .agenda-pagination .mini{padding:5px 10px;font-size:16px;line-height:1}
 .agenda-pagination .mini:disabled{opacity:.35;cursor:default}
 #agendaPageLabel{font-size:12px;font-weight:700;color:#526a84;font-variant-numeric:tabular-nums}
+
+/* Reserve five interview-card rows even when fewer than five appointments exist. */
+.agenda-stack .upcoming-list{min-height:450px!important;box-sizing:border-box!important;align-content:start!important}
+@media(max-width:700px){.agenda-stack .upcoming-list{min-height:450px!important}}
 </style></head><body><header><a class="lg-header-home" href="../management-top/" title="総合管理TOPに戻る"><img src="../interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><a href="../management-top/">総合管理TOPに戻る</a></header><main><div class="alert" id="alert"></div><div class="grid agenda-grid">
 <aside class="side-stack">
 <div class="box"><div class="box-title"><h2>日付を選択</h2><button class="btn btn-today" id="today" type="button">今日</button></div><div class="month-controls"><button class="btn" id="prevMonth">‹</button><b id="monthTitle"></b><button class="btn" id="nextMonth">›</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="calendar" id="calendar"></div><div class="calendar-legend"><span><i class="dot blue"></i>面接</span><span><i class="dot orange"></i>対応不可</span></div></div>
