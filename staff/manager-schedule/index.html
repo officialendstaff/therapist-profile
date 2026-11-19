@@ -336,6 +336,20 @@ main>.agenda-grid>.agenda-stack>.box{width:100%;max-width:none}
 }
 .block-mode label:has(input:focus-visible),.block-type label:has(input:focus-visible),.weekday-choices label:has(input:focus-visible){outline:2px solid #2563a6;outline-offset:2px}
 .block-mode label:hover,.block-type label:hover,.weekday-choices label:hover{border-color:#76a5d2}
+
+/* Japanese weekend and national holiday calendar; never allow past dates */
+.week span:first-child{color:#bd4153!important;font-weight:800}
+.week span:last-child{color:#2766ad!important;font-weight:800}
+.calendar .day.sunday,.calendar .day.holiday{color:#c34b59!important;background:#fff0f1}
+.calendar .day.saturday:not(.holiday){color:#2869b4!important;background:#eef5ff}
+.calendar .day.active{background:#234f7f!important;color:#fff!important}
+.calendar .day.past,.calendar .day.past.sunday,.calendar .day.past.saturday,.calendar .day.past.holiday{
+  color:#aab1bc!important;background:#ebeef2!important;border-color:#e3e6eb!important;
+  opacity:1!important;cursor:not-allowed!important
+}
+.calendar .day.past .day-dots{opacity:.45}
+.calendar .day.today:not(.active){border:2px solid #d4a449}
+#prevMonth:disabled{opacity:.35;cursor:not-allowed}
 </style></head><body><header><a class="lg-header-home" href="../management-top/" title="総合管理TOPに戻る"><img src="../interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><a href="../management-top/">総合管理TOPに戻る</a></header><main><div class="alert" id="alert"></div><div class="grid agenda-grid">
 <aside class="side-stack">
 <div class="box"><div class="box-title"><h2>日付を選択</h2><button class="btn btn-today" id="today" type="button">今日</button></div><div class="month-controls"><button class="btn" id="prevMonth">‹</button><b id="monthTitle"></b><button class="btn" id="nextMonth">›</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="calendar" id="calendar"></div><div class="calendar-legend"><span><i class="dot blue"></i>面接</span><span><i class="dot orange"></i>対応不可</span></div></div>
@@ -369,6 +383,8 @@ main>.agenda-grid>.agenda-stack>.box{width:100%;max-width:none}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js"></script><script>
 (()=>{"use strict";const $=id=>document.getElementById(id),db=window.supabase?.createClient("https://vjjnkflbfsjihwzjsjpr.supabase.co","sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos",{auth:{persistSession:true,autoRefreshToken:true,storage:localStorage,storageKey:"mattan-recruit-auth"}});
 const pad=n=>String(n).padStart(2,"0"),jst=()=>new Intl.DateTimeFormat("sv-SE",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date()),dObj=s=>new Date(s+"T12:00:00+09:00"),dFmt=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()),step=(d,n)=>{const x=dObj(d);x.setDate(x.getDate()+n);return dFmt(x)},esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+// Japanese national holidays & statutory substitute holidays, Cabinet Office (published 2026–2027)
+const PUBLIC_HOLIDAYS={"2026-01-01":"元日","2026-01-12":"成人の日","2026-02-11":"建国記念の日","2026-02-23":"天皇誕生日","2026-03-20":"春分の日","2026-04-29":"昭和の日","2026-05-03":"憲法記念日","2026-05-04":"みどりの日","2026-05-05":"こどもの日","2026-05-06":"振替休日","2026-07-20":"海の日","2026-08-11":"山の日","2026-09-21":"敬老の日","2026-09-22":"国民の休日","2026-09-23":"秋分の日","2026-10-12":"スポーツの日","2026-11-03":"文化の日","2026-11-23":"勤労感謝の日","2027-01-01":"元日","2027-01-11":"成人の日","2027-02-11":"建国記念の日","2027-02-23":"天皇誕生日","2027-03-21":"春分の日","2027-03-22":"振替休日","2027-04-29":"昭和の日","2027-05-03":"憲法記念日","2027-05-04":"みどりの日","2027-05-05":"こどもの日","2027-07-19":"海の日","2027-08-11":"山の日","2027-09-20":"敬老の日","2027-09-23":"秋分の日","2027-10-11":"スポーツの日","2027-11-03":"文化の日","2027-11-23":"勤労感謝の日"};
 let selected=jst(),month=selected.slice(0,7),state={me:null,managers:[],interviews:[],blocks:[]},moving=null,busy=false,selectedMultiple=new Set(),blockMode='single',blockType='all';
 const say=t=>$("alert").textContent=t||"",active=x=>["面接予定","日程変更"].includes(x.status);
 function filter(date,uid,kind){return (kind==="block"?state.blocks:state.interviews).filter(x=>x.date===date&&x.uid===uid)}
@@ -402,8 +418,14 @@ function render(){
  const me=state.managers.find(m=>m.id===state.me),mine=me?.id,now=jst(),[year,mon]=month.split("-").map(Number),last=new Date(year,mon,0).getDate(),offset=new Date(year,mon-1,1).getDay();
  $("monthTitle").textContent=year+"年"+mon+"月";
  let cal="";for(let x=0;x<offset;x++)cal+="<span></span>";
- for(let d=1;d<=last;d++){const date=month+"-"+pad(d),iv=state.interviews.some(x=>x.uid===mine&&x.date===date&&active(x)),bl=state.blocks.some(x=>x.uid===mine&&x.date===date);
- cal+='<button class="day '+((blockMode==="multi"?selectedMultiple.has(date):date===selected)?"active ":"")+(date===now?"today":"")+'" data-date="'+date+'">'+d+'<span class="day-dots">'+(iv?'<i class="dot blue"></i>':"")+(bl?'<i class="dot orange"></i>':"")+'</span></button>'}
+ for(let d=1;d<=last;d++){
+  const date=month+"-"+pad(d),weekday=new Date(year,mon-1,d).getDay(),holiday=PUBLIC_HOLIDAYS[date],past=date<now;
+  const iv=state.interviews.some(x=>x.uid===mine&&x.date===date&&active(x)),bl=state.blocks.some(x=>x.uid===mine&&x.date===date);
+  const classes=["day",weekday===0?"sunday":weekday===6?"saturday":"",holiday?"holiday":"",past?"past":"",((blockMode==="multi"?selectedMultiple.has(date):date===selected)?"active":""),(date===now?"today":"")].filter(Boolean).join(" ");
+  const label=holiday?esc(holiday):weekday===0?"日曜日":weekday===6?"土曜日":"";
+  cal+='<button type="button" class="'+classes+'" data-date="'+date+'" aria-label="'+date+(label?" "+label:"")+'" title="'+label+'"'+(past?' disabled aria-disabled="true"':"")+'>'+d+'<span class="day-dots">'+(iv?'<i class="dot blue"></i>':"")+(bl?'<i class="dot orange"></i>':"")+'</span></button>';
+ }
+ $("prevMonth").disabled=month<=now.slice(0,7);
  $("calendar").innerHTML=cal;
  const displayDate=d=>d.slice(5).replace("-","/")+"（"+"日月火水木金土"[dObj(d).getDay()]+"）";
 
@@ -427,11 +449,11 @@ function render(){
  $("futureBlockCount").textContent=futureBlocks.length+"件";
  $("futureBlocks").innerHTML=futureBlocks.map(b=>'<div class="block-entry"><div><b>'+displayDate(b.date)+'</b><small>'+(b.all_day?"終日":esc(b.start)+"〜"+esc(b.end))+'</small></div><button class="mini" data-delete="'+b.id+'">解除</button></div>').join("")||'<div class="muted">登録なし</div>';
 }
-$("calendar").onclick=e=>{const b=e.target.closest("[data-date]");if(!b)return;const d=b.dataset.date;if(blockMode==="multi"){if(d<jst())return;if(selectedMultiple.has(d))selectedMultiple.delete(d);else selectedMultiple.add(d)}else selected=d;render()};$("upcoming").onclick=handleEventClick;$("futureBlocks").onclick=handleEventClick;async function handleEventClick(e){if(e.target.closest("[data-open-management]")){location.href="../interview-sheet-preview/";return}const mv=e.target.closest("[data-move]"),del=e.target.closest("[data-delete]");if(mv){moving=state.interviews.find(i=>i.id===Number(mv.dataset.move)&&i.uid===state.me);if(!moving)return;$("moveLabel").textContent=moving.shop+"｜"+moving.date+" "+moving.time;$("moveDate").value=moving.date;$("moveDate").min=jst();$("moveTime").value=moving.time;$("moveError").textContent="";$("moveDialog").showModal()}else if(del){const b=state.blocks.find(x=>x.id===Number(del.dataset.delete)&&x.uid===state.me);if(!b||!confirm("自分の対応不可を解除しますか？"))return;const {error}=await db.from("interview_staff_unavailability").delete().eq("id",b.id).eq("interviewer_user_id",state.me);if(error)say("解除できません："+error.message);else await load()}}
+$("calendar").onclick=e=>{const b=e.target.closest("[data-date]");if(!b||b.disabled)return;const d=b.dataset.date;if(blockMode==="multi"){if(selectedMultiple.has(d))selectedMultiple.delete(d);else selectedMultiple.add(d)}else selected=d;render()};$("upcoming").onclick=handleEventClick;$("futureBlocks").onclick=handleEventClick;async function handleEventClick(e){if(e.target.closest("[data-open-management]")){location.href="../interview-sheet-preview/";return}const mv=e.target.closest("[data-move]"),del=e.target.closest("[data-delete]");if(mv){moving=state.interviews.find(i=>i.id===Number(mv.dataset.move)&&i.uid===state.me);if(!moving)return;$("moveLabel").textContent=moving.shop+"｜"+moving.date+" "+moving.time;$("moveDate").value=moving.date;$("moveDate").min=jst();$("moveTime").value=moving.time;$("moveError").textContent="";$("moveDialog").showModal()}else if(del){const b=state.blocks.find(x=>x.id===Number(del.dataset.delete)&&x.uid===state.me);if(!b||!confirm("自分の対応不可を解除しますか？"))return;const {error}=await db.from("interview_staff_unavailability").delete().eq("id",b.id).eq("interviewer_user_id",state.me);if(error)say("解除できません："+error.message);else await load()}}
 $("today").onclick=()=>setDate(jst());$("reload").onclick=load;
 
 async function setDate(d){selected=d;if(month!==d.slice(0,7)){month=d.slice(0,7);await load()}else render()}
-async function setMonth(n){let [y,m]=month.split("-").map(Number),date=new Date(y,m-1+n,1);month=dFmt(date).slice(0,7);selected=month+"-01";await load()}
+async function setMonth(n){let [y,m]=month.split("-").map(Number),date=new Date(y,m-1+n,1),target=dFmt(date).slice(0,7);if(target<jst().slice(0,7))return;month=target;selected=month===jst().slice(0,7)?jst():month+"-01";await load()}
 $("prevMonth").onclick=()=>setMonth(-1);$("nextMonth").onclick=()=>setMonth(1);
 
 function addTimeRow(from="10:00",to="12:00"){
