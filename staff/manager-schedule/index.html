@@ -320,6 +320,22 @@ main>.agenda-grid>.agenda-stack>.box{width:100%;max-width:none}
 #blockError:not(:empty){display:block;margin-top:10px;font-size:12px}
 .quick-block-body>.full{margin-top:13px}
 #blockForm .quick-hint{font-size:11px;line-height:1.5;margin:9px 0 0}
+
+/* Tap-select controls: hide native radio/checkbox graphics while retaining semantics */
+.block-mode label,.block-type label,.weekday-choices label{position:relative;user-select:none;min-height:38px;transition:background-color .12s,border-color .12s}
+.block-mode label input,.block-type label input,.weekday-choices label input{
+ position:absolute!important;width:1px!important;height:1px!important;
+ padding:0!important;margin:-1px!important;overflow:hidden!important;
+ clip:rect(0,0,0,0)!important;clip-path:inset(50%)!important;
+ white-space:nowrap!important;border:0!important;opacity:0!important;
+}
+.block-mode label:has(input:checked),.block-type label:has(input:checked),.weekday-choices label:has(input:checked){
+ background:#dceeff!important;border:1px solid #3a79b7!important;
+ color:#174b79!important;font-weight:800!important;
+ box-shadow:inset 0 0 0 1px #3a79b7;
+}
+.block-mode label:has(input:focus-visible),.block-type label:has(input:focus-visible),.weekday-choices label:has(input:focus-visible){outline:2px solid #2563a6;outline-offset:2px}
+.block-mode label:hover,.block-type label:hover,.weekday-choices label:hover{border-color:#76a5d2}
 </style></head><body><header><a class="lg-header-home" href="../management-top/" title="総合管理TOPに戻る"><img src="../interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><a href="../management-top/">総合管理TOPに戻る</a></header><main><div class="alert" id="alert"></div><div class="grid agenda-grid">
 <aside class="side-stack">
 <div class="box"><div class="box-title"><h2>日付を選択</h2><button class="btn btn-today" id="today" type="button">今日</button></div><div class="month-controls"><button class="btn" id="prevMonth">‹</button><b id="monthTitle"></b><button class="btn" id="nextMonth">›</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="calendar" id="calendar"></div><div class="calendar-legend"><span><i class="dot blue"></i>面接</span><span><i class="dot orange"></i>対応不可</span></div></div>
