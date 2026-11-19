@@ -296,6 +296,30 @@ main>.agenda-grid>.agenda-stack>.box{width:100%;max-width:none}
  .schedule-applicant-avatar{height:48px!important;width:48px!important}
  .schedule-interview-datetime{height:56px!important}
 }
+
+/* Availability setting form: daily, weekday repeat, multi-date and multiple slots */
+.quick-block-body{padding:16px!important}
+.block-form-label{font-size:14px;font-weight:750;margin-bottom:9px;color:#30465f}
+.block-mode{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+.block-mode label,.block-type label,.weekday-choices label{border:1px solid #cfdae8;border-radius:6px;background:#f7f9fc;min-width:0;padding:10px 4px;display:flex;align-items:center;justify-content:center;gap:4px;font-size:12px;cursor:pointer}
+.block-mode input,.block-type input,.weekday-choices input{accent-color:#275886;margin:0;flex-shrink:0}
+.block-mode label:has(input:checked),.block-type label:has(input:checked),.weekday-choices label:has(input:checked){background:#e5f1fd;border-color:#77a6d0;color:#174b79;font-weight:750}
+.block-selected-day{font-size:12px!important;margin:10px 0 0!important;color:#48627b!important}
+.block-type{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.block-inline-head{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:700;margin:10px 0 7px}
+.selected-dates{font-size:12px;line-height:1.7;max-height:72px;overflow:auto;color:#35546f}
+.repeat-dates{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.repeat-dates label{font-size:12px;font-weight:700}
+.repeat-dates input{display:block;width:100%;min-width:0;margin-top:5px;border:1px solid #ced9e5;border-radius:6px;padding:7px 4px;font-size:12px}
+.weekday-choices{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.weekday-choices label{font-size:11px;padding:8px 1px}
+.block-time-row{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto;gap:5px;align-items:center;margin-top:8px}
+.block-time-row input{min-width:0;width:100%;border:1px solid #cfdae8;border-radius:6px;padding:7px 3px;font-size:13px}
+.block-time-row span{font-size:12px}
+.btn-add-range{margin-top:9px;font-size:12px!important}
+#blockError:not(:empty){display:block;margin-top:10px;font-size:12px}
+.quick-block-body>.full{margin-top:13px}
+#blockForm .quick-hint{font-size:11px;line-height:1.5;margin:9px 0 0}
 </style></head><body><header><a class="lg-header-home" href="../management-top/" title="総合管理TOPに戻る"><img src="../interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><a href="../management-top/">総合管理TOPに戻る</a></header><main><div class="alert" id="alert"></div><div class="grid agenda-grid">
 <aside class="side-stack">
 <div class="box"><div class="box-title"><h2>日付を選択</h2><button class="btn btn-today" id="today" type="button">今日</button></div><div class="month-controls"><button class="btn" id="prevMonth">‹</button><b id="monthTitle"></b><button class="btn" id="nextMonth">›</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="calendar" id="calendar"></div><div class="calendar-legend"><span><i class="dot blue"></i>面接</span><span><i class="dot orange"></i>対応不可</span></div></div>
