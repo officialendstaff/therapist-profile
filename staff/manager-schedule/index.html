@@ -406,6 +406,27 @@ main>.agenda-grid>.agenda-stack>.box{width:100%;max-width:none}
  .schedule-applicant-actions{gap:3px!important}
  .schedule-applicant-actions button{height:23px!important;padding:2px!important;font-size:10px!important}
 }
+
+/* Five equal appointment slots within the calendar-matched top row */
+@media(min-width:951px){
+ .agenda-grid>.agenda-stack>.upcoming-box{
+  display:flex!important;flex-direction:column!important;min-height:0!important;
+ }
+ .agenda-grid>.agenda-stack>.upcoming-box>.boardhead{flex:0 0 auto}
+ .agenda-grid>.agenda-stack>.upcoming-box>.upcoming-list{
+  flex:1 1 auto!important;min-height:0!important;height:auto!important;
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:repeat(5,minmax(0,1fr))!important;
+  grid-auto-flow:row!important;align-content:stretch!important;
+  gap:4px!important;padding:6px 9px 8px!important;overflow:hidden!important;
+ }
+ .agenda-grid>.agenda-stack>.upcoming-box .schedule-applicant-card{
+  width:100%!important;height:100%!important;min-height:0!important;
+  margin:0!important;padding:3px 9px!important;align-self:stretch!important;
+ }
+ .agenda-grid>.agenda-stack>.upcoming-box .schedule-applicant-avatar{height:46px!important;width:46px!important}
+ .agenda-grid>.agenda-stack>.upcoming-box .schedule-interview-datetime{height:48px!important}
+}
 </style></head><body><header><a class="lg-header-home" href="../management-top/" title="総合管理TOPに戻る"><img src="../interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><a href="../management-top/">総合管理TOPに戻る</a></header><main><div class="alert" id="alert"></div><div class="grid agenda-grid">
 <aside class="side-stack">
 <div class="box"><div class="box-title"><h2>日付を選択</h2><button class="btn btn-today" id="today" type="button">今日</button></div><div class="month-controls"><button class="btn" id="prevMonth">‹</button><b id="monthTitle"></b><button class="btn" id="nextMonth">›</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="calendar" id="calendar"></div><div class="calendar-legend"><span><i class="dot blue"></i>面接</span><span><i class="dot orange"></i>対応不可</span></div></div>
