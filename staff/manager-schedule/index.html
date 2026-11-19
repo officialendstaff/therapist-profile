@@ -545,12 +545,14 @@ async function load(){
  try{
   const today=jst(),base=today.slice(0,7);
   const ymOffset=(ym,n)=>{const [y,m]=ym.split("-").map(Number);const d=new Date(y,m-1+n,1);return d.getFullYear()+"-"+pad(d.getMonth()+1)};
-  const months=[month,base,ymOffset(base,1),ymOffset(base,2)].filter((x,i,a)=>a.indexOf(x)===i);
+  // One year of upcoming appointments, plus any separately viewed calendar month.
+  const firstMonth=base, lastMonth=ymOffset(base,12);
+  const ranges=[[firstMonth+"-01",monthBounds(lastMonth)[1]]];
+  if(month>lastMonth)ranges.push(monthBounds(month));
   const results=[];
-  for(const ym of months){
-   const [p_from,p_to]=monthBounds(ym);
-   const span=(Date.parse(p_to+"T00:00:00Z")-Date.parse(p_from+"T00:00:00Z"))/86400000;
-   if(!/^\d{4}-\d{2}-\d{2}$/.test(p_from)||!/^\d{4}-\d{2}-\d{2}$/.test(p_to)||!Number.isFinite(span)||span<0||span>62)throw new Error("取得期間が不正です："+p_from+"〜"+p_to);
+  for(const [p_from,p_to] of ranges){
+   const span=Math.round((Date.parse(p_to+"T00:00:00Z")-Date.parse(p_from+"T00:00:00Z"))/86400000);
+   if(!/^\d{4}-\d{2}-\d{2}$/.test(p_from)||!/^\d{4}-\d{2}-\d{2}$/.test(p_to)||span<0||span>400)throw new Error("取得期間が不正です");
    const {data,error}=await db.rpc("manager_schedule_overview",{p_from,p_to});
    if(error)throw new Error(error.message+"（"+p_from+"〜"+p_to+"）");
    results.push(data);
@@ -693,7 +695,9 @@ $("blockForm").onsubmit=async e=>{
  }catch(err){errorEl.textContent=err.message||String(err)}
  finally{btn.disabled=false}
 };
-$("moveForm").onsubmit=async e=>{e.preventDefault();if(!moving)return;let date=$("moveDate").value,time=$("moveTime").value;if(date<jst()||time<"10:00"||time>"23:30"||!["00","30"].includes(time.slice(3,5))){$("moveError").textContent="日時を確認してください";return}let btn=$("moveSave");btn.disabled=true;const {error}=await db.rpc("manager_schedule_reschedule",{p_id:moving.id,p_date:date,p_time:time});btn.disabled=false;if(error){$("moveError").textContent=error.message;return}$("moveDialog").close();moving=null;await setDate(date);await load()};
+$("moveForm").onsubmit=async e=>{e.preventDefault();if(!moving)return;let date=$("moveDate").value,time=$("moveTime").value;if(date<jst()||time<"10:00"||time>"23:30"||!["00","30"].includes(time.slice(3,5))){$("moveError").textContent="日時を確認してください";return}let btn=$("moveSave");btn.disabled=true;const {error}=await db.rpc("manager_schedule_reschedule",{p_id:moving.id,p_date:date,p_time:time});btn.disabled=false;if(error){$("moveError").textContent=error.message;return}$("moveDialog").close();moving=null;selected=date;month=date.slice(0,7);agendaPage=0;await load()};
 authorized().then(ok=>{if(ok)load()});
+setInterval(()=>{if(!document.hidden&&!busy)load()},90000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!busy)load()});
 })();
 </script></body></html>
