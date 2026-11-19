@@ -563,7 +563,13 @@ async function call(action,params={}){
  catch(e){if(e.status===401)unauthorized();throw e}
 }
 function isUnread(t){return !!(t.last_customer_message_at&&(!t.staff_last_read_at||new Date(t.last_customer_message_at)>new Date(t.staff_last_read_at)))}
-function nameOf(t){const visitor=t.booking_chat_visitors;const saved=typeof visitor?.display_name==="string"?visitor.display_name.trim():"";return saved||String(t.visitor_id||"").slice(0,8)+" 様"}
+function nameOf(t){
+ const visitor=t.booking_chat_visitors;
+ const saved=typeof visitor?.display_name==="string"?visitor.display_name.trim():"";
+ const base=saved||String(t.visitor_id||"").slice(0,8);
+ const digits=String(visitor?.phone||"");
+ return base+(/^[0-9]{6}$/.test(digits)?" "+digits:"")+" 様";
+}
 function drawList(){
  const list=$("threads");list.replaceChildren();
  let unread=0;
@@ -663,7 +669,7 @@ async function openThread(id,options={}){
   $("editCustomerName").hidden=false;
   showCustomerTitle(data.thread);
   for(const item of items){
-   if(String(item.visitor_id)===currentCustomerId)item.booking_chat_visitors={...(item.booking_chat_visitors||{}),display_name:currentCustomerName||null};
+   if(String(item.visitor_id)===currentCustomerId)item.booking_chat_visitors={...(item.booking_chat_visitors||{}),display_name:currentCustomerName||null,phone:data.thread.booking_chat_visitors?.phone??item.booking_chat_visitors?.phone??null};
   }
   drawList();
   const rel=$("relatedThreads");rel.replaceChildren();
