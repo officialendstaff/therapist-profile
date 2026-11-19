@@ -610,9 +610,9 @@ $("prevMonth").onclick=()=>setMonth(-1);$("nextMonth").onclick=()=>setMonth(1);
 
 function addTimeRow(from="10:00",to="12:00"){
  const row=document.createElement("div");row.className="block-time-row";
- const start=document.createElement("input");start.type="time";start.step=1800;start.value=from;start.setAttribute("aria-label","対応不可の開始時刻");
+ const start=document.createElement("input");start.type="time";start.step=1800;start.min="10:00";start.max="23:30";start.value=from;start.setAttribute("aria-label","対応不可の開始時刻");
  const end=document.createElement("select");end.setAttribute("aria-label","対応不可の終了時刻");
- for(let h=0;h<24;h++)for(const minute of ["00","30"]){
+ for(let h=10;h<24;h++)for(const minute of ["00","30"]){
   const v=String(h).padStart(2,"0")+":"+minute;
   const option=document.createElement("option");option.value=v;option.textContent=v;end.append(option);
  }
@@ -666,7 +666,7 @@ $("blockForm").onsubmit=async e=>{
    return {all_day:false,start_time:start.value,end_time:end.value};
   });
   const validTime=x=>/^([01]\d|2[0-3]):[0-5]\d$/.test(x);
-  if(!ranges.length||ranges.some(x=>!x.all_day&&(!validTime(x.start_time)||!validTime(x.end_time)||x.start_time>=x.end_time)))throw Error("開始時間と終了時間を確認してください");
+  if(!ranges.length||ranges.some(x=>!x.all_day&&(!validTime(x.start_time)||!validTime(x.end_time)||x.start_time<"10:00"||x.start_time>"23:30"||x.start_time>=x.end_time)))throw Error("開始時間と終了時間を確認してください");
   const sorted=ranges.filter(x=>!x.all_day).sort((a,b)=>a.start_time.localeCompare(b.start_time));
   if(sorted.some((x,i)=>i>0&&sorted[i-1].end_time>x.start_time))throw Error("時間帯が重複しています");
   btn.disabled=true;
