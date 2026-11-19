@@ -414,6 +414,11 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
 #blockDialogError{margin-top:11px!important;color:#b22c46!important;font-size:12px!important}
 #blockDialogError:empty{display:none}
 @media(max-width:700px){#chatBlockDialog{padding:22px 18px}#chatBlockDialog .block-dialog-actions button{flex:1;min-width:0}}
+/* Unified compact 49px management header; chat body keeps fixed viewport */
+header.lg-common-header{height:49px!important;min-height:49px!important;max-height:49px!important;padding:0 12px!important;flex-wrap:nowrap!important;gap:8px!important}
+header.lg-common-header .lg-header-home img{width:32px;height:37px}
+header.lg-common-header .lg-chat-header-actions{gap:5px}
+header.lg-common-header button{padding:5px 7px;font-size:10px}
 </style></head><body>
 <div id="authLoading" role="status" aria-live="polite"><span class="auth-spinner" aria-hidden="true"></span><span>管理者認証を確認中…</span></div>
 <div id="gate" class="lg-interview-login" hidden><div class="auth-card">
