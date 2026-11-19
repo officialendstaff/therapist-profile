@@ -73,7 +73,47 @@ header.header .brand img,header.lg-common-header .lg-header-home img,header .lg-
 header.header .brand #homeLabel,header.lg-common-header .lg-header-home span,header .lg-header-home span{
   font-size:13px!important;font-weight:700!important;letter-spacing:normal!important;
 }
-</style></head><body><header><a class="lg-header-home" href="../management-top/" title="総合管理TOPに戻る"><img src="../interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><a href="../management-top/">総合管理TOPに戻る</a></header><main><div class="alert" id="alert"></div><div class="grid"><aside><div class="box"><div class="box-title"><h2>日付を選択</h2></div><div class="month-controls"><button class="btn" id="prevMonth">‹</button><b id="monthTitle"></b><button class="btn" id="nextMonth">›</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="calendar" id="calendar"></div></div><div class="box" style="margin-top:13px"><div class="box-title"><h2>選択日の予定</h2></div><div class="stats">面接予定：<strong id="interviewCount">—</strong> 件<br>対応不可：<strong id="blockCount">—</strong> 件</div><p style="padding:0 15px 15px">面接予定は青、対応不可はオレンジで表示しています。</p></div></aside><div class="box"><div class="boardhead"><div><h2 id="dateTitle">予定を取得中</h2><p>面接日時の変更・対応不可の登録と解除ができます</p></div><div class="controls"><button class="btn" id="prevDay">‹ 前日</button><button class="btn" id="nextDay">翌日 ›</button></div></div><div class="board" id="board"><div class="loading">読み込み中…</div></div><div class="actions" id="ownActions" hidden><button class="btn primary" id="addBlock">＋ 自分の対応不可を登録</button></div><div class="note">面接日時の変更は通常の面接管理にも反映されます。</div></div></div></main>
+
+/* My schedule workflow: calendar + quick blocks / upcoming agenda + chosen day */
+main{max-width:1540px;padding:16px 22px 28px}
+.alert:empty{display:none}.alert:not(:empty){margin-bottom:12px}
+.agenda-grid{grid-template-columns:300px minmax(0,1fr);gap:16px}
+.side-stack,.agenda-stack{display:flex;flex-direction:column;gap:14px;min-width:0}
+.box-title:has(.btn-today){display:flex;align-items:center;justify-content:space-between}
+.btn-today{min-height:30px;padding:5px 11px;font-size:12px}
+.calendar-legend{display:flex;gap:16px;padding:0 14px 15px;font-size:11px;color:#64788f}
+.calendar-legend span{display:inline-flex;align-items:center;gap:5px}
+.day{position:relative;padding:5px 2px 2px}
+.day-dots{display:flex;justify-content:center;gap:3px;height:7px;margin-top:4px}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dot.blue{background:#2873b3}.dot.orange{background:#ce784a}
+.day.active .dot{outline:1px solid #fff}
+.quick-block-body{padding:14px}.quick-block-body>p:first-child{font-size:13px;font-weight:700;color:#264362;margin-bottom:10px}
+.btn.full{width:100%;min-height:40px}.quick-hint{font-size:11px;margin:9px 0 14px;color:#71849a}
+.block-heading{display:flex;justify-content:space-between;font-size:13px;font-weight:750;padding:10px 0;border-top:1px solid #e7edf4}
+.block-heading b{color:#9b5a38}
+.block-list{max-height:210px;overflow-y:auto}.block-entry{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:10px 0;border-top:1px solid #edf0f4}
+.block-entry b{font-size:12px}.block-entry small{display:block;color:#b66b42;font-size:11px;margin-top:3px}
+.upcoming-box .boardhead{padding:15px 19px}.boardhead h2{font-size:18px!important}
+.boardhead p{margin-top:3px;font-size:11px}.count-chip{display:inline-block;font-size:12px;color:#285b85;background:#eaf2fa;border-radius:12px;padding:3px 8px;margin-left:5px}
+.upcoming-list{max-height:calc(100vh - 225px);min-height:150px;overflow-y:auto;padding:5px 18px 14px}
+.agenda-date{font-weight:800;color:#244d72;font-size:13px;background:#f0f5fa;padding:8px 11px;margin:11px 0 4px;border-radius:6px}
+.agenda-event{display:flex;gap:15px;align-items:center;min-height:53px;border-bottom:1px solid #e8eef4;padding:8px 11px}
+.agenda-time{font-size:17px;color:#183d60;font-weight:800;min-width:54px}.agenda-info{display:flex;flex:1;align-items:baseline;gap:12px;min-width:0;font-size:13px}.agenda-info small{font-size:11px;color:#78899a}
+.agenda-empty{padding:22px 5px;color:#8392a3;font-size:13px}
+.agenda-stack .board{padding:12px 17px}.agenda-stack .personhead{padding:10px 13px;min-height:0}.agenda-stack .personhead b{font-size:14px}
+.agenda-stack .items{display:block;padding:10px 12px}.agenda-stack .subtitle{margin-top:10px}.agenda-stack .event{display:inline-block;vertical-align:top;min-width:190px;margin-right:8px}
+.agenda-stack .event.block{min-width:170px}
+@media(max-width:800px){main{padding:10px}.agenda-grid{grid-template-columns:1fr}.side-stack{gap:10px}.agenda-stack{gap:10px}.upcoming-list{max-height:370px}.agenda-info{display:block}.agenda-info small{display:block}.calendar{max-width:480px;margin:auto}.boardhead{padding:12px}.agenda-event{gap:8px}}
+</style></head><body><header><a class="lg-header-home" href="../management-top/" title="総合管理TOPに戻る"><img src="../interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><a href="../management-top/">総合管理TOPに戻る</a></header><main><div class="alert" id="alert"></div><div class="grid agenda-grid">
+<aside class="side-stack">
+<div class="box"><div class="box-title"><h2>日付を選択</h2><button class="btn btn-today" id="today" type="button">今日</button></div><div class="month-controls"><button class="btn" id="prevMonth">‹</button><b id="monthTitle"></b><button class="btn" id="nextMonth">›</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="calendar" id="calendar"></div><div class="calendar-legend"><span><i class="dot blue"></i>面接</span><span><i class="dot orange"></i>対応不可</span></div></div>
+<div class="box quick-block"><div class="box-title"><h2>対応不可の設定</h2></div><div class="quick-block-body"><p id="blockSelectedDate"></p><button class="btn primary full" id="addBlock">＋ 対応不可を登録</button><p class="quick-hint">日付を選び、終日または時間帯を登録できます。</p><div class="block-heading">今後の対応不可 <b id="futureBlockCount">0件</b></div><div id="futureBlocks" class="block-list"></div></div></div>
+</aside>
+<section class="agenda-stack">
+<div class="box upcoming-box"><div class="boardhead"><div><h2>今日以降の面接予定 <span id="upcomingCount" class="count-chip">0件</span></h2><p>本人の確定済み予定を日時順に表示</p></div><button class="btn" id="reload" type="button">情報更新</button></div><div id="upcoming" class="upcoming-list"><div class="loading">読み込み中…</div></div></div>
+<div class="box"><div class="boardhead"><div><h2 id="dateTitle">選択日の予定</h2><p id="dateSummary"></p></div><div class="controls"><button class="btn" id="prevDay">‹ 前日</button><button class="btn" id="nextDay">翌日 ›</button></div></div><div class="board" id="board"><div class="loading">読み込み中…</div></div></div>
+</section></div><div id="ownActions" hidden></div></main>
 <dialog id="blockDialog"><div class="dialogtitle">対応不可を登録</div><form id="blockForm" class="dialogbody"><label>日付<input id="blockDate" type="date" required></label><label><input id="allDay" type="checkbox" checked style="width:auto;display:inline;margin:0 6px 0 0">終日</label><div id="timeFields" hidden><label>開始<input type="time" id="blockStart" value="19:00"></label><label>終了<input type="time" id="blockEnd" value="23:59"></label></div><div id="blockError" class="alert"></div><div class="dialogbottom"><button class="btn" type="button" data-close="blockDialog">閉じる</button><button class="btn primary" type="submit" id="blockSave">登録</button></div></form></dialog>
 <dialog id="moveDialog"><div class="dialogtitle">自分の面接予定を変更</div><form id="moveForm" class="dialogbody"><p id="moveLabel" style="margin-bottom:14px"></p><label>日付<input type="date" id="moveDate" required></label><label>時刻（30分単位）<input type="time" id="moveTime" min="10:00" max="23:30" step="1800" required></label><div id="moveError" class="alert"></div><div class="dialogbottom"><button class="btn" type="button" data-close="moveDialog">閉じる</button><button class="btn primary" type="submit" id="moveSave">保存</button></div></form></dialog>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js"></script><script>
@@ -82,12 +122,36 @@ const pad=n=>String(n).padStart(2,"0"),jst=()=>new Intl.DateTimeFormat("sv-SE",{
 let selected=jst(),month=selected.slice(0,7),state={me:null,managers:[],interviews:[],blocks:[]},moving=null,busy=false;
 const say=t=>$("alert").textContent=t||"",active=x=>["面接予定","日程変更"].includes(x.status);
 function filter(date,uid,kind){return (kind==="block"?state.blocks:state.interviews).filter(x=>x.date===date&&x.uid===uid)}
-function bounds(){const [y,m]=month.split("-").map(Number);return [month+"-01",dFmt(new Date(y,m,0))]}
+function bounds(){const [y,m]=month.split("-").map(Number),start=month+"-01",today=jst(),end=dFmt(new Date(y,m+2,0)),future=dFmt(new Date(dObj(today).getFullYear(),dObj(today).getMonth()+3,0));return [start<today?start:today,end>future?end:future]}
 async function authorized(){if(!db){say("認証ライブラリを読み込めません");return false}const {data:{session}}=await db.auth.getSession();if(!session){location.replace("../management-top/");return false}const {data,error}=await db.rpc("interview_my_profile");const p=Array.isArray(data)?data[0]:data;if(error||!["owner","president","ota","festival","nishii"].includes(p?.profile_key)){say("本人専用のマイページです。利用権限を確認できません。");$("board").innerHTML='<div class="loading">アクセス権限がありません</div>';return false}return true}
 async function load(){if(busy)return;busy=true;say("");$("board").innerHTML='<div class="loading">予定を読み込んでいます…</div>';try{const [p_from,p_to]=bounds();const {data,error}=await db.rpc("manager_schedule_overview",{p_from,p_to});if(error)throw error;state=data; $("ownActions").hidden=!state.managers.some(m=>m.id===state.me);render()}catch(e){say("取得エラー："+e.message);$("board").innerHTML='<div class="loading">取得に失敗しました</div>'}finally{busy=false;}}
-function render(){let [year,mon]=month.split("-").map(Number),last=new Date(year,mon,0).getDate(),offset=new Date(year,mon-1,1).getDay();$("monthTitle").textContent=year+"年"+mon+"月";let cal="";for(let x=0;x<offset;x++)cal+="<span></span>";for(let d=1;d<=last;d++){let date=month+"-"+pad(d),count=state.interviews.filter(x=>x.date===date&&active(x)).length+state.blocks.filter(x=>x.date===date).length;cal+='<button class="day '+(date===selected?"active ":"")+(date===jst()?"today":"")+'" data-date="'+date+'">'+d+(count?'<small>● '+count+'</small>':"")+"</button>"}$("calendar").innerHTML=cal;$("dateTitle").textContent=selected.replaceAll("-","/")+"（"+"日月火水木金土"[dObj(selected).getDay()]+"）";$("interviewCount").textContent=state.interviews.filter(x=>x.date===selected&&active(x)).length;$("blockCount").textContent=state.blocks.filter(x=>x.date===selected).length;
-$("board").innerHTML=state.managers.map(m=>{let mine=m.id===state.me,iv=filter(selected,m.id,"interview").sort((a,b)=>a.time.localeCompare(b.time)),bl=filter(selected,m.id,"block"),future=iv.filter(active),past=iv.filter(x=>!active(x));const event=i=>'<div class="event '+(!active(i)?"done":"")+'"><div class="evhead"><span class="evtime">'+esc(i.time)+'</span>'+(mine&&active(i)?'<button class="mini" data-move="'+i.id+'">変更</button>':"")+'</div><div class="meta">'+esc(i.shop)+'<br>'+esc(i.status)+'</div></div>';return '<div class="person '+(mine?"mine":"")+'"><div class="personhead"><b>'+esc(m.name)+'</b><small>'+(mine?"本人・編集可":"閲覧専用")+'</small></div><div class="items"><div class="subtitle">面接予定　'+future.length+'件</div>'+(future.map(event).join("")||'<div class="muted">予定なし</div>')+(past.length?'<div class="subtitle">その他</div>'+past.map(event).join(""):"")+'<div class="subtitle">対応不可　'+bl.length+'件</div>'+(bl.map(b=>'<div class="event block"><div class="evhead"><span class="evtime">'+(b.all_day?"終日":esc(b.start)+"〜"+esc(b.end))+'</span>'+(mine?'<button class="mini" data-delete="'+b.id+'">解除</button>':"")+'</div></div>').join("")||'<div class="muted">設定なし</div>')+'</div></div>'}).join("")}
-$("calendar").onclick=e=>{let b=e.target.closest("[data-date]");if(b){selected=b.dataset.date;render()}};$("board").onclick=async e=>{const mv=e.target.closest("[data-move]"),del=e.target.closest("[data-delete]");if(mv){moving=state.interviews.find(i=>i.id===Number(mv.dataset.move)&&i.uid===state.me);if(!moving)return;$("moveLabel").textContent=moving.shop+"｜"+moving.date+" "+moving.time;$("moveDate").value=moving.date;$("moveDate").min=jst();$("moveTime").value=moving.time;$("moveError").textContent="";$("moveDialog").showModal()}else if(del){const b=state.blocks.find(x=>x.id===Number(del.dataset.delete)&&x.uid===state.me);if(!b||!confirm("自分の対応不可を解除しますか？"))return;const {error}=await db.from("interview_staff_unavailability").delete().eq("id",b.id).eq("interviewer_user_id",state.me);if(error)say("解除できません："+error.message);else await load()}};
+function render(){
+ const me=state.managers.find(m=>m.id===state.me),mine=me?.id,now=jst(),[year,mon]=month.split("-").map(Number),last=new Date(year,mon,0).getDate(),offset=new Date(year,mon-1,1).getDay();
+ $("monthTitle").textContent=year+"年"+mon+"月";
+ let cal="";for(let x=0;x<offset;x++)cal+="<span></span>";
+ for(let d=1;d<=last;d++){const date=month+"-"+pad(d),iv=state.interviews.some(x=>x.uid===mine&&x.date===date&&active(x)),bl=state.blocks.some(x=>x.uid===mine&&x.date===date);
+ cal+='<button class="day '+(date===selected?"active ":"")+(date===now?"today":"")+'" data-date="'+date+'">'+d+'<span class="day-dots">'+(iv?'<i class="dot blue"></i>':"")+(bl?'<i class="dot orange"></i>':"")+'</span></button>'}
+ $("calendar").innerHTML=cal;
+ const displayDate=d=>d.slice(5).replace("-","/")+"（"+"日月火水木金土"[dObj(d).getDay()]+"）";
+ $("blockSelectedDate").textContent="選択中： "+selected.replaceAll("-","/")+"（"+"日月火水木金土"[dObj(selected).getDay()]+"）";
+ $("addBlock").disabled=selected<now;
+ $("dateTitle").textContent=selected.replaceAll("-","/")+"（"+"日月火水木金土"[dObj(selected).getDay()]+"）";
+ const iv=state.interviews.filter(x=>x.uid===mine&&x.date===selected).sort((a,b)=>a.time.localeCompare(b.time)),bl=state.blocks.filter(x=>x.uid===mine&&x.date===selected),future=iv.filter(active);
+ $("dateSummary").textContent="面接 "+future.length+"件 ／ 対応不可 "+bl.length+"件";
+ const event=i=>'<div class="event '+(!active(i)?"done":"")+'"><div class="evhead"><span class="evtime">'+esc(i.time)+'</span>'+(active(i)?'<button class="mini" data-move="'+i.id+'">変更</button>':"")+'</div><div class="meta">'+esc(i.shop)+' ／ '+esc(i.status)+'</div></div>';
+ $("board").innerHTML='<div class="person"><div class="personhead"><b>'+esc(me?.name||"自分の予定")+'</b><small>本人・編集可</small></div><div class="items"><div class="subtitle">面接予定</div>'+(future.map(event).join("")||'<div class="muted">面接予定なし</div>')+(iv.some(x=>!active(x))?'<div class="subtitle">その他の面接</div>'+iv.filter(x=>!active(x)).map(event).join(""):"")+'<div class="subtitle">対応不可</div>'+(bl.map(b=>'<div class="event block"><div class="evhead"><span class="evtime">'+(b.all_day?"終日":esc(b.start)+"〜"+esc(b.end))+'</span><button class="mini" data-delete="'+b.id+'">解除</button></div></div>').join("")||'<div class="muted">登録なし</div>')+'</div></div>';
+ const upcoming=state.interviews.filter(x=>x.uid===mine&&active(x)&&x.date>=now).sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
+ $("upcomingCount").textContent=upcoming.length+"件";
+ let lastDate="",out="";
+ for(const i of upcoming){if(i.date!==lastDate){lastDate=i.date;out+='<div class="agenda-date">'+(lastDate===now?"今日｜":"")+displayDate(lastDate)+'</div>'}
+ out+='<div class="agenda-event"><span class="agenda-time">'+esc(i.time)+'</span><span class="agenda-info"><b>'+esc(i.shop)+'</b><small>'+esc(i.status)+'</small></span><button class="mini" data-move="'+i.id+'">変更</button></div>'}
+ $("upcoming").innerHTML=out||'<div class="agenda-empty">今日以降の面接予定はありません</div>';
+ const futureBlocks=state.blocks.filter(x=>x.uid===mine&&x.date>=now).sort((a,b)=>a.date.localeCompare(b.date)||String(a.start||"").localeCompare(String(b.start||"")));
+ $("futureBlockCount").textContent=futureBlocks.length+"件";
+ $("futureBlocks").innerHTML=futureBlocks.map(b=>'<div class="block-entry"><div><b>'+displayDate(b.date)+'</b><small>'+(b.all_day?"終日":esc(b.start)+"〜"+esc(b.end))+'</small></div><button class="mini" data-delete="'+b.id+'">解除</button></div>').join("")||'<div class="muted">登録なし</div>';
+}
+$("calendar").onclick=e=>{let b=e.target.closest("[data-date]");if(b){selected=b.dataset.date;render()}};$("board").onclick=handleEventClick;$("upcoming").onclick=handleEventClick;$("futureBlocks").onclick=handleEventClick;async function handleEventClick(e){{const mv=e.target.closest("[data-move]"),del=e.target.closest("[data-delete]");if(mv){moving=state.interviews.find(i=>i.id===Number(mv.dataset.move)&&i.uid===state.me);if(!moving)return;$("moveLabel").textContent=moving.shop+"｜"+moving.date+" "+moving.time;$("moveDate").value=moving.date;$("moveDate").min=jst();$("moveTime").value=moving.time;$("moveError").textContent="";$("moveDialog").showModal()}else if(del){const b=state.blocks.find(x=>x.id===Number(del.dataset.delete)&&x.uid===state.me);if(!b||!confirm("自分の対応不可を解除しますか？"))return;const {error}=await db.from("interview_staff_unavailability").delete().eq("id",b.id).eq("interviewer_user_id",state.me);if(error)say("解除できません："+error.message);else await load()}}
+$("today").onclick=()=>setDate(jst());$("reload").onclick=load;
 $("prevDay").onclick=()=>setDate(step(selected,-1));$("nextDay").onclick=()=>setDate(step(selected,1));
 async function setDate(d){selected=d;if(month!==d.slice(0,7)){month=d.slice(0,7);await load()}else render()}
 async function setMonth(n){let [y,m]=month.split("-").map(Number),date=new Date(y,m-1+n,1);month=dFmt(date).slice(0,7);selected=month+"-01";await load()}
