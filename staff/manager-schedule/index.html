@@ -204,6 +204,37 @@ main{max-width:1100px!important;width:100%!important;margin:0!important;padding:
 /* Keep fixed card geometry visible instead of redistributing columns and creating giant gaps. */
 @media(max-width:1150px){.agenda-grid{grid-template-columns:370px minmax(0,1fr)!important}.agenda-stack .upcoming-list{overflow-x:auto!important}.schedule-applicant-card{min-width:760px}}
 @media(max-width:900px){.agenda-grid{grid-template-columns:1fr!important}.schedule-applicant-card{min-width:760px}}
+
+/* Fix: show full original-style cards without horizontal scrolling */
+main{max-width:1450px!important;width:100%!important;margin:0!important;padding:12px 14px!important}
+.agenda-grid{display:grid!important;grid-template-columns:440px minmax(0,1fr)!important;gap:14px!important}
+.agenda-stack,.upcoming-box{min-width:0!important}
+.agenda-stack .upcoming-list{overflow-x:hidden!important;overflow-y:auto!important}
+.schedule-applicant-card{width:100%!important;min-width:0!important;grid-template-columns:48px 94px 130px 92px minmax(0,1fr) 134px!important;gap:8px!important}
+.schedule-message{display:block!important;min-width:0!important}
+@media(max-width:1230px){
+ .agenda-grid{grid-template-columns:375px minmax(0,1fr)!important}
+ .schedule-applicant-card{grid-template-columns:45px minmax(70px,90px) 125px 86px minmax(0,1fr) 128px!important;gap:5px!important}
+ .schedule-applicant-actions{grid-template-columns:repeat(2,62px);width:128px}
+ .schedule-confirmation{width:86px}
+ .schedule-interview-datetime{width:125px}
+}
+@media(max-width:1050px){
+ .agenda-grid{grid-template-columns:1fr!important}
+ .schedule-applicant-card{grid-template-columns:48px 94px 130px 92px minmax(0,1fr) 134px!important;gap:8px!important}
+ .schedule-confirmation{width:92px}
+ .schedule-interview-datetime{width:130px}
+ .schedule-applicant-actions{grid-template-columns:repeat(2,65px);width:134px}
+}
+@media(max-width:700px){
+ .schedule-applicant-card{grid-template-columns:46px minmax(85px,1fr) 128px!important;gap:7px!important}
+ .schedule-applicant-avatar{grid-column:1}
+ .schedule-applicant-name{grid-column:2}
+ .schedule-interview-datetime{grid-column:3;width:128px}
+ .schedule-confirmation{grid-column:2;grid-row:2;display:grid!important;width:100%;grid-template-columns:1fr 1fr}
+ .schedule-message{display:none!important}
+ .schedule-applicant-actions{grid-column:1/-1;grid-row:3;width:100%;grid-template-columns:repeat(4,minmax(0,1fr));justify-self:stretch}
+}
 </style></head><body><header><a class="lg-header-home" href="../management-top/" title="総合管理TOPに戻る"><img src="../interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><a href="../management-top/">総合管理TOPに戻る</a></header><main><div class="alert" id="alert"></div><div class="grid agenda-grid">
 <aside class="side-stack">
 <div class="box"><div class="box-title"><h2>日付を選択</h2><button class="btn btn-today" id="today" type="button">今日</button></div><div class="month-controls"><button class="btn" id="prevMonth">‹</button><b id="monthTitle"></b><button class="btn" id="nextMonth">›</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="calendar" id="calendar"></div><div class="calendar-legend"><span><i class="dot blue"></i>面接</span><span><i class="dot orange"></i>対応不可</span></div></div>
