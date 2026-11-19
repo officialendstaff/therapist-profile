@@ -419,6 +419,20 @@ header.lg-common-header{height:49px!important;min-height:49px!important;max-heig
 header.lg-common-header .lg-header-home img{width:32px;height:37px}
 header.lg-common-header .lg-chat-header-actions{gap:5px}
 header.lg-common-header button{padding:5px 7px;font-size:10px}
+
+/* Unified compact staff header identity: 49px header / 32px icon / 13px label */
+header.header .brand,header.lg-common-header .lg-header-home,header .lg-header-home{
+  display:inline-flex!important;align-items:center!important;gap:8px!important;
+  font-size:13px!important;font-weight:700!important;letter-spacing:normal!important;
+  line-height:1.25!important;white-space:nowrap!important;
+}
+header.header .brand img,header.lg-common-header .lg-header-home img,header .lg-header-home img{
+  width:32px!important;height:32px!important;max-height:32px!important;
+  object-fit:contain!important;flex:0 0 32px!important;
+}
+header.header .brand #homeLabel,header.lg-common-header .lg-header-home span,header .lg-header-home span{
+  font-size:13px!important;font-weight:700!important;letter-spacing:normal!important;
+}
 </style></head><body>
 <div id="authLoading" role="status" aria-live="polite"><span class="auth-spinner" aria-hidden="true"></span><span>管理者認証を確認中…</span></div>
 <div id="gate" class="lg-interview-login" hidden><div class="auth-card">
