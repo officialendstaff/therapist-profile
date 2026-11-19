@@ -465,6 +465,30 @@ main>.agenda-grid>.agenda-stack>.box{width:100%;max-width:none}
 .schedule-applicant-card[data-detail-interview]:hover{border-color:#a7c3df;background:#fbfdff}
 .schedule-applicant-card[data-detail-interview]:focus-visible{outline:2px solid #286aa5;outline-offset:1px}
 .schedule-message .schedule-message-label{font-size:13px;line-height:1.4;color:#52647b;font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+
+/* Compact unavailability list: date/time/action stay together, three columns on desktop. */
+.agenda-stack .block-list-right{
+ display:grid!important;
+ grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ gap:9px!important;padding:12px 14px 14px!important;
+ max-height:none!important;min-height:0!important;overflow:visible!important;
+ align-items:start!important;
+}
+.availability-card{
+ min-width:0;min-height:66px;display:flex;align-items:center;justify-content:space-between;
+ gap:8px;padding:10px 11px;border:1px solid #dce5ee;border-radius:7px;
+ background:#fafcfe;
+}
+.availability-card-info{min-width:0;display:flex;flex-direction:column;gap:5px}
+.availability-card-info b{font-size:14px;color:#254666;line-height:1.2;white-space:nowrap}
+.availability-card-info .availability-time{font-size:13px;color:#b56843;line-height:1.2;white-space:nowrap}
+.availability-card .mini{flex:none;font-size:11px;padding:6px 9px}
+@media(max-width:1250px){
+ .agenda-stack .block-list-right{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:690px){
+ .agenda-stack .block-list-right{grid-template-columns:1fr!important}
+}
 </style></head><body><header><a class="lg-header-home" href="../management-top/" title="総合管理TOPに戻る"><img src="../interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><a href="../management-top/">総合管理TOPに戻る</a></header><main><div class="alert" id="alert"></div><div class="grid agenda-grid">
 <aside class="side-stack">
 <div class="box"><div class="box-title"><h2>日付を選択</h2><button class="btn btn-today" id="today" type="button">今日</button></div><div class="month-controls"><button class="btn" id="prevMonth">‹</button><b id="monthTitle"></b><button class="btn" id="nextMonth">›</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="calendar" id="calendar"></div><div class="calendar-legend"><span><i class="dot blue"></i>面接</span><span><i class="dot orange"></i>対応不可</span></div></div>
@@ -568,7 +592,7 @@ function render(){
  $("upcoming").innerHTML=out||'<div class="agenda-empty">今日以降の面接予定はありません</div>';
  const futureBlocks=state.blocks.filter(x=>x.uid===mine&&x.date>=now).sort((a,b)=>a.date.localeCompare(b.date)||String(a.start||"").localeCompare(String(b.start||"")));
  $("futureBlockCount").textContent=futureBlocks.length+"件";
- $("futureBlocks").innerHTML=futureBlocks.map(b=>'<div class="block-entry"><div><b>'+displayDate(b.date)+'</b><small>'+(b.all_day?"終日":esc(b.start)+"〜"+esc(b.end))+'</small></div><button class="mini" data-delete="'+b.id+'">解除</button></div>').join("")||'<div class="muted">登録なし</div>';
+ $("futureBlocks").innerHTML=futureBlocks.map(b=>'<div class="availability-card"><div class="availability-card-info"><b>'+(b.date.slice(0,4)!==now.slice(0,4)?esc(b.date.slice(0,4))+"/":"")+displayDate(b.date)+'</b><span class="availability-time">'+(b.all_day?"終日":esc(b.start)+"〜"+esc(b.end))+'</span></div><button type="button" class="mini" data-delete="'+b.id+'">解除</button></div>').join("")||'<div class="muted">登録なし</div>';
 }
 $("calendar").onclick=e=>{const b=e.target.closest("[data-date]");if(!b||b.disabled)return;const d=b.dataset.date;if(blockMode==="multi"){if(selectedMultiple.has(d))selectedMultiple.delete(d);else selectedMultiple.add(d)}else selected=d;render()};$("upcoming").onclick=handleEventClick;$("upcoming").onkeydown=e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches("[data-detail-interview]")){e.preventDefault();openInterviewDetail(e.target.dataset.detailInterview)}};$("futureBlocks").onclick=handleEventClick;
 function openInterviewDetail(id){if(!/^\d+$/.test(String(id)))return;location.href="../interview-sheet-preview/?detailInterview="+encodeURIComponent(id)}async function handleEventClick(e){if(e.target.closest("[data-open-management]")){location.href="../interview-sheet-preview/";return}if(e.target.closest("[data-detail-interview]")&&!e.target.closest("button,a,input")){openInterviewDetail(e.target.closest("[data-detail-interview]").dataset.detailInterview);return}const mv=e.target.closest("[data-move]"),del=e.target.closest("[data-delete]");if(mv){moving=state.interviews.find(i=>i.id===Number(mv.dataset.move)&&i.uid===state.me);if(!moving)return;$("moveLabel").textContent=moving.shop+"｜"+moving.date+" "+moving.time;$("moveDate").value=moving.date;$("moveDate").min=jst();$("moveTime").value=moving.time;$("moveError").textContent="";$("moveDialog").showModal()}else if(del){const b=state.blocks.find(x=>x.id===Number(del.dataset.delete)&&x.uid===state.me);if(!b||!confirm("自分の対応不可を解除しますか？"))return;const {error}=await db.from("interview_staff_unavailability").delete().eq("id",b.id).eq("interviewer_user_id",state.me);if(error)say("解除できません："+error.message);else await load()}}
