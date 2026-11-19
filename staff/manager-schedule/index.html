@@ -495,6 +495,9 @@ main>.agenda-grid>.agenda-stack>.box{width:100%;max-width:none}
  min-width:0;width:100%;height:35px;border:1px solid #cfdae8;border-radius:6px;
  padding:5px 4px;font-size:13px;background:#fff;color:#24374b;
 }
+
+/* Identical native dropdowns for start and end times */
+.block-time-row select{height:35px!important;width:100%!important;min-width:0!important;padding:5px 6px!important;font-size:13px!important;border:1px solid #cfdae8!important;border-radius:6px!important;background:#fff!important;color:#24374b!important;box-sizing:border-box!important}
 </style></head><body><header><a class="lg-header-home" href="../management-top/" title="総合管理TOPに戻る"><img src="../interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><a href="../management-top/">総合管理TOPに戻る</a></header><main><div class="alert" id="alert"></div><div class="grid agenda-grid">
 <aside class="side-stack">
 <div class="box"><div class="box-title"><h2>日付を選択</h2><button class="btn btn-today" id="today" type="button">今日</button></div><div class="month-controls"><button class="btn" id="prevMonth">‹</button><b id="monthTitle"></b><button class="btn" id="nextMonth">›</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="calendar" id="calendar"></div><div class="calendar-legend"><span><i class="dot blue"></i>面接</span><span><i class="dot orange"></i>対応不可</span></div></div>
@@ -610,7 +613,12 @@ $("prevMonth").onclick=()=>setMonth(-1);$("nextMonth").onclick=()=>setMonth(1);
 
 function addTimeRow(from="10:00",to="12:00"){
  const row=document.createElement("div");row.className="block-time-row";
- const start=document.createElement("input");start.type="time";start.step=1800;start.min="10:00";start.max="23:30";start.value=from;start.setAttribute("aria-label","対応不可の開始時刻");
+ const start=document.createElement("select");start.setAttribute("aria-label","対応不可の開始時刻");
+ for(let h=10;h<24;h++)for(const minute of ["00","30"]){
+  const v=String(h).padStart(2,"0")+":"+minute;
+  const option=document.createElement("option");option.value=v;option.textContent=v;start.append(option);
+ }
+ start.value=from;
  const end=document.createElement("select");end.setAttribute("aria-label","対応不可の終了時刻");
  for(let h=10;h<24;h++)for(const minute of ["00","30"]){
   const v=String(h).padStart(2,"0")+":"+minute;
@@ -661,8 +669,7 @@ $("blockForm").onsubmit=async e=>{
   if(days.length>90||days.some(d=>d<today))throw Error("今日以降の日付を選択してください（最大90日）");
   const all=blockType==="all";
   const ranges=all?[{all_day:true,start_time:null,end_time:null}]:Array.from($("blockTimeRows").children).map(row=>{
-   const start=row.querySelector('input[type="time"]');
-   const end=row.querySelector('select');
+   const [start,end]=row.querySelectorAll('select');
    return {all_day:false,start_time:start.value,end_time:end.value};
   });
   const validTime=x=>/^([01]\d|2[0-3]):[0-5]\d$/.test(x);
