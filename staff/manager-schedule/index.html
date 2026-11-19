@@ -131,9 +131,24 @@ const pad=n=>String(n).padStart(2,"0"),jst=()=>new Intl.DateTimeFormat("sv-SE",{
 let selected=jst(),month=selected.slice(0,7),state={me:null,managers:[],interviews:[],blocks:[]},moving=null,busy=false;
 const say=t=>$("alert").textContent=t||"",active=x=>["面接予定","日程変更"].includes(x.status);
 function filter(date,uid,kind){return (kind==="block"?state.blocks:state.interviews).filter(x=>x.date===date&&x.uid===uid)}
-function bounds(){const [y,m]=month.split("-").map(Number),start=month+"-01",today=jst(),end=dFmt(new Date(y,m+2,0)),future=dFmt(new Date(dObj(today).getFullYear(),dObj(today).getMonth()+3,0));return [start<today?start:today,end>future?end:future]}
+function monthBounds(ym){const [y,m]=ym.split("-").map(Number);return [ym+"-01",dFmt(new Date(y,m,0))]}
 async function authorized(){if(!db){say("認証ライブラリを読み込めません");return false}const {data:{session}}=await db.auth.getSession();if(!session){location.replace("../management-top/");return false}const {data,error}=await db.rpc("interview_my_profile");const p=Array.isArray(data)?data[0]:data;if(error||!["owner","president","ota","festival","nishii"].includes(p?.profile_key)){say("本人専用のマイページです。利用権限を確認できません。");$("upcoming").innerHTML='<div class="loading">アクセス権限がありません</div>';return false}return true}
-async function load(){if(busy)return;busy=true;say("");$("upcoming").innerHTML='<div class="loading">予定を読み込んでいます…</div>';try{const [p_from,p_to]=bounds();const {data,error}=await db.rpc("manager_schedule_overview",{p_from,p_to});if(error)throw error;state=data; $("ownActions").hidden=!state.managers.some(m=>m.id===state.me);render()}catch(e){say("取得エラー："+e.message);$("upcoming").innerHTML='<div class="loading">取得に失敗しました</div>'}finally{busy=false;}}
+async function load(){
+ if(busy)return;busy=true;say("");
+ $("upcoming").innerHTML='<div class="loading">予定を読み込んでいます…</div>';
+ $("futureBlocks").innerHTML='<div class="loading">読み込み中…</div>';
+ try{
+  // The overview RPC accepts a calendar-month interval. Fetch separately rather than passing a multi-month range.
+  const today=jst(),base=today.slice(0,7),ymOffset=(ym,n)=>{const [y,m]=ym.split("-").map(Number);const d=new Date(y,m-1+n,1);return d.getFullYear()+"-"+pad(d.getMonth()+1)};
+  const months=[month,base,ymOffset(base,1),ymOffset(base,2)].filter((x,i,a)=>a.indexOf(x)===i);
+  const results=await Promise.all(months.map(async ym=>{const [p_from,p_to]=monthBounds(ym);const {data,error}=await db.rpc("manager_schedule_overview",{p_from,p_to});if(error)throw error;return data}));
+  const first=results[0];
+  const unique=(arr)=>Array.from(new Map(arr.map(x=>[String(x.id)+"|"+String(x.uid),x])).values());
+  state={...first,interviews:unique(results.flatMap(x=>x.interviews||[])),blocks:unique(results.flatMap(x=>x.blocks||[]))};
+  $("ownActions").hidden=!(state.managers||[]).some(m=>m.id===state.me);
+  render();
+ }catch(e){say("取得エラー："+e.message);$("upcoming").innerHTML='<div class="loading">取得に失敗しました</div>';$("futureBlocks").innerHTML='<div class="loading">取得に失敗しました</div>'}finally{busy=false}
+}
 function render(){
  const me=state.managers.find(m=>m.id===state.me),mine=me?.id,now=jst(),[year,mon]=month.split("-").map(Number),last=new Date(year,mon,0).getDate(),offset=new Date(year,mon-1,1).getDay();
  $("monthTitle").textContent=year+"年"+mon+"月";
