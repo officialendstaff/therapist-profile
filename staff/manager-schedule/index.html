@@ -427,6 +427,38 @@ main>.agenda-grid>.agenda-stack>.box{width:100%;max-width:none}
  .agenda-grid>.agenda-stack>.upcoming-box .schedule-applicant-avatar{height:46px!important;width:46px!important}
  .agenda-grid>.agenda-stack>.upcoming-box .schedule-interview-datetime{height:48px!important}
 }
+
+/* Exact shop and interviewer color theme copied from the interview management COLOR_THEME. */
+.schedule-applicant-name .store-pill{
+ display:inline-block!important;width:max-content!important;max-width:100%!important;
+ padding:3px 7px!important;border-width:1px!important;border-style:solid!important;
+ border-radius:4px!important;font-size:11px!important;font-weight:700!important;line-height:1.3!important;
+}
+.schedule-applicant-name .store-pill.grand,
+.schedule-staff-label.staff-grand{background:#E9E4F3!important;color:#674C92!important;border-color:#C5B5DD!important}
+.schedule-applicant-name .store-pill.luxy,
+.schedule-staff-label.staff-luxy{background:#E4EFFB!important;color:#32679E!important;border-color:#A9C8EA!important}
+.schedule-applicant-name .store-pill.rose,
+.schedule-staff-label.staff-rose{background:#F9E5ED!important;color:#A34870!important;border-color:#E9B3C8!important}
+.schedule-applicant-name .store-pill.secret,
+.schedule-staff-label.staff-secret{background:#E5F2ED!important;color:#317A60!important;border-color:#A9D6C3!important}
+.schedule-applicant-name .store-pill.busty,
+.schedule-staff-label.staff-busty{background:#FFF0DF!important;color:#9B612A!important;border-color:#EBC79B!important}
+.schedule-staff-label{
+ display:inline-block!important;width:max-content!important;max-width:100%!important;
+ border:1px solid #cbd5e1!important;border-radius:3px!important;
+ padding:2px 5px!important;font-size:11px!important;font-weight:700!important;
+ line-height:1.15!important;white-space:nowrap!important
+}
+.schedule-applicant-name strong{font-size:15px!important;line-height:1.25!important}
+.schedule-interview-datetime strong{font-size:13px!important;line-height:1.2!important}
+@media(min-width:951px){
+ .agenda-grid>.agenda-stack>.upcoming-box .schedule-applicant-name strong{font-size:15px!important}
+ .agenda-grid>.agenda-stack>.upcoming-box .store-pill{font-size:11px!important;padding:3px 7px!important}
+ .agenda-grid>.agenda-stack>.upcoming-box .schedule-interview-datetime{height:50px!important;gap:3px!important}
+ .agenda-grid>.agenda-stack>.upcoming-box .schedule-interview-datetime strong{font-size:13px!important}
+ .agenda-grid>.agenda-stack>.upcoming-box .schedule-staff-label{font-size:11px!important}
+}
 </style></head><body><header><a class="lg-header-home" href="../management-top/" title="総合管理TOPに戻る"><img src="../interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><a href="../management-top/">総合管理TOPに戻る</a></header><main><div class="alert" id="alert"></div><div class="grid agenda-grid">
 <aside class="side-stack">
 <div class="box"><div class="box-title"><h2>日付を選択</h2><button class="btn btn-today" id="today" type="button">今日</button></div><div class="month-controls"><button class="btn" id="prevMonth">‹</button><b id="monthTitle"></b><button class="btn" id="nextMonth">›</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="calendar" id="calendar"></div><div class="calendar-legend"><span><i class="dot blue"></i>面接</span><span><i class="dot orange"></i>対応不可</span></div></div>
@@ -516,12 +548,13 @@ function render(){
  $("agendaPrev").disabled=agendaPage===0;
  $("agendaNext").disabled=agendaPage>=pageCount-1;
  let out="";
- const shopClass=v=>/LUXY/i.test(v)?"luxy":/薔薇|BUSTY/.test(v)?"rose":/Un Secret/i.test(v)?"secret":/Grand Luxe/i.test(v)?"grand":"general";
+ const shopClass=v=>/LUXY/i.test(v)?"luxy":/薔薇/.test(v)?"rose":/BUSTY/i.test(v)?"busty":/Un Secret/i.test(v)?"secret":/Grand Luxe/i.test(v)?"grand":"general";
+ const staffClass=v=>({"社長":"grand","オオタ":"luxy","オオタくん":"luxy","村上":"rose","お祭り":"secret"})[String(v||"").trim()]||"general";
  for(const i of upcoming.slice(agendaPage*5,(agendaPage+1)*5)){
   const name=esc(i.applicant_name||"氏名未取得"),photo=String(i.picture||""),isPhoto=/^https:\/\//.test(photo);
   const avatar=isPhoto?'<img src="'+esc(photo)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.parentElement.classList.add(\'missing-avatar\')">':'<span class="fallback-person">♙</span>';
   out+='<article class="schedule-applicant-card"><div class="schedule-applicant-avatar">'+avatar+'</div><div class="schedule-applicant-name"><strong>'+name+'</strong><span class="store-pill '+shopClass(String(i.shop||""))+'">'+esc(i.shop)+'</span></div>'+
-  '<div class="schedule-interview-datetime"><strong>'+esc(i.date)+' '+esc(i.time)+'</strong><small>担当：'+esc(i.staff_name||me?.name||"未設定")+'</small></div>'+
+  '<div class="schedule-interview-datetime"><strong>'+esc(i.date)+' '+esc(i.time)+'</strong><span class="schedule-staff-label staff-"+staffClass(i.staff_name||me?.name)+'">担当：'+esc(i.staff_name||me?.name||"未設定")+'</span></div>'+
   '<div class="schedule-confirmation"><button type="button" data-open-management="1">LINE送信</button><button type="button" data-open-management="1">確認OK</button></div>'+
   '<div class="schedule-message"><span class="schedule-message-label">'+esc(i.status)+'</span></div>'+
   '<div class="schedule-applicant-actions"><button type="button" class="action-register" data-open-management="1">面接登録</button><button type="button" class="action-change" '+(i.uid===state.me?'data-move="'+i.id+'"':'data-open-management="1"')+'>日程変更</button><button type="button" class="action-cancel" data-open-management="1">キャンセル</button><button type="button" class="action-afterlife" data-open-management="1">来世期待</button></div></article>';
