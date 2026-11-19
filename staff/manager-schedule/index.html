@@ -352,13 +352,13 @@ main>.agenda-grid>.agenda-stack>.box{width:100%;max-width:none}
 <div id="repeatArea" hidden><div class="repeat-dates"><label>開始日<input id="repeatFrom" type="date"></label><label>終了日<input id="repeatTo" type="date"></label></div>
 <div id="weekdayArea" hidden><div class="block-inline-head">曜日を指定（複数可）</div><div class="weekday-choices" id="weekdayChoices">
 <label><input type="checkbox" value="0">日</label><label><input type="checkbox" value="1">月</label><label><input type="checkbox" value="2">火</label><label><input type="checkbox" value="3">水</label><label><input type="checkbox" value="4">木</label><label><input type="checkbox" value="5">金</label><label><input type="checkbox" value="6">土</label>
-</div></div><p class="quick-hint">期間内の日付へ保存（最大90日・自動延長なし）</p></div>
+</div></div></div>
 <div class="block-form-label" style="margin-top:14px">対応不可の時間</div>
 <div class="block-type"><label><input type="radio" name="blockType" value="all" checked>終日不可</label><label><input type="radio" name="blockType" value="time">時間指定</label></div>
-<div id="blockTimeArea" hidden><div id="blockTimeRows"></div><button type="button" class="btn btn-add-range" id="addTimeRange">＋ 時間帯を追加</button><p class="quick-hint">同日にも複数の時間帯を保存できます。</p></div>
+<div id="blockTimeArea" hidden><div id="blockTimeRows"></div><button type="button" class="btn btn-add-range" id="addTimeRange">＋ 時間帯を追加</button></div>
 <div id="blockError" class="alert" role="alert"></div>
 <button class="btn primary full" type="submit" id="blockSave">設定を保存</button>
-<p class="quick-hint">保存済みの設定は右側の一覧から個別に解除できます。</p>
+
 </form></div>
 </aside>
 <section class="agenda-stack">
@@ -407,7 +407,7 @@ function render(){
  $("calendar").innerHTML=cal;
  const displayDate=d=>d.slice(5).replace("-","/")+"（"+"日月火水木金土"[dObj(d).getDay()]+"）";
 
- $("blockSelectedDate").textContent=blockMode==="single"?"選択中： "+selected.replaceAll("-","/")+"（"+"日月火水木金土"[dObj(selected).getDay()]+"）":blockMode==="multi"?"選択中： "+selectedMultiple.size+"日":blockMode==="daily"?"期間内の毎日を登録":"指定曜日を毎週登録";
+ $("blockSelectedDate").textContent=blockMode==="single"?"選択中： "+selected.replaceAll("-","/")+"（"+"日月火水木金土"[dObj(selected).getDay()]+"）":blockMode==="multi"?"選択中： "+selectedMultiple.size+"日":"";
  $("selectedDates").textContent=Array.from(selectedMultiple).sort().map(d=>d.slice(5).replace("-","/")).join("、")||"カレンダーから日付を選んでください";
  const upcoming=state.interviews.filter(x=>x.uid===mine&&active(x)&&x.date>=now).sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
  $("upcomingCount").textContent=upcoming.length+"件";
