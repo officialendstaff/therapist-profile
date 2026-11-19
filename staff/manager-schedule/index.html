@@ -350,6 +350,19 @@ main>.agenda-grid>.agenda-stack>.box{width:100%;max-width:none}
 .calendar .day.past .day-dots{opacity:.45}
 .calendar .day.today:not(.active){border:2px solid #d4a449}
 #prevMonth:disabled{opacity:.35;cursor:not-allowed}
+
+/* Compact applicant cards: remove excessive vertical whitespace without changing columns */
+@media(min-width:951px){
+ .schedule-applicant-card{min-height:76px!important;height:auto!important;padding:6px 12px!important;margin:5px 0!important;row-gap:5px!important}
+ .schedule-applicant-avatar{width:52px!important;height:52px!important}
+ .schedule-applicant-name{gap:4px!important}
+ .schedule-interview-datetime{height:56px!important;padding:5px 6px!important;gap:3px!important}
+ .schedule-confirmation{gap:3px!important}
+ .schedule-confirmation button{height:26px!important;padding:3px 4px!important}
+ .schedule-applicant-actions{gap:4px!important}
+ .schedule-applicant-actions button{height:27px!important;padding:3px 2px!important}
+ .agenda-stack .upcoming-list{padding:7px 12px 10px!important}
+}
 </style></head><body><header><a class="lg-header-home" href="../management-top/" title="総合管理TOPに戻る"><img src="../interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><a href="../management-top/">総合管理TOPに戻る</a></header><main><div class="alert" id="alert"></div><div class="grid agenda-grid">
 <aside class="side-stack">
 <div class="box"><div class="box-title"><h2>日付を選択</h2><button class="btn btn-today" id="today" type="button">今日</button></div><div class="month-controls"><button class="btn" id="prevMonth">‹</button><b id="monthTitle"></b><button class="btn" id="nextMonth">›</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="calendar" id="calendar"></div><div class="calendar-legend"><span><i class="dot blue"></i>面接</span><span><i class="dot orange"></i>対応不可</span></div></div>
