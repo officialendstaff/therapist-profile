@@ -489,6 +489,12 @@ main>.agenda-grid>.agenda-stack>.box{width:100%;max-width:none}
 @media(max-width:690px){
  .agenda-stack .block-list-right{grid-template-columns:1fr!important}
 }
+
+/* Custom end-time selector: 23時台の後は「以降不可」、00時に循環しない */
+.block-time-row select{
+ min-width:0;width:100%;height:35px;border:1px solid #cfdae8;border-radius:6px;
+ padding:5px 4px;font-size:13px;background:#fff;color:#24374b;
+}
 </style></head><body><header><a class="lg-header-home" href="../management-top/" title="総合管理TOPに戻る"><img src="../interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><a href="../management-top/">総合管理TOPに戻る</a></header><main><div class="alert" id="alert"></div><div class="grid agenda-grid">
 <aside class="side-stack">
 <div class="box"><div class="box-title"><h2>日付を選択</h2><button class="btn btn-today" id="today" type="button">今日</button></div><div class="month-controls"><button class="btn" id="prevMonth">‹</button><b id="monthTitle"></b><button class="btn" id="nextMonth">›</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="calendar" id="calendar"></div><div class="calendar-legend"><span><i class="dot blue"></i>面接</span><span><i class="dot orange"></i>対応不可</span></div></div>
@@ -592,7 +598,7 @@ function render(){
  $("upcoming").innerHTML=out||'<div class="agenda-empty">今日以降の面接予定はありません</div>';
  const futureBlocks=state.blocks.filter(x=>x.uid===mine&&x.date>=now).sort((a,b)=>a.date.localeCompare(b.date)||String(a.start||"").localeCompare(String(b.start||"")));
  $("futureBlockCount").textContent=futureBlocks.length+"件";
- $("futureBlocks").innerHTML=futureBlocks.map(b=>'<div class="availability-card"><div class="availability-card-info"><b>'+(b.date.slice(0,4)!==now.slice(0,4)?esc(b.date.slice(0,4))+"/":"")+displayDate(b.date)+'</b><span class="availability-time">'+(b.all_day?"終日":esc(b.start)+"〜"+esc(b.end))+'</span></div><button type="button" class="mini" data-delete="'+b.id+'">解除</button></div>').join("")||'<div class="muted">登録なし</div>';
+ $("futureBlocks").innerHTML=futureBlocks.map(b=>'<div class="availability-card"><div class="availability-card-info"><b>'+(b.date.slice(0,4)!==now.slice(0,4)?esc(b.date.slice(0,4))+"/":"")+displayDate(b.date)+'</b><span class="availability-time">'+(b.all_day?"終日":esc(b.start)+"〜"+(b.end==="23:59"?"以降不可":esc(b.end)))+'</span></div><button type="button" class="mini" data-delete="'+b.id+'">解除</button></div>').join("")||'<div class="muted">登録なし</div>';
 }
 $("calendar").onclick=e=>{const b=e.target.closest("[data-date]");if(!b||b.disabled)return;const d=b.dataset.date;if(blockMode==="multi"){if(selectedMultiple.has(d))selectedMultiple.delete(d);else selectedMultiple.add(d)}else selected=d;render()};$("upcoming").onclick=handleEventClick;$("upcoming").onkeydown=e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches("[data-detail-interview]")){e.preventDefault();openInterviewDetail(e.target.dataset.detailInterview)}};$("futureBlocks").onclick=handleEventClick;
 function openInterviewDetail(id){if(!/^\d+$/.test(String(id)))return;location.href="../interview-sheet-preview/?detailInterview="+encodeURIComponent(id)}async function handleEventClick(e){if(e.target.closest("[data-open-management]")){location.href="../interview-sheet-preview/";return}if(e.target.closest("[data-detail-interview]")&&!e.target.closest("button,a,input")){openInterviewDetail(e.target.closest("[data-detail-interview]").dataset.detailInterview);return}const mv=e.target.closest("[data-move]"),del=e.target.closest("[data-delete]");if(mv){moving=state.interviews.find(i=>i.id===Number(mv.dataset.move)&&i.uid===state.me);if(!moving)return;$("moveLabel").textContent=moving.shop+"｜"+moving.date+" "+moving.time;$("moveDate").value=moving.date;$("moveDate").min=jst();$("moveTime").value=moving.time;$("moveError").textContent="";$("moveDialog").showModal()}else if(del){const b=state.blocks.find(x=>x.id===Number(del.dataset.delete)&&x.uid===state.me);if(!b||!confirm("自分の対応不可を解除しますか？"))return;const {error}=await db.from("interview_staff_unavailability").delete().eq("id",b.id).eq("interviewer_user_id",state.me);if(error)say("解除できません："+error.message);else await load()}}
@@ -605,7 +611,13 @@ $("prevMonth").onclick=()=>setMonth(-1);$("nextMonth").onclick=()=>setMonth(1);
 function addTimeRow(from="10:00",to="12:00"){
  const row=document.createElement("div");row.className="block-time-row";
  const start=document.createElement("input");start.type="time";start.step=1800;start.value=from;start.setAttribute("aria-label","対応不可の開始時刻");
- const end=document.createElement("input");end.type="time";end.step=1800;end.value=to;end.setAttribute("aria-label","対応不可の終了時刻");
+ const end=document.createElement("select");end.setAttribute("aria-label","対応不可の終了時刻");
+ for(let h=0;h<24;h++)for(const minute of ["00","30"]){
+  const v=String(h).padStart(2,"0")+":"+minute;
+  const option=document.createElement("option");option.value=v;option.textContent=v;end.append(option);
+ }
+ const last=document.createElement("option");last.value="23:59";last.textContent="以降不可";end.append(last);
+ end.value=to==="00:00"?"23:59":to;
  const dash=document.createElement("span");dash.textContent="〜";
  const remove=document.createElement("button");remove.type="button";remove.className="mini";remove.textContent="削除";remove.onclick=()=>{if($("blockTimeRows").children.length>1)row.remove()};
  row.append(start,dash,end,remove);$("blockTimeRows").append(row);
@@ -649,8 +661,9 @@ $("blockForm").onsubmit=async e=>{
   if(days.length>90||days.some(d=>d<today))throw Error("今日以降の日付を選択してください（最大90日）");
   const all=blockType==="all";
   const ranges=all?[{all_day:true,start_time:null,end_time:null}]:Array.from($("blockTimeRows").children).map(row=>{
-   const inputs=row.querySelectorAll('input[type="time"]');
-   return {all_day:false,start_time:inputs[0].value,end_time:inputs[1].value};
+   const start=row.querySelector('input[type="time"]');
+   const end=row.querySelector('select');
+   return {all_day:false,start_time:start.value,end_time:end.value};
   });
   const validTime=x=>/^([01]\d|2[0-3]):[0-5]\d$/.test(x);
   if(!ranges.length||ranges.some(x=>!x.all_day&&(!validTime(x.start_time)||!validTime(x.end_time)||x.start_time>=x.end_time)))throw Error("開始時間と終了時間を確認してください");
