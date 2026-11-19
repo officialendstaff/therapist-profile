@@ -3221,4 +3221,18 @@ html.metrics-standalone #storeMetrics:not([hidden]){display:block!important}
 :root{--header:49px!important}
 .header{height:49px!important;min-height:49px!important;max-height:49px!important;padding-top:0!important;padding-bottom:0!important}
 .header .brand img{max-height:38px}
+
+/* Unified compact staff header identity: 49px header / 32px icon / 13px label */
+header.header .brand,header.lg-common-header .lg-header-home,header .lg-header-home{
+  display:inline-flex!important;align-items:center!important;gap:8px!important;
+  font-size:13px!important;font-weight:700!important;letter-spacing:normal!important;
+  line-height:1.25!important;white-space:nowrap!important;
+}
+header.header .brand img,header.lg-common-header .lg-header-home img,header .lg-header-home img{
+  width:32px!important;height:32px!important;max-height:32px!important;
+  object-fit:contain!important;flex:0 0 32px!important;
+}
+header.header .brand #homeLabel,header.lg-common-header .lg-header-home span,header .lg-header-home span{
+  font-size:13px!important;font-weight:700!important;letter-spacing:normal!important;
+}
 </style></body></html>
