@@ -329,7 +329,7 @@ main>.agenda-grid>.agenda-stack>.box{width:100%;max-width:none}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js"></script><script>
 (()=>{"use strict";const $=id=>document.getElementById(id),db=window.supabase?.createClient("https://vjjnkflbfsjihwzjsjpr.supabase.co","sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos",{auth:{persistSession:true,autoRefreshToken:true,storage:localStorage,storageKey:"mattan-recruit-auth"}});
 const pad=n=>String(n).padStart(2,"0"),jst=()=>new Intl.DateTimeFormat("sv-SE",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date()),dObj=s=>new Date(s+"T12:00:00+09:00"),dFmt=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()),step=(d,n)=>{const x=dObj(d);x.setDate(x.getDate()+n);return dFmt(x)},esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-let selected=jst(),month=selected.slice(0,7),state={me:null,managers:[],interviews:[],blocks:[]},moving=null,busy=false;
+let selected=jst(),month=selected.slice(0,7),state={me:null,managers:[],interviews:[],blocks:[]},moving=null,busy=false,selectedMultiple=new Set(),blockMode='single',blockType='all';
 const say=t=>$("alert").textContent=t||"",active=x=>["面接予定","日程変更"].includes(x.status);
 function filter(date,uid,kind){return (kind==="block"?state.blocks:state.interviews).filter(x=>x.date===date&&x.uid===uid)}
 function monthBounds(ym){const [y,m]=ym.split("-").map(Number);return [ym+"-01",dFmt(new Date(y,m,0))]}
@@ -363,11 +363,12 @@ function render(){
  $("monthTitle").textContent=year+"年"+mon+"月";
  let cal="";for(let x=0;x<offset;x++)cal+="<span></span>";
  for(let d=1;d<=last;d++){const date=month+"-"+pad(d),iv=state.interviews.some(x=>x.uid===mine&&x.date===date&&active(x)),bl=state.blocks.some(x=>x.uid===mine&&x.date===date);
- cal+='<button class="day '+(date===selected?"active ":"")+(date===now?"today":"")+'" data-date="'+date+'">'+d+'<span class="day-dots">'+(iv?'<i class="dot blue"></i>':"")+(bl?'<i class="dot orange"></i>':"")+'</span></button>'}
+ cal+='<button class="day '+((blockMode==="multi"?selectedMultiple.has(date):date===selected)?"active ":"")+(date===now?"today":"")+'" data-date="'+date+'">'+d+'<span class="day-dots">'+(iv?'<i class="dot blue"></i>':"")+(bl?'<i class="dot orange"></i>':"")+'</span></button>'}
  $("calendar").innerHTML=cal;
  const displayDate=d=>d.slice(5).replace("-","/")+"（"+"日月火水木金土"[dObj(d).getDay()]+"）";
- $("blockSelectedDate").textContent="選択中： "+selected.replaceAll("-","/")+"（"+"日月火水木金土"[dObj(selected).getDay()]+"）";
- $("addBlock").disabled=selected<now;
+
+ $("blockSelectedDate").textContent=blockMode==="single"?"選択中： "+selected.replaceAll("-","/")+"（"+"日月火水木金土"[dObj(selected).getDay()]+"）":blockMode==="multi"?"選択中： "+selectedMultiple.size+"日":blockMode==="daily"?"期間内の毎日を登録":"指定曜日を毎週登録";
+ $("selectedDates").textContent=Array.from(selectedMultiple).sort().map(d=>d.slice(5).replace("-","/")).join("、")||"カレンダーから日付を選んでください";
  const upcoming=state.interviews.filter(x=>x.uid===mine&&active(x)&&x.date>=now).sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
  $("upcomingCount").textContent=upcoming.length+"件";
  let out="";
@@ -386,7 +387,7 @@ function render(){
  $("futureBlockCount").textContent=futureBlocks.length+"件";
  $("futureBlocks").innerHTML=futureBlocks.map(b=>'<div class="block-entry"><div><b>'+displayDate(b.date)+'</b><small>'+(b.all_day?"終日":esc(b.start)+"〜"+esc(b.end))+'</small></div><button class="mini" data-delete="'+b.id+'">解除</button></div>').join("")||'<div class="muted">登録なし</div>';
 }
-$("calendar").onclick=e=>{let b=e.target.closest("[data-date]");if(b){selected=b.dataset.date;render()}};$("upcoming").onclick=handleEventClick;$("futureBlocks").onclick=handleEventClick;async function handleEventClick(e){if(e.target.closest("[data-open-management]")){location.href="../interview-sheet-preview/";return}const mv=e.target.closest("[data-move]"),del=e.target.closest("[data-delete]");if(mv){moving=state.interviews.find(i=>i.id===Number(mv.dataset.move)&&i.uid===state.me);if(!moving)return;$("moveLabel").textContent=moving.shop+"｜"+moving.date+" "+moving.time;$("moveDate").value=moving.date;$("moveDate").min=jst();$("moveTime").value=moving.time;$("moveError").textContent="";$("moveDialog").showModal()}else if(del){const b=state.blocks.find(x=>x.id===Number(del.dataset.delete)&&x.uid===state.me);if(!b||!confirm("自分の対応不可を解除しますか？"))return;const {error}=await db.from("interview_staff_unavailability").delete().eq("id",b.id).eq("interviewer_user_id",state.me);if(error)say("解除できません："+error.message);else await load()}}
+$("calendar").onclick=e=>{const b=e.target.closest("[data-date]");if(!b)return;const d=b.dataset.date;if(blockMode==="multi"){if(d<jst())return;if(selectedMultiple.has(d))selectedMultiple.delete(d);else selectedMultiple.add(d)}else selected=d;render()};$("upcoming").onclick=handleEventClick;$("futureBlocks").onclick=handleEventClick;async function handleEventClick(e){if(e.target.closest("[data-open-management]")){location.href="../interview-sheet-preview/";return}const mv=e.target.closest("[data-move]"),del=e.target.closest("[data-delete]");if(mv){moving=state.interviews.find(i=>i.id===Number(mv.dataset.move)&&i.uid===state.me);if(!moving)return;$("moveLabel").textContent=moving.shop+"｜"+moving.date+" "+moving.time;$("moveDate").value=moving.date;$("moveDate").min=jst();$("moveTime").value=moving.time;$("moveError").textContent="";$("moveDialog").showModal()}else if(del){const b=state.blocks.find(x=>x.id===Number(del.dataset.delete)&&x.uid===state.me);if(!b||!confirm("自分の対応不可を解除しますか？"))return;const {error}=await db.from("interview_staff_unavailability").delete().eq("id",b.id).eq("interviewer_user_id",state.me);if(error)say("解除できません："+error.message);else await load()}}
 $("today").onclick=()=>setDate(jst());$("reload").onclick=load;
 
 async function setDate(d){selected=d;if(month!==d.slice(0,7)){month=d.slice(0,7);await load()}else render()}
