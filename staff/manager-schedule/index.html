@@ -393,9 +393,78 @@ $("today").onclick=()=>setDate(jst());$("reload").onclick=load;
 async function setDate(d){selected=d;if(month!==d.slice(0,7)){month=d.slice(0,7);await load()}else render()}
 async function setMonth(n){let [y,m]=month.split("-").map(Number),date=new Date(y,m-1+n,1);month=dFmt(date).slice(0,7);selected=month+"-01";await load()}
 $("prevMonth").onclick=()=>setMonth(-1);$("nextMonth").onclick=()=>setMonth(1);
-$("addBlock").onclick=()=>{$("blockDate").value=selected;$("blockDate").min=jst();$("blockError").textContent="";$("blockDialog").showModal()};
-$("allDay").onchange=()=>{$("timeFields").hidden=$("allDay").checked};document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>$(b.dataset.close).close());
-$("blockForm").onsubmit=async e=>{e.preventDefault();let day=$("blockDate").value,all=$("allDay").checked,start=all?null:$("blockStart").value,end=all?null:$("blockEnd").value;if(day<jst()||!all&&(!start||!end||start>=end)){$("blockError").textContent="日時を確認してください";return}let btn=$("blockSave");btn.disabled=true;const {error}=await db.from("interview_staff_unavailability").insert({interviewer_user_id:state.me,block_date:day,all_day:all,start_time:start,end_time:end});btn.disabled=false;if(error){$("blockError").textContent=error.message;return}$("blockDialog").close();await setDate(day);await load()};
+
+function addTimeRow(from="10:00",to="12:00"){
+ const row=document.createElement("div");row.className="block-time-row";
+ const start=document.createElement("input");start.type="time";start.step=1800;start.value=from;start.setAttribute("aria-label","対応不可の開始時刻");
+ const end=document.createElement("input");end.type="time";end.step=1800;end.value=to;end.setAttribute("aria-label","対応不可の終了時刻");
+ const dash=document.createElement("span");dash.textContent="〜";
+ const remove=document.createElement("button");remove.type="button";remove.className="mini";remove.textContent="削除";remove.onclick=()=>{if($("blockTimeRows").children.length>1)row.remove()};
+ row.append(start,dash,end,remove);$("blockTimeRows").append(row);
+}
+addTimeRow();
+$("addTimeRange").onclick=()=>addTimeRow("18:00","20:00");
+$("clearDates").onclick=()=>{selectedMultiple.clear();render()};
+$("repeatFrom").min=jst();$("repeatTo").min=jst();
+$("repeatFrom").value=jst();$("repeatTo").value=step(jst(),29);
+document.querySelectorAll('input[name="blockMode"]').forEach(el=>el.onchange=()=>{
+ blockMode=document.querySelector('input[name="blockMode"]:checked').value;
+ $("multiDateArea").hidden=blockMode!=="multi";
+ $("repeatArea").hidden=blockMode!=="daily"&&blockMode!=="weekly";
+ $("weekdayArea").hidden=blockMode!=="weekly";
+ render();
+});
+document.querySelectorAll('input[name="blockType"]').forEach(el=>el.onchange=()=>{
+ blockType=document.querySelector('input[name="blockType"]:checked').value;
+ $("blockTimeArea").hidden=blockType==="all";
+});
+function blockDates(){
+ const today=jst();
+ if(blockMode==="single")return [selected];
+ if(blockMode==="multi")return Array.from(selectedMultiple).sort();
+ const from=$("repeatFrom").value,to=$("repeatTo").value;
+ if(!from||!to||from<today||to<from)throw Error("開始日と終了日を確認してください");
+ const length=Math.round((Date.parse(to+"T00:00:00Z")-Date.parse(from+"T00:00:00Z"))/86400000);
+ if(!Number.isFinite(length)||length>89)throw Error("登録期間は最大90日です");
+ const checked=new Set(Array.from(document.querySelectorAll("#weekdayChoices input:checked")).map(e=>Number(e.value)));
+ if(blockMode==="weekly"&&!checked.size)throw Error("曜日を1つ以上選択してください");
+ const dates=[];
+ for(let n=0;n<=length;n++){const d=step(from,n);if(blockMode==="daily"||checked.has(dObj(d).getDay()))dates.push(d)}
+ return dates;
+}
+$("blockForm").onsubmit=async e=>{
+ e.preventDefault();const errorEl=$("blockError"),btn=$("blockSave");errorEl.textContent="";
+ try{
+  if(!state.me)throw Error("本人確認が完了していません");
+  const days=blockDates(),today=jst();
+  if(!days.length)throw Error("登録日を選択してください");
+  if(days.length>90||days.some(d=>d<today))throw Error("今日以降の日付を選択してください（最大90日）");
+  const all=blockType==="all";
+  const ranges=all?[{all_day:true,start_time:null,end_time:null}]:Array.from($("blockTimeRows").children).map(row=>{
+   const inputs=row.querySelectorAll('input[type="time"]');
+   return {all_day:false,start_time:inputs[0].value,end_time:inputs[1].value};
+  });
+  const validTime=x=>/^([01]\d|2[0-3]):[0-5]\d$/.test(x);
+  if(!ranges.length||ranges.some(x=>!x.all_day&&(!validTime(x.start_time)||!validTime(x.end_time)||x.start_time>=x.end_time)))throw Error("開始時間と終了時間を確認してください");
+  const sorted=ranges.filter(x=>!x.all_day).sort((a,b)=>a.start_time.localeCompare(b.start_time));
+  if(sorted.some((x,i)=>i>0&&sorted[i-1].end_time>x.start_time))throw Error("時間帯が重複しています");
+  btn.disabled=true;
+  const {data:existing,error:readError}=await db.from("interview_staff_unavailability").select("block_date,all_day,start_time,end_time").eq("interviewer_user_id",state.me).gte("block_date",days[0]).lte("block_date",days[days.length-1]);
+  if(readError)throw readError;
+  const proposed=[];
+  for(const day of days)for(const slot of ranges){
+   if((existing||[]).some(x=>x.block_date===day&&(slot.all_day||x.all_day||(
+    String(x.start_time||"").slice(0,5)<slot.end_time&&String(x.end_time||"").slice(0,5)>slot.start_time
+   ))))throw Error(day+" は既存の対応不可と時間帯が重複しています");
+   proposed.push({interviewer_user_id:state.me,block_date:day,...slot});
+  }
+  if(!confirm(days.length+"日・"+proposed.length+"件の対応不可を保存しますか？"))return;
+  const {error:writeError}=await db.from("interview_staff_unavailability").insert(proposed);
+  if(writeError)throw writeError;
+  selectedMultiple.clear();await load();say(proposed.length+"件の対応不可を保存しました");
+ }catch(err){errorEl.textContent=err.message||String(err)}
+ finally{btn.disabled=false}
+};
 $("moveForm").onsubmit=async e=>{e.preventDefault();if(!moving)return;let date=$("moveDate").value,time=$("moveTime").value;if(date<jst()||time<"10:00"||time>"23:30"||!["00","30"].includes(time.slice(3,5))){$("moveError").textContent="日時を確認してください";return}let btn=$("moveSave");btn.disabled=true;const {error}=await db.rpc("manager_schedule_reschedule",{p_id:moving.id,p_date:date,p_time:time});btn.disabled=false;if(error){$("moveError").textContent=error.message;return}$("moveDialog").close();moving=null;await setDate(date);await load()};
 authorized().then(ok=>{if(ok)load()});
 })();
