@@ -163,6 +163,15 @@ main{max-width:1100px!important;width:100%!important;margin:0!important;padding:
  main{max-width:none!important;padding:10px!important}
  .agenda-grid{grid-template-columns:1fr!important}
 }
+
+/* Interview schedule rows use exactly the same row composition as unavailable dates */
+.upcoming-list{padding:3px 18px 14px!important}
+.upcoming-list .interview-entry{padding:12px 8px;margin:0;border-top:1px solid #edf0f4}
+.upcoming-list .interview-entry:first-child{border-top:0}
+.upcoming-list .interview-entry-info{min-width:0}
+.upcoming-list .interview-entry b{font-size:15px;color:#1d3957}
+.upcoming-list .interview-entry small{display:block;font-size:13px;color:#536d86;line-height:1.5;margin-top:3px}
+.upcoming-list .interview-entry .mini{margin-left:auto}
 </style></head><body><header><a class="lg-header-home" href="../management-top/" title="総合管理TOPに戻る"><img src="../interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><a href="../management-top/">総合管理TOPに戻る</a></header><main><div class="alert" id="alert"></div><div class="grid agenda-grid">
 <aside class="side-stack">
 <div class="box"><div class="box-title"><h2>日付を選択</h2><button class="btn btn-today" id="today" type="button">今日</button></div><div class="month-controls"><button class="btn" id="prevMonth">‹</button><b id="monthTitle"></b><button class="btn" id="nextMonth">›</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="calendar" id="calendar"></div><div class="calendar-legend"><span><i class="dot blue"></i>面接</span><span><i class="dot orange"></i>対応不可</span></div></div>
@@ -218,9 +227,9 @@ function render(){
  $("addBlock").disabled=selected<now;
  const upcoming=state.interviews.filter(x=>x.uid===mine&&active(x)&&x.date>=now).sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
  $("upcomingCount").textContent=upcoming.length+"件";
- let lastDate="",out="";
- for(const i of upcoming){if(i.date!==lastDate){lastDate=i.date;out+='<div class="agenda-date">'+(lastDate===now?"今日｜":"")+displayDate(lastDate)+'</div>'}
- out+='<div class="agenda-event"><span class="agenda-time">'+esc(i.time)+'</span><span class="agenda-info"><b>'+esc(i.shop)+'</b><small>'+esc(i.status)+'</small></span><button class="mini" data-move="'+i.id+'">変更</button></div>'}
+ let out="";
+ for(const i of upcoming){
+ out+='<div class="block-entry interview-entry"><div class="interview-entry-info"><b>'+displayDate(i.date)+'</b><small>'+esc(i.time)+'　'+esc(i.shop)+' ／ '+esc(i.status)+'</small></div><button class="mini" data-move="'+i.id+'">変更</button></div>'}
  $("upcoming").innerHTML=out||'<div class="agenda-empty">今日以降の面接予定はありません</div>';
  const futureBlocks=state.blocks.filter(x=>x.uid===mine&&x.date>=now).sort((a,b)=>a.date.localeCompare(b.date)||String(a.start||"").localeCompare(String(b.start||"")));
  $("futureBlockCount").textContent=futureBlocks.length+"件";
