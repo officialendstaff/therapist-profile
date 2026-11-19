@@ -254,6 +254,48 @@ main>.agenda-grid>.agenda-stack>.box{width:100%;max-width:none}
 @media(max-width:700px){
  .schedule-applicant-card{grid-template-columns:46px minmax(85px,1fr) 128px!important;gap:7px!important}
 }
+
+/* Scale interview cards vertically with the available desktop width. Keep the approved column order. */
+@media(min-width:1250px){
+ .schedule-applicant-card{
+  min-height:100px!important;
+  padding:12px 16px!important;
+  margin:9px 0!important;
+  gap:13px!important;
+  grid-template-columns:64px 120px 168px 110px minmax(0,1fr) 172px!important;
+ }
+ .schedule-applicant-avatar{width:62px!important;height:62px!important}
+ .schedule-applicant-name{gap:7px!important}
+ .schedule-applicant-name strong{font-size:16px!important}
+ .store-pill{font-size:11px!important;padding:3px 7px!important}
+ .schedule-interview-datetime{
+  width:168px!important;height:68px!important;gap:6px!important;
+  padding:9px 7px!important;border-radius:6px!important
+ }
+ .schedule-interview-datetime strong{font-size:14px!important}
+ .schedule-interview-datetime small{font-size:12px!important}
+ .schedule-confirmation{width:110px!important;gap:5px!important}
+ .schedule-confirmation button{height:32px!important;font-size:11px!important}
+ .schedule-message{font-size:13px!important;line-height:1.6!important}
+ .schedule-applicant-actions{width:172px!important;grid-template-columns:repeat(2,84px)!important;gap:5px!important}
+ .schedule-applicant-actions button{height:34px!important;font-size:11px!important}
+ .agenda-stack .upcoming-list{padding:10px 15px 15px!important}
+}
+@media(min-width:1600px){
+ .schedule-applicant-card{min-height:112px!important;padding:14px 18px!important;
+  grid-template-columns:68px 140px 180px 116px minmax(0,1fr) 184px!important;gap:15px!important}
+ .schedule-applicant-avatar{width:66px!important;height:66px!important}
+ .schedule-interview-datetime{width:180px!important;height:72px!important}
+ .schedule-confirmation{width:116px!important}
+ .schedule-confirmation button{height:34px!important}
+ .schedule-applicant-actions{width:184px!important;grid-template-columns:repeat(2,90px)!important}
+ .schedule-applicant-actions button{height:35px!important}
+}
+@media(min-width:951px) and (max-width:1249px){
+ .schedule-applicant-card{min-height:84px!important;padding:8px!important;margin:6px 0!important}
+ .schedule-applicant-avatar{height:48px!important;width:48px!important}
+ .schedule-interview-datetime{height:56px!important}
+}
 </style></head><body><header><a class="lg-header-home" href="../management-top/" title="総合管理TOPに戻る"><img src="../interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><a href="../management-top/">総合管理TOPに戻る</a></header><main><div class="alert" id="alert"></div><div class="grid agenda-grid">
 <aside class="side-stack">
 <div class="box"><div class="box-title"><h2>日付を選択</h2><button class="btn btn-today" id="today" type="button">今日</button></div><div class="month-controls"><button class="btn" id="prevMonth">‹</button><b id="monthTitle"></b><button class="btn" id="nextMonth">›</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="calendar" id="calendar"></div><div class="calendar-legend"><span><i class="dot blue"></i>面接</span><span><i class="dot orange"></i>対応不可</span></div></div>
