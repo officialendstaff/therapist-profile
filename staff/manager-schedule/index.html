@@ -172,6 +172,33 @@ main{max-width:1100px!important;width:100%!important;margin:0!important;padding:
 .upcoming-list .interview-entry b{font-size:15px;color:#1d3957}
 .upcoming-list .interview-entry small{display:block;font-size:13px;color:#536d86;line-height:1.5;margin-top:3px}
 .upcoming-list .interview-entry .mini{margin-left:auto}
+
+/* Applicant cards modeled on the existing interview management 明日以降 list */
+main{max-width:none!important;margin:0!important;padding:12px 14px!important}
+.agenda-grid{grid-template-columns:440px minmax(0,1fr)!important;gap:14px!important}
+.schedule-applicant-card{display:grid;grid-template-columns:minmax(135px,1.1fr) 135px 92px minmax(70px,1fr) 144px;gap:8px;align-items:center;background:#fff;border:1px solid #d7e0ec;border-left:3px solid #95a8bd;border-radius:6px;margin:5px 0;padding:8px;font-size:12px;min-height:73px}
+.schedule-applicant-id{display:flex;gap:9px;align-items:center;min-width:0}
+.schedule-applicant-avatar{height:46px;width:46px;min-width:46px;border-radius:50%;overflow:hidden;background:#edf2f7;display:grid;place-items:center;color:#65788c}
+.schedule-applicant-avatar img{width:100%;height:100%;object-fit:cover}
+.schedule-applicant-name{display:flex;flex-direction:column;gap:4px;min-width:0;align-items:start}
+.schedule-applicant-name strong{font-size:13px;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.store-pill{border:1px solid #acc0db;padding:2px 5px;border-radius:3px;color:#335f9d;font-weight:700;font-size:10px;white-space:nowrap}
+.store-pill.rose{color:#c34376;background:#ffeaf2;border-color:#e7a1bf}.store-pill.secret{color:#208371;background:#e1f7f2;border-color:#9bd1c4}.store-pill.grand{color:#8059a5;background:#f2eafb;border-color:#ccb4e3}
+.schedule-interview-datetime{background:#eaf3ff;border:1px solid #b6d1ed;border-radius:4px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;color:#215889;text-align:center;white-space:nowrap}
+.schedule-interview-datetime strong{font-size:11px}.schedule-interview-datetime small{font-size:10px;color:#7888b7}
+.schedule-confirmation,.schedule-applicant-actions{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:3px}
+.schedule-confirmation button{border:1px solid #d2d6dc;background:#e1e4e9;border-radius:4px;color:#8896aa;font-size:10px;font-weight:700;padding:6px 4px}
+.schedule-message{font-size:11px;color:#72849a;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.schedule-applicant-actions{grid-template-columns:1fr 1fr}
+.schedule-applicant-actions button{border:1px solid #d6c6b9;border-radius:4px;padding:6px 2px;color:white;font-size:10px;font-weight:700;white-space:nowrap}
+.schedule-applicant-actions .action-register{background:#9eabb8}
+.schedule-applicant-actions .action-change{background:#d39d61}
+.schedule-applicant-actions .action-cancel{background:#c77986}
+.schedule-applicant-actions .action-afterlife{background:#aa6477}
+.agenda-stack .upcoming-list{padding:8px 12px 12px!important}
+@media(max-width:1250px){.agenda-grid{grid-template-columns:390px minmax(0,1fr)!important}.schedule-applicant-card{grid-template-columns:minmax(125px,1fr) 130px 84px 120px;}.schedule-message{display:none}}
+@media(max-width:1050px){.agenda-grid{grid-template-columns:1fr!important}.schedule-applicant-card{grid-template-columns:minmax(125px,1fr) 135px 92px minmax(70px,1fr) 144px}.schedule-message{display:block}}
+@media(max-width:700px){.schedule-applicant-card{grid-template-columns:1fr 130px;gap:8px}.schedule-confirmation,.schedule-message{display:none}.schedule-applicant-actions{grid-column:1/-1;grid-template-columns:repeat(4,1fr)}}
 </style></head><body><header><a class="lg-header-home" href="../management-top/" title="総合管理TOPに戻る"><img src="../interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><a href="../management-top/">総合管理TOPに戻る</a></header><main><div class="alert" id="alert"></div><div class="grid agenda-grid">
 <aside class="side-stack">
 <div class="box"><div class="box-title"><h2>日付を選択</h2><button class="btn btn-today" id="today" type="button">今日</button></div><div class="month-controls"><button class="btn" id="prevMonth">‹</button><b id="monthTitle"></b><button class="btn" id="nextMonth">›</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="calendar" id="calendar"></div><div class="calendar-legend"><span><i class="dot blue"></i>面接</span><span><i class="dot orange"></i>対応不可</span></div></div>
@@ -228,14 +255,22 @@ function render(){
  const upcoming=state.interviews.filter(x=>x.uid===mine&&active(x)&&x.date>=now).sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
  $("upcomingCount").textContent=upcoming.length+"件";
  let out="";
+ const shopClass=v=>/LUXY/i.test(v)?"luxy":/薔薇|BUSTY/.test(v)?"rose":/Un Secret/i.test(v)?"secret":/Grand Luxe/i.test(v)?"grand":"general";
  for(const i of upcoming){
- out+='<div class="block-entry interview-entry"><div class="interview-entry-info"><b>'+displayDate(i.date)+'</b><small>'+esc(i.time)+'　'+esc(i.shop)+' ／ '+esc(i.status)+'</small></div><button class="mini" data-move="'+i.id+'">変更</button></div>'}
+  const name=esc(i.applicant_name||"氏名未取得"),photo=String(i.picture||""),isPhoto=/^https:\/\//.test(photo);
+  const avatar=isPhoto?'<img src="'+esc(photo)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.parentElement.classList.add(\'missing-avatar\')">':'<span class="fallback-person">♙</span>';
+  out+='<article class="schedule-applicant-card"><div class="schedule-applicant-id"><div class="schedule-applicant-avatar">'+avatar+'</div><div class="schedule-applicant-name"><strong>'+name+'</strong><span class="store-pill '+shopClass(String(i.shop||""))+'">'+esc(i.shop)+'</span></div></div>'+
+  '<div class="schedule-interview-datetime"><strong>'+esc(i.date)+' '+esc(i.time)+'</strong><small>担当：'+esc(me?.name||"本人")+'</small></div>'+
+  '<div class="schedule-confirmation"><button type="button" data-open-management="1">LINE送信</button><button type="button" data-open-management="1">確認OK</button></div>'+
+  '<div class="schedule-message"><span class="schedule-message-label">'+esc(i.status)+'</span></div>'+
+  '<div class="schedule-applicant-actions"><button type="button" class="action-register" data-open-management="1">面接登録</button><button type="button" class="action-change" data-move="'+i.id+'">日程変更</button><button type="button" class="action-cancel" data-open-management="1">キャンセル</button><button type="button" class="action-afterlife" data-open-management="1">来世期待</button></div></article>';
+ }
  $("upcoming").innerHTML=out||'<div class="agenda-empty">今日以降の面接予定はありません</div>';
  const futureBlocks=state.blocks.filter(x=>x.uid===mine&&x.date>=now).sort((a,b)=>a.date.localeCompare(b.date)||String(a.start||"").localeCompare(String(b.start||"")));
  $("futureBlockCount").textContent=futureBlocks.length+"件";
  $("futureBlocks").innerHTML=futureBlocks.map(b=>'<div class="block-entry"><div><b>'+displayDate(b.date)+'</b><small>'+(b.all_day?"終日":esc(b.start)+"〜"+esc(b.end))+'</small></div><button class="mini" data-delete="'+b.id+'">解除</button></div>').join("")||'<div class="muted">登録なし</div>';
 }
-$("calendar").onclick=e=>{let b=e.target.closest("[data-date]");if(b){selected=b.dataset.date;render()}};$("upcoming").onclick=handleEventClick;$("futureBlocks").onclick=handleEventClick;async function handleEventClick(e){const mv=e.target.closest("[data-move]"),del=e.target.closest("[data-delete]");if(mv){moving=state.interviews.find(i=>i.id===Number(mv.dataset.move)&&i.uid===state.me);if(!moving)return;$("moveLabel").textContent=moving.shop+"｜"+moving.date+" "+moving.time;$("moveDate").value=moving.date;$("moveDate").min=jst();$("moveTime").value=moving.time;$("moveError").textContent="";$("moveDialog").showModal()}else if(del){const b=state.blocks.find(x=>x.id===Number(del.dataset.delete)&&x.uid===state.me);if(!b||!confirm("自分の対応不可を解除しますか？"))return;const {error}=await db.from("interview_staff_unavailability").delete().eq("id",b.id).eq("interviewer_user_id",state.me);if(error)say("解除できません："+error.message);else await load()}}
+$("calendar").onclick=e=>{let b=e.target.closest("[data-date]");if(b){selected=b.dataset.date;render()}};$("upcoming").onclick=handleEventClick;$("futureBlocks").onclick=handleEventClick;async function handleEventClick(e){if(e.target.closest("[data-open-management]")){location.href="../interview-sheet-preview/";return}const mv=e.target.closest("[data-move]"),del=e.target.closest("[data-delete]");if(mv){moving=state.interviews.find(i=>i.id===Number(mv.dataset.move)&&i.uid===state.me);if(!moving)return;$("moveLabel").textContent=moving.shop+"｜"+moving.date+" "+moving.time;$("moveDate").value=moving.date;$("moveDate").min=jst();$("moveTime").value=moving.time;$("moveError").textContent="";$("moveDialog").showModal()}else if(del){const b=state.blocks.find(x=>x.id===Number(del.dataset.delete)&&x.uid===state.me);if(!b||!confirm("自分の対応不可を解除しますか？"))return;const {error}=await db.from("interview_staff_unavailability").delete().eq("id",b.id).eq("interviewer_user_id",state.me);if(error)say("解除できません："+error.message);else await load()}}
 $("today").onclick=()=>setDate(jst());$("reload").onclick=load;
 
 async function setDate(d){selected=d;if(month!==d.slice(0,7)){month=d.slice(0,7);await load()}else render()}
