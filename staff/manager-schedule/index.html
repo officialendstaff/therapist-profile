@@ -386,6 +386,26 @@ main>.agenda-grid>.agenda-stack>.box{width:100%;max-width:none}
  .agenda-grid>.agenda-stack>.box:not(.upcoming-box){grid-column:2;grid-row:2;align-self:start}
  .agenda-stack .upcoming-list{min-height:0!important;max-height:none!important;overflow:visible!important}
 }
+
+/* Fixed five-card capacity aligned to the calendar height without enlarging its row. */
+@media(min-width:951px){
+ .agenda-stack .upcoming-list{min-height:0!important;max-height:none!important;padding:5px 9px 7px!important;overflow:visible!important}
+ .schedule-applicant-card{
+  min-height:58px!important;height:58px!important;box-sizing:border-box!important;
+  margin:3px 0!important;padding:2px 9px!important;row-gap:2px!important;
+ }
+ .schedule-applicant-avatar{width:44px!important;height:44px!important}
+ .schedule-applicant-name{gap:2px!important}
+ .schedule-applicant-name strong{font-size:13px!important}
+ .store-pill{font-size:10px!important;padding:2px 5px!important}
+ .schedule-interview-datetime{height:48px!important;padding:3px 5px!important;gap:2px!important}
+ .schedule-interview-datetime strong{font-size:12px!important}
+ .schedule-interview-datetime small{font-size:10px!important}
+ .schedule-confirmation{gap:2px!important}
+ .schedule-confirmation button{height:23px!important;padding:2px 4px!important;font-size:10px!important}
+ .schedule-applicant-actions{gap:3px!important}
+ .schedule-applicant-actions button{height:23px!important;padding:2px!important;font-size:10px!important}
+}
 </style></head><body><header><a class="lg-header-home" href="../management-top/" title="総合管理TOPに戻る"><img src="../interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><a href="../management-top/">総合管理TOPに戻る</a></header><main><div class="alert" id="alert"></div><div class="grid agenda-grid">
 <aside class="side-stack">
 <div class="box"><div class="box-title"><h2>日付を選択</h2><button class="btn btn-today" id="today" type="button">今日</button></div><div class="month-controls"><button class="btn" id="prevMonth">‹</button><b id="monthTitle"></b><button class="btn" id="nextMonth">›</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="calendar" id="calendar"></div><div class="calendar-legend"><span><i class="dot blue"></i>面接</span><span><i class="dot orange"></i>対応不可</span></div></div>
@@ -456,7 +476,7 @@ function render(){
  let cal="";for(let x=0;x<offset;x++)cal+="<span></span>";
  for(let d=1;d<=last;d++){
   const date=month+"-"+pad(d),weekday=new Date(year,mon-1,d).getDay(),holiday=PUBLIC_HOLIDAYS[date],past=date<now;
-  const iv=state.interviews.some(x=>x.uid===mine&&x.date===date&&active(x)),bl=state.blocks.some(x=>x.uid===mine&&x.date===date);
+  const iv=state.interviews.some(x=>(state.is_master||x.uid===mine)&&x.date===date&&active(x)),bl=state.blocks.some(x=>x.uid===mine&&x.date===date);
   const classes=["day",weekday===0?"sunday":weekday===6?"saturday":"",holiday?"holiday":"",past?"past":"",((blockMode==="multi"?selectedMultiple.has(date):date===selected)?"active":""),(date===now?"today":"")].filter(Boolean).join(" ");
   const label=holiday?esc(holiday):weekday===0?"日曜日":weekday===6?"土曜日":"";
   cal+='<button type="button" class="'+classes+'" data-date="'+date+'" aria-label="'+date+(label?" "+label:"")+'" title="'+label+'"'+(past?' disabled aria-disabled="true"':"")+'>'+d+'<span class="day-dots">'+(iv?'<i class="dot blue"></i>':"")+(bl?'<i class="dot orange"></i>':"")+'</span></button>';
@@ -467,7 +487,7 @@ function render(){
 
  $("blockSelectedDate").textContent=blockMode==="single"?"選択中： "+selected.replaceAll("-","/")+"（"+"日月火水木金土"[dObj(selected).getDay()]+"）":blockMode==="multi"?"選択中： "+selectedMultiple.size+"日":"";
  $("selectedDates").textContent=Array.from(selectedMultiple).sort().map(d=>d.slice(5).replace("-","/")).join("、")||"カレンダーから日付を選んでください";
- const upcoming=state.interviews.filter(x=>x.uid===mine&&active(x)&&x.date>=now).sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
+ const upcoming=state.interviews.filter(x=>(state.is_master||x.uid===mine)&&active(x)&&x.date>=now).sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time));
  const pageCount=Math.max(1,Math.ceil(upcoming.length/5));
  agendaPage=Math.min(Math.max(agendaPage,0),pageCount-1);
  $("agendaPagination").hidden=pageCount<=1;
@@ -480,10 +500,10 @@ function render(){
   const name=esc(i.applicant_name||"氏名未取得"),photo=String(i.picture||""),isPhoto=/^https:\/\//.test(photo);
   const avatar=isPhoto?'<img src="'+esc(photo)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\';this.parentElement.classList.add(\'missing-avatar\')">':'<span class="fallback-person">♙</span>';
   out+='<article class="schedule-applicant-card"><div class="schedule-applicant-avatar">'+avatar+'</div><div class="schedule-applicant-name"><strong>'+name+'</strong><span class="store-pill '+shopClass(String(i.shop||""))+'">'+esc(i.shop)+'</span></div>'+
-  '<div class="schedule-interview-datetime"><strong>'+esc(i.date)+' '+esc(i.time)+'</strong><small>担当：'+esc(me?.name||"本人")+'</small></div>'+
+  '<div class="schedule-interview-datetime"><strong>'+esc(i.date)+' '+esc(i.time)+'</strong><small>担当：'+esc(i.staff_name||me?.name||"未設定")+'</small></div>'+
   '<div class="schedule-confirmation"><button type="button" data-open-management="1">LINE送信</button><button type="button" data-open-management="1">確認OK</button></div>'+
   '<div class="schedule-message"><span class="schedule-message-label">'+esc(i.status)+'</span></div>'+
-  '<div class="schedule-applicant-actions"><button type="button" class="action-register" data-open-management="1">面接登録</button><button type="button" class="action-change" data-move="'+i.id+'">日程変更</button><button type="button" class="action-cancel" data-open-management="1">キャンセル</button><button type="button" class="action-afterlife" data-open-management="1">来世期待</button></div></article>';
+  '<div class="schedule-applicant-actions"><button type="button" class="action-register" data-open-management="1">面接登録</button><button type="button" class="action-change" '+(i.uid===state.me?'data-move="'+i.id+'"':'data-open-management="1"')+'>日程変更</button><button type="button" class="action-cancel" data-open-management="1">キャンセル</button><button type="button" class="action-afterlife" data-open-management="1">来世期待</button></div></article>';
  }
  $("upcoming").innerHTML=out||'<div class="agenda-empty">今日以降の面接予定はありません</div>';
  const futureBlocks=state.blocks.filter(x=>x.uid===mine&&x.date>=now).sort((a,b)=>a.date.localeCompare(b.date)||String(a.start||"").localeCompare(String(b.start||"")));
