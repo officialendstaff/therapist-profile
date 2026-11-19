@@ -777,10 +777,24 @@ $("blockForm").onsubmit=async e=>{
   if(readError)throw readError;
   const proposed=[];
   const batchId=crypto.randomUUID();
-  for(const day of days)for(const slot of ranges){
-   if((existing||[]).some(x=>x.block_date===day&&(slot.all_day||x.all_day||(
+  const overlaps=(day,slot)=>(existing||[]).filter(x=>x.block_date===day&&(slot.all_day||x.all_day||(
     String(x.start_time||"").slice(0,5)<slot.end_time&&String(x.end_time||"").slice(0,5)>slot.start_time
-   ))))throw Error(day+" は既存の対応不可と時間帯が重複しています");
+  )));
+  if(blockMode==="single"&&days.length===1&&ranges.length===1){
+   const collided=overlaps(days[0],ranges[0]);
+   if(collided.length){
+    const before=collided.map(x=>x.all_day?"終日":String(x.start_time).slice(0,5)+"〜"+(String(x.end_time).slice(0,5)==="23:59"?"以降不可":String(x.end_time).slice(0,5))).join("、");
+    const after=ranges[0].all_day?"終日":ranges[0].start_time+"〜"+(ranges[0].end_time==="23:59"?"以降不可":ranges[0].end_time);
+    if(!confirm(days[0]+" の登録済み「"+before+"」を「"+after+"」へ置き換えますか？"))return;
+    const {error:replaceError}=await db.rpc("manager_schedule_replace_single_block",{
+      p_date:days[0],p_all_day:ranges[0].all_day,p_start:ranges[0].start_time,p_end:ranges[0].end_time
+    });
+    if(replaceError)throw replaceError;
+    await load();say("対応不可時間を変更しました");return;
+   }
+  }
+  for(const day of days)for(const slot of ranges){
+   if(overlaps(day,slot).length)throw Error(day+" は既存の対応不可と時間帯が重複しています");
    proposed.push({interviewer_user_id:state.me,block_date:day,registration_batch_id:batchId,registration_mode:blockMode,...slot});
   }
   if(!confirm(days.length+"日・"+proposed.length+"件の対応不可を保存しますか？"))return;
