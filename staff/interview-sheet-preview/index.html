@@ -1134,13 +1134,19 @@ function showDecisionPopup(record,kind){
  const heading=document.createElement('h2');heading.textContent=kind==='詳細'?'面接詳細':kind+'の登録';panel.append(heading);
  const body=document.createElement('div');panel.append(body);
  const field=(label,type,value='')=>{const l=document.createElement('label');l.textContent=label;const el=document.createElement(type==='select'?'select':type==='textarea'?'textarea':'input');if(type!=='select'&&type!=='textarea')el.type=type;el.value=value||'';body.append(l,el);return el};
- let shop,stage,date,checks,note;
+ let shop,stage,date,media,checks,note;
  if(kind==='採用'){
   shop=field('採用店舗','select',sheet.hire_shop||sheet.shop||record.shop);
   for(const name of ['Grand Luxe','LUXY OSAKA','薔薇と紳士','Un Secret','BUSTY OSAKA']){const o=document.createElement('option');o.value=name;o.textContent=name;shop.append(o)}
   shop.value=sheet.hire_shop||sheet.shop||record.shop||'Grand Luxe';
-  stage=field('源氏名','text',sheet.stage_name);
-  date=field('入店予定日（任意）','date',sheet.hire_date);
+  stage=field('源氏名（未入力可）','text',sheet.stage_name);
+  date=field('入店日（未入力可）','date',sheet.hire_date);
+  media=field('広告媒体（必須）','select','');
+  media.required=true;
+  media.setAttribute('aria-label','広告媒体（必須）');
+  const placeholder=document.createElement('option');placeholder.value='';placeholder.textContent='広告媒体を選択してください';media.append(placeholder);
+  for(const name of ["エステ魂","メンズエステワーク","エステラブワーク","リラクジョブ","エステクイーン","Richセラピ","エステアイ","メンエスリクルート","バニラ","02","X","ココア","HP","その他"]){const option=document.createElement('option');option.value=name;option.textContent=name;media.append(option)}
+  media.value=sheet.recruit_source||'';
  }else if(kind==='不採用'){
   checks=document.createElement('div');checks.className='decision-reasons';body.append(checks);
   let saved=[];try{saved=JSON.parse(sheet.rejection_reason||'[]')}catch{saved=(sheet.rejection_reason||'').split(',').filter(Boolean)}
@@ -1162,7 +1168,7 @@ function showDecisionPopup(record,kind){
   const save=document.createElement('button');save.className='primary';save.textContent='確定';footer.append(save);
   save.onclick=async()=>{
    const payload=linkedSheet?{action:'decide_sheet',sheet_id:sheet.id,result:kind}:{action:'decide_interview',interview_id:record.interviewId,result:kind};
-   if(kind==='採用'){payload.shop=shop.value;payload.stage_name=stage.value.trim();payload.hire_date=date.value;if(!payload.stage_name){appNotice('源氏名を入力してください');return}}
+   if(kind==='採用'){payload.shop=shop.value;payload.stage_name=stage.value.trim();payload.hire_date=date.value;payload.recruit_source=media.value;if(!payload.recruit_source){appNotice('広告媒体を選択してください');media.focus();return}}
    if(kind==='不採用'){payload.reasons=[...checks.querySelectorAll('input:checked')].map(x=>x.value);if(!payload.reasons.length){appNotice('不採用理由を選択してください');return}}
    if(kind==='辞退'){payload.note=note.value.trim();if(!payload.note){appNotice('辞退理由を入力してください');return}}
    if(!window.confirm(kind+'で確定しますか？'))return;
