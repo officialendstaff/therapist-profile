@@ -717,9 +717,9 @@ html.metrics-standalone body.interview-admin-locked>.main{visibility:visible!imp
 .metrics-v8-grid{display:grid;grid-template-columns:.97fr 1.03fr;gap:9px;width:100%;height:100%;min-height:0}
 .metrics-v8-col{display:grid;gap:9px;min-width:0;min-height:0}
 .metrics-v8-grid.monthly .metrics-v8-left{grid-template-rows:1.5fr .9fr .9fr}
-.metrics-v8-grid.monthly .metrics-v8-right{grid-template-rows:1.95fr 1.35fr}
+.metrics-v8-grid.monthly .metrics-v8-right{grid-template-rows:1.45fr 1.05fr 1.05fr}
 .metrics-v8-grid.annual .metrics-v8-left{grid-template-rows:1.52fr 1fr 1fr}
-.metrics-v8-grid.annual .metrics-v8-right{grid-template-rows:1.98fr 1.54fr}
+.metrics-v8-grid.annual .metrics-v8-right{grid-template-rows:1.45fr 1.1fr 1.1fr}
 .metrics-v8-panel{min-width:0;min-height:0;overflow:hidden;border:1px solid #d1deed;border-radius:5px;padding:10px 11px;display:flex;flex-direction:column;background:#fff}
 .metrics-v8-heading{flex:none;min-height:18px;font-size:11px;font-weight:750;color:#213a58;display:flex;align-items:center;justify-content:space-between;gap:5px}
 .metrics-v8-media{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-flow:column;grid-template-rows:repeat(7,minmax(0,1fr));column-gap:14px;row-gap:2px;flex:1;min-height:0;padding-top:7px}
@@ -1521,6 +1521,7 @@ function bindStoreMetrics(){const shop=document.getElementById('storeMetricsShop
 let storeMetricsHistoricalMonthly=[];
 let storeMetricsRecentInquiryMonthly=null;
 let storeMetricsSheets=[];
+let storeMetricsHiringMedia=[];
 let storeMetricsSheetsStatus='idle';
 async function refreshStoreMetricsSheets(){
  const token=sessionStorage.getItem('interview_staff_session_v2')||localStorage.getItem('interview_staff_session_v2');
@@ -1529,7 +1530,7 @@ async function refreshStoreMetricsSheets(){
  try{
   const res=await fetch('https://vjjnkflbfsjihwzjsjpr.supabase.co/functions/v1/interview-staff-access',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({action:'metrics_sheets',token})});
   const data=await res.json();if(!res.ok||!Array.isArray(data.sheets))throw Error(data.error||'metrics_sheet_fetch_failed');
-  storeMetricsSheets=data.sheets;storeMetricsSheetsStatus='ready';return true;
+  storeMetricsSheets=data.sheets;storeMetricsHiringMedia=Array.isArray(data.hiring_media)?data.hiring_media:[];storeMetricsSheetsStatus='ready';return true;
  }catch(e){storeMetricsSheetsStatus='error';return false}
 }
 
@@ -2623,6 +2624,36 @@ chart.append(compare);
   });
   holder.append(grid);
  };
+ // Explicit recruitment source selected when recording a successful hiring outcome.
+ // Count each interview once; never count inquiries or attendance as hires.
+ const hiringMediaOrder=['エステ魂','メンズエステワーク','エステラブワーク','リラクジョブ','エステクイーン','Richセラピ','エステアイ','メンエスリクルート','バニラ','02','X','ココア','HP','その他'];
+ const renderHiringMedia=(holder)=>{
+  const raw=new Map();
+  for(const item of storeMetricsHiringMedia){
+   if(!matchShop(item.shop)||!dateInPeriod(item.month))continue;
+   const category=normalizedRecruitMedia(item.source);
+   const name=hiringMediaOrder.includes(category)?category:'その他';
+   raw.set(name,(raw.get(name)||0)+1);
+  }
+  const maximum=Math.max(1,...raw.values()),grid=document.createElement('div');
+  grid.className='metrics-v8-media';
+  grid.style.gridTemplateRows='repeat(7,minmax(0,1fr))';
+  for(const name of hiringMediaOrder){
+   const line=document.createElement('div');line.className='metrics-v8-media-row';
+   line.title=name;
+   const label=document.createElement('span');label.textContent=name;label.title=name;
+   const track=document.createElement('div');track.className='metrics-v8-track';
+   const number=raw.get(name)||0;
+   const fill=document.createElement('div');fill.className='metrics-v8-fill';
+   fill.style.width=number/maximum*100+'%';
+   fill.style.background=previewMediaColor(name);
+   track.append(fill);
+   const count=document.createElement('b');
+   count.textContent=storeMetricsSheetsStatus==='ready'?String(number):'—';
+   line.append(label,track,count);grid.append(line);
+  }
+  holder.append(grid);
+ };
  const hourGraph=holder=>{
   const labels=Array.from({length:24},(_,i)=>String(i));
   const values=Array(24).fill(0);
@@ -2681,12 +2712,14 @@ chart.append(compare);
   countBars(section(l,'求人媒体別｜面接実施数','monthly-count'),attendedMedia,storeMetricsSheetsStatus==='ready'&&interviewReady);
   comparisons(section(r,'求人媒体別｜面接実施数・前月比較','monthly-compare'),attendedMedia,priorMedia,currentAttendanceAvailable,priorAttendanceAvailable,'先月','当月');
   ageGraph(section(r,'問い合わせ者｜年齢分布','monthly-age'));
+  renderHiringMedia(section(r,'求人媒体別｜採用数','monthly-hiring'));
  }else{
   annualTrend(section(l,'問い合わせ・面接実施｜12か月推移','annual-trend'));
   countBars(section(l,'求人媒体別｜年間問い合わせ数','annual-count'),annualInquiryMedia,lineReady);
   countBars(section(l,'求人媒体別｜年間面接実施数','annual-count'),annualMedia,storeMetricsSheetsStatus==='ready'&&interviewReady);
   comparisons(section(r,'求人媒体別｜面接実施数・前年比較','annual-compare'),annualMedia,previousAnnualMedia,storeMetricsSheetsStatus==='ready'&&interviewReady,storeMetricsSheetsStatus==='ready'&&interviewReady&&previousAnnualMediaRaw.size>0,'前年','当年');
   ageGraph(section(r,'問い合わせ者｜年間年齢分布','annual-age'));
+  renderHiringMedia(section(r,'求人媒体別｜年間採用数','annual-hiring'));
  }
  root.replaceChildren(dash);
 
