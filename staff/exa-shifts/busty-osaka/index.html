@@ -857,7 +857,7 @@ function dummyPattern(id){
    EXA ID 51 Raime excluded, and December 31 is store closure. */
 const BUSTY_DEC_HOURS=new Map([[26,[900,1560]],[58,[1200,1680]],[21,[600,960]],[59,[720,1200]],[6,[660,1200]],[10,[600,1200]],[11,[1260,1680]],[23,[1320,1680]],[27,[1080,1680]],[4,[1200,1680]],[17,[1140,1680]],[24,[720,1260]],[25,[720,1380]],[29,[1140,1560]],[32,[1140,1680]],[7,[600,1020]],[55,[600,1200]],[20,[600,1080]],[5,[1020,1560]],[60,[600,1080]],[8,[840,1320]],[63,[600,1080]],[66,[900,1380]]]);
 // Weekday-fixed EXA entry plan. Allocated using 2026-11-06 to 2026-11-19 actual real-working shift coverage (two observations per weekday).
-const BUSTY_DEC_WEEK=[[10,55,21,23,11,4,29,58,17,7,32],[25,55,23,63,66,5,8,59,27,20,60],[25,10,55,11,24,29,6,26,58,21,4],[7,63,17,32,5,23,8,66,11,59,27],[10,4,20,60,29,6,24,21,58,32,26],[25,17,7,5,66,63,23,59,8,11,27],[25,10,27,32,58,26,20,60,29,24,21]];
+const BUSTY_DEC_WEEK=[[10,55,21,58,11],[25,63,27,20,66],[26,6,60,4,7,24,29],[63,59,23],[10,32,21,17],[25,5,11,7,8,66],[55,26,27,24,58,32,20,29,60]];
 function bustyDecemberPlan(date,storedRows,staffMap){
  if(!date.startsWith("2026-12-")||date==="2026-12-31")return [];
  const weekday=new Date(date+"T00:00:00Z").getUTCDay();
@@ -865,7 +865,7 @@ function bustyDecemberPlan(date,storedRows,staffMap){
  const recorded=storedRows.filter(x=>!x.is_pre_off&&staffMap.has(x.exa_id));
  const actualReal=new Set(recorded.filter(x=>!x.is_dummy_shift&&staffMap.get(x.exa_id)?.operating_category!=="dummy_use").map(x=>x.exa_id));
  const actualDummy=new Set(recorded.filter(x=>x.is_dummy_shift||staffMap.get(x.exa_id)?.operating_category==="dummy_use").map(x=>x.exa_id));
- const n=Math.max(0,11-actualReal.size-actualDummy.size);
+ const n=Math.max(0,Math.min(order.length,11-actualReal.size-actualDummy.size));
  const available=order.filter(id=>id!==51&&staffMap.get(id)?.operating_category==="dummy_use"&&!actualDummy.has(id)&&!actualReal.has(id)&&BUSTY_DEC_HOURS.has(id));
  const planned=[];
  const windows=[[600,840,3],[840,1080,3],[1080,1320,3],[1320,1680,3]];
