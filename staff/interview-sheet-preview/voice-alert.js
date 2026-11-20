@@ -34,9 +34,9 @@ function lineTone(key){
  try{
   const sound=new Audio(lineSoundUrl);
   sound.preload='auto';sound.volume=1;
-  sound.addEventListener('error',()=>console.warn('LINE通知音ファイルを読み込めません'));
+  sound.addEventListener('error',()=>{console.warn('LINE通知音ファイルを読み込めません');say('新着通知がありまっせ！新着通知がありまっせ！',key+'-fallback')});
   const playback=sound.play();
-  if(playback&&typeof playback.catch==='function')playback.catch(error=>console.warn('LINE通知音の再生がブロックされました',error));
+  if(playback&&typeof playback.catch==='function')playback.catch(error=>{console.warn('LINE通知音の再生がブロックされました',error);say('新着通知がありまっせ！新着通知がありまっせ！',key+'-fallback')});
   if(activeAudio){activeAudio.pause();activeAudio.currentTime=0}
   activeAudio=sound;lastKey=key;lastSpokenAt=Date.now();
   return true;
