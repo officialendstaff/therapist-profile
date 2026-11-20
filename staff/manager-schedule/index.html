@@ -552,6 +552,9 @@ main>.agenda-grid>.agenda-stack>.box{width:100%;max-width:none}
 /* Static, fully visible unavailability groups: no expand/collapse */
 .availability-static .availability-static-head{display:flex;align-items:center;min-height:88px;padding:12px 14px}
 .availability-static .availability-group-rows{max-height:none!important;overflow:visible!important}
+
+.block-pager{display:flex;justify-content:flex-end;align-items:center;gap:12px;padding:8px 16px 15px;font-size:13px;font-weight:700;color:#294b69}
+.block-pager .mini:disabled{opacity:.35;cursor:default}
 </style></head><body><header><a class="lg-header-home" href="../management-top/" title="総合管理TOPに戻る"><img src="../interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><a href="../management-top/">総合管理TOPに戻る</a></header><main><div class="alert" id="alert"></div><div class="grid agenda-grid">
 <aside class="side-stack">
 <div class="box"><div class="box-title"><h2>日付を選択</h2><button class="btn btn-today" id="today" type="button">今日</button></div><div class="month-controls"><button class="btn" id="prevMonth">‹</button><b id="monthTitle"></b><button class="btn" id="nextMonth">›</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="calendar" id="calendar"></div><div class="calendar-legend"><span><i class="dot blue"></i>面接</span><span><i class="dot orange"></i>対応不可</span></div></div>
@@ -579,7 +582,7 @@ main>.agenda-grid>.agenda-stack>.box{width:100%;max-width:none}
 </aside>
 <section class="agenda-stack">
 <div class="box upcoming-box"><div class="boardhead"><h2>面接予定</h2><div class="agenda-pagination" id="agendaPagination" hidden><button type="button" class="mini" id="agendaPrev" aria-label="前の5件">‹</button><span id="agendaPageLabel"></span><button type="button" class="mini" id="agendaNext" aria-label="次の5件">›</button></div></div><div id="upcoming" class="upcoming-list"><div class="loading">読み込み中…</div></div></div>
-<div class="box"><div class="boardhead"><div><h2>対応不可日時一覧 <span id="futureBlockCount" class="count-chip">0件</span></h2></div></div><div id="futureBlocks" class="block-list block-list-right"><div class="loading">読み込み中…</div></div></div>
+<div class="box"><div class="boardhead"><div><h2>対応不可日時一覧 <span id="futureBlockCount" class="count-chip">0件</span></h2></div></div><div id="futureBlocks" class="block-list block-list-right"><div class="loading">読み込み中…</div></div><div id="blockPager" class="block-pager" hidden><button type="button" class="mini" id="blockPrev">‹ 前へ</button><span id="blockPageInfo"></span><button type="button" class="mini" id="blockNext">次へ ›</button></div></div>
 </section></div><div id="ownActions" hidden></div></main>
 <dialog id="moveDialog"><div class="dialogtitle">自分の面接予定を変更</div><form id="moveForm" class="dialogbody"><p id="moveLabel" style="margin-bottom:14px"></p><label>日付<input type="date" id="moveDate" required></label><label>時刻（30分単位）<input type="time" id="moveTime" min="10:00" max="23:30" step="1800" required></label><div id="moveError" class="alert"></div><div class="dialogbottom"><button class="btn" type="button" data-close="moveDialog">閉じる</button><button class="btn primary" type="submit" id="moveSave">保存</button></div></form></dialog>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js"></script><script>
@@ -587,7 +590,7 @@ main>.agenda-grid>.agenda-stack>.box{width:100%;max-width:none}
 const pad=n=>String(n).padStart(2,"0"),jst=()=>new Intl.DateTimeFormat("sv-SE",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date()),dObj=s=>new Date(s+"T12:00:00+09:00"),dFmt=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()),step=(d,n)=>{const x=dObj(d);x.setDate(x.getDate()+n);return dFmt(x)},esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 // Japanese national holidays & statutory substitute holidays, Cabinet Office (published 2026–2027)
 const PUBLIC_HOLIDAYS={"2026-01-01":"元日","2026-01-12":"成人の日","2026-02-11":"建国記念の日","2026-02-23":"天皇誕生日","2026-03-20":"春分の日","2026-04-29":"昭和の日","2026-05-03":"憲法記念日","2026-05-04":"みどりの日","2026-05-05":"こどもの日","2026-05-06":"振替休日","2026-07-20":"海の日","2026-08-11":"山の日","2026-09-21":"敬老の日","2026-09-22":"国民の休日","2026-09-23":"秋分の日","2026-10-12":"スポーツの日","2026-11-03":"文化の日","2026-11-23":"勤労感謝の日","2027-01-01":"元日","2027-01-11":"成人の日","2027-02-11":"建国記念の日","2027-02-23":"天皇誕生日","2027-03-21":"春分の日","2027-03-22":"振替休日","2027-04-29":"昭和の日","2027-05-03":"憲法記念日","2027-05-04":"みどりの日","2027-05-05":"こどもの日","2027-07-19":"海の日","2027-08-11":"山の日","2027-09-20":"敬老の日","2027-09-23":"秋分の日","2027-10-11":"スポーツの日","2027-11-03":"文化の日","2027-11-23":"勤労感謝の日"};
-let selected=jst(),month=selected.slice(0,7),state={me:null,managers:[],interviews:[],blocks:[]},moving=null,busy=false,agendaPage=0,selectedMultiple=new Set(),blockMode='single',blockType='all';
+let selected=jst(),month=selected.slice(0,7),state={me:null,managers:[],interviews:[],blocks:[]},moving=null,busy=false,agendaPage=0,blockPage=0,selectedMultiple=new Set(),blockMode='single',blockType='all';
 const say=t=>$("alert").textContent=t||"",active=x=>["面接予定","日程変更"].includes(x.status);
 function filter(date,uid,kind){return (kind==="block"?state.blocks:state.interviews).filter(x=>x.date===date&&x.uid===uid)}
 function monthBounds(ym){const [y,m]=ym.split("-").map(Number);return [ym+"-01",dFmt(new Date(y,m,0))]}
@@ -709,9 +712,18 @@ function renderBlockGroup(group){
 
  const futureBlocks=state.blocks.filter(x=>x.uid===mine&&x.date>=now).sort((a,b)=>a.date.localeCompare(b.date)||String(a.start||"").localeCompare(String(b.start||"")));
  $("futureBlockCount").textContent=futureBlocks.length+"件";
- $("futureBlocks").innerHTML=groupedUnavailability(futureBlocks).map(renderBlockGroup).join("")||'<div class="muted">登録なし</div>';
+ const groups=groupedUnavailability(futureBlocks);
+ const pages=Math.max(1,Math.ceil(groups.length/10));
+ blockPage=Math.min(blockPage,pages-1);
+ $("futureBlocks").innerHTML=groups.slice(blockPage*10,(blockPage+1)*10).map(renderBlockGroup).join("")||'<div class="muted">登録なし</div>';
+ $("blockPager").hidden=pages<=1;
+ $("blockPageInfo").textContent=(blockPage+1)+" / "+pages;
+ $("blockPrev").disabled=blockPage===0;
+ $("blockNext").disabled=blockPage>=pages-1;
 }
 $("calendar").onclick=e=>{const b=e.target.closest("[data-date]");if(!b||b.disabled)return;const d=b.dataset.date;if(blockMode==="multi"){if(selectedMultiple.has(d))selectedMultiple.delete(d);else selectedMultiple.add(d)}else selected=d;render()};$("upcoming").onclick=handleEventClick;$("upcoming").onkeydown=e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches("[data-detail-interview]")){e.preventDefault();openInterviewDetail(e.target.dataset.detailInterview)}};$("futureBlocks").onclick=handleEventClick;
+$("blockPrev").onclick=()=>{if(blockPage>0){blockPage--;render()}};
+$("blockNext").onclick=()=>{blockPage++;render()};
 function openInterviewDetail(id){if(!/^\d+$/.test(String(id)))return;location.href="../interview-sheet-preview/?detailInterview="+encodeURIComponent(id)}async function handleEventClick(e){if(e.target.closest("[data-open-management]")){location.href="../interview-sheet-preview/";return}if(e.target.closest("[data-detail-interview]")&&!e.target.closest("button,a,input")){openInterviewDetail(e.target.closest("[data-detail-interview]").dataset.detailInterview);return}const mv=e.target.closest("[data-move]"),del=e.target.closest("[data-delete]");if(mv){moving=state.interviews.find(i=>i.id===Number(mv.dataset.move)&&i.uid===state.me);if(!moving)return;$("moveLabel").textContent=moving.shop+"｜"+moving.date+" "+moving.time;$("moveDate").value=moving.date;$("moveDate").min=jst();$("moveTime").value=moving.time;$("moveError").textContent="";$("moveDialog").showModal()}else if(del){const b=state.blocks.find(x=>x.id===Number(del.dataset.delete)&&x.uid===state.me);if(!b||!confirm("自分の対応不可を解除しますか？"))return;const {error}=await db.from("interview_staff_unavailability").delete().eq("id",b.id).eq("interviewer_user_id",state.me);if(error)say("解除できません："+error.message);else await load()}}
 $("today").onclick=()=>setDate(jst());$("agendaPrev").onclick=()=>{if(agendaPage>0){agendaPage--;render()}};$("agendaNext").onclick=()=>{agendaPage++;render()};
 
