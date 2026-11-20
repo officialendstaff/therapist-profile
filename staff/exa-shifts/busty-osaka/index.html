@@ -799,7 +799,7 @@ async function load(){
 if(!authorized)return;showMsg("Supabaseを読み込み中…");
 const start=month+"-01",end=dayStr(daysIn());
 const responses=staffReadOnly?(await staffRead("shift",{store:"busty",month})).rows.map(data=>({data,error:null})):await Promise.all([
-client.from("exa_shift_therapists").select("exa_id,stage_name,residency,employment_status,operating_category,evaluation_score").eq("store_code","busty"),
+client.from("exa_shift_therapists").select("exa_id,stage_name,residency,employment_status,operating_category,evaluation_score,exa_is_visible").eq("store_code","busty"),
 client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_dummy_shift,is_pre_off").eq("store_code","busty").gte("work_date",start).lte("work_date",end).order("work_date"),
 client.from("exa_shift_performance").select("exa_id,work_date,customer_count,attendance_status").eq("store_code","busty").gte("work_date",start).lte("work_date",end),
 client.from("exa_shift_sync_runs").select("finished_at,record_count,mode").eq("store_code","busty").eq("state","success").order("finished_at",{ascending:false}).limit(1),
@@ -813,7 +813,8 @@ const [a,b,c,d,e,future,sv,sl,roster]=responses;
 const err=[a,b,c,d,e,future,sv,sl,roster].find(r=>r.error)?.error;
 if(err){showMsg("読み込みエラー："+err.message,true);return;}
 rosterIds=new Set((roster.data||[]).map(r=>r.exa_id));
-therapists=(a.data||[]).filter(t=>rosterIds.has(t.exa_id)||t.operating_category==="not_used");shifts=b.data||[];performances=c.data||[];historyPerformances=e.data||[];futureShifts=future.data||[];
+therapists=(a.data||[]).filter(t=>t.exa_is_visible!==false&&(rosterIds.has(t.exa_id)||t.operating_category==="not_used"));
+rosterIds=new Set(therapists.map(t=>t.exa_id));shifts=b.data||[];performances=c.data||[];historyPerformances=e.data||[];futureShifts=future.data||[];
 surveyScores=sv.data||[];surveyLinks=sl.data||[];
 $("monthLabel").textContent=month.replace("-","年")+"月";
 $("message").textContent="";
