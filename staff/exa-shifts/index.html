@@ -598,6 +598,20 @@ header.lg-common-header .header-menu{flex-wrap:nowrap}
 .shift-table .staff-name:has(>.name-editor[data-staff-id="138"]):not(:has(>.reading))::after{content:"ゆきむら";display:block;font-weight:400;color:#77879c;font-size:9px;line-height:1.2;margin-top:2px;}
 .shift-table .staff-name:has(>.name-editor[data-staff-id="151"]):not(:has(>.reading))::after{content:"うえと";display:block;font-weight:400;color:#77879c;font-size:9px;line-height:1.2;margin-top:2px;}
 .shift-table .staff-name:has(>.name-editor[data-staff-id="191"]):not(:has(>.reading))::after{content:"まつい";display:block;font-weight:400;color:#77879c;font-size:9px;line-height:1.2;margin-top:2px;}
+
+/* Keep the first date column typography identical to every later date. */
+.shift-table.dummy-layout thead tr:first-child th.day-heading:nth-child(5) button{
+ font-size:13px!important;font-weight:700!important;
+}
+.shift-table.dummy-layout thead tr.daily-totals > th.day-total:first-child{
+ font-size:12px!important;font-weight:700!important;
+}
+.shift-table.dummy-layout tbody tr:not(.group) > td:nth-child(5){
+ font-size:13px!important;font-weight:500!important;letter-spacing:-.025em!important;
+}
+.shift-table.dummy-layout tbody tr:not(.group) > td:nth-child(5) .dec-plan-shift{
+ font-size:10px!important;
+}
 </style><script id="shared-management-auth-migration">(function(){try{const key='mattan-recruit-auth',old=sessionStorage.getItem(key),current=localStorage.getItem(key);if(!old)return;const expiry=value=>{try{const v=JSON.parse(value);return Number(v.expires_at||v.expiresAt||0)}catch{return 0}};if(!current||expiry(old)>expiry(current))localStorage.setItem(key,old);}catch(e){console.warn('管理ログインの共有が使えません',e);}})();</script><style id="staff-readonly-shift-v1">
  body.staff-readonly #exaSync,body.staff-readonly #autoSync,body.staff-readonly #unscheduledAdd,
  body.staff-readonly #csvImport,body.staff-readonly #serverTest,body.staff-readonly #residencySave,
