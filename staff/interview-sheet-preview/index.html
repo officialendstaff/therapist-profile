@@ -226,7 +226,23 @@ button{font-family:inherit;letter-spacing:inherit}
  .store-metrics-charts>section:nth-child(2) .store-metrics-axis-label{font-size:8px!important;letter-spacing:-.04em}
  .store-metrics-charts>section:nth-child(4) .store-metrics-comparison-graph{overflow-x:hidden!important;overflow-y:auto!important}
 }
-</style><style id="sheet-preview-layout">.main-panel:not(.sheet-mode)>.sheet-preview-host{display:none!important}.main-panel.sheet-mode> :not(.sheet-preview-host){display:none!important}.main-panel.sheet-mode{height:100%;min-height:0;padding:0!important;overflow:hidden!important}.main-panel:not(.sheet-mode){height:auto!important;min-height:100%!important;padding:12px 16px!important;overflow:visible!important;display:block!important}.main-panel:not(.sheet-mode)>.today-panel:not([hidden]),.main-panel:not(.sheet-mode)>.shared-panel:not([hidden]){display:block!important}.main-panel:not(.sheet-mode)>.sheet-preview-host{display:none!important}.sheet-preview-host{display:block;width:100%;height:100%;min-height:0}.sheet-preview-host iframe{display:block;width:100%;height:100%;border:0;background:#eef3f9}.nav button[data-page="集計頁"]+ .nav-group-space + #interviewSheetPreviewLink{background:#eaf2fc;border-color:#d2e2f6;color:#275c9b}.main{min-height:0!important;overflow:hidden!important}@media(max-width:850px){.sheet-preview-host iframe{min-height:100%}}</style><style id="sheet-visibility-override">.main-panel.sheet-mode>.sheet-preview-host{display:block!important;visibility:visible!important;position:relative!important;flex:1 1 auto!important;min-height:0!important;height:100%!important}.main-panel.sheet-mode>.sheet-preview-host iframe{display:block!important;width:100%!important;height:100%!important;visibility:visible!important}.main-panel.sheet-mode>.today-panel,.main-panel.sheet-mode>.shared-panel,.main-panel.sheet-mode>#registrationPanel,.main-panel.sheet-mode>#applicantDetail{display:none!important}.main-panel.sheet-mode{display:flex!important;flex-direction:column!important;min-height:0!important}</style><style id="applicant-detail-scroll-restoration">
+</style><style id="sheet-preview-layout">.main-panel:not(.sheet-mode)>.sheet-preview-host{display:none!important}.main-panel.sheet-mode> :not(.sheet-preview-host){display:none!important}.main-panel.sheet-mode{height:100%;min-height:0;padding:0!important;overflow:hidden!important}.main-panel:not(.sheet-mode){height:auto!important;min-height:100%!important;padding:12px 16px!important;overflow:visible!important;display:block!important}.main-panel:not(.sheet-mode)>.today-panel:not([hidden]),.main-panel:not(.sheet-mode)>.shared-panel:not([hidden]){display:block!important}.main-panel:not(.sheet-mode)>.sheet-preview-host{display:none!important}.sheet-preview-host{display:block;width:100%;height:100%;min-height:0}.sheet-preview-host iframe{display:block;width:100%;height:100%;border:0;background:#eef3f9}.nav button[data-page="集計頁"]+ .nav-group-space + #interviewSheetPreviewLink{background:#eaf2fc;border-color:#d2e2f6;color:#275c9b}.main{min-height:0!important;overflow:hidden!important}@media(max-width:850px){.sheet-preview-host iframe{min-height:100%}}</style><style id="desktop-interview-list-scroll-fix">
+/* Desktop list and interview pages scroll independently under the fixed chart.
+   The embedded sheet preview retains its own fixed-height iframe. */
+@media (min-width:701px){
+ html:not(.metrics-standalone) .main:has(>.main-panel:not(.sheet-mode)){
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior-y:contain;
+  scrollbar-gutter:stable;
+ }
+ html:not(.metrics-standalone) .main>.main-panel:not(.sheet-mode){
+  min-height:100%!important;
+  height:auto!important;
+  overflow:visible!important;
+ }
+}
+</style><style id="sheet-visibility-override">.main-panel.sheet-mode>.sheet-preview-host{display:block!important;visibility:visible!important;position:relative!important;flex:1 1 auto!important;min-height:0!important;height:100%!important}.main-panel.sheet-mode>.sheet-preview-host iframe{display:block!important;width:100%!important;height:100%!important;visibility:visible!important}.main-panel.sheet-mode>.today-panel,.main-panel.sheet-mode>.shared-panel,.main-panel.sheet-mode>#registrationPanel,.main-panel.sheet-mode>#applicantDetail{display:none!important}.main-panel.sheet-mode{display:flex!important;flex-direction:column!important;min-height:0!important}</style><style id="applicant-detail-scroll-restoration">
 /* Keep the two history columns bounded by the viewport, each independently scrollable. */
 @media(min-width:701px){
 .main-panel:has(#applicantDetail:not([hidden])){min-height:0!important;overflow:hidden!important}
