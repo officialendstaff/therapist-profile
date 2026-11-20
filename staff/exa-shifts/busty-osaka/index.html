@@ -866,8 +866,31 @@ function bustyDecemberPlan(date,storedRows,staffMap){
  const actualReal=new Set(recorded.filter(x=>!x.is_dummy_shift&&staffMap.get(x.exa_id)?.operating_category!=="dummy_use").map(x=>x.exa_id));
  const actualDummy=new Set(recorded.filter(x=>x.is_dummy_shift||staffMap.get(x.exa_id)?.operating_category==="dummy_use").map(x=>x.exa_id));
  const n=Math.max(0,11-actualReal.size-actualDummy.size);
- return order.filter(id=>id!==51&&staffMap.get(id)?.operating_category==="dummy_use"&&!actualDummy.has(id)&&!actualReal.has(id))
- .slice(0,n).map(id=>({exa_id:id,work_date:date,start_minutes:BUSTY_DEC_HOURS.get(id)[0],end_minutes:BUSTY_DEC_HOURS.get(id)[1],is_dummy_shift:true,is_pre_off:false,december_plan:true}));
+ const available=order.filter(id=>id!==51&&staffMap.get(id)?.operating_category==="dummy_use"&&!actualDummy.has(id)&&!actualReal.has(id)&&BUSTY_DEC_HOURS.has(id));
+ const planned=[];
+ const windows=[[600,840,3],[840,1080,3],[1080,1320,3],[1320,1680,3]];
+ const overlap=(a,b,c,d)=>Math.max(0,Math.min(b,d)-Math.max(a,c));
+ // Balance the actual roster by time of day, rather than removing shifts from the end of the list.
+ // Count EXA entries as authoritative; a planned shift is display-only.
+ while(planned.length<n&&available.length){
+   const combined=[...recorded,...planned];
+   const coverage=windows.map(([start,end])=>
+     combined.reduce((sum,x)=>sum+overlap(x.start_minutes,x.end_minutes,start,end)/(end-start),0));
+   let winner=0,best=-Infinity;
+   for(let i=0;i<available.length;i++){
+     const id=available[i],time=BUSTY_DEC_HOURS.get(id);
+     const score=windows.reduce((sum,[start,end,target],k)=>{
+       const fraction=overlap(time[0],time[1],start,end)/(end-start);
+       const beforeGap=Math.max(0,target-coverage[k]);
+       const afterGap=Math.max(0,target-coverage[k]-fraction);
+       return sum+(beforeGap-afterGap)*(k===3?1.15:1);
+     },0)-i*0.00001;
+     if(score>best){best=score;winner=i;}
+   }
+   const id=available.splice(winner,1)[0],time=BUSTY_DEC_HOURS.get(id);
+   planned.push({exa_id:id,work_date:date,start_minutes:time[0],end_minutes:time[1],is_dummy_shift:true,is_pre_off:false,december_plan:true});
+ }
+ return planned;
 }
 
 let staffView="real";
