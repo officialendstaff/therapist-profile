@@ -34,9 +34,9 @@ function lineTone(key){
  try{
   const sound=new Audio(lineSoundUrl);
   sound.preload='auto';sound.volume=1;
-  sound.addEventListener('error',()=>{console.warn('LINE通知音ファイルを読み込めません');say('新着通知がありまっせ！新着通知がありまっせ！',key+'-fallback')});
+  sound.addEventListener('error',()=>{console.warn('LINE通知音ファイルを読み込めません。音声読み上げへの切り替えは行いません。')});
   const playback=sound.play();
-  if(playback&&typeof playback.catch==='function')playback.catch(error=>{console.warn('LINE通知音の再生がブロックされました',error);say('新着通知がありまっせ！新着通知がありまっせ！',key+'-fallback')});
+  if(playback&&typeof playback.catch==='function')playback.catch(error=>{console.warn('LINE通知音の再生がブロックされました。音声読み上げへの切り替えは行いません。',error)});
   if(activeAudio){activeAudio.pause();activeAudio.currentTime=0}
   activeAudio=sound;lastKey=key;lastSpokenAt=Date.now();
   return true;
@@ -65,7 +65,7 @@ window.interviewVoiceAlert={
    if(interviewTone()){lastKey=k;lastSpokenAt=Date.now();return true}
    return false;
   }
-  return say(type==='line'?'新着通知がありまっせ！新着通知がありまっせ！':'はよー見なはれ！はよー見なはれ！',k);
+  return type==='line'?lineTone(k):say('はよー見なはれ！はよー見なはれ！',k);
  },
  stop:function(){
   if(window.speechSynthesis)window.speechSynthesis.cancel();
