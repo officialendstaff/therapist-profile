@@ -835,13 +835,12 @@ const dayType=date=>{
 const exaFourDigit=minutes=>String(Math.floor(minutes/60)).padStart(2,"0")+String(minutes%60).padStart(2,"0");
 const weekdayNames=["日","月","火","水","木","金","土"];
 function dummyPattern(id){
- const rows=month==="2026-12"
- ?Array.from({length:daysIn()},(_,i)=>dayStr(i+1)).flatMap(date=>{
-   const stored=shifts.filter(x=>x.work_date===date);
-   const actual=stored.filter(x=>x.exa_id===id&&!x.is_pre_off);
-   return actual.length?actual:bustyDecemberPlan(date,stored,staffById()).filter(x=>x.exa_id===id);
- })
- :futureShifts.filter(r=>r.exa_id===id&&!r.is_pre_off);
+ if(month==="2026-12"&&BUSTY_DEC_HOURS.has(id)){
+   const days=BUSTY_DEC_WEEK.flatMap((ids,k)=>ids.includes(id)?[k]:[]);
+   const time=BUSTY_DEC_HOURS.get(id);
+   return {weekdays:days.map(k=>weekdayNames[(k+1)%7]).join("・")||"—",start:days.length?exaFourDigit(time[0]):null,end:days.length?exaFourDigit(time[1]):null,multiple:false};
+ }
+ const rows=futureShifts.filter(r=>r.exa_id===id&&!r.is_pre_off);
  if(!rows.length)return {weekdays:"—",start:null,end:null,multiple:false};
  const weekdaySet=[...new Set(rows.map(r=>new Date(r.work_date+"T00:00:00Z").getUTCDay()))];
  weekdaySet.sort((a,b)=>(a+6)%7-(b+6)%7);
@@ -857,11 +856,11 @@ function dummyPattern(id){
 /* December 2026 EXA-input reference; never submitted to EXA via the server-sync pipeline.
    EXA ID 51 Raime excluded, and December 31 is store closure. */
 const BUSTY_DEC_HOURS=new Map([[26,[900,1560]],[58,[1200,1680]],[21,[600,960]],[59,[720,1200]],[6,[660,1200]],[10,[600,1200]],[11,[1260,1680]],[23,[1320,1680]],[27,[1080,1680]],[4,[1200,1680]],[17,[1140,1680]],[24,[720,1260]],[25,[720,1380]],[29,[1140,1560]],[32,[1140,1680]],[7,[600,1020]],[55,[600,1200]],[20,[600,1080]],[5,[1020,1560]],[60,[600,1080]],[8,[840,1320]],[63,[600,1080]],[66,[900,1380]]]);
-const BUSTY_DEC_DAYS=[[7,60,25,55,8,5,29,23,11,4,17],[59,24,10,20,26,27,58,32,17,4,29],[6,21,63,59,66,26,58,32,11,23,29],[25,20,6,60,27,5,11,4,23,17,58],[10,55,7,24,8,66,32,11,58,29,17],[21,63,24,10,26,27,23,32,4,11,58],[6,59,60,20,5,66,23,17,32,29,4],[21,7,25,55,8,5,29,23,11,4,58],[63,59,24,10,26,27,17,32,4,58,11],[6,21,7,25,8,66,17,32,29,23,58],[20,60,55,63,26,27,23,17,11,4,32],[59,7,10,55,8,5,29,32,11,58,23],[21,24,25,20,66,26,29,17,4,58,23],[6,60,63,20,27,5,17,32,29,11,4],[55,21,7,60,8,66,11,4,29,23,58],[24,10,25,59,26,27,17,32,4,58,11],[6,63,24,21,8,5,17,32,29,23,58],[60,25,20,6,66,26,23,17,11,4,29],[59,7,10,55,5,8,32,58,29,11,23],[63,20,21,24,27,66,4,17,32,58,29],[6,59,60,10,26,27,23,17,32,11,4],[25,55,7,63,5,8,11,4,29,23,17],[24,10,25,55,66,26,32,58,17,4,23],[6,21,59,7,8,66,29,32,58,11,17],[20,60,63,6,27,5,23,11,4,58,29],[59,7,10,55,5,8,32,11,58,29,4],[25,20,21,24,26,27,23,17,32,11,58],[60,63,20,6,66,26,17,32,23,4,29],[7,60,25,55,8,5,23,11,4,29,17],[59,24,10,21,27,66,58,32,17,4,29]];
+const BUSTY_DEC_WEEK=[[6,10,20,59,5,26,27,4,11,17,23],[7,21,25,55,8,66,5,29,58,32,4],[24,63,60,10,26,27,66,11,17,23,29],[6,7,21,24,8,5,26,32,58,11,17],[20,25,55,60,27,66,8,4,23,29,32],[59,63,7,10,5,8,66,58,4,11,17],[20,21,24,25,26,27,66,23,29,32,58]];
 function bustyDecemberPlan(date,storedRows,staffMap){
  if(!date.startsWith("2026-12-")||date==="2026-12-31")return [];
- const calendarDay=Number(date.slice(-2));
- const order=BUSTY_DEC_DAYS[calendarDay-1]||[];
+ const weekday=new Date(date+"T00:00:00Z").getUTCDay();
+ const order=BUSTY_DEC_WEEK[(weekday+6)%7]||[];
  const recorded=storedRows.filter(x=>!x.is_pre_off&&staffMap.has(x.exa_id));
  const actualReal=new Set(recorded.filter(x=>!x.is_dummy_shift&&staffMap.get(x.exa_id)?.operating_category!=="dummy_use").map(x=>x.exa_id));
  const actualDummy=new Set(recorded.filter(x=>x.is_dummy_shift||staffMap.get(x.exa_id)?.operating_category==="dummy_use").map(x=>x.exa_id));
