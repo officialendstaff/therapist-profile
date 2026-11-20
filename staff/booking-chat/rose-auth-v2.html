@@ -622,13 +622,18 @@ function notificationTone(){
   const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio)return;
   const ctx=audioContext||(audioContext=new Audio());
   if(ctx.state==="suspended")void ctx.resume();
-  const t=ctx.currentTime,osc=ctx.createOscillator(),gain=ctx.createGain();
-  osc.type="sine";osc.frequency.setValueAtTime(880,t);
-  osc.frequency.setValueAtTime(1046,t+0.12);
-  gain.gain.setValueAtTime(0.0001,t);
-  gain.gain.exponentialRampToValueAtTime(0.085,t+0.02);
-  gain.gain.exponentialRampToValueAtTime(0.0001,t+0.32);
-  osc.connect(gain);gain.connect(ctx.destination);osc.start(t);osc.stop(t+0.34);
+  const start=ctx.currentTime;
+  const limiter=ctx.createDynamicsCompressor();
+  limiter.threshold.value=-12;limiter.ratio.value=8;limiter.attack.value=0.002;limiter.release.value=0.12;
+  limiter.connect(ctx.destination);
+  [880,1175,1568].forEach((frequency,i)=>{
+   const t=start+i*0.17,osc=ctx.createOscillator(),gain=ctx.createGain();
+   osc.type="sine";osc.frequency.setValueAtTime(frequency,t);
+   gain.gain.setValueAtTime(0.0001,t);
+   gain.gain.exponentialRampToValueAtTime(0.42,t+0.012);
+   gain.gain.exponentialRampToValueAtTime(0.0001,t+0.22);
+   osc.connect(gain);gain.connect(limiter);osc.start(t);osc.stop(t+0.23);
+  });
  }catch(error){console.warn("通知音を再生できません",error)}
 }
 $("notifyToggle").addEventListener("click",()=>{
