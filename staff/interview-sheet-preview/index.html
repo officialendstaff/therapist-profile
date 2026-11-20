@@ -1119,7 +1119,7 @@ async function showInterviewResultDetails(record){
   const d=data.details||{},reasons=Array.isArray(d.rejection_reasons)?d.rejection_reasons:[];
   const status=d.result||record.status;
   let description='応募者：'+record.name+'\\n応募店舗：'+record.shop+'\\n面接予定：'+listMinuteTime(record.date)+'\\n結果：'+(['採用','不採用','辞退'].includes(status)?status:'未確定');
-  if(status==='採用'){description+='\\n採用店舗：'+(d.hire_shop||'未登録')+'\\n源氏名：'+(d.stage_name||'未登録')+'\\n入店予定日：'+(d.hire_date||'未定')}
+  if(status==='採用'){description+='\\n採用店舗：'+(d.hire_shop||'未登録')+'\\n源氏名：'+(d.stage_name||'未登録')+'\\n入店日：'+(d.hire_date||'未定')+'\\n広告媒体：'+(d.recruit_source||'未登録')}
   if(status==='不採用')description+='\\n不採用理由：'+(reasons.join('、')||'未登録');
   if(status==='辞退')description+='\\n辞退理由：'+(d.withdrawal_note||'未登録');
   void appDialog(description.replace(/\\n/g,'\n'),'notice');
@@ -1158,7 +1158,7 @@ function showDecisionPopup(record,kind){
   let reasons=[];try{reasons=JSON.parse(sheet.rejection_reason||'[]')}catch{reasons=[sheet.rejection_reason].filter(Boolean)}
   const applicationShop=record.shop||sheet.shop||'未登録';
   const hiringShop=sheet.hire_shop||'未登録';
-  info.textContent='応募者：'+(sheet.name||record.name)+'\n応募店舗：'+applicationShop+'\n面接結果：'+(['採用','不採用','辞退'].includes(sheet.status)?sheet.status:'未確定')+(sheet.status==='採用'?'\n採用店舗：'+hiringShop+'\n源氏名：'+(sheet.stage_name||'未登録')+'\n入店予定日：'+(sheet.hire_date||'未定'):sheet.status==='不採用'?'\n不採用理由：'+(reasons.join('、')||'－'):sheet.status==='辞退'?'\n辞退理由：'+(sheet.rejection_note||'－'):'');
+  info.textContent='応募者：'+(sheet.name||record.name)+'\n応募店舗：'+applicationShop+'\n面接結果：'+(['採用','不採用','辞退'].includes(sheet.status)?sheet.status:'未確定')+(sheet.status==='採用'?'\n採用店舗：'+hiringShop+'\n源氏名：'+(sheet.stage_name||'未登録')+'\n入店日：'+(sheet.hire_date||'未定')+'\n広告媒体：'+(sheet.recruit_source||'未登録'):sheet.status==='不採用'?'\n不採用理由：'+(reasons.join('、')||'－'):sheet.status==='辞退'?'\n辞退理由：'+(sheet.rejection_note||'－'):'');
   body.append(info);
   if(sheet.status==='採用'){const print=document.createElement('p');print.textContent='印刷機能：後日実装予定';print.style.cssText='font-size:12px;color:#64748b;margin-top:14px';body.append(print)}
  }
