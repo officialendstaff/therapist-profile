@@ -2,6 +2,7 @@
 'use strict';
 const config={rate:1.04,pitch:1.70,volume:1};
 let lastSpokenAt=0,lastKey='',lastUtterance=null,activeAudio=null,activeContext=null;
+const lineSoundUrl='./vivant_line_5s.mp3';
 function interviewTone(){
  try{
   const Audio=window.AudioContext||window.webkitAudioContext;
@@ -29,6 +30,18 @@ function interviewTone(){
   return true;
  }catch(error){console.warn('面接通知音を再生できません',error);return false}
 }
+function lineTone(key){
+ try{
+  const sound=new Audio(lineSoundUrl);
+  sound.preload='auto';sound.volume=1;
+  sound.addEventListener('error',()=>console.warn('LINE通知音ファイルを読み込めません'));
+  const playback=sound.play();
+  if(playback&&typeof playback.catch==='function')playback.catch(error=>console.warn('LINE通知音の再生がブロックされました',error));
+  if(activeAudio){activeAudio.pause();activeAudio.currentTime=0}
+  activeAudio=sound;lastKey=key;lastSpokenAt=Date.now();
+  return true;
+ }catch(error){console.warn('LINE通知音を再生できません',error);return false}
+}
 function say(message,key){
  if(!window.speechSynthesis||!window.SpeechSynthesisUtterance)return false;
  const now=Date.now();
@@ -47,6 +60,7 @@ window.interviewVoiceAlert={
  play:function(type,key){
   const k=key||type;
   if(k===lastKey)return true; // Same event must not trigger reminder sounds
+  if(type==='line')return lineTone(k);
   if(type==='interview'){
    if(interviewTone()){lastKey=k;lastSpokenAt=Date.now();return true}
    return false;
@@ -55,6 +69,7 @@ window.interviewVoiceAlert={
  },
  stop:function(){
   if(window.speechSynthesis)window.speechSynthesis.cancel();
+  if(activeAudio){activeAudio.pause();activeAudio.currentTime=0;activeAudio=null}
   if(activeContext){const ctx=activeContext;activeContext=null;ctx.close().catch(()=>{})}
   lastUtterance=null;
  },
