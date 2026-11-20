@@ -832,7 +832,13 @@ const dayType=date=>{
 const exaFourDigit=minutes=>String(Math.floor(minutes/60)).padStart(2,"0")+String(minutes%60).padStart(2,"0");
 const weekdayNames=["日","月","火","水","木","金","土"];
 function dummyPattern(id){
- const rows=futureShifts.filter(r=>r.exa_id===id&&!r.is_pre_off);
+ const rows=month==="2026-12"
+ ?Array.from({length:daysIn()},(_,i)=>dayStr(i+1)).flatMap(date=>{
+   const stored=shifts.filter(x=>x.work_date===date);
+   const actual=stored.filter(x=>x.exa_id===id&&!x.is_pre_off);
+   return actual.length?actual:bustyDecemberPlan(date,stored,staffById()).filter(x=>x.exa_id===id);
+ })
+ :futureShifts.filter(r=>r.exa_id===id&&!r.is_pre_off);
  if(!rows.length)return {weekdays:"—",start:null,end:null,multiple:false};
  const weekdaySet=[...new Set(rows.map(r=>new Date(r.work_date+"T00:00:00Z").getUTCDay()))];
  weekdaySet.sort((a,b)=>(a+6)%7-(b+6)%7);
