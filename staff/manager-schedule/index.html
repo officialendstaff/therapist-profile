@@ -548,6 +548,10 @@ main>.agenda-grid>.agenda-stack>.box{width:100%;max-width:none}
 .availability-group-card summary{min-height:100px!important}
 .availability-expand{border:0!important;background:transparent!important;padding:4px!important;font-size:18px!important}
 @media(max-width:690px){.agenda-stack .block-list-right{grid-template-columns:1fr!important;max-height:none!important;overflow:visible!important}}
+
+/* Static, fully visible unavailability groups: no expand/collapse */
+.availability-static .availability-static-head{display:flex;align-items:center;min-height:88px;padding:12px 14px}
+.availability-static .availability-group-rows{max-height:none!important;overflow:visible!important}
 </style></head><body><header><a class="lg-header-home" href="../management-top/" title="総合管理TOPに戻る"><img src="../interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><a href="../management-top/">総合管理TOPに戻る</a></header><main><div class="alert" id="alert"></div><div class="grid agenda-grid">
 <aside class="side-stack">
 <div class="box"><div class="box-title"><h2>日付を選択</h2><button class="btn btn-today" id="today" type="button">今日</button></div><div class="month-controls"><button class="btn" id="prevMonth">‹</button><b id="monthTitle"></b><button class="btn" id="nextMonth">›</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="calendar" id="calendar"></div><div class="calendar-legend"><span><i class="dot blue"></i>面接</span><span><i class="dot orange"></i>対応不可</span></div></div>
@@ -700,7 +704,7 @@ function renderBlockGroup(group){
  const range=dates.length===1?blockDateLabel(dates[0]):blockDateLabel(dates[0])+"〜"+blockDateLabel(dates[dates.length-1]);
  const timeSummary=hours.length<=2?hours.join(" / "):hours.slice(0,2).join(" / ")+" ほか"+(hours.length-2)+"件";
  const details=rows.map(b=>'<div class="availability-group-row"><span>'+blockDateLabel(b.date)+'（'+"日月火水木金土"[dObj(b.date).getDay()]+'）</span><span class="availability-time">'+blockTimeLabel(b)+'</span><button type="button" class="mini" data-delete="'+b.id+'">解除</button></div>').join("");
- return '<details class="availability-group-card"><summary><span class="availability-summary-main"><span class="availability-summary-meta"><b>'+esc(label)+'</b><em>'+dates.length+'日</em></span><strong class="availability-main-time">'+timeSummary+'</strong><span class="availability-summary-date">'+range+'</span></span><span class="availability-expand" aria-hidden="true">⌄</span></summary><div class="availability-group-rows">'+details+'</div></details>';
+ return '<div class="availability-group-card availability-static"><div class="availability-static-head"><span class="availability-summary-main"><span class="availability-summary-meta"><b>'+esc(label)+'</b><em>'+dates.length+'日</em></span><strong class="availability-main-time">'+timeSummary+'</strong><span class="availability-summary-date">'+range+'</span></span></div><div class="availability-group-rows">'+details+'</div></div>';
 }
 
  const futureBlocks=state.blocks.filter(x=>x.uid===mine&&x.date>=now).sort((a,b)=>a.date.localeCompare(b.date)||String(a.start||"").localeCompare(String(b.start||"")));
