@@ -863,7 +863,7 @@ client.from("exa_shift_performance").select("exa_id,work_date,customer_count,att
 client.from("exa_shift_entries").select("exa_id,work_date,start_minutes,end_minutes,is_dummy_shift,is_pre_off").eq("store_code","rose").order("work_date").limit(5000),
 client.from("exa_survey_scores").select("sheet_person_id,rose_stage_name,response_count,score_100,synced_at").limit(1000),
 client.from("exa_survey_links").select("exa_id,sheet_person_id").eq("store_code","rose"),
-client.from("exa_rose_roster_current").select("exa_id,roster_name")
+client.from("exa_shift_therapists").select("exa_id,stage_name").eq("store_code","rose").eq("exa_is_visible",true)
 ]);
 }catch(error){
  showMsg("読み込みエラー："+String(error?.message||error),true);
