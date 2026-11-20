@@ -553,7 +553,13 @@ main>.agenda-grid>.agenda-stack>.box{width:100%;max-width:none}
 .availability-static .availability-static-head{display:flex;align-items:center;min-height:88px;padding:12px 14px}
 .availability-static .availability-group-rows{max-height:none!important;overflow:visible!important}
 
-.block-pager{display:flex;justify-content:flex-end;align-items:center;gap:12px;padding:8px 16px 15px;font-size:13px;font-weight:700;color:#294b69}
+.block-pager{display:flex;justify-content:flex-end;align-items:center;gap:9px;padding:0;font-size:12px;font-weight:700;color:#294b69}
+.block-pager[hidden]{display:none!important}
+.agenda-stack .block-list-right{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:repeat(5,minmax(0,1fr))!important;grid-auto-flow:row!important;gap:8px!important;overflow:visible!important;max-height:none!important;align-items:stretch!important}
+.agenda-stack .block-list-right .availability-simple{min-height:83px!important;height:auto!important;padding:10px 12px!important}
+.agenda-stack .block-list-right .availability-simple .availability-time{font-size:15px!important}
+@media(max-width:690px){.agenda-stack .block-list-right{grid-template-columns:1fr!important;grid-template-rows:auto!important}}
+
 .block-pager .mini:disabled{opacity:.35;cursor:default}
 </style></head><body><header><a class="lg-header-home" href="../management-top/" title="総合管理TOPに戻る"><img src="../interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><a href="../management-top/">総合管理TOPに戻る</a></header><main><div class="alert" id="alert"></div><div class="grid agenda-grid">
 <aside class="side-stack">
@@ -582,7 +588,7 @@ main>.agenda-grid>.agenda-stack>.box{width:100%;max-width:none}
 </aside>
 <section class="agenda-stack">
 <div class="box upcoming-box"><div class="boardhead"><h2>面接予定</h2><div class="agenda-pagination" id="agendaPagination" hidden><button type="button" class="mini" id="agendaPrev" aria-label="前の5件">‹</button><span id="agendaPageLabel"></span><button type="button" class="mini" id="agendaNext" aria-label="次の5件">›</button></div></div><div id="upcoming" class="upcoming-list"><div class="loading">読み込み中…</div></div></div>
-<div class="box"><div class="boardhead"><div><h2>対応不可日時一覧 <span id="futureBlockCount" class="count-chip">0件</span></h2></div></div><div id="futureBlocks" class="block-list block-list-right"><div class="loading">読み込み中…</div></div><div id="blockPager" class="block-pager" hidden><button type="button" class="mini" id="blockPrev">‹ 前へ</button><span id="blockPageInfo"></span><button type="button" class="mini" id="blockNext">次へ ›</button></div></div>
+<div class="box"><div class="boardhead"><div><h2>対応不可日時一覧 <span id="futureBlockCount" class="count-chip">0件</span></h2></div><div id="blockPager" class="block-pager" hidden><button type="button" class="mini" id="blockPrev">‹</button><span id="blockPageInfo"></span><button type="button" class="mini" id="blockNext">›</button></div></div><div id="futureBlocks" class="block-list block-list-right"><div class="loading">読み込み中…</div></div></div>
 </section></div><div id="ownActions" hidden></div></main>
 <dialog id="moveDialog"><div class="dialogtitle">自分の面接予定を変更</div><form id="moveForm" class="dialogbody"><p id="moveLabel" style="margin-bottom:14px"></p><label>日付<input type="date" id="moveDate" required></label><label>時刻（30分単位）<input type="time" id="moveTime" min="10:00" max="23:30" step="1800" required></label><div id="moveError" class="alert"></div><div class="dialogbottom"><button class="btn" type="button" data-close="moveDialog">閉じる</button><button class="btn primary" type="submit" id="moveSave">保存</button></div></form></dialog>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js"></script><script>
@@ -712,10 +718,12 @@ function renderBlockGroup(group){
 
  const futureBlocks=state.blocks.filter(x=>x.uid===mine&&x.date>=now).sort((a,b)=>a.date.localeCompare(b.date)||String(a.start||"").localeCompare(String(b.start||"")));
  $("futureBlockCount").textContent=futureBlocks.length+"件";
- const groups=groupedUnavailability(futureBlocks);
- const pages=Math.max(1,Math.ceil(groups.length/10));
+ // One blocked date/time per card; never expand a multi-day group into an unbounded list.
+ // Pagination is always 10 cards (two columns by five rows) with no inner scrolling.
+ const entries=futureBlocks.map(b=>({mode:"single",rows:[b]}));
+ const pages=Math.max(1,Math.ceil(entries.length/10));
  blockPage=Math.min(blockPage,pages-1);
- $("futureBlocks").innerHTML=groups.slice(blockPage*10,(blockPage+1)*10).map(renderBlockGroup).join("")||'<div class="muted">登録なし</div>';
+ $("futureBlocks").innerHTML=entries.slice(blockPage*10,(blockPage+1)*10).map(renderBlockGroup).join("")||'<div class="muted">登録なし</div>';
  $("blockPager").hidden=pages<=1;
  $("blockPageInfo").textContent=(blockPage+1)+" / "+pages;
  $("blockPrev").disabled=blockPage===0;
