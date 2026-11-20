@@ -543,11 +543,11 @@ main>.agenda-grid>.agenda-stack>.box{width:100%;max-width:none}
 @media(max-width:850px){.agenda-stack .block-list-right{grid-template-columns:1fr!important}}
 
 /* 2026-11-20: unavailable slots use two columns and five visible rows. */
-.agenda-stack .block-list-right{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:minmax(102px,auto)!important;align-items:stretch!important;gap:8px!important;max-height:calc(5 * 110px + 4 * 8px + 24px)!important;overflow-y:auto!important;align-content:start!important}
+.agenda-stack .block-list-right{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:minmax(102px,auto)!important;align-items:stretch!important;gap:8px!important;max-height:none!important;overflow:visible!important;align-content:start!important}
 .availability-group-card,.availability-simple{height:100%!important;align-self:stretch!important}
 .availability-group-card summary{min-height:100px!important}
 .availability-expand{border:0!important;background:transparent!important;padding:4px!important;font-size:18px!important}
-@media(max-width:690px){.agenda-stack .block-list-right{grid-template-columns:1fr!important;max-height:calc(5 * 110px + 4 * 8px + 24px)!important}}
+@media(max-width:690px){.agenda-stack .block-list-right{grid-template-columns:1fr!important;max-height:none!important;overflow:visible!important}}
 </style></head><body><header><a class="lg-header-home" href="../management-top/" title="総合管理TOPに戻る"><img src="../interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><a href="../management-top/">総合管理TOPに戻る</a></header><main><div class="alert" id="alert"></div><div class="grid agenda-grid">
 <aside class="side-stack">
 <div class="box"><div class="box-title"><h2>日付を選択</h2><button class="btn btn-today" id="today" type="button">今日</button></div><div class="month-controls"><button class="btn" id="prevMonth">‹</button><b id="monthTitle"></b><button class="btn" id="nextMonth">›</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="calendar" id="calendar"></div><div class="calendar-legend"><span><i class="dot blue"></i>面接</span><span><i class="dot orange"></i>対応不可</span></div></div>
