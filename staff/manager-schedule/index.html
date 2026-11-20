@@ -561,6 +561,14 @@ main>.agenda-grid>.agenda-stack>.box{width:100%;max-width:none}
 @media(max-width:690px){.agenda-stack .block-list-right{grid-template-columns:1fr!important;grid-template-rows:auto!important}}
 
 .block-pager .mini:disabled{opacity:.35;cursor:default}
+
+/* Recurring/unavailability batch is always a single compact card. */
+.agenda-stack .block-list-right .availability-group-card{height:auto!important;min-height:83px!important}
+.agenda-stack .block-list-right .availability-group-card .availability-static-head{min-height:83px!important;padding:10px 12px!important;gap:10px;display:flex!important;align-items:center!important;justify-content:space-between!important}
+.agenda-stack .block-list-right .availability-group-card .availability-summary-main{min-width:0;gap:4px!important}
+.agenda-stack .block-list-right .availability-group-card .availability-main-time{font-size:15px!important;line-height:1.25!important}
+.agenda-stack .block-list-right .availability-group-card .availability-summary-date{font-size:11px!important}
+.agenda-stack .block-list-right .availability-group-card .mini{flex:none;white-space:nowrap}
 </style></head><body><header><a class="lg-header-home" href="../management-top/" title="総合管理TOPに戻る"><img src="../interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a><a href="../management-top/">総合管理TOPに戻る</a></header><main><div class="alert" id="alert"></div><div class="grid agenda-grid">
 <aside class="side-stack">
 <div class="box"><div class="box-title"><h2>日付を選択</h2><button class="btn btn-today" id="today" type="button">今日</button></div><div class="month-controls"><button class="btn" id="prevMonth">‹</button><b id="monthTitle"></b><button class="btn" id="nextMonth">›</button></div><div class="week"><span>日</span><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span></div><div class="calendar" id="calendar"></div><div class="calendar-legend"><span><i class="dot blue"></i>面接</span><span><i class="dot orange"></i>対応不可</span></div></div>
@@ -697,7 +705,7 @@ function blockTimeLabel(b){return b.all_day?"終日":esc(b.start)+"〜"+(b.end==
 function blockDateLabel(d){return d.slice(0,4)!==jst().slice(0,4)?esc(d.slice(0,4))+"/"+esc(d.slice(5).replace("-","/")):esc(d.slice(5).replace("-","/"))}
 function renderBlockGroup(group){
  const rows=group.rows;
- if(rows.length===1){
+ if(rows.length===1 && (group.mode==="single"||group.mode==="legacy")){
   const b=rows[0];
   return '<div class="availability-card availability-simple"><div class="availability-card-info"><b class="availability-date">'+blockDateLabel(b.date)+'（'+"日月火水木金土"[dObj(b.date).getDay()]+'）</b><span class="availability-time">'+blockTimeLabel(b)+'</span></div><button type="button" class="mini" data-delete="'+b.id+'">解除</button></div>';
  }
@@ -712,18 +720,18 @@ function renderBlockGroup(group){
  }
  const range=dates.length===1?blockDateLabel(dates[0]):blockDateLabel(dates[0])+"〜"+blockDateLabel(dates[dates.length-1]);
  const timeSummary=hours.length<=2?hours.join(" / "):hours.slice(0,2).join(" / ")+" ほか"+(hours.length-2)+"件";
- const details=rows.map(b=>'<div class="availability-group-row"><span>'+blockDateLabel(b.date)+'（'+"日月火水木金土"[dObj(b.date).getDay()]+'）</span><span class="availability-time">'+blockTimeLabel(b)+'</span><button type="button" class="mini" data-delete="'+b.id+'">解除</button></div>').join("");
- return '<div class="availability-group-card availability-static"><div class="availability-static-head"><span class="availability-summary-main"><span class="availability-summary-meta"><b>'+esc(label)+'</b><em>'+dates.length+'日</em></span><strong class="availability-main-time">'+timeSummary+'</strong><span class="availability-summary-date">'+range+'</span></span></div><div class="availability-group-rows">'+details+'</div></div>';
+ const ids=rows.map(b=>Number(b.id)).filter(Number.isSafeInteger);
+ return '<div class="availability-group-card availability-static"><div class="availability-static-head"><span class="availability-summary-main"><span class="availability-summary-meta"><b>'+esc(label)+'</b><em>'+dates.length+'日</em></span><strong class="availability-main-time">'+timeSummary+'</strong><span class="availability-summary-date">'+range+'</span></span><button type="button" class="mini" data-delete-group="'+ids.join(',')+'">一括解除</button></div></div>';
 }
 
  const futureBlocks=state.blocks.filter(x=>x.uid===mine&&x.date>=now).sort((a,b)=>a.date.localeCompare(b.date)||String(a.start||"").localeCompare(String(b.start||"")));
  $("futureBlockCount").textContent=futureBlocks.length+"件";
- // One blocked date/time per card; never expand a multi-day group into an unbounded list.
- // Pagination is always 10 cards (two columns by five rows) with no inner scrolling.
- const entries=futureBlocks.map(b=>({mode:"single",rows:[b]}));
- const pages=Math.max(1,Math.ceil(entries.length/10));
+ // Group by original registration batch (daily, weekly or multiple dates).
+ // One compact group card per registration; paginate 10 cards, never expand its dates.
+ const groups=groupedUnavailability(futureBlocks);
+ const pages=Math.max(1,Math.ceil(groups.length/10));
  blockPage=Math.min(blockPage,pages-1);
- $("futureBlocks").innerHTML=entries.slice(blockPage*10,(blockPage+1)*10).map(renderBlockGroup).join("")||'<div class="muted">登録なし</div>';
+ $("futureBlocks").innerHTML=groups.slice(blockPage*10,(blockPage+1)*10).map(renderBlockGroup).join("")||'<div class="muted">登録なし</div>';
  $("blockPager").hidden=pages<=1;
  $("blockPageInfo").textContent=(blockPage+1)+" / "+pages;
  $("blockPrev").disabled=blockPage===0;
@@ -732,7 +740,14 @@ function renderBlockGroup(group){
 $("calendar").onclick=e=>{const b=e.target.closest("[data-date]");if(!b||b.disabled)return;const d=b.dataset.date;if(blockMode==="multi"){if(selectedMultiple.has(d))selectedMultiple.delete(d);else selectedMultiple.add(d)}else selected=d;render()};$("upcoming").onclick=handleEventClick;$("upcoming").onkeydown=e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches("[data-detail-interview]")){e.preventDefault();openInterviewDetail(e.target.dataset.detailInterview)}};$("futureBlocks").onclick=handleEventClick;
 $("blockPrev").onclick=()=>{if(blockPage>0){blockPage--;render()}};
 $("blockNext").onclick=()=>{blockPage++;render()};
-function openInterviewDetail(id){if(!/^\d+$/.test(String(id)))return;location.href="../interview-sheet-preview/?detailInterview="+encodeURIComponent(id)}async function handleEventClick(e){if(e.target.closest("[data-open-management]")){location.href="../interview-sheet-preview/";return}if(e.target.closest("[data-detail-interview]")&&!e.target.closest("button,a,input")){openInterviewDetail(e.target.closest("[data-detail-interview]").dataset.detailInterview);return}const mv=e.target.closest("[data-move]"),del=e.target.closest("[data-delete]");if(mv){moving=state.interviews.find(i=>i.id===Number(mv.dataset.move)&&i.uid===state.me);if(!moving)return;$("moveLabel").textContent=moving.shop+"｜"+moving.date+" "+moving.time;$("moveDate").value=moving.date;$("moveDate").min=jst();$("moveTime").value=moving.time;$("moveError").textContent="";$("moveDialog").showModal()}else if(del){const b=state.blocks.find(x=>x.id===Number(del.dataset.delete)&&x.uid===state.me);if(!b||!confirm("自分の対応不可を解除しますか？"))return;const {error}=await db.from("interview_staff_unavailability").delete().eq("id",b.id).eq("interviewer_user_id",state.me);if(error)say("解除できません："+error.message);else await load()}}
+function openInterviewDetail(id){if(!/^\d+$/.test(String(id)))return;location.href="../interview-sheet-preview/?detailInterview="+encodeURIComponent(id)}async function handleEventClick(e){if(e.target.closest("[data-open-management]")){location.href="../interview-sheet-preview/";return}if(e.target.closest("[data-detail-interview]")&&!e.target.closest("button,a,input")){openInterviewDetail(e.target.closest("[data-detail-interview]").dataset.detailInterview);return}const mv=e.target.closest("[data-move]"),del=e.target.closest("[data-delete]"),delGroup=e.target.closest("[data-delete-group]");if(delGroup){
+ const ids=String(delGroup.dataset.deleteGroup||"").split(",").map(Number).filter(Number.isSafeInteger);
+ const owned=state.blocks.filter(x=>ids.includes(x.id)&&x.uid===state.me);
+ if(ids.length===0||owned.length!==ids.length||!confirm("この登録の対応不可 "+ids.length+"件をまとめて解除しますか？"))return;
+ const {error}=await db.from("interview_staff_unavailability").delete().in("id",ids).eq("interviewer_user_id",state.me);
+ if(error)say("一括解除できません："+error.message);else await load();
+ return;
+ }if(mv){moving=state.interviews.find(i=>i.id===Number(mv.dataset.move)&&i.uid===state.me);if(!moving)return;$("moveLabel").textContent=moving.shop+"｜"+moving.date+" "+moving.time;$("moveDate").value=moving.date;$("moveDate").min=jst();$("moveTime").value=moving.time;$("moveError").textContent="";$("moveDialog").showModal()}else if(del){const b=state.blocks.find(x=>x.id===Number(del.dataset.delete)&&x.uid===state.me);if(!b||!confirm("自分の対応不可を解除しますか？"))return;const {error}=await db.from("interview_staff_unavailability").delete().eq("id",b.id).eq("interviewer_user_id",state.me);if(error)say("解除できません："+error.message);else await load()}}
 $("today").onclick=()=>setDate(jst());$("agendaPrev").onclick=()=>{if(agendaPage>0){agendaPage--;render()}};$("agendaNext").onclick=()=>{agendaPage++;render()};
 
 async function setDate(d){selected=d;if(month!==d.slice(0,7)){month=d.slice(0,7);await load()}else render()}
