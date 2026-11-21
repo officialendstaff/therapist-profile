@@ -2847,7 +2847,27 @@ chart.append(compare);
   countBars(roseSection('求人媒体別｜面接数'),annual?annualMedia:attendedMedia,storeMetricsSheetsStatus==='ready'&&interviewReady);
   const cmp=roseSection(annual?'求人媒体別｜問い合わせ数・前年比較':'求人媒体別｜問い合わせ数・前月比較');
   cmp.style.gridColumn='1 / -1';
-  comparisons(cmp,inquiryCompareNow,inquiryCompareOld,lineReady,lineReady,annual?'前年':'前月',annual?'当年':'当月');
+  // Compact full-width comparison: media name stays beside two bar rows, never above them.
+  const comparisonGrid=document.createElement('div');
+  comparisonGrid.style.cssText='display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(6,minmax(0,1fr));grid-auto-flow:column;column-gap:18px;row-gap:3px;flex:1;min-height:0;padding-top:4px';
+  const compareMax=Math.max(1,...fixedMedia.flatMap(n=>[inquiryCompareNow.get(n)||0,inquiryCompareOld.get(n)||0]));
+  for(const name of fixedMedia){
+   const item=document.createElement('div');item.style.cssText='display:flex;align-items:center;gap:9px;min-width:0;min-height:0;overflow:hidden';
+   const title=document.createElement('strong');title.textContent=mediaChartLabel(name);title.title=name;
+   title.style.cssText='flex:0 0 108px;max-width:108px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px;line-height:13px';
+   const rows=document.createElement('div');rows.style.cssText='flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px';
+   for(const [period,counts,color] of [[annual?'前年':'前月',inquiryCompareOld,'#adb8c8'],[annual?'当年':'当月',inquiryCompareNow,previewMediaColor(name)]]){
+    const line=document.createElement('div');line.style.cssText='display:flex;align-items:center;gap:4px;height:11px;min-height:11px';
+    const tag=document.createElement('span');tag.textContent=period;tag.style.cssText='flex:0 0 25px;color:#61758c;font-size:9px';
+    const track=document.createElement('div');track.className='metrics-v8-track';track.style.flex='1';
+    const fill=document.createElement('div');fill.className='metrics-v8-fill';fill.style.background=color;fill.style.width=lineReady?(counts.get(name)||0)/compareMax*100+'%':'0%';
+    track.append(fill);
+    const value=document.createElement('b');value.textContent=lineReady?String(counts.get(name)||0):'—';value.style.cssText='flex:0 0 22px;text-align:right;font-size:10px';
+    line.append(tag,track,value);rows.append(line);
+   }
+   item.append(title,rows);comparisonGrid.append(item);
+  }
+  cmp.append(comparisonGrid);
  }else{
   inquiryTrend(section(l,annual?'問い合わせ数｜12か月推移':'問い合わせ数｜日別推移',annual?'annual-trend':'monthly-hour'));
   hourGraph(section(l,'初回問い合わせ｜時間帯別',annual?'annual-count':'monthly-count'));
