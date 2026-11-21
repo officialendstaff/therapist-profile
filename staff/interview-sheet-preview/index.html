@@ -3481,20 +3481,33 @@ html.metrics-standalone #storeMetrics:not([hidden]){display:block!important}
 </style><script id="metrics-standalone-router">(function(){
  if(!document.documentElement.classList.contains('metrics-standalone'))return;
  const requested=new URLSearchParams(location.search).get('metricsMode')==='sales'?'sales':'interview';
- let activating=false;
+ let verified=false,activating=false;
+ // The iframe can also be visited directly: verify the master account here.
+ async function authorizeStandalone(){
+  try{
+   if(!window.supabase?.createClient)throw Error('auth unavailable');
+   const client=window.supabase.createClient('https://vjjnkflbfsjihwzjsjpr.supabase.co','sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos',{auth:{persistSession:true,storage:localStorage,storageKey:'mattan-recruit-auth'}});
+   const {data:{session}}=await client.auth.getSession();
+   if(!session)throw Error('login required');
+   const {data,error}=await client.from('recruit_staff_profiles').select('role,approved_at').eq('user_id',session.user.id).maybeSingle();
+   if(error||!data?.approved_at||data.role!=='master')throw Error('master only');
+   verified=true;activate();
+  }catch(_){
+   verified=false;
+   document.documentElement.classList.remove('metrics-standalone');
+   document.body.replaceChildren(Object.assign(document.createElement('p'),{textContent:'この数値ページの閲覧権限がありません。'}));
+  }
+ }
  function activate(){
-  if(activating)return;
+  if(!verified||activating)return;
   if(typeof showStoreMetrics!=='function'||typeof setMetricsMode!=='function')return;
   activating=true;
   try{showStoreMetrics();setMetricsMode(requested);}
   finally{activating=false;}
  }
- // The parent metrics wrapper authenticates before loading this iframe.
- // Open the required dashboard on DOM readiness rather than waiting for an auth event
- // that may already have fired before this late router is registered.
- activate();
  window.addEventListener('interview-auth-ready',activate);
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',activate,{once:true});
+ void authorizeStandalone();
 })();</script><script src="./line-push-control.js?v=20261107-combined-settings-v3" defer></script><style id="retire-legacy-interview-login">#adminAuthDialog{display:none!important}/* Unified 49px header; fixed-position content follows --header without adding page scroll */
 :root{--header:49px!important}
 .header{height:49px!important;min-height:49px!important;max-height:49px!important;padding-top:0!important;padding-bottom:0!important}
