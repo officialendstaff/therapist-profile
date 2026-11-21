@@ -2762,15 +2762,101 @@ chart.append(compare);
  const annualInquiryMedia=groupedMediaCounts(mediaCounts(ageApplicants));
  const inquiryCompareNow=annual?annualInquiryMedia:mediaNow;
  const inquiryCompareOld=groupedMediaCounts(mediaCounts(previousInquiryApplicants));
- // Rose-only interview dashboard: inquiry trend, first-contact hours, media inquiries,
- // prior-period inquiry comparison, and interview counts.
- inquiryTrend(section(l,annual?'問い合わせ数｜12か月推移':'問い合わせ数｜日別推移',annual?'annual-trend':'monthly-hour'));
- hourGraph(section(l,'初回問い合わせ｜時間帯別',annual?'annual-count':'monthly-count'));
- countBars(section(l,'求人媒体別｜問い合わせ数',annual?'annual-count':'monthly-count'),inquiryCompareNow,lineReady);
- comparisons(section(r,annual?'求人媒体別｜問い合わせ数・前年比較':'求人媒体別｜問い合わせ数・前月比較',
-  annual?'annual-compare':'monthly-compare'),inquiryCompareNow,inquiryCompareOld,lineReady,lineReady,annual?'前年':'前月',annual?'当年':'当月');
- countBars(section(r,'求人媒体別｜面接数',annual?'annual-age':'monthly-age'),
-  annual?annualMedia:attendedMedia,storeMetricsSheetsStatus==='ready'&&interviewReady);
+
+ const roseStandalone=shop==='薔薇と紳士'&&new URLSearchParams(location.search).get('standaloneMetrics')==='1';
+ if(roseStandalone){
+  // Compare all available shops with Rose without changing the Rose-only KPI/media counts.
+  const allConfirmedAccounts=['grandluxe','luxy','unsecret','rose'];
+  const knownAccountIds=new Set(allConfirmedAccounts);
+  const allKnownApplicants=lineInboxReadOnly.applicants.filter(a=>knownAccountIds.has(a.accountId));
+  const allInterviewRows=liveInterviewLists.rows;
+  const roseFirstApplicants=allApplicants;
+  const accountMonthlyInquiries=key=>{
+   const rows=storeMetricsHistoricalMonthly.filter(x=>String(x.month||'').slice(0,7)===key&&knownAccountIds.has(x.account_id));
+   const historical=rows.reduce((sum,x)=>sum+(Number(x.estimated_count)||0),0);
+   const recent=storeMetricsRecentInquiryMonthly;
+   const recentSum=()=>allConfirmedAccounts.reduce((sum,id)=>sum+(Number(recent[id+':'+key])||0),0);
+   if(key==='2026-10')return rows.length&&recent!==null?historical+recentSum():null;
+   if(key>'2026-10')return recent!==null?recentSum():null;
+   return rows.length?historical:(lineReady?allKnownApplicants.filter(a=>firstDate(a).slice(0,7)===key).length:null);
+  };
+  const perMonthInterviews=(rows,key)=>interviewReady?rows.filter(row=>String(row.date||'').slice(0,7)===key&&attendedStatuses.includes(row.status)).length:null;
+  const labels=annual?Array.from({length:12},(_,i)=>(i+1)+'月'):Array.from({length:new Date(yr,mo,0).getDate()},(_,i)=>String(i+1));
+  const xkeys=annual?labels.map((_,i)=>yr+'-'+String(i+1).padStart(2,'0')):labels.map(d=>month+'-'+d.padStart(2,'0'));
+  const dailyCount=(rows,key)=>rows.filter(a=>String(firstDate(a)||'').slice(0,10)===key).length;
+  const dailyInterviews=(rows,key)=>interviewReady?rows.filter(row=>String(row.date||'').slice(0,10)===key&&attendedStatuses.includes(row.status)).length:null;
+  const totalInquiry=xkeys.map(k=>annual?accountMonthlyInquiries(k):lineReady?dailyCount(allKnownApplicants,k):null);
+  const roseInquiry=xkeys.map(k=>annual?inquiryCountForMonth(k):lineReady?dailyCount(roseFirstApplicants,k):null);
+  const totalInterview=xkeys.map(k=>annual?perMonthInterviews(allInterviewRows,k):dailyInterviews(allInterviewRows,k));
+  const roseInterview=xkeys.map(k=>annual?perMonthInterviews(allInterviews,k):dailyInterviews(allInterviews,k));
+  // All shops use the same data-availability rules as the existing dashboard.
+  const overlayBars=(holder,axis,groups)=>{
+   const max=Math.max(1,...groups.flatMap(g=>g.all.concat(g.rose)).filter(Number.isFinite));
+   const legend=document.createElement('div');legend.style.cssText='display:flex;gap:12px;flex-wrap:wrap;margin:4px 0 6px;font-size:10px;font-weight:700;color:#304a69';
+   for(const g of groups)for(const [label,color] of [['全店 '+g.name,g.color],['薔薇と紳士 '+g.name,g.roseColor]]){
+    const tag=document.createElement('span');tag.style.cssText='display:inline-flex;align-items:center;gap:4px;white-space:nowrap';
+    const sw=document.createElement('i');sw.style.cssText='display:inline-block;width:9px;height:9px;border-radius:2px;background:'+color;
+    tag.append(sw,document.createTextNode(label));legend.append(tag);
+   }
+   holder.append(legend);
+   const graph=document.createElement('div');graph.style.cssText='display:flex;align-items:flex-end;gap:'+(axis.length>24?'1px':'3px')+';flex:1;min-height:0;border-bottom:1px solid #d1deed;padding:8px 1px 0';
+   axis.forEach((label,i)=>{
+    const col=document.createElement('div');col.style.cssText='display:flex;flex-direction:column;align-items:center;justify-content:flex-end;flex:1;min-width:0;height:100%';
+    const row=document.createElement('div');row.style.cssText='display:flex;align-items:flex-end;justify-content:center;gap:1px;width:100%;height:calc(100% - 16px)';
+    for(const group of groups){
+     const wrap=document.createElement('div');wrap.style.cssText='flex:1;max-width:28px;min-width:0;height:100%;position:relative';
+     const all=group.all[i],rose=group.rose[i];
+     const bg=document.createElement('div');
+     bg.style.cssText='position:absolute;bottom:0;left:0;width:100%;height:'+(Number.isFinite(all)?all/max*92:0)+'%;background:'+group.color+';border-radius:2px 2px 0 0;opacity:.78';
+     const fg=document.createElement('div');
+     fg.style.cssText='position:absolute;bottom:0;left:25%;width:50%;height:'+(Number.isFinite(rose)?rose/max*92:0)+'%;background:'+group.roseColor+';border-radius:2px 2px 0 0;box-shadow:0 0 0 1px #ffffff88';
+     wrap.title=label+' '+group.name+'｜全店：'+(all==null?'未取得':all+'件')+'／薔薇と紳士：'+(rose==null?'未取得':rose+'件');
+     wrap.append(bg,fg);row.append(wrap);
+    }
+    const tick=document.createElement('small');tick.textContent=axis.length>24?((i+1)%5===0||i===0?label:''):axis.length===24?(i%3===0?label:''):label;
+    tick.style.cssText='height:15px;font-size:9px;color:#365273;font-weight:650;white-space:nowrap';
+    col.append(row,tick);graph.append(col);
+   });
+   holder.append(graph);
+  };
+  dash.className='metrics-v8-grid rose-overlay-metrics';
+  dash.style.cssText='display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:1.4fr 1fr 1.15fr;gap:9px;height:100%;min-height:0';
+  dash.replaceChildren();
+  const roseSection=(title)=>{
+   const el=document.createElement('section');el.className='metrics-v8-panel';
+   const heading=document.createElement('div');heading.className='metrics-v8-heading';heading.textContent=title;
+   el.append(heading);dash.append(el);return el;
+  };
+  overlayBars(roseSection(annual?'問合せ・面接実施数｜12か月推移':'問合せ・面接実施数｜日別推移'),labels,[
+   {name:'問合せ',all:totalInquiry,rose:roseInquiry,color:'#8ec5f5',roseColor:'#1688f0'},
+   {name:'面接実施',all:totalInterview,rose:roseInterview,color:'#f7a4ca',roseColor:'#e94290'}
+  ]);
+  const hourAll=Array(24).fill(0),hourRose=Array(24).fill(0);
+  if(lineReady){
+   for(const a of allKnownApplicants){const date=firstDate(a);if(!date)continue;
+    const h=new Date(date).getHours();if(Number.isInteger(h)&&h>=0&&h<24)hourAll[h]++;
+   }
+   for(const a of roseFirstApplicants){const date=firstDate(a);if(!date)continue;
+    const h=new Date(date).getHours();if(Number.isInteger(h)&&h>=0&&h<24)hourRose[h]++;
+   }
+  }
+  overlayBars(roseSection('初回問合せ時間｜時間帯別'),Array.from({length:24},(_,i)=>String(i)),[
+   {name:'初回問合せ',all:lineReady?hourAll:Array(24).fill(null),rose:lineReady?hourRose:Array(24).fill(null),color:'#a4d8d0',roseColor:'#08a994'}
+  ]);
+  countBars(roseSection('求人媒体別｜問い合わせ数'),inquiryCompareNow,lineReady);
+  countBars(roseSection('求人媒体別｜面接数'),annual?annualMedia:attendedMedia,storeMetricsSheetsStatus==='ready'&&interviewReady);
+  const cmp=roseSection(annual?'求人媒体別｜問い合わせ数・前年比較':'求人媒体別｜問い合わせ数・前月比較');
+  cmp.style.gridColumn='1 / -1';
+  comparisons(cmp,inquiryCompareNow,inquiryCompareOld,lineReady,lineReady,annual?'前年':'前月',annual?'当年':'当月');
+ }else{
+  inquiryTrend(section(l,annual?'問い合わせ数｜12か月推移':'問い合わせ数｜日別推移',annual?'annual-trend':'monthly-hour'));
+  hourGraph(section(l,'初回問い合わせ｜時間帯別',annual?'annual-count':'monthly-count'));
+  countBars(section(l,'求人媒体別｜問い合わせ数',annual?'annual-count':'monthly-count'),inquiryCompareNow,lineReady);
+  comparisons(section(r,annual?'求人媒体別｜問い合わせ数・前年比較':'求人媒体別｜問い合わせ数・前月比較',
+   annual?'annual-compare':'monthly-compare'),inquiryCompareNow,inquiryCompareOld,lineReady,lineReady,annual?'前年':'前月',annual?'当年':'当月');
+  countBars(section(r,'求人媒体別｜面接数',annual?'annual-age':'monthly-age'),
+   annual?annualMedia:attendedMedia,storeMetricsSheetsStatus==='ready'&&interviewReady);
+ }
 
  root.replaceChildren(dash);
 
