@@ -240,13 +240,12 @@ async function staffMetricsView(){
 async function check(){
  if(!client){showLogin("認証処理を読み込めません。");return}
  const {data:{session}}=await client.auth.getSession();
- if(!session){if(await staffMetricsView())return;showLogin();return}
+ if(!session){showLogin();return}
  const [profile,allowed]=await Promise.all([
   client.from("recruit_staff_profiles").select("display_name,role,approved_at").eq("user_id",session.user.id).maybeSingle(),
   client.rpc("can_link_therapist_interview")
  ]);
- if(profile.error||allowed.error||allowed.data!==true||!profile.data?.approved_at||!["master","full"].includes(profile.data.role)){
-  if(await staffMetricsView())return;
+ if(profile.error||allowed.error||allowed.data!==true||!profile.data?.approved_at||profile.data.role!=="master"){
   showLogin("このページへの権限がありません。");return
  }
  await syncInterviewHomeHeader(profile.data.display_name);
