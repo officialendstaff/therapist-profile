@@ -6,6 +6,9 @@
 const top=document.getElementById('personalMobileTop');
 if(!top)return;
 const profile=window.__interviewPersonal?.profile;
+const ownerOnlyStores=new Set(['薔薇と紳士','BUSTY OSAKA']);
+const ownerOnlyAccounts=new Set(['rose','busty']);
+const inOwnerScope=shop=>ownerOnlyStores.has(String(shop||'').trim());
 if(!['owner','president','ota','festival'].includes(profile))return;
 const SB='https://vjjnkflbfsjihwzjsjpr.supabase.co';
 const LINE_KEY='interview_new_line_seen_at_v1';
@@ -26,10 +29,10 @@ function currentToday(){
  const rows=Array.isArray(window.scheduleInterviewRows)?window.scheduleInterviewRows:[];
  if(!userId)return [];
  // Owner's schedule displays all interviewers; other profiles show only their assigned interviews.
- return rows.filter(x=>(profile==='owner'||String(x.interviewer_user_id)===String(userId))&&String(x.interview_date)===dateJP()&&['面接予定','日程変更'].includes(x.status));
+ return rows.filter(x=>(profile==='owner'||String(x.interviewer_user_id)===String(userId))&&(profile!=='owner'||inOwnerScope(x.shop))&&String(x.interview_date)===dateJP()&&['面接予定','日程変更'].includes(x.status));
 }
 function unseenSheets(){
- const rows=currentSheets();
+ const rows=currentSheets().filter(x=>profile!=='owner'||inOwnerScope(x.shop||x.shop_name||x.linkedShop));
  const readIds=new Set((()=>{try{return JSON.parse(localStorage.getItem('interviewSheetReadIds')||'[]')}catch{return []}})().map(String));
  const seen=localStorage.getItem(SHEET_KEY);
  const last=seen===null?Math.max(Number(localStorage.getItem('interviewSheetSeenAt')||0),legacySheetStart):Date.parse(seen)||0;
@@ -40,7 +43,7 @@ function unseenLines(){
  const latest=lineEvents.reduce((m,e)=>String(e.received_at||'')>m?String(e.received_at):m,'');
  let seen=localStorage.getItem(LINE_KEY);
  if(seen===null&&latest){localStorage.setItem(LINE_KEY,latest);seen=latest}
- return lineEvents.filter(e=>String(e.received_at||'')>String(seen||''));
+ return lineEvents.filter(e=>(profile!=='owner'||ownerOnlyAccounts.has(String(e.account_id||e.accountId||'')))&&String(e.received_at||'')>String(seen||''));
 }
 function update(){
  if(!authorized())return;
@@ -111,7 +114,7 @@ async function pollLines(){
    sessionStorage.removeItem('interview_staff_session_v2');
    result=await getInbox(await getAccessToken(true));
   }
-  lineEvents=Array.isArray(result.events)?result.events:[];
+  lineEvents=(Array.isArray(result.events)?result.events:[]).filter(e=>profile!=='owner'||ownerOnlyAccounts.has(String(e.account_id||e.accountId||'')));
   lineLoaded=true;lastReadError='';update();
  }catch(e){lastReadError=String(e.message||e);console.warn('TOP LINE通知:',e)}
  finally{linesLoading=false}
@@ -140,7 +143,7 @@ function acknowledge(key){
   const latest=lineEvents.reduce((m,e)=>String(e.received_at||'')>m?String(e.received_at):m,'');
   if(latest)localStorage.setItem(LINE_KEY,latest);
  }else if(key==='Interview Sheet'){
-  const sheets=currentSheets();const latest=sheets.reduce((m,s)=>String(s.submitted_at||'')>m?String(s.submitted_at):m,'');
+  const sheets=currentSheets().filter(x=>profile!=='owner'||inOwnerScope(x.shop||x.shop_name||x.linkedShop));const latest=sheets.reduce((m,s)=>String(s.submitted_at||'')>m?String(s.submitted_at):m,'');
   if(latest)localStorage.setItem(SHEET_KEY,latest);
   const ids=new Set((()=>{try{return JSON.parse(localStorage.getItem('interviewSheetReadIds')||'[]')}catch{return []}})().map(String));
   sheets.forEach(s=>{if(s.id)ids.add(String(s.id))});
