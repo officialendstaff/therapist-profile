@@ -279,12 +279,12 @@ body:has(.lg-interview-login:not(.hide):not(.hidden)) .page>.topbar{display:none
 
  <h2 class="section-heading">管理メニュー</h2>
  <nav class="menus" aria-label="管理メニュー">
+  <a class="menu-card" href="../booking-chat/rose-auth-v2.html" target="_blank" rel="noopener noreferrer"><span class="icon"><img src="/therapist-profile/staff/assets/favicons/chat.svg" alt="" width="32" height="32"></span><strong>チャット</strong><span class="arrow">↗</span></a>
+  <a class="menu-card" href="../exa-shifts/" target="_blank" rel="noopener noreferrer"><span class="icon">▦</span><strong>出勤管理</strong><span class="arrow">↗</span></a>
   <a class="menu-card" href="../interview-sheet-preview/" target="_blank" rel="noopener noreferrer"><span class="icon">▤</span><strong>面接管理</strong><span class="arrow">↗</span></a>
   <a class="menu-card" href="../interview-sheet-preview/metrics.html?view=interview" target="_blank" rel="noopener noreferrer"><span class="icon">▥</span><strong>面接数値</strong><span class="arrow">↗</span></a>
-  <a class="menu-card" href="../exa-shifts/" target="_blank" rel="noopener noreferrer"><span class="icon">▦</span><strong>出勤管理</strong><span class="arrow">↗</span></a>
-  <a class="menu-card" href="../interview-sheet-preview/metrics.html?view=sales" target="_blank" rel="noopener noreferrer"><span class="icon">▥</span><strong>数値管理</strong><span class="arrow">↗</span></a>
-  <a class="menu-card" href="../booking-chat/rose-auth-v2.html" target="_blank" rel="noopener noreferrer"><span class="icon"><img src="/therapist-profile/staff/assets/favicons/chat.svg" alt="" width="32" height="32"></span><strong>チャット</strong><span class="arrow">↗</span></a>
   <a id="managerMyPageCard" class="menu-card temporarily-disabled" aria-disabled="true" tabindex="-1" title="責任者専用"><span class="icon"><img src="/therapist-profile/staff/assets/favicons/residency.svg" alt="" width="32" height="32"></span><strong>マイページ</strong><small>責任者のスケジュール管理</small><span class="arrow" aria-hidden="true">—</span></a>
+  <a class="menu-card" href="../interview-sheet-preview/metrics.html?view=sales" target="_blank" rel="noopener noreferrer"><span class="icon">▥</span><strong>数値管理</strong><span class="arrow">↗</span></a>
  </nav>
 </main>
 <main id="staffApp" class="hidden" style="max-width:820px"><div class="page-head"><div><h1>スタッフ管理</h1><p>許可された面接管理ページへ移動できます。</p></div></div><nav class="menus" aria-label="スタッフメニュー" style="grid-template-columns:1fr"><a class="menu-card" href="../interview-management/" target="_blank" rel="noopener noreferrer"><span class="icon">▤</span><strong>面接管理</strong><small>担当店舗の応募・面接情報</small><span class="arrow">↗</span></a></nav></main>
@@ -363,7 +363,7 @@ async function authorize(){
  for(const card of document.querySelectorAll("#app .menus .menu-card")){
   if(!(card instanceof HTMLAnchorElement))continue;
   const name=card.querySelector("strong")?.textContent?.trim();
-  const denied=staffOnly&&["面接数値","数値管理"].includes(name);
+  const denied=profile.data.role!=="master"&&["出勤管理","面接数値","数値管理"].includes(name);
   if(name==="面接管理")card.href="../interview-sheet-preview/";
   if(denied){
    card.removeAttribute("href");
@@ -391,10 +391,11 @@ async function authorize(){
  pageCard.removeAttribute("target");
  pageCard.removeAttribute("rel");
  pageCard.querySelector(".arrow").textContent="—";
- if(!staffOnly){
+ if(profile.data.role==="master"||profile.data.role==="full"){
   const {data:assignment,error:assignmentError}=await client.rpc("interview_my_profile");
   const myAssignment=Array.isArray(assignment)?assignment[0]:assignment;
-  const key=!assignmentError&&["owner","president","ota","festival","nishii"].includes(myAssignment?.profile_key)?myAssignment.profile_key:null;
+  const allowedKeys=profile.data.role==="master"?["owner"]:["president","ota","festival"];
+  const key=!assignmentError&&allowedKeys.includes(myAssignment?.profile_key)?myAssignment.profile_key:null;
   if(key){
    pageCard.href="../manager-schedule/";
    pageCard.target="_blank";pageCard.rel="noopener noreferrer";
