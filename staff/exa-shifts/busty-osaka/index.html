@@ -790,10 +790,14 @@ function syncStaffHomeHeader(){
 async function loginCheck(){if(!client){location.replace("/therapist-profile/staff/management-top/");return;}
 const {data:{session}}=await client.auth.getSession();if(!session){authorized=false;$("app").classList.add("hide");location.replace("/therapist-profile/staff/interview-sheet-preview/");return;}
 const [{data,error},access]=await Promise.all([client.from("recruit_staff_profiles").select("display_name,role,approved_at").eq("user_id",session.user.id).maybeSingle(),client.rpc("can_link_therapist_interview")]);
-if(error||access.error||access.data!==true||!data||!data.approved_at||data.role!=="master"){
+const {data:assignment,error:assignmentError}=await client.rpc("interview_my_profile");
+const assignedProfile=Array.isArray(assignment)?assignment[0]:assignment;
+const festivalViewer=!assignmentError&&data?.role==="full"&&assignedProfile?.profile_key==="festival";
+if(error||access.error||access.data!==true||!data||!data.approved_at||!(data.role==="master"||festivalViewer)){
   authorized=false;$("app").classList.add("hide");location.replace("/therapist-profile/staff/management-top/");$("loginError").textContent="このページへの権限がありません。";return;
 }
 await syncInterviewHomeHeader(data.display_name);
+if(festivalViewer)document.body.classList.add("staff-readonly");
 authorized=true;$("login").classList.add("hide");$("app").classList.remove("hide");$("logout").classList.remove("hide");$("authLabel").textContent="認証済み";await load();}
 $("loginForm").onsubmit=async e=>{e.preventDefault();$("loginError").textContent="確認中…";const {error}=await client.auth.signInWithPassword({email:$("email").value,password:$("password").value});if(error){$("loginError").textContent="ログインできません。入力情報をご確認ください。";return;}$("loginError").textContent="";await loginCheck()};
 $("logout").onclick=async()=>{if(staffReadOnly){sessionStorage.removeItem("interview_staff_session_v2");localStorage.removeItem("interview_staff_session_v2");location.replace("/therapist-profile/staff/interview-sheet-preview/");return}await client.auth.signOut();sessionStorage.removeItem("mattan-recruit-auth");location.reload()};
