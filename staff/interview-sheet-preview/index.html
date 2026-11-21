@@ -2743,10 +2743,10 @@ chart.append(compare);
   const d=firstDate(a);
   return annual?String(d||'').slice(0,4)===String(yr-1):String(d||'').slice(0,7)===previousKey;
  });
- const inquiryCompareNow=annual?annualInquiryMedia:mediaNow;
- const inquiryCompareOld=groupedMediaCounts(mediaCounts(previousInquiryApplicants));
 
  const annualInquiryMedia=groupedMediaCounts(mediaCounts(ageApplicants));
+ const inquiryCompareNow=annual?annualInquiryMedia:mediaNow;
+ const inquiryCompareOld=groupedMediaCounts(mediaCounts(previousInquiryApplicants));
  // Rose-only interview dashboard: inquiry trend, first-contact hours, media inquiries,
  // prior-period inquiry comparison, and interview counts.
  inquiryTrend(section(l,annual?'問い合わせ数｜12か月推移':'問い合わせ数｜日別推移',annual?'annual-trend':'monthly-hour'));
