@@ -1468,6 +1468,7 @@ function isExpiredUnscheduled(record){
 function recordsForLivePage(page){
  const today=dateKey(new Date());
  const filtered=liveInterviewLists.rows.filter(r=>{
+  if(['面接済み','採用','不採用','未処理'].includes(page)&&!['薔薇と紳士','BUSTY OSAKA'].includes(r.shop))return false;
   const day=r.date.slice(0,10),done=['来店済み','採用','不採用','辞退','在籍','入店'].includes(r.status);
   const closed=['キャンセル','無断トビ','トビ（キャンセル）','返信なし'].includes(r.status);
   const unscheduled=['日程未定','日程調整中'].includes(r.status);
@@ -1513,7 +1514,20 @@ if(currentPage==='今日の予定'||currentPage==='未処理'&&record.status==='
 const confirmationButtons=[...card.querySelectorAll('.confirmation-controls button:not(.arrival-action)')];if(['面接済み','採用','不採用','未処理'].includes(currentPage)&&record.status!=='面接予定'){confirmationButtons.forEach((b,i)=>{b.textContent=i===0?'紐づけ':'解除';b.classList.remove('sent-btn','is-ok');b.classList.toggle('sheet-unlink-btn',i===1);b.classList.toggle('sheet-link-btn',i===0);const linked=sheetDataState.rows.some(x=>String(x.linkedInterviewId)===String(record.interviewId));b.disabled=i===0&&linked;b.title=i===0?(linked?'Interview Sheet紐づけ済み':'面接シートの紐づけ'):'面接シートの紐づけ解除';b.onclick=()=>openCompletedSheetAction(record,i===1)})}else confirmationButtons.forEach((b,i)=>{const enabled=currentPage==='今日の予定'&&!record.confirmed&&(i===1||!record.confirmationLineSent);b.disabled=!enabled;b.title=enabled?'確認状態を保存':'操作済み、または本日の面接以外';if(i===0){b.textContent=record.confirmationLineSent?'送信済み':'LINE送信';b.classList.toggle('sent-btn',!!record.confirmationLineSent)}if(i===1)b.classList.toggle('is-ok',!!record.confirmed);b.onclick=enabled?()=>saveLiveConfirmation(record,i===0?'sent':'ok',b):null});card.querySelectorAll('.card-actions button:not(.arrival-action)').forEach(b=>{const label=b.textContent;if((['明日以降','今日の予定'].includes(currentPage)||currentPage==='日程調整'&&label==='日程変更')&&['日程変更','キャンセル','来世期待'].includes(label)){b.disabled=false;b.title=label==='キャンセル'?'面接をキャンセルして履歴に保存':'操作画面を開く';b.onclick=()=>label==='キャンセル'?(currentPage==='今日の予定'?openTodayCancelChoice(record,b):cancelLiveInterview(record,b)):label==='日程変更'?openRescheduleChoice(record):label==='面接登録'?openPendingActionPage('面接登録',record,'登録',currentPage):openAfterlifeReasonChoice(record)}else{b.disabled=true;b.title='この一覧では操作できません'}});return card}
 function listMinuteTime(value){return String(value??'').replace(/(\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}):\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})?/g,'$1').replace(/(\d{1,2}:\d{2}):\d{2}(?:\.\d+)?/g,'$1')}
 function listShopMatches(shop,selected){const v=String(shop||'').trim();return selected==='all'||v===selected||(selected==='LUXY'&&v==='LUXY OSAKA')}
-function updateListShopFilter(){const el=$('listShopFilter');el.hidden=!['LINE通知','面接済み','採用','不採用','未処理'].includes(currentPage);return el.hidden?'all':el.value}
+function updateListShopFilter(){
+ const el=$('listShopFilter');
+ const limited=['面接済み','採用','不採用','未処理'].includes(currentPage);
+ el.hidden=!['LINE通知','面接済み','採用','不採用','未処理'].includes(currentPage);
+ const mode=limited?'two-stores':'all-stores';
+ if(el.dataset.optionMode!==mode){
+  const previous=el.value;
+  const options=limited?[['all','対象2店舗'],['薔薇と紳士','薔薇と紳士'],['BUSTY OSAKA','BUSTY OSAKA']]:[['all','全店舗'],['Grand Luxe','Grand Luxe'],['LUXY','LUXY OSAKA'],['Un Secret','Un Secret'],['薔薇と紳士','薔薇と紳士'],['BUSTY OSAKA','BUSTY OSAKA']];
+  el.replaceChildren(...options.map(([value,label])=>{const o=document.createElement('option');o.value=value;o.textContent=label;return o}));
+  el.value=options.some(([value])=>value===previous)?previous:'all';
+  el.dataset.optionMode=mode;
+ }
+ return el.hidden?'all':el.value;
+}
 function renderList(){
  updateSidebarCounts();const list=$('applicantList');list.replaceChildren();$('pageTitle').textContent=currentPage;const selectedShop=updateListShopFilter();
  if(currentPage==='来世期待'){const records=afterlifeList.items,total=Math.max(1,Math.ceil(records.length/8));pageNumber=Math.min(Math.max(1,pageNumber),total);$('pageIndicator').textContent=pageNumber+' / '+total;$('pagePrev').disabled=pageNumber===1;$('pageNext').disabled=pageNumber===total;records.slice((pageNumber-1)*8,pageNumber*8).forEach(item=>list.append(makeAfterlifeCard(item)));$('listNote').textContent=afterlifeList.status==='error'?'来世期待の取得に失敗しました：'+afterlifeList.error:afterlifeList.status==='login-required'?'面接管理の認証が必要です':records.length?'':'来世期待の登録はありません';return}
