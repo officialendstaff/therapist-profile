@@ -2712,7 +2712,22 @@ chart.append(compare);
  }
  const annualMedia=groupedMediaCounts(annualMediaRaw),previousAnnualMedia=groupedMediaCounts(previousAnnualMediaRaw);
  const inquiryTrend=holder=>{
-  if(annual){annualTrend(holder);return;}
+  if(annual){
+   const values=Array.from({length:12},(_,i)=>inquiryCountForMonth(yr+'-'+String(i+1).padStart(2,'0')));
+   const max=Math.max(1,...values.filter(x=>Number.isFinite(x)));
+   const graph=document.createElement('div');graph.className='metrics-v8-trend';
+   values.forEach((n,i)=>{
+    const group=document.createElement('div');group.className='metrics-v8-trend-group';
+    const bar=document.createElement('div');bar.className='metrics-v8-trend-bar';
+    bar.style.background='linear-gradient(180deg,#a6d9ff,#1688f0)';
+    bar.style.height=(n===null?0:n/max*85)+'%';
+    bar.title=n===null?'未取得':n+'件';
+    if(n){const label=document.createElement('span');label.textContent=n;bar.append(label);}
+    const tick=document.createElement('small');tick.textContent=(i+1)+'月';
+    group.append(bar,tick);graph.append(group);
+   });
+   holder.append(graph);return;
+  }
   const days=new Date(yr,mo,0).getDate();
   const byDay=Array.from({length:days},()=>0);
   const interviewByDay=Array.from({length:days},()=>0);
