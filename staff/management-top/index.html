@@ -359,11 +359,14 @@ async function authorize(){
  $("refresh").classList.remove("hidden");
  text($("userName"),profile.data.display_name||(staffOnly?"スタッフ":"管理者"));
  $("login").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden");
+ const {data:menuAssignment,error:menuAssignmentError}=await client.rpc("interview_my_profile");
+ const menuProfile=Array.isArray(menuAssignment)?menuAssignment[0]:menuAssignment;
+ const isFestivalAccount=!menuAssignmentError&&profile.data.role==="full"&&menuProfile?.profile_key==="festival";
  // Keep the management TOP identical for both roles; unavailable cards stay visible but cannot open.
  for(const card of document.querySelectorAll("#app .menus .menu-card")){
   if(!(card instanceof HTMLAnchorElement))continue;
   const name=card.querySelector("strong")?.textContent?.trim();
-  const denied=profile.data.role!=="master"&&["出勤管理","面接数値","数値管理"].includes(name);
+  const denied=profile.data.role!=="master"&&(["面接数値","数値管理"].includes(name)||(name==="出勤管理"&&!isFestivalAccount));
   if(name==="面接管理")card.href="../interview-sheet-preview/";
   if(denied){
    card.removeAttribute("href");
@@ -392,10 +395,8 @@ async function authorize(){
  pageCard.removeAttribute("rel");
  pageCard.querySelector(".arrow").textContent="—";
  if(profile.data.role==="master"||profile.data.role==="full"){
-  const {data:assignment,error:assignmentError}=await client.rpc("interview_my_profile");
-  const myAssignment=Array.isArray(assignment)?assignment[0]:assignment;
   const allowedKeys=profile.data.role==="master"?["owner"]:["president","ota","festival"];
-  const key=!assignmentError&&allowedKeys.includes(myAssignment?.profile_key)?myAssignment.profile_key:null;
+  const key=!menuAssignmentError&&allowedKeys.includes(menuProfile?.profile_key)?menuProfile.profile_key:null;
   if(key){
    pageCard.href="../manager-schedule/";
    pageCard.target="_blank";pageCard.rel="noopener noreferrer";
