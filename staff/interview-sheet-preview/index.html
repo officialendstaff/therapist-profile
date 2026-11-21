@@ -2808,7 +2808,7 @@ chart.append(compare);
      const bg=document.createElement('div');
      bg.style.cssText='position:absolute;bottom:0;left:0;width:100%;height:'+allPercent+'%;background:'+group.color+';border-radius:2px 2px 0 0;opacity:.78';
      const fg=document.createElement('div');
-     fg.style.cssText='position:absolute;bottom:0;left:25%;width:50%;height:'+rosePercent+'%;background:'+group.roseColor+';border-radius:2px 2px 0 0;box-shadow:0 0 0 1px #ffffff88';
+     fg.style.cssText='position:absolute;bottom:0;left:20%;width:60%;height:'+rosePercent+'%;background:'+group.roseColor+';border-radius:2px 2px 0 0;box-shadow:0 0 0 1px #ffffff88';
      wrap.title=label+' '+group.name+'｜全店：'+(all==null?'未取得':all+'件')+'／薔薇と紳士：'+(rose==null?'未取得':rose+'件');
      wrap.append(bg,fg);
      // Full-shop count above the background bar; Rose count at the foreground bar.
@@ -2817,8 +2817,8 @@ chart.append(compare);
      allTag.textContent=all==null?'—':String(all);
      allTag.style.cssText='position:absolute;bottom:calc('+allPercent+'% + 3px);left:0;width:100%;font-size:9px;font-weight:800;line-height:11px;text-align:center;color:#264663;white-space:nowrap;pointer-events:none';
      const roseTag=document.createElement('span');
-     roseTag.textContent=rose==null?'—':String(rose);
-     roseTag.style.cssText='position:absolute;bottom:'+Math.max(0,rosePercent/2)+'%;left:25%;width:50%;font-size:9px;font-weight:800;line-height:11px;text-align:center;color:#103c67;text-shadow:0 1px 1px #fff;white-space:nowrap;pointer-events:none';
+     roseTag.textContent=Number.isFinite(rose)&&rose>0?String(rose):'';
+     roseTag.style.cssText='position:absolute;bottom:calc('+rosePercent+'% + 3px);left:50%;transform:translateX(-50%);min-width:14px;padding:0 1px;font-size:11px;font-weight:900;line-height:12px;text-align:center;color:#103c67;white-space:nowrap;pointer-events:none;text-shadow:-1px -1px 0 #fff,1px -1px 0 #fff,-1px 1px 0 #fff,1px 1px 0 #fff,0 0 3px #fff';
      wrap.append(allTag,roseTag);
      row.append(wrap);
     }
