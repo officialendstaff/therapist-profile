@@ -786,10 +786,9 @@ function syncStaffHomeHeader(){
  showCommonAccountMenu("スタッフ","閲覧専用");
 }
 async function loginCheck(){if(!client){location.replace("/therapist-profile/staff/management-top/");return;}
-const {data:{session}}=await client.auth.getSession();if(!session){if(await staffReadOnlyLogin())return;authorized=false;$("app").classList.add("hide");location.replace("/therapist-profile/staff/interview-sheet-preview/");return;}
+const {data:{session}}=await client.auth.getSession();if(!session){authorized=false;$("app").classList.add("hide");location.replace("/therapist-profile/staff/interview-sheet-preview/");return;}
 const [{data,error},access]=await Promise.all([client.from("recruit_staff_profiles").select("display_name,role,approved_at").eq("user_id",session.user.id).maybeSingle(),client.rpc("can_link_therapist_interview")]);
-if(error||access.error||access.data!==true||!data||!data.approved_at||!["master","full"].includes(data.role)){
-  if(await staffReadOnlyLogin())return;
+if(error||access.error||access.data!==true||!data||!data.approved_at||data.role!=="master"){
   authorized=false;$("app").classList.add("hide");location.replace("/therapist-profile/staff/management-top/");$("loginError").textContent="このページへの権限がありません。";return;
 }
 await syncInterviewHomeHeader(data.display_name);
