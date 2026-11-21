@@ -1468,7 +1468,7 @@ function isExpiredUnscheduled(record){
 function recordsForLivePage(page){
  const today=dateKey(new Date());
  const filtered=liveInterviewLists.rows.filter(r=>{
-  if(['面接済み','採用','不採用','未処理','日程調整','日程変更','不届き者'].includes(page)&&!['薔薇と紳士','BUSTY OSAKA'].includes(r.shop))return false;
+  if(['面接済み','採用','不採用','未処理','不届き者'].includes(page)&&!['薔薇と紳士','BUSTY OSAKA'].includes(r.shop))return false;
   const day=r.date.slice(0,10),done=['来店済み','採用','不採用','辞退','在籍','入店'].includes(r.status);
   const closed=['キャンセル','無断トビ','トビ（キャンセル）','返信なし'].includes(r.status);
   const unscheduled=['日程未定','日程調整中'].includes(r.status);
@@ -1516,7 +1516,7 @@ function listMinuteTime(value){return String(value??'').replace(/(\d{4}-\d{2}-\d
 function listShopMatches(shop,selected){const v=String(shop||'').trim();return selected==='all'||v===selected||(selected==='LUXY'&&v==='LUXY OSAKA')}
 function updateListShopFilter(){
  const el=$('listShopFilter');
- const limited=['面接済み','採用','不採用','未処理','日程調整','不届き者','来世期待'].includes(currentPage);
+ const limited=['面接済み','採用','不採用','未処理','不届き者','来世期待'].includes(currentPage);
  el.hidden=!['LINE通知','面接済み','採用','不採用','未処理','日程調整','不届き者','来世期待'].includes(currentPage);
  const mode=limited?'two-stores':'all-stores';
  if(el.dataset.optionMode!==mode){
