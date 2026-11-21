@@ -2792,29 +2792,39 @@ chart.append(compare);
   // All shops use the same data-availability rules as the existing dashboard.
   const overlayBars=(holder,axis,groups)=>{
    const max=Math.max(1,...groups.flatMap(g=>g.all.concat(g.rose)).filter(Number.isFinite));
-   const legend=document.createElement('div');legend.style.cssText='display:flex;gap:12px;flex-wrap:wrap;margin:4px 0 6px;font-size:10px;font-weight:700;color:#304a69';
-   for(const g of groups)for(const [label,color] of [['全店 '+g.name,g.color],['薔薇と紳士 '+g.name,g.roseColor]]){
-    const tag=document.createElement('span');tag.style.cssText='display:inline-flex;align-items:center;gap:4px;white-space:nowrap';
-    const sw=document.createElement('i');sw.style.cssText='display:inline-block;width:9px;height:9px;border-radius:2px;background:'+color;
-    tag.append(sw,document.createTextNode(label));legend.append(tag);
-   }
-   holder.append(legend);
-   const graph=document.createElement('div');graph.style.cssText='display:flex;align-items:flex-end;gap:'+(axis.length>24?'1px':'3px')+';flex:1;min-height:0;border-bottom:1px solid #d1deed;padding:8px 1px 0';
+   const graph=document.createElement('div');
+   graph.style.cssText='display:flex;align-items:flex-end;gap:'+(axis.length>24?'1px':'3px')+';flex:1;min-height:0;border-bottom:1px solid #d1deed;padding:16px 1px 0';
    axis.forEach((label,i)=>{
-    const col=document.createElement('div');col.style.cssText='display:flex;flex-direction:column;align-items:center;justify-content:flex-end;flex:1;min-width:0;height:100%';
-    const row=document.createElement('div');row.style.cssText='display:flex;align-items:flex-end;justify-content:center;gap:1px;width:100%;height:calc(100% - 16px)';
+    const col=document.createElement('div');
+    col.style.cssText='display:flex;flex-direction:column;align-items:center;justify-content:flex-end;flex:1;min-width:0;height:100%';
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:flex-end;justify-content:center;gap:1px;width:100%;height:calc(100% - 19px)';
     for(const group of groups){
-     const wrap=document.createElement('div');wrap.style.cssText='flex:1;max-width:28px;min-width:0;height:100%;position:relative';
+     const wrap=document.createElement('div');
+     wrap.style.cssText='flex:1;max-width:28px;min-width:0;height:100%;position:relative';
      const all=group.all[i],rose=group.rose[i];
+     const allPercent=Number.isFinite(all)?all/max*82:0;
+     const rosePercent=Number.isFinite(rose)?rose/max*82:0;
      const bg=document.createElement('div');
-     bg.style.cssText='position:absolute;bottom:0;left:0;width:100%;height:'+(Number.isFinite(all)?all/max*92:0)+'%;background:'+group.color+';border-radius:2px 2px 0 0;opacity:.78';
+     bg.style.cssText='position:absolute;bottom:0;left:0;width:100%;height:'+allPercent+'%;background:'+group.color+';border-radius:2px 2px 0 0;opacity:.78';
      const fg=document.createElement('div');
-     fg.style.cssText='position:absolute;bottom:0;left:25%;width:50%;height:'+(Number.isFinite(rose)?rose/max*92:0)+'%;background:'+group.roseColor+';border-radius:2px 2px 0 0;box-shadow:0 0 0 1px #ffffff88';
+     fg.style.cssText='position:absolute;bottom:0;left:25%;width:50%;height:'+rosePercent+'%;background:'+group.roseColor+';border-radius:2px 2px 0 0;box-shadow:0 0 0 1px #ffffff88';
      wrap.title=label+' '+group.name+'｜全店：'+(all==null?'未取得':all+'件')+'／薔薇と紳士：'+(rose==null?'未取得':rose+'件');
-     wrap.append(bg,fg);row.append(wrap);
+     wrap.append(bg,fg);
+     // Full-shop count above the background bar; Rose count at the foreground bar.
+     // All values, including zero, remain visible without the removed legend.
+     const allTag=document.createElement('span');
+     allTag.textContent=all==null?'—':String(all);
+     allTag.style.cssText='position:absolute;bottom:calc('+allPercent+'% + 3px);left:0;width:100%;font-size:9px;font-weight:800;line-height:11px;text-align:center;color:#264663;white-space:nowrap;pointer-events:none';
+     const roseTag=document.createElement('span');
+     roseTag.textContent=rose==null?'—':String(rose);
+     roseTag.style.cssText='position:absolute;bottom:'+Math.max(0,rosePercent/2)+'%;left:25%;width:50%;font-size:9px;font-weight:800;line-height:11px;text-align:center;color:#103c67;text-shadow:0 1px 1px #fff;white-space:nowrap;pointer-events:none';
+     wrap.append(allTag,roseTag);
+     row.append(wrap);
     }
-    const tick=document.createElement('small');tick.textContent=axis.length>24?((i+1)%5===0||i===0?label:''):axis.length===24?(i%3===0?label:''):label;
-    tick.style.cssText='height:15px;font-size:9px;color:#365273;font-weight:650;white-space:nowrap';
+    const tick=document.createElement('small');
+    tick.textContent=label;
+    tick.style.cssText='height:18px;line-height:18px;font-size:'+(axis.length===24?'8px':'9px')+';color:#365273;font-weight:650;white-space:nowrap';
     col.append(row,tick);graph.append(col);
    });
    holder.append(graph);
