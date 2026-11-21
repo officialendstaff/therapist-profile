@@ -158,6 +158,8 @@ header.header .brand #homeLabel,header.lg-common-header .lg-header-home span,hea
 (()=>{"use strict";
 const $=id=>document.getElementById(id);
 const standaloneView=new URLSearchParams(location.search).get("view")==="sales"?"sales":"interview";
+const roseOnly=standaloneView==="interview";
+const roseShop="薔薇と紳士";
 document.title=(standaloneView==="sales"?"数値管理｜営業数値":"面接数値")+"｜L GROUP";
 document.getElementById("metricsFrame").title=standaloneView==="sales"?"営業数値ダッシュボード":"面接数値ダッシュボード";
 const client=window.supabase?.createClient("https://vjjnkflbfsjihwzjsjpr.supabase.co","sb_publishable_J5WCsft5jMU2_2qVYXKieg_JfSX5Uos",{auth:{persistSession:true,autoRefreshToken:true,storage:localStorage,storageKey:"mattan-recruit-auth"}});
@@ -264,6 +266,7 @@ $("metricsLoginForm").addEventListener("submit",async e=>{
 function bindMetricsHeaderControls(){
  const frame=$("metricsFrame"),toolbar=$("metricsHeaderControls");
  const outerShop=$("metricsHeaderShop"),yearLabel=$("metricsHeaderYear");
+ if(roseOnly){outerShop.innerHTML='<option value="薔薇と紳士">薔薇と紳士</option>';outerShop.value=roseShop;outerShop.disabled=true;outerShop.setAttribute("aria-label","集計対象：薔薇と紳士");}
  let inside=null,view=null,observer=null;
  function target(id){return inside?.getElementById(id)}
  function sync(){
@@ -272,6 +275,10 @@ function bindMetricsHeaderControls(){
   const ready=Boolean(panel&&!panel.hidden&&shop&&month&&month.value);
   toolbar.hidden=!ready;
   if(!ready)return;
+  if(roseOnly&&shop.value!==roseShop){
+   shop.value=roseShop;
+   shop.dispatchEvent(new Event("change",{bubbles:true}));
+  }
   if(outerShop.value!==shop.value)outerShop.value=shop.value;
   const year=Number(month.value.slice(0,4));
   yearLabel.textContent=year+"年";
@@ -335,10 +342,16 @@ function bindMetricsHeaderControls(){
     }
    }
    if(!inside||!target("storeMetricsShop")){toolbar.hidden=true;return;}
+   if(roseOnly){
+    const shop=target("storeMetricsShop");
+    shop.value=roseShop;
+    shop.dispatchEvent(new Event("change",{bubbles:true}));
+   }
    observer=new MutationObserver(sync);
    const month=target("storeMetricsMonth"),panel=target("storeMetrics");
    if(month)observer.observe(month,{attributes:true,attributeFilter:["value"]});
    if(month)month.addEventListener("change",sync);
+   if(roseOnly)target("storeMetricsShop").addEventListener("change",sync);
    const innerPeriodLabel=target("storeMetricsMonthLabel");
    if(innerPeriodLabel)observer.observe(innerPeriodLabel,{childList:true,characterData:true,subtree:true});
    if(panel)observer.observe(panel,{attributes:true,attributeFilter:["hidden"]});
