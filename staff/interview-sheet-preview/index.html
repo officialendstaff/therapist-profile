@@ -2781,14 +2781,14 @@ chart.append(compare);
    return rows.length?historical:(lineReady?allKnownApplicants.filter(a=>firstDate(a).slice(0,7)===key).length:null);
   };
   const perMonthInterviews=(rows,key)=>interviewReady?rows.filter(row=>String(row.date||'').slice(0,7)===key&&attendedStatuses.includes(row.status)).length:null;
-  const labels=annual?Array.from({length:12},(_,i)=>(i+1)+'月'):Array.from({length:new Date(yr,mo,0).getDate()},(_,i)=>String(i+1));
-  const xkeys=annual?labels.map((_,i)=>yr+'-'+String(i+1).padStart(2,'0')):labels.map(d=>month+'-'+d.padStart(2,'0'));
+  const labels=Array.from({length:12},(_,i)=>(i+1)+'月');
+  const xkeys=labels.map((_,i)=>yr+'-'+String(i+1).padStart(2,'0'));
   const dailyCount=(rows,key)=>rows.filter(a=>String(firstDate(a)||'').slice(0,10)===key).length;
   const dailyInterviews=(rows,key)=>interviewReady?rows.filter(row=>String(row.date||'').slice(0,10)===key&&attendedStatuses.includes(row.status)).length:null;
-  const totalInquiry=xkeys.map(k=>annual?accountMonthlyInquiries(k):lineReady?dailyCount(allKnownApplicants,k):null);
-  const roseInquiry=xkeys.map(k=>annual?inquiryCountForMonth(k):lineReady?dailyCount(roseFirstApplicants,k):null);
-  const totalInterview=xkeys.map(k=>annual?perMonthInterviews(allInterviewRows,k):dailyInterviews(allInterviewRows,k));
-  const roseInterview=xkeys.map(k=>annual?perMonthInterviews(allInterviews,k):dailyInterviews(allInterviews,k));
+  const totalInquiry=xkeys.map(accountMonthlyInquiries);
+  const roseInquiry=xkeys.map(inquiryCountForMonth);
+  const totalInterview=xkeys.map(k=>perMonthInterviews(allInterviewRows,k));
+  const roseInterview=xkeys.map(k=>perMonthInterviews(allInterviews,k));
   // All shops use the same data-availability rules as the existing dashboard.
   const overlayBars=(holder,axis,groups)=>{
    const max=Math.max(1,...groups.flatMap(g=>g.all.concat(g.rose)).filter(Number.isFinite));
@@ -2827,16 +2827,16 @@ chart.append(compare);
    const heading=document.createElement('div');heading.className='metrics-v8-heading';heading.textContent=title;
    el.append(heading);dash.append(el);return el;
   };
-  overlayBars(roseSection(annual?'問合せ・面接実施数｜12か月推移':'問合せ・面接実施数｜日別推移'),labels,[
+  overlayBars(roseSection('問合せ・面接実施数｜12か月推移'),labels,[
    {name:'問合せ',all:totalInquiry,rose:roseInquiry,color:'#8ec5f5',roseColor:'#1688f0'},
    {name:'面接実施',all:totalInterview,rose:roseInterview,color:'#f7a4ca',roseColor:'#e94290'}
   ]);
   const hourAll=Array(24).fill(0),hourRose=Array(24).fill(0);
   if(lineReady){
-   for(const a of allKnownApplicants){const date=firstDate(a);if(!date)continue;
+   for(const a of allKnownApplicants){const date=firstDate(a);if(!date||String(date).slice(0,4)!==String(yr))continue;
     const h=new Date(date).getHours();if(Number.isInteger(h)&&h>=0&&h<24)hourAll[h]++;
    }
-   for(const a of roseFirstApplicants){const date=firstDate(a);if(!date)continue;
+   for(const a of roseFirstApplicants){const date=firstDate(a);if(!date||String(date).slice(0,4)!==String(yr))continue;
     const h=new Date(date).getHours();if(Number.isInteger(h)&&h>=0&&h<24)hourRose[h]++;
    }
   }
