@@ -158,7 +158,7 @@ header.header .brand #homeLabel,header.lg-common-header .lg-header-home span,hea
 (()=>{"use strict";
 const $=id=>document.getElementById(id);
 const standaloneView=new URLSearchParams(location.search).get("view")==="sales"?"sales":"interview";
-const roseOnly=standaloneView==="interview";
+const roseOnly=true; // Both interview and sales dashboards are dedicated to 薔薇と紳士.
 const roseShop="薔薇と紳士";
 document.title=(standaloneView==="sales"?"数値管理｜営業数値":"面接数値")+"｜L GROUP";
 document.getElementById("metricsFrame").title=standaloneView==="sales"?"営業数値ダッシュボード":"面接数値ダッシュボード";
