@@ -158,7 +158,7 @@ let photos=d.photos.map(x=>({url:x}));
 if(currentPage!=='shifts'){
 let s; // 見出し言語設定は廃止
 s=section('OGP・SNS共有設定');{
- const note=document.createElement('p');note.className='muted';note.textContent='SNSにページURLを貼った際の共有カードを設定します。このデモはブラウザ内保存のため、X・LINEへの公開OGP反映には本番サーバー側の更新が必要です。';s.append(note);
+ const note=document.createElement('p');note.className='muted';note.textContent='OG画像は管理画面で画像を選び、下部の「保存」を押すと公開用データへ反映されます。SNS側の既存プレビューはキャッシュにより古い画像が表示される場合があります。共有タイトル・説明文は現時点では公開HTMLと連動していません。';s.append(note);
  const imageLabel=document.createElement('label');imageLabel.textContent='① OG画像を登録・変更（1200×630px推奨）';s.append(imageLabel);
  const upload=document.createElement('input');upload.type='file';upload.accept='image/jpeg,image/png,image/webp';s.append(upload);
  const imagePreview=document.createElement('img');imagePreview.style.cssText='display:block;width:100%;max-width:450px;aspect-ratio:1200/630;object-fit:contain;background:#110e14;border:1px solid #70526b;border-radius:8px;margin:12px 0';s.append(imagePreview);
@@ -173,7 +173,7 @@ s=section('OGP・SNS共有設定');{
  titleInput.addEventListener('input',draw);descInput.addEventListener('input',draw);
  upload.onchange=async()=>{const file=upload.files?.[0];if(!file)return;if(!['image/jpeg','image/png','image/webp'].includes(file.type)){alert('JPG・PNG・WebP画像を選択してください');return}try{const url=URL.createObjectURL(file);const img=new Image();try{await new Promise((ok,ng)=>{img.onload=ok;img.onerror=ng;img.src=url});const canvas=document.createElement('canvas');const scale=Math.min(1,1200/Math.max(img.naturalWidth,img.naturalHeight));canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);d.ogp.image=canvas.toDataURL('image/jpeg',.78);draw()}finally{URL.revokeObjectURL(url)}}catch(e){alert('画像を読み込めませんでした')}};
  remove.onclick=()=>{if(confirm('OG画像を削除しますか？')){d.ogp.image='';upload.value='';draw()}};
- const hint=document.createElement('p');hint.className='muted';hint.textContent='推奨：1200×630px、JPGまたはPNG。登録した画像はデモ版ではこのブラウザ内に保存され、SNSには直接配信されません。';s.append(hint);draw();
+ const hint=document.createElement('p');hint.className='muted';hint.textContent='推奨：1200×630px、JPGまたはPNG。画像を選択した後、画面下部の「保存」で公開してください。保存前にこの画面を閉じると反映されません。画像削除時は公開用の初期画像が表示されます。';s.append(hint);draw();
 }
 s=section('HERO / NEWS / INTRODUCTION');textfield(s,'お名前',d,'name');{
  const row=document.createElement('div');row.className='item';
