@@ -470,6 +470,11 @@ $("customerNameForm").addEventListener("submit",async event=>{
  finally{nameSaving=false;$("customerNameSave").disabled=false;$("customerNameCancel").disabled=false;}
 });
 const defaultTitle=document.title;
+const CHAT_SOUND_KEY="booking-chat-sound-enabled-v1";
+try{notifyOn=localStorage.getItem(CHAT_SOUND_KEY)!=="off"}catch{notifyOn=true}
+function saveChatSoundSetting(){try{localStorage.setItem(CHAT_SOUND_KEY,notifyOn?"on":"off")}catch{}}
+function syncChatSoundSetting(){$("notifyToggle").textContent="画面内通知音 "+(notifyOn?"ON":"OFF");$("notifyToggle").setAttribute("aria-pressed",String(notifyOn))}
+syncChatSoundSetting();
 let activeChatAudio=null;
 const chatSoundUrl=new URL("../interview-sheet-preview/vivant_line_5s.mp3",location.href).href;
 function notificationTone(){
@@ -485,7 +490,7 @@ function notificationTone(){
  }catch(error){pushLabel("画面内通知音の再生失敗："+error.message)}
 }
 $("notifyToggle").addEventListener("click",()=>{
- notifyOn=!notifyOn;
+ notifyOn=!notifyOn;saveChatSoundSetting();
  $("notifyToggle").textContent="画面内通知音 "+(notifyOn?"ON":"OFF");
  $("notifyToggle").setAttribute("aria-pressed",String(notifyOn));
  if(notifyOn)notificationTone();
@@ -497,7 +502,7 @@ chatSoundTest.type="button";chatSoundTest.textContent="VIVANT音源テスト";
 chatSoundTest.style.cssText="width:100%;margin-top:6px;padding:8px;cursor:pointer";
 $("notifyToggle").insertAdjacentElement("afterend",chatSoundTest);
 chatSoundTest.addEventListener("click",()=>{
- notifyOn=true;
+ notifyOn=true;saveChatSoundSetting();
  $("notifyToggle").textContent="画面内通知音 ON";
  $("notifyToggle").setAttribute("aria-pressed","true");
  notificationTone();
