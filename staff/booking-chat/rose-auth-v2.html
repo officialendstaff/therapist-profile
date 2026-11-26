@@ -616,14 +616,18 @@ $("customerNameForm").addEventListener("submit",async event=>{
  finally{nameSaving=false;$("customerNameSave").disabled=false;$("customerNameCancel").disabled=false;}
 });
 const defaultTitle=document.title;
-const chatNotificationAudio=new Audio("../interview-sheet-preview/vivant_line_5s.mp3");
-chatNotificationAudio.preload="auto";
-chatNotificationAudio.volume=1;
+let activeChatAudio=null;
+const chatSoundUrl=new URL("../interview-sheet-preview/vivant_line_5s.mp3",location.href).href;
 function notificationTone(){
  if(!notifyOn)return;
  try{
-  chatNotificationAudio.currentTime=0;
-  void chatNotificationAudio.play().catch(error=>{console.warn("通知音を再生できません",error);pushLabel("画面内通知音の再生失敗："+error.name+"（"+error.message+"）")});
+  const sound=new Audio(chatSoundUrl);
+  sound.preload="auto";sound.volume=1;
+  sound.addEventListener("error",()=>pushLabel("VIVANT音源の読み込みに失敗しました"));
+  if(activeChatAudio){activeChatAudio.pause();activeChatAudio.currentTime=0}
+  activeChatAudio=sound;
+  const playback=sound.play();
+  if(playback&&typeof playback.catch==="function")playback.catch(error=>{console.warn("通知音を再生できません",error);pushLabel("画面内通知音の再生失敗："+error.name)});
  }catch(error){pushLabel("画面内通知音の再生失敗："+error.message)}
 }
 $("notifyToggle").addEventListener("click",()=>{
@@ -631,9 +635,19 @@ $("notifyToggle").addEventListener("click",()=>{
  $("notifyToggle").textContent="画面内通知音 "+(notifyOn?"ON":"OFF");
  $("notifyToggle").setAttribute("aria-pressed",String(notifyOn));
  if(notifyOn)notificationTone();
- else chatNotificationAudio.pause();
+ else if(activeChatAudio)activeChatAudio.pause();
 });
 $("pushTest").addEventListener("click",()=>{if(notifyOn)notificationTone()},true);
+const chatSoundTest=document.createElement("button");
+chatSoundTest.type="button";chatSoundTest.textContent="VIVANT音源テスト";
+chatSoundTest.style.cssText="width:100%;margin-top:6px;padding:8px;cursor:pointer";
+$("notifyToggle").insertAdjacentElement("afterend",chatSoundTest);
+chatSoundTest.addEventListener("click",()=>{
+ notifyOn=true;
+ $("notifyToggle").textContent="画面内通知音 ON";
+ $("notifyToggle").setAttribute("aria-pressed","true");
+ notificationTone();
+});
 const notificationSettings=$("notificationSettings");
 document.addEventListener("pointerdown",event=>{
  if(notificationSettings.open&&!notificationSettings.contains(event.target))notificationSettings.open=false;
@@ -997,7 +1011,7 @@ $("greetingForm").addEventListener("submit",async e=>{
 $("draft").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();$("reply").requestSubmit()}});
 $("store").addEventListener("change",()=>{setCustomerTestLink();threadId="";activeThreadUpdatedAt="";listInitialized=false;$("layout").classList.remove("chat-open");$("threadTitle").textContent="チャットを選択してください";$("relatedThreads").replaceChildren();$("messages").replaceChildren();$("reply").hidden=true;$("blockThread").hidden=true;$("activeBlockStatus").hidden=true;void loadList()});
 $("reload").addEventListener("click",()=>{void loadList();if(threadId)void openThread(threadId)});
-setInterval(()=>{if(!document.hidden&&token)void loadList()},10000);
+setInterval(()=>{if(token)void loadList()},10000);
 void connectExisting();
 })();
 </script></body></html>
