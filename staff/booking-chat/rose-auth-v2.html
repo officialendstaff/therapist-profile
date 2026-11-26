@@ -616,33 +616,22 @@ $("customerNameForm").addEventListener("submit",async event=>{
  finally{nameSaving=false;$("customerNameSave").disabled=false;$("customerNameCancel").disabled=false;}
 });
 const defaultTitle=document.title;
+const chatNotificationAudio=new Audio("../interview-sheet-preview/vivant_line_5s.mp3");
+chatNotificationAudio.preload="auto";
+chatNotificationAudio.volume=1;
 function notificationTone(){
  if(!notifyOn)return;
  try{
-  const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio)return;
-  const ctx=audioContext||(audioContext=new Audio());
-  if(ctx.state==="suspended")void ctx.resume();
-  const start=ctx.currentTime;
-  const limiter=ctx.createDynamicsCompressor();
-  limiter.threshold.value=-12;limiter.ratio.value=8;limiter.attack.value=0.002;limiter.release.value=0.12;
-  limiter.connect(ctx.destination);
-  [880,1175,1568].forEach((frequency,i)=>{
-   const t=start+i*0.17,osc=ctx.createOscillator(),gain=ctx.createGain();
-   osc.type="sine";osc.frequency.setValueAtTime(frequency,t);
-   gain.gain.setValueAtTime(0.0001,t);
-   gain.gain.exponentialRampToValueAtTime(0.42,t+0.012);
-   gain.gain.exponentialRampToValueAtTime(0.0001,t+0.22);
-   osc.connect(gain);gain.connect(limiter);osc.start(t);osc.stop(t+0.23);
-  });
+  chatNotificationAudio.currentTime=0;
+  void chatNotificationAudio.play().catch(error=>console.warn("通知音を再生できません",error));
  }catch(error){console.warn("通知音を再生できません",error)}
 }
 $("notifyToggle").addEventListener("click",()=>{
  notifyOn=!notifyOn;
- $("notifyToggle").textContent="通知音 "+(notifyOn?"ON":"OFF");
+ $("notifyToggle").textContent="画面内通知音 "+(notifyOn?"ON":"OFF");
  $("notifyToggle").setAttribute("aria-pressed",String(notifyOn));
- if(notifyOn){
-  try{const Audio=window.AudioContext||window.webkitAudioContext;if(Audio){audioContext=audioContext||new Audio();void audioContext.resume()}}catch{}
- }
+ if(notifyOn)notificationTone();
+ else chatNotificationAudio.pause();
 });
 const notificationSettings=$("notificationSettings");
 document.addEventListener("pointerdown",event=>{
