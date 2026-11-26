@@ -506,8 +506,8 @@ function notificationTone(){
  if(!notifyOn)return;
  try{
   chatNotificationAudio.currentTime=0;
-  void chatNotificationAudio.play().catch(error=>console.warn("通知音を再生できません",error));
- }catch(error){console.warn("通知音を再生できません",error)}
+  void chatNotificationAudio.play().catch(error=>{console.warn("通知音を再生できません",error);pushLabel("画面内通知音の再生失敗："+error.name+"（"+error.message+"）")});
+ }catch(error){pushLabel("画面内通知音の再生失敗："+error.message)}
 }
 $("notifyToggle").addEventListener("click",()=>{
  notifyOn=!notifyOn;
@@ -516,6 +516,7 @@ $("notifyToggle").addEventListener("click",()=>{
  if(notifyOn)notificationTone();
  else chatNotificationAudio.pause();
 });
+$("pushTest").addEventListener("click",()=>{if(notifyOn)notificationTone()},true);
 const notificationSettings=$("notificationSettings");
 document.addEventListener("pointerdown",event=>{
  if(notificationSettings.open&&!notificationSettings.contains(event.target))notificationSettings.open=false;
@@ -595,7 +596,7 @@ async function loadList(){
   if(store!==$("store").value)return;
   const next=data.threads||[];
   const hasNew=listInitialized&&next.some(item=>{
-   if(!item.last_customer_message_at||!isUnread(item))return false;
+   if(!item.last_customer_message_at)return false;
    const old=previous.get(item.id);
    return old===undefined||item.last_customer_message_at>old;
   });
