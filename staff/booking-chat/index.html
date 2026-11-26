@@ -117,7 +117,7 @@ header{flex-wrap:wrap}#customerTestLink{margin-left:auto}header #reload{margin-l
 <div id="error" class="alert" hidden role="alert"></div>
 <div class="layout" id="layout">
 <div class="aside"><div class="filters"><select id="store" aria-label="店舗を切り替える"><option value="all">全店舗</option><option value="Grand Luxe">Grand Luxe</option><option value="LUXY OSAKA">LUXY OSAKA</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select><div class="hint" id="summary">問い合わせを取得中です</div></div><div class="thread-list" id="threads"></div></div>
-<div class="chat-pane"><div class="thread-heading" id="heading"><button id="backToList" type="button">〈 一覧</button><strong id="threadTitle">チャットを選択してください</strong><button id="blockThread" type="button" hidden>ブロック</button><div id="relatedThreads" class="related"></div></div><div class="message-list" id="messages"><div class="placeholder">左の一覧から会話を選択してください。</div></div><form class="reply" id="reply" hidden><textarea id="draft" maxlength="2000" required placeholder="返信を入力" aria-label="返信内容"></textarea><button id="send" class="primary" type="submit">送信</button></form></div>
+<div class="chat-pane"><div class="thread-heading" id="heading"><button id="backToList" type="button">〈 一覧</button><strong id="threadTitle">チャットを選択してください</strong><button id="blockThread" type="button" hidden>ブロック</button><div id="relatedThreads" class="related"></div></div><div class="message-list" id="messages"><div class="placeholder">左の一覧から会話を選択してください。</div></div><form class="reply" id="reply" hidden><textarea id="draft" maxlength="2000" required placeholder="返信を入力（Enter：改行／Ctrl・Alt＋Enter：送信）" aria-label="返信内容"></textarea><button id="send" class="primary" type="submit">送信</button></form></div>
 </div></div>
 <dialog id="greetingDialog" aria-labelledby="greetingDialogTitle"><form id="convoGreetingForm"><h2 id="greetingDialogTitle" style="margin:0;font-size:18px">あいさつ文の編集</h2><label>対象店舗<select id="greetingStore" required><option value="Grand Luxe">Grand Luxe</option><option value="LUXY OSAKA">LUXY OSAKA</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select></label><label>新規のお客様に表示する本文<textarea id="greetingText" maxlength="500" required></textarea></label><div id="greetingStatus" role="status" style="font-size:12px;color:#637992"></div><div class="greeting-buttons"><button id="greetingCancel" type="button">キャンセル</button><button id="greetingSave" class="primary" type="submit">保存</button></div></form></dialog>
 <script>
@@ -428,7 +428,13 @@ $("convoGreetingForm").addEventListener("submit",async e=>{
  catch(err){$("greetingStatus").textContent="保存失敗："+err.message}
  finally{$("greetingSave").disabled=false}
 });
-$("draft").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();$("reply").requestSubmit()}});
+$("draft").addEventListener("keydown",e=>{
+ if(e.key!=="Enter"||e.isComposing||e.keyCode===229||e.getModifierState?.("AltGraph"))return;
+ if(!(e.ctrlKey||e.altKey))return;
+ e.preventDefault();
+ if(e.repeat||replying||$("send").disabled)return;
+ $("reply").requestSubmit();
+});
 $("store").addEventListener("change",()=>{setCustomerTestLink();threadId="";activeThreadUpdatedAt="";listInitialized=false;$("layout").classList.remove("chat-open");$("threadTitle").textContent="チャットを選択してください";$("relatedThreads").replaceChildren();$("messages").replaceChildren();$("reply").hidden=true;$("blockThread").hidden=true;void loadList()});
 $("reload").addEventListener("click",()=>{void loadList();if(threadId)void openThread(threadId)});
 setInterval(()=>{if(token)void loadList()},10000);
