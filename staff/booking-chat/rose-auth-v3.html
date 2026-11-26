@@ -470,28 +470,22 @@ $("customerNameForm").addEventListener("submit",async event=>{
  finally{nameSaving=false;$("customerNameSave").disabled=false;$("customerNameCancel").disabled=false;}
 });
 const defaultTitle=document.title;
+const chatNotificationAudio=new Audio("../interview-sheet-preview/vivant_line_5s.mp3");
+chatNotificationAudio.preload="auto";
+chatNotificationAudio.volume=1;
 function notificationTone(){
  if(!notifyOn)return;
  try{
-  const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio)return;
-  const ctx=audioContext||(audioContext=new Audio());
-  if(ctx.state==="suspended")void ctx.resume();
-  const t=ctx.currentTime,osc=ctx.createOscillator(),gain=ctx.createGain();
-  osc.type="sine";osc.frequency.setValueAtTime(880,t);
-  osc.frequency.setValueAtTime(1046,t+0.12);
-  gain.gain.setValueAtTime(0.0001,t);
-  gain.gain.exponentialRampToValueAtTime(0.085,t+0.02);
-  gain.gain.exponentialRampToValueAtTime(0.0001,t+0.32);
-  osc.connect(gain);gain.connect(ctx.destination);osc.start(t);osc.stop(t+0.34);
+  chatNotificationAudio.currentTime=0;
+  void chatNotificationAudio.play().catch(error=>console.warn("通知音を再生できません",error));
  }catch(error){console.warn("通知音を再生できません",error)}
 }
 $("notifyToggle").addEventListener("click",()=>{
  notifyOn=!notifyOn;
- $("notifyToggle").textContent="通知音 "+(notifyOn?"ON":"OFF");
+ $("notifyToggle").textContent="画面内通知音 "+(notifyOn?"ON":"OFF");
  $("notifyToggle").setAttribute("aria-pressed",String(notifyOn));
- if(notifyOn){
-  try{const Audio=window.AudioContext||window.webkitAudioContext;if(Audio){audioContext=audioContext||new Audio();void audioContext.resume()}}catch{}
- }
+ if(notifyOn)notificationTone();
+ else chatNotificationAudio.pause();
 });
 const notificationSettings=$("notificationSettings");
 document.addEventListener("pointerdown",event=>{
