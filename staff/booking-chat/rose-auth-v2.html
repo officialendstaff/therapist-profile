@@ -433,7 +433,7 @@ header.header .brand img,header.lg-common-header .lg-header-home img,header .lg-
 header.header .brand #homeLabel,header.lg-common-header .lg-header-home span,header .lg-header-home span{
   font-size:13px!important;font-weight:700!important;letter-spacing:normal!important;
 }
-</style><style>.customer-phone-copy{cursor:pointer;text-decoration:underline;text-underline-offset:3px;color:#245d8d;white-space:nowrap}.customer-phone-copy:hover,.customer-phone-copy:focus-visible{background:#dcecf9}#customerPhoneCopyToast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#20334b;color:white;padding:10px 18px;border-radius:8px;z-index:99999;font-size:14px;pointer-events:none}#customerPhoneCopyToast[hidden]{display:none}</style></head><body>
+</style><style>.customer-phone-copy{cursor:pointer;text-decoration:underline;text-underline-offset:3px;color:#245d8d;white-space:nowrap}.customer-phone-copy:hover,.customer-phone-copy:focus-visible{background:#dcecf9}#customerPhoneCopyToast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#20334b;color:white;padding:10px 18px;border-radius:8px;z-index:99999;font-size:14px;pointer-events:none}#customerPhoneCopyToast[hidden]{display:none}</style><style>#reply{flex-wrap:wrap}.template-toolbar{flex:0 0 100%;display:flex;justify-content:flex-start}.template-toolbar button{background:#f0f5fa;border:1px solid #bdcedf;border-radius:6px;color:#284a70;padding:6px 12px;font-size:12px}.template-dialog{width:min(580px,calc(100% - 24px));max-height:85vh;overflow:auto;border:1px solid #c4d4e4;border-radius:12px;padding:18px;color:#20354e;background:white}.template-dialog::backdrop{background:#17283e99}.template-dialog button{font:inherit;font-size:12px;padding:6px 9px;border:1px solid #c3d2e0;border-radius:5px;background:#f2f6fa;color:#24496c;cursor:pointer}.template-head,.template-actions,.template-row,.template-tabs{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.template-head{justify-content:space-between}.template-head h2{font-size:18px;margin:0}.template-tabs button[aria-pressed=true]{background:#285e87;color:white}.template-row{padding:10px 0;border-bottom:1px solid #dce5ee}.template-row strong{flex:1;min-width:90px;overflow-wrap:anywhere}.template-preview{display:block;font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;color:#627587;width:100%}.template-pick{display:block;width:100%;text-align:left;margin-top:8px;padding:10px!important}.template-pick strong{display:block;font-size:14px}.template-dialog label{display:flex;flex-direction:column;gap:5px;margin:10px 0;font-size:13px}.template-dialog input,.template-dialog textarea,.template-dialog select{width:100%;border:1px solid #b9cbdc;border-radius:5px;padding:8px;font:inherit}.template-dialog [hidden]{display:none!important}.template-actions{justify-content:flex-end}#templateStatus{font-size:12px;color:#526e89}#templateContent{margin:10px 0}#templateEditor{border-top:1px solid #cbd8e5;padding-top:10px}</style></head><body>
 <div id="authLoading" role="status" aria-live="polite"><span class="auth-spinner" aria-hidden="true"></span><span>管理者認証を確認中…</span></div>
 <div id="gate" class="lg-interview-login" hidden><div class="auth-card">
 <aside class="auth-brand-panel" aria-hidden="true">
@@ -454,11 +454,11 @@ header.header .brand #homeLabel,header.lg-common-header .lg-header-home span,hea
  <p class="auth-footnote">AUTHORIZED PERSONNEL ONLY</p>
 </div></div></div>
 <div id="app" hidden>
-<header class="lg-common-header"><div class="lg-header-brand"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ戻る"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a></div><div class="lg-chat-header-actions"><span class="unread-total" id="unreadTotal" aria-live="polite">未読 <span id="unreadBadge" class="chat-unread-badge" hidden>0</span></span><button id="editGreeting" type="button">あいさつ文編集</button><details id="notificationSettings" class="chat-notification-settings"><summary aria-label="通知設定を開く">通知設定</summary><div class="chat-notification-panel" role="group" aria-label="チャットの通知設定"><strong>通知設定</strong><button id="pushEnable" type="button" data-enabled="false">プッシュ通知を有効化</button><button id="pushTest" type="button" disabled>通知テスト</button><button id="notifyToggle" type="button" aria-pressed="false">画面内通知音 OFF</button><p id="pushStatus" aria-live="polite">未設定</p></div></details><button id="reload" type="button">情報更新</button></div></header>
+<header class="lg-common-header"><div class="lg-header-brand"><a class="lg-header-home" href="/therapist-profile/staff/management-top/" title="総合管理TOPへ戻る"><img src="/therapist-profile/staff/interview-sheet-preview/icons/murakami-pc.webp" alt="" onerror="this.style.display='none'"><span>村上 TOP</span></a></div><div class="lg-chat-header-actions"><span class="unread-total" id="unreadTotal" aria-live="polite">未読 <span id="unreadBadge" class="chat-unread-badge" hidden>0</span></span><button id="editGreeting" type="button">あいさつ文編集</button><button id="editTemplates" type="button">定型文編集</button><details id="notificationSettings" class="chat-notification-settings"><summary aria-label="通知設定を開く">通知設定</summary><div class="chat-notification-panel" role="group" aria-label="チャットの通知設定"><strong>通知設定</strong><button id="pushEnable" type="button" data-enabled="false">プッシュ通知を有効化</button><button id="pushTest" type="button" disabled>通知テスト</button><button id="notifyToggle" type="button" aria-pressed="false">画面内通知音 OFF</button><p id="pushStatus" aria-live="polite">未設定</p></div></details><button id="reload" type="button">情報更新</button></div></header>
 <div id="error" class="alert" hidden role="alert"></div>
 <div class="layout" id="layout">
 <div class="aside"><div class="filters"><select id="store" aria-label="店舗を切り替える"><option value="all">全店舗</option><option value="Grand Luxe">Grand Luxe</option><option value="LUXY OSAKA">LUXY OSAKA</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select><div class="hint" id="summary">問い合わせを取得中です</div></div><div class="thread-list" id="threads"></div></div>
-<div class="chat-pane"><div class="thread-heading" id="heading"><button id="backToList" type="button">〈 一覧</button><strong id="threadTitle">チャットを選択してください</strong><span id="activeBlockStatus" class="active-block-status" hidden>ブロック中</span><div class="chat-heading-actions"><button id="editCustomerName" class="edit-customer-name" type="button" hidden aria-label="お客様名を編集">✎ 名前変更</button><button id="blockThread" type="button" hidden>ブロック</button></div><div id="relatedThreads" class="related"></div></div><div class="message-list" id="messages"><div class="placeholder">左の一覧から会話を選択してください。</div></div><form class="reply" id="reply" hidden><textarea id="draft" maxlength="2000" required placeholder="返信を入力（Enter：改行／Ctrl・Alt＋Enter：送信）" aria-label="返信内容"></textarea><button id="send" class="primary" type="submit">送信</button></form></div>
+<div class="chat-pane"><div class="thread-heading" id="heading"><button id="backToList" type="button">〈 一覧</button><strong id="threadTitle">チャットを選択してください</strong><span id="activeBlockStatus" class="active-block-status" hidden>ブロック中</span><div class="chat-heading-actions"><button id="editCustomerName" class="edit-customer-name" type="button" hidden aria-label="お客様名を編集">✎ 名前変更</button><button id="blockThread" type="button" hidden>ブロック</button></div><div id="relatedThreads" class="related"></div></div><div class="message-list" id="messages"><div class="placeholder">左の一覧から会話を選択してください。</div></div><form class="reply" id="reply" hidden><div class="template-toolbar"><button id="pickTemplate" type="button">定型文一覧 ▾</button></div><textarea id="draft" maxlength="2000" required placeholder="返信を入力（Enter：改行／Ctrl・Alt＋Enter：送信）" aria-label="返信内容"></textarea><button id="send" class="primary" type="submit">送信</button></form></div>
 </div></div>
 <dialog id="customerNameDialog" class="customer-name-dialog" aria-labelledby="customerNameDialogTitle">
  <form id="customerNameForm">
@@ -480,7 +480,7 @@ header.header .brand #homeLabel,header.lg-common-header .lg-header-home span,hea
   <button id="blockDialogConfirm" type="button">ブロックする</button>
  </div>
 </dialog>
-<dialog id="greetingDialog" aria-labelledby="greetingTitle"><form id="greetingForm"><h2 id="greetingTitle">あいさつ文編集</h2><label>対象店舗<select id="greetingStore" required><option value="Grand Luxe">Grand Luxe</option><option value="LUXY OSAKA">LUXY OSAKA</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select></label><div class="greeting-current"><strong>現在のあいさつ文（変更前）</strong><div id="greetingCurrentText">読み込み中…</div></div><label>お客様用チャットに表示する本文<textarea id="greetingText" maxlength="500" required></textarea></label><div class="greeting-link-fields"><strong>文字列にリンクを設定（任意）</strong><label>リンクにする文字列<input id="greetingLinkText" type="text" maxlength="100" autocomplete="off" placeholder="例：本日の出勤スケジュールを見る"></label><label>リンク先URL<input id="greetingLinkUrl" type="url" maxlength="1000" inputmode="url" autocomplete="url" placeholder="https://example.com/"></label><small>本文に含まれる文字列を指定してください。リンク先は新しいタブで開きます。</small></div><p id="greetingStatus" role="status" style="font-size:12px;color:#526e89;margin:0"></p><div class="greeting-actions"><button id="greetingCancel" type="button">キャンセル</button><button id="greetingSave" type="submit" class="primary">保存</button></div></form></dialog>
+<dialog id="templateDialog" class="template-dialog"><div class="template-head"><h2 id="templateTitle">定型文</h2><button id="templateClose" type="button">閉じる</button></div><p id="templateStatus" role="status"></p><div id="templateContent"></div><form id="templateEditor" hidden><label>表示名<input id="templateName" required></label><label id="templateBodyLabel">本文<textarea id="templateBody" maxlength="2000" rows="5"></textarea></label><label id="templateDestLabel">カテゴリー<select id="templateDest"></select></label><div class="template-actions"><button id="templateCancel" type="button">キャンセル</button><button type="submit" class="primary">保存</button></div></form></dialog><dialog id="greetingDialog" aria-labelledby="greetingTitle"><form id="greetingForm"><h2 id="greetingTitle">あいさつ文編集</h2><label>対象店舗<select id="greetingStore" required><option value="Grand Luxe">Grand Luxe</option><option value="LUXY OSAKA">LUXY OSAKA</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select></label><div class="greeting-current"><strong>現在のあいさつ文（変更前）</strong><div id="greetingCurrentText">読み込み中…</div></div><label>お客様用チャットに表示する本文<textarea id="greetingText" maxlength="500" required></textarea></label><div class="greeting-link-fields"><strong>文字列にリンクを設定（任意）</strong><label>リンクにする文字列<input id="greetingLinkText" type="text" maxlength="100" autocomplete="off" placeholder="例：本日の出勤スケジュールを見る"></label><label>リンク先URL<input id="greetingLinkUrl" type="url" maxlength="1000" inputmode="url" autocomplete="url" placeholder="https://example.com/"></label><small>本文に含まれる文字列を指定してください。リンク先は新しいタブで開きます。</small></div><p id="greetingStatus" role="status" style="font-size:12px;color:#526e89;margin:0"></p><div class="greeting-actions"><button id="greetingCancel" type="button">キャンセル</button><button id="greetingSave" type="submit" class="primary">保存</button></div></form></dialog>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js"></script>
 <script>
 (()=>{
@@ -1051,6 +1051,61 @@ $("draft").addEventListener("keydown",e=>{
 });
 $("store").addEventListener("change",()=>{setCustomerTestLink();threadId="";activeThreadUpdatedAt="";listInitialized=false;$("layout").classList.remove("chat-open");$("threadTitle").textContent="チャットを選択してください";$("relatedThreads").replaceChildren();$("messages").replaceChildren();$("reply").hidden=true;$("blockThread").hidden=true;$("activeBlockStatus").hidden=true;void loadList()});
 $("reload").addEventListener("click",()=>{void loadList();if(threadId)void openThread(threadId)});
+
+let templateCategories=[],templateRevision=0,templateMode="",templateCategory="",templateEdit=null,templateBusy=false;
+const templateBtn=(name,fn,disabled=false)=>{const b=document.createElement("button");b.type="button";b.textContent=name;b.disabled=disabled;b.addEventListener("click",fn);return b};
+function templateText(tag,str,cls=""){const el=document.createElement(tag);el.textContent=str;if(cls)el.className=cls;return el}
+async function templateLoad(){
+ const data=await call("staff_templates_get");templateCategories=data.categories||[];templateRevision=data.revision;
+}
+async function templateOpen(mode){
+ if(!token)return;templateMode=mode;templateCategory="";templateEdit=null;$("templateEditor").hidden=true;
+ $("templateTitle").textContent=mode==="edit"?"定型文編集（全店舗共通）":"定型文一覧";
+ $("templateContent").replaceChildren();$("templateStatus").textContent="読み込み中…";$("templateDialog").showModal();
+ try{await templateLoad();$("templateStatus").textContent="";templateDraw()}catch(e){$("templateStatus").textContent="取得できませんでした："+e.message}
+}
+function templateDraw(){
+ const root=$("templateContent");root.replaceChildren();
+ if(!templateCategories.some(c=>c.id===templateCategory))templateCategory=templateCategories[0]?.id||"";
+ const cat=templateCategories.find(c=>c.id===templateCategory);
+ if(templateMode==="edit"){
+  const bar=document.createElement("div");bar.className="template-row";bar.append(templateText("strong","カテゴリー管理"),templateBtn("＋追加",()=>templateForm("category_add")));root.append(bar);
+  templateCategories.forEach((c,i)=>{
+   const row=document.createElement("div");row.className="template-row";row.append(templateText("strong",c.name+"（"+c.items.length+"件）"),templateBtn("↑",()=>templateMutate({op:"category_move",category_id:c.id,direction:-1}),i===0),templateBtn("↓",()=>templateMutate({op:"category_move",category_id:c.id,direction:1}),i===templateCategories.length-1),templateBtn("名称変更",()=>templateForm("category_rename",c)),templateBtn("削除",()=>{if(confirm("空のカテゴリーを削除しますか？"))void templateMutate({op:"category_delete",category_id:c.id})},c.items.length>0),templateBtn("選択",()=>{templateCategory=c.id;templateDraw()}));root.append(row)
+  });
+ }
+ const tabs=document.createElement("div");tabs.className="template-tabs";templateCategories.forEach(c=>{const b=templateBtn(c.name,()=>{templateCategory=c.id;templateDraw()});b.setAttribute("aria-pressed",String(c.id===templateCategory));tabs.append(b)});root.append(tabs);
+ if(!cat){root.append(templateText("p","カテゴリーがありません。"));return}
+ if(templateMode==="edit"){const row=document.createElement("div");row.className="template-row";row.append(templateText("strong",cat.name+" の定型文"),templateBtn("＋定型文追加",()=>templateForm("item_add",cat)));root.append(row)}
+ if(!cat.items.length)root.append(templateText("p","定型文がありません。"));
+ cat.items.forEach((item,i)=>{
+  if(templateMode==="pick"){
+   const b=templateBtn("",()=>{const d=$("draft");if(!threadId||$("reply").hidden)return;if(d.value.trim()&&!confirm("入力中の文章を定型文に置き換えますか？"))return;d.value=item.body;d.dispatchEvent(new Event("input",{bubbles:true}));$("templateDialog").close();d.focus()});b.className="template-pick";b.append(templateText("strong",item.name),templateText("span",item.body,"template-preview"));root.append(b)
+  }else{
+   const row=document.createElement("div");row.className="template-row";row.append(templateText("strong",item.name),templateBtn("↑",()=>templateMutate({op:"item_move",category_id:cat.id,item_id:item.id,direction:-1}),i===0),templateBtn("↓",()=>templateMutate({op:"item_move",category_id:cat.id,item_id:item.id,direction:1}),i===cat.items.length-1),templateBtn("編集",()=>templateForm("item_edit",cat,item)),templateBtn("削除",()=>{if(confirm("この定型文を削除しますか？"))void templateMutate({op:"item_delete",category_id:cat.id,item_id:item.id})}),templateText("span",item.body,"template-preview"));root.append(row)
+  }
+ });
+}
+function templateForm(op,c,item){
+ templateEdit={op,category_id:c?.id,item_id:item?.id};
+ const isItem=op.startsWith("item_");$("templateName").maxLength=isItem?10:30;$("templateName").value=item?.name||(op==="category_rename"?c.name:"");
+ $("templateBodyLabel").hidden=!isItem;$("templateBody").required=isItem;$("templateBody").value=item?.body||"";
+ $("templateDestLabel").hidden=!isItem;const dest=$("templateDest");dest.replaceChildren();
+ templateCategories.forEach(v=>{const o=document.createElement("option");o.value=v.id;o.textContent=v.name;dest.append(o)});if(c)dest.value=c.id;
+ $("templateEditor").hidden=false;$("templateName").focus();$("templateEditor").scrollIntoView({block:"nearest"});
+}
+async function templateMutate(payload){
+ if(templateBusy)return;templateBusy=true;$("templateStatus").textContent="保存中…";
+ try{const data=await call("staff_templates_mutate",{revision:templateRevision,...payload});templateCategories=data.categories;templateRevision=data.revision;templateEdit=null;$("templateEditor").hidden=true;$("templateStatus").textContent="保存しました";templateDraw()}
+ catch(e){$("templateStatus").textContent="保存できませんでした："+e.message;if(e.status===409){try{await templateLoad();templateDraw();$("templateStatus").textContent="他のスタッフが更新しました。内容を確認して再操作してください。"}catch{}}}
+ finally{templateBusy=false}
+}
+$("editTemplates").addEventListener("click",()=>void templateOpen("edit"));
+$("pickTemplate").addEventListener("click",()=>void templateOpen("pick"));
+$("templateClose").addEventListener("click",()=>$("templateDialog").close());
+$("templateCancel").addEventListener("click",()=>{templateEdit=null;$("templateEditor").hidden=true});
+$("templateEditor").addEventListener("submit",e=>{e.preventDefault();if(templateEdit)void templateMutate({...templateEdit,name:$("templateName").value,body:$("templateBody").value,destination_id:$("templateDest").value})});
+
 setInterval(()=>{if(token)void loadList()},10000);
 void connectExisting();
 })();
