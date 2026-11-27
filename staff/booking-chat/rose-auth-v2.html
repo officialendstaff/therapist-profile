@@ -452,6 +452,19 @@ header.header .brand #homeLabel,header.lg-common-header .lg-header-home span,hea
 #reply #send{flex:0 0 auto}
 #reply .template-toolbar{flex:0 0 100%}
 @media(max-width:700px){#templateDialog{width:calc(100vw - 20px);min-height:min(340px,70vh);padding:16px}#templateDialog .template-head h2{font-size:20px}#templateDialog button{font-size:15px;padding:8px 10px}#templateDialog .template-pick strong{font-size:17px}#templateDialog .template-preview{font-size:15px}}
+</style><style id="lg-template-edit-layout">
+#templateDialog.template-edit-mode{width:min(1160px,calc(100vw - 32px))!important;max-width:none!important;padding:26px!important;min-height:min(580px,75vh);font-size:16px!important}
+#templateDialog.template-edit-mode #templateContent{display:grid;grid-template-columns:minmax(300px, 0.95fr) minmax(0,1.25fr);gap:20px;align-items:start}
+#templateDialog .template-category-panel,#templateDialog .template-item-panel{min-width:0;border:1px solid #c6d5e4;border-radius:10px;padding:14px;background:#fff}
+#templateDialog .template-category-panel>.template-row:first-child,#templateDialog .template-item-panel>.template-row:first-child{background:#e8f0f8;border-radius:6px;padding:12px;margin-bottom:10px}
+#templateDialog.template-edit-mode .template-row strong{font-size:18px!important;line-height:1.45;flex:1 0 100%;color:#18304a}
+#templateDialog.template-edit-mode .template-row button{font-size:15px!important;min-height:38px;padding:7px 10px!important}
+#templateDialog.template-edit-mode .template-row button:disabled{opacity:.4}
+#templateDialog.template-edit-mode .template-row{padding:14px 10px;gap:7px}
+#templateDialog.template-edit-mode .selected-category{background:#e7f1fc;border-left:4px solid #285e87;border-radius:6px}
+#templateDialog.template-edit-mode .template-preview{font-size:16px!important;color:#263c50;line-height:1.6;margin-top:4px}
+#templateDialog.template-edit-mode #templateEditor{margin-top:16px;padding:18px;border:1px solid #b6c9dc;border-radius:8px;background:#f5f8fc}
+@media(max-width:800px){#templateDialog.template-edit-mode{width:calc(100vw - 20px)!important;padding:14px!important}#templateDialog.template-edit-mode #templateContent{grid-template-columns:1fr;gap:14px}}
 </style></head><body>
 <div id="authLoading" role="status" aria-live="polite"><span class="auth-spinner" aria-hidden="true"></span><span>管理者認証を確認中…</span></div>
 <div id="gate" class="lg-interview-login" hidden><div class="auth-card">
@@ -1087,21 +1100,24 @@ function templateDraw(){
  const root=$("templateContent");root.replaceChildren();
  if(!templateCategories.some(c=>c.id===templateCategory))templateCategory=templateCategories[0]?.id||"";
  const cat=templateCategories.find(c=>c.id===templateCategory);
+ $("templateDialog").classList.toggle("template-edit-mode",templateMode==="edit");
+ let left=root,right=root;
+ if(templateMode==="edit"){left=document.createElement("section");left.className="template-category-panel";right=document.createElement("section");right.className="template-item-panel";root.append(left,right)}
  if(templateMode==="edit"){
-  const bar=document.createElement("div");bar.className="template-row";bar.append(templateText("strong","カテゴリー管理"),templateBtn("＋追加",()=>templateForm("category_add")));root.append(bar);
+  const bar=document.createElement("div");bar.className="template-row";bar.append(templateText("strong","カテゴリー管理"),templateBtn("＋追加",()=>templateForm("category_add")));left.append(bar);
   templateCategories.forEach((c,i)=>{
-   const row=document.createElement("div");row.className="template-row";row.append(templateText("strong",c.name+"（"+c.items.length+"件）"),templateBtn("↑",()=>templateMutate({op:"category_move",category_id:c.id,direction:-1}),i===0),templateBtn("↓",()=>templateMutate({op:"category_move",category_id:c.id,direction:1}),i===templateCategories.length-1),templateBtn("名称変更",()=>templateForm("category_rename",c)),templateBtn("削除",()=>{if(confirm("空のカテゴリーを削除しますか？"))void templateMutate({op:"category_delete",category_id:c.id})},c.items.length>0),templateBtn("選択",()=>{templateCategory=c.id;templateDraw()}));root.append(row)
+   const row=document.createElement("div");row.className="template-row";row.append(templateText("strong",c.name+"（"+c.items.length+"件）"),templateBtn("↑",()=>templateMutate({op:"category_move",category_id:c.id,direction:-1}),i===0),templateBtn("↓",()=>templateMutate({op:"category_move",category_id:c.id,direction:1}),i===templateCategories.length-1),templateBtn("名称変更",()=>templateForm("category_rename",c)),templateBtn("削除",()=>{if(confirm("空のカテゴリーを削除しますか？"))void templateMutate({op:"category_delete",category_id:c.id})},c.items.length>0),templateBtn("開く",()=>{templateCategory=c.id;templateDraw()}));row.classList.toggle("selected-category",c.id===templateCategory);left.append(row)
   });
  }
- const tabs=document.createElement("div");tabs.className="template-tabs";templateCategories.forEach(c=>{const b=templateBtn(c.name,()=>{templateCategory=c.id;templateDraw()});b.setAttribute("aria-pressed",String(c.id===templateCategory));tabs.append(b)});root.append(tabs);
- if(!cat){root.append(templateText("p","カテゴリーがありません。"));return}
- if(templateMode==="edit"){const row=document.createElement("div");row.className="template-row";row.append(templateText("strong",cat.name+" の定型文"),templateBtn("＋定型文追加",()=>templateForm("item_add",cat)));root.append(row)}
- if(!cat.items.length)root.append(templateText("p","定型文がありません。"));
+ const tabs=document.createElement("div");tabs.className="template-tabs";templateCategories.forEach(c=>{const b=templateBtn(c.name,()=>{templateCategory=c.id;templateDraw()});b.setAttribute("aria-pressed",String(c.id===templateCategory));tabs.append(b)});if(templateMode!=="edit")root.append(tabs);
+ if(!cat){right.append(templateText("p","カテゴリーがありません。"));return}
+ if(templateMode==="edit"){const row=document.createElement("div");row.className="template-row";row.append(templateText("strong",cat.name+" の定型文"),templateBtn("＋定型文追加",()=>templateForm("item_add",cat)));right.append(row)}
+ if(!cat.items.length)right.append(templateText("p","定型文がありません。"));
  cat.items.forEach((item,i)=>{
   if(templateMode==="pick"){
    const b=templateBtn("",()=>{const d=$("draft");if(!threadId||$("reply").hidden)return;if(d.value.trim()&&!confirm("入力中の文章を定型文に置き換えますか？"))return;d.value=item.body;d.dispatchEvent(new Event("input",{bubbles:true}));$("templateDialog").close();d.focus()});b.className="template-pick";b.append(templateText("strong",item.name),templateText("span",item.body,"template-preview"));root.append(b)
   }else{
-   const row=document.createElement("div");row.className="template-row";row.append(templateText("strong",item.name),templateBtn("↑",()=>templateMutate({op:"item_move",category_id:cat.id,item_id:item.id,direction:-1}),i===0),templateBtn("↓",()=>templateMutate({op:"item_move",category_id:cat.id,item_id:item.id,direction:1}),i===cat.items.length-1),templateBtn("編集",()=>templateForm("item_edit",cat,item)),templateBtn("削除",()=>{if(confirm("この定型文を削除しますか？"))void templateMutate({op:"item_delete",category_id:cat.id,item_id:item.id})}),templateText("span",item.body,"template-preview"));root.append(row)
+   const row=document.createElement("div");row.className="template-row";row.append(templateText("strong",item.name),templateBtn("↑",()=>templateMutate({op:"item_move",category_id:cat.id,item_id:item.id,direction:-1}),i===0),templateBtn("↓",()=>templateMutate({op:"item_move",category_id:cat.id,item_id:item.id,direction:1}),i===cat.items.length-1),templateBtn("編集",()=>templateForm("item_edit",cat,item)),templateBtn("削除",()=>{if(confirm("この定型文を削除しますか？"))void templateMutate({op:"item_delete",category_id:cat.id,item_id:item.id})}),templateText("span",item.body,"template-preview"));right.append(row)
   }
  });
 }
