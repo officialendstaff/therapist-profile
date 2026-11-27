@@ -433,7 +433,7 @@ header.header .brand img,header.lg-common-header .lg-header-home img,header .lg-
 header.header .brand #homeLabel,header.lg-common-header .lg-header-home span,header .lg-header-home span{
   font-size:13px!important;font-weight:700!important;letter-spacing:normal!important;
 }
-</style></head><body>
+</style><style>.customer-phone-copy{cursor:pointer;text-decoration:underline;text-underline-offset:3px;color:#245d8d;white-space:nowrap}.customer-phone-copy:hover,.customer-phone-copy:focus-visible{background:#dcecf9}#customerPhoneCopyToast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#20334b;color:white;padding:10px 18px;border-radius:8px;z-index:99999;font-size:14px;pointer-events:none}#customerPhoneCopyToast[hidden]{display:none}</style></head><body>
 <div id="authLoading" role="status" aria-live="polite"><span class="auth-spinner" aria-hidden="true"></span><span>管理者認証を確認中…</span></div>
 <div id="gate" class="lg-interview-login" hidden><div class="auth-card">
 <aside class="auth-brand-panel" aria-hidden="true">
@@ -575,7 +575,7 @@ function mergeReadAcknowledgements(threads){
 }
 let currentCustomerId="",currentCustomerName="",nameSaving=false;
 function showCustomerTitle(thread){
- $("threadTitle").replaceChildren(makeStoreLabel(thread.store_key),document.createTextNode("｜"+nameOf(thread)));
+ $("threadTitle").replaceChildren(makeStoreLabel(thread.store_key),document.createTextNode("｜"),customerNameNode(thread,true));
 }
 function syncCustomerName(visitorId,newName){
  for(const thread of items){
@@ -722,6 +722,29 @@ function nameOf(t){
  base=base||String(t.visitor_id||"").slice(0,8);
  return base+(suffix?" "+suffix:"")+" 様";
 }
+function customerNameNode(t,keyboard){
+ const name=nameOf(t), root=document.createElement("span");
+ const m=/(?:0[0-9]{10})(?![0-9])/u.exec(name);
+ if(!m){root.textContent=name;return root}
+ root.append(document.createTextNode(name.slice(0,m.index)));
+ const phone=document.createElement("span");phone.className="customer-phone-copy";phone.textContent=m[0];phone.title="電話番号をコピー";
+ if(keyboard){phone.tabIndex=0;phone.setAttribute("role","button");phone.setAttribute("aria-label","電話番号 "+m[0]+" をコピー")}
+ async function copyPhone(e){
+  e.preventDefault();e.stopPropagation();
+  let ok=false;
+  try{await navigator.clipboard.writeText(m[0]);ok=true}catch(err){
+   const input=document.createElement("textarea");input.value=m[0];input.style.cssText="position:fixed;left:-9999px;top:0";document.body.append(input);input.select();
+   try{ok=document.execCommand("copy")}catch(err2){}finally{input.remove()}
+  }
+  let toast=document.getElementById("customerPhoneCopyToast");
+  if(!toast){toast=document.createElement("div");toast.id="customerPhoneCopyToast";toast.setAttribute("role","status");document.body.append(toast)}
+  toast.textContent=ok?"電話番号をコピーしました":"コピーできませんでした";toast.hidden=false;
+  clearTimeout(toast.copyTimer);toast.copyTimer=setTimeout(()=>{toast.hidden=true},1800);
+ }
+ phone.addEventListener("click",copyPhone);
+ if(keyboard)phone.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" ")void copyPhone(e)});
+ root.append(phone,document.createTextNode(name.slice(m.index+m[0].length)));return root;
+}
 function drawList(){
  const list=$("threads");list.replaceChildren();
  let unread=0;
@@ -730,7 +753,7 @@ function drawList(){
   if(isUnread(t))unread++;
   const btn=document.createElement("button");btn.type="button";btn.className="thread"+(active?" active":"")+(isUnread(t)?" unread":"")+(t.status==="blocked"?" blocked":"");
   const heading=document.createElement("div");
-  const strong=document.createElement("strong");strong.className="customer-name";strong.textContent=nameOf(t);
+  const strong=document.createElement("strong");strong.className="customer-name";strong.append(customerNameNode(t,false));
   const time=document.createElement("time");time.textContent=labelTime(t.updated_at);heading.append(strong,time);
   const desc=document.createElement("div");desc.className="sub";
   const customer=makeStoreLabel(t.store_key);desc.append(customer);
