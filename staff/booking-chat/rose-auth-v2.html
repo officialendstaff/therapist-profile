@@ -714,9 +714,17 @@ function isUnread(t){return !!(t.last_customer_message_at&&(!t.staff_last_read_a
 function nameOf(t){
  const visitor=t.booking_chat_visitors;
  const saved=typeof visitor?.display_name==="string"?visitor.display_name.trim():"";
- const base=saved||String(t.visitor_id||"").slice(0,8);
- const digits=String(visitor?.phone||"");
- return base+(/^[0-9]{6}$/.test(digits)?" "+digits:"")+" 様";
+ const digits=String(visitor?.phone||"").trim();
+ const suffix=/^[0-9]{6}$/.test(digits)?digits:"";
+ let base=saved.normalize("NFKC").trim();
+ if(suffix){
+  const tail=base.match(/[0-9](?:[0-9\s-]*[0-9])?\s*(?:様|さま|さん)?$/u);
+  if(tail && tail[0].replace(/[^0-9]/g,"").endsWith(suffix)){
+   base=base.slice(0,tail.index).trim();
+  }
+ }
+ base=base.replace(/(?:\s*(?:様|さま|さん))+$/u,"").trim()||String(t.visitor_id||"").slice(0,8);
+ return base+(suffix?" "+suffix:"")+" 様";
 }
 function drawList(){
  const list=$("threads");list.replaceChildren();
