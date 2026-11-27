@@ -716,7 +716,7 @@ function nameOf(t){
  const saved=typeof visitor?.display_name==="string"?visitor.display_name.trim():"";
  const digits=String(visitor?.phone||"").trim();
  const suffix=/^[0-9]{6}$/.test(digits)?digits:"";
- if(/(?:^|[^0-9])0(?:[\s-]*[0-9]){10}(?![0-9])/u.test(saved.normalize("NFKC"))) return saved;
+ if(/(?:^|[^0-9])0(?:[\s-]*[0-9]){10}(?![0-9])/u.test(saved.normalize("NFKC"))) return saved.replace(/様[\s　]*(?=[0０])/u,"様　");
  let base=saved.replace(/(?:\s*(?:様|さま))+$/u,"").trim();
  if(suffix && base.endsWith(suffix)) return base+" 様";
  base=base||String(t.visitor_id||"").slice(0,8);
