@@ -716,14 +716,10 @@ function nameOf(t){
  const saved=typeof visitor?.display_name==="string"?visitor.display_name.trim():"";
  const digits=String(visitor?.phone||"").trim();
  const suffix=/^[0-9]{6}$/.test(digits)?digits:"";
- let base=saved.normalize("NFKC").trim();
- if(suffix){
-  const tail=base.match(/[0-9](?:[0-9\s-]*[0-9])?\s*(?:様|さま|さん)?$/u);
-  if(tail && tail[0].replace(/[^0-9]/g,"").endsWith(suffix)){
-   base=base.slice(0,tail.index).trim();
-  }
- }
- base=base.replace(/(?:\s*(?:様|さま|さん))+$/u,"").trim()||String(t.visitor_id||"").slice(0,8);
+ if(/(?:^|[^0-9])0(?:[\s-]*[0-9]){10}(?![0-9])/u.test(saved.normalize("NFKC"))) return saved;
+ let base=saved.replace(/(?:\s*(?:様|さま))+$/u,"").trim();
+ if(suffix && base.endsWith(suffix)) return base+" 様";
+ base=base||String(t.visitor_id||"").slice(0,8);
  return base+(suffix?" "+suffix:"")+" 様";
 }
 function drawList(){
