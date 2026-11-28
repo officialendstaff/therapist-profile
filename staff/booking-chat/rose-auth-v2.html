@@ -490,14 +490,16 @@ header.header .brand #homeLabel,header.lg-common-header .lg-header-home span,hea
 <div id="error" class="alert" hidden role="alert"></div>
 <div class="layout" id="layout">
 <div class="aside"><div class="filters"><select id="store" aria-label="店舗を切り替える"><option value="all">全店舗</option><option value="Grand Luxe">Grand Luxe</option><option value="LUXY OSAKA">LUXY OSAKA</option><option value="Un Secret">Un Secret</option><option value="薔薇と紳士">薔薇と紳士</option><option value="BUSTY OSAKA">BUSTY OSAKA</option></select><div class="hint" id="summary">問い合わせを取得中です</div></div><div class="thread-list" id="threads"></div></div>
-<div class="chat-pane"><div class="thread-heading" id="heading"><button id="backToList" type="button">〈 一覧</button><strong id="threadTitle">チャットを選択してください</strong><span id="activeBlockStatus" class="active-block-status" hidden>ブロック中</span><div class="chat-heading-actions"><button id="editCustomerName" class="edit-customer-name" type="button" hidden aria-label="お客様名を編集">✎ 名前変更</button><button id="blockThread" type="button" hidden>ブロック</button></div><div id="relatedThreads" class="related"></div></div><div class="message-list" id="messages"><div class="placeholder">左の一覧から会話を選択してください。</div></div><form class="reply" id="reply" hidden><div class="template-toolbar"><button id="pickTemplate" type="button">定型文一覧 ▾</button><button id="pickRoseUrl" type="button" hidden>URL挿入 ▾</button></div><textarea id="draft" maxlength="2000" required placeholder="返信を入力（Enter：改行／Ctrl・Alt＋Enter：送信）" aria-label="返信内容"></textarea><button id="send" class="primary" type="submit">送信</button></form></div>
+<div class="chat-pane"><div class="thread-heading" id="heading"><button id="backToList" type="button">〈 一覧</button><strong id="threadTitle">チャットを選択してください</strong><span id="activeBlockStatus" class="active-block-status" hidden>ブロック中</span><div class="chat-heading-actions"><button id="editCustomerName" class="edit-customer-name" type="button" hidden aria-label="顧客情報を編集">✎ 顧客情報編集</button><button id="blockThread" type="button" hidden>ブロック</button></div><div id="relatedThreads" class="related"></div></div><div class="message-list" id="messages"><div class="placeholder">左の一覧から会話を選択してください。</div></div><form class="reply" id="reply" hidden><div class="template-toolbar"><button id="pickTemplate" type="button">定型文一覧 ▾</button><button id="pickRoseUrl" type="button" hidden>URL挿入 ▾</button></div><textarea id="draft" maxlength="2000" required placeholder="返信を入力（Enter：改行／Ctrl・Alt＋Enter：送信）" aria-label="返信内容"></textarea><button id="send" class="primary" type="submit">送信</button></form></div>
 </div></div>
 <dialog id="customerNameDialog" class="customer-name-dialog" aria-labelledby="customerNameDialogTitle">
  <form id="customerNameForm">
-  <h2 id="customerNameDialogTitle">お客様名を変更</h2>
-  <p>同じお客様の他店舗の会話にも、変更後の名前を表示します。</p>
+  <h2 id="customerNameDialogTitle">顧客情報編集</h2>
+  <p>同じお客様の他店舗の会話にも、変更後の名前と番号を表示します。</p>
   <label for="customerNameInput">表示名</label>
   <input id="customerNameInput" type="text" maxlength="60" autocomplete="off" required placeholder="例：山田様">
+  <label for="customerPhoneInput">電話番号・登録番号</label>
+  <input id="customerPhoneInput" type="tel" maxlength="20" autocomplete="off" placeholder="6桁または電話番号">
   <p id="customerNameError" class="customer-name-error" role="alert" aria-live="polite"></p>
   <div class="customer-name-buttons"><button type="button" id="customerNameCancel">キャンセル</button><button type="submit" id="customerNameSave" class="primary">保存</button></div>
  </form>
@@ -605,17 +607,17 @@ function mergeReadAcknowledgements(threads){
  }
  return threads;
 }
-let currentCustomerId="",currentCustomerName="",nameSaving=false;
+let currentCustomerId="",currentCustomerName="",currentCustomerPhone="",nameSaving=false;
 function showCustomerTitle(thread){
  $("threadTitle").replaceChildren(makeStoreLabel(thread.store_key),document.createTextNode("｜"),customerNameNode(thread,true));
 }
-function syncCustomerName(visitorId,newName){
+function syncCustomerName(visitorId,newName,newPhone){
  for(const thread of items){
   if(String(thread.visitor_id)!==visitorId)continue;
-  thread.booking_chat_visitors={...(thread.booking_chat_visitors||{}),display_name:newName};
+  thread.booking_chat_visitors={...(thread.booking_chat_visitors||{}),display_name:newName,phone:newPhone};
  }
  if(threadId&&currentCustomerId===visitorId){
-  currentCustomerName=newName;
+  currentCustomerName=newName;currentCustomerPhone=newPhone||"";
   const current=items.find(item=>item.id===threadId);
   if(current)showCustomerTitle(current);
  }
@@ -623,7 +625,9 @@ function syncCustomerName(visitorId,newName){
 }
 $("editCustomerName").addEventListener("click",()=>{
  if(!currentCustomerId||nameSaving)return;
- $("customerNameInput").value=currentCustomerName;
+ const legacy=/(?:^|[^0-9])(0(?:[\s-]*[0-9]){10})(?![0-9])/u.exec(currentCustomerName.normalize("NFKC"));
+ $("customerNameInput").value=legacy?currentCustomerName.normalize("NFKC").replace(legacy[1],"").trim():currentCustomerName;
+ $("customerPhoneInput").value=legacy?legacy[1].replace(/[\s-]/g,""):currentCustomerPhone;
  $("customerNameError").textContent="";
  $("customerNameDialog").showModal();
  $("customerNameInput").focus();
@@ -635,16 +639,18 @@ $("customerNameForm").addEventListener("submit",async event=>{
  if(nameSaving||!currentCustomerId)return;
  const name=$("customerNameInput").value.trim().replace(/\s+/g," ");
  if(!name||name.length>60){$("customerNameError").textContent="名前は1〜60文字で入力してください。";return}
+ const phone=$("customerPhoneInput").value.normalize("NFKC").replace(/[\s-]/g,"");
+ if(!/^(?:[0-9]{6}|0[0-9]{9,10})?$/.test(phone)){$("customerNameError").textContent="番号は6桁または0から始まる10〜11桁で入力してください。";return}
  const visitorId=currentCustomerId,selectedThread=threadId;
  nameSaving=true;$("customerNameSave").disabled=true;$("customerNameCancel").disabled=true;
  $("customerNameError").textContent="";
  try{
-  const result=await call("staff_rename_customer",{thread_id:selectedThread,display_name:name});
+  const result=await call("staff_edit_customer",{thread_id:selectedThread,display_name:name,phone});
   if(String(result.visitor_id)!==visitorId)throw Error("更新先が一致しません");
-  syncCustomerName(visitorId,result.display_name);
+  syncCustomerName(visitorId,result.display_name,result.phone);
   $("customerNameDialog").close();
   void loadList();
- }catch(error){$("customerNameError").textContent="保存できませんでした。再度お試しください。";}
+ }catch(error){$("customerNameError").textContent=String(error).includes("duplicate_phone")?"同じ電話番号が別の顧客に登録されています。":"保存できませんでした。再度お試しください。";}
  finally{nameSaving=false;$("customerNameSave").disabled=false;$("customerNameCancel").disabled=false;}
 });
 const defaultTitle=document.title;
@@ -747,16 +753,16 @@ function nameOf(t){
  const visitor=t.booking_chat_visitors;
  const saved=typeof visitor?.display_name==="string"?visitor.display_name.trim():"";
  const digits=String(visitor?.phone||"").trim();
- const suffix=/^[0-9]{6}$/.test(digits)?digits:"";
+ const suffix=/^(?:[0-9]{6}|0[0-9]{9,10})$/.test(digits)?digits:"";
  if(/(?:^|[^0-9])0(?:[\s-]*[0-9]){10}(?![0-9])/u.test(saved.normalize("NFKC"))) return saved.replace(/様[\s　]*(?=[0０])/u,"様　");
  let base=saved.replace(/(?:\s*(?:様|さま))+$/u,"").trim();
- if(suffix && base.endsWith(suffix)) base=base.slice(0,-6).trim().replace(/(?:\s*(?:様|さま))+$/u,"").trim();
+ if(suffix && base.endsWith(suffix)) base=base.slice(0,-suffix.length).trim().replace(/(?:\s*(?:様|さま))+$/u,"").trim();
  base=base||String(t.visitor_id||"").slice(0,8);
  return base+"様"+(suffix?"　"+suffix:"");
 }
 function customerNameNode(t,keyboard){
  const name=nameOf(t), root=document.createElement("span");
- const full=/(?:0[0-9]{10})(?![0-9])/u.exec(name);
+ const full=/(?:0[0-9]{9,10})(?![0-9])/u.exec(name);
  const m=full||/(?<=様　)[0-9]{6}$/u.exec(name);
  const copyValue=m?(full?m[0]:m[0].slice(-4)):"";
  if(!m){root.textContent=name;return root}
@@ -897,11 +903,12 @@ async function openThread(id,options={}){
   if(threadId!==id)return;
     currentCustomerId=String(data.thread.visitor_id);
   currentCustomerName=data.thread.booking_chat_visitors?.display_name||"";
+  currentCustomerPhone=data.thread.booking_chat_visitors?.phone||"";
   $("editCustomerName").hidden=false;
   showCustomerTitle(data.thread);
   $("pickRoseUrl").hidden=data.thread.store_key!=="薔薇と紳士";
   for(const item of items){
-   if(String(item.visitor_id)===currentCustomerId)item.booking_chat_visitors={...(item.booking_chat_visitors||{}),display_name:currentCustomerName||null};
+   if(String(item.visitor_id)===currentCustomerId)item.booking_chat_visitors={...(item.booking_chat_visitors||{}),display_name:currentCustomerName||null,phone:currentCustomerPhone||null};
   }
   drawList();
   const rel=$("relatedThreads");rel.replaceChildren();
